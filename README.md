@@ -1,2 +1,2 @@
 # autorino
-AUtomatic Treatement &amp; Organisation of RINex Observations 
+Assisted Unloading, Treatement & Organisation of RINex Observations
