@@ -14,24 +14,22 @@ station:
     serial_number: 
 sessions:
   - session:
-      generality:
-        session_name: &ses_name1 session1
-        session_name_on_receiver: *ses_name1 # if differs from session_name
-        path_structure:  <CODE9>/%Y/%j
-        name_structure:  <CODE9><YYYY><HH>.t02
-        period_length: 3600 # seconds or RINEX convention (01D, 01H etc...)
+      session_name: &ses_name1 session1
+      session_name_on_receiver: *ses_name1 # if differs from session_name
+      path_structure:  <CODE9>/%Y/%j
+      name_structure:  <CODE9><YYYY><HH>.t02
+      period_length: 3600 # seconds or RINEX convention (01D, 01H etc...)
       download:
         raw_output_parent_dir: 
         raw_output_structure: <CODE9>/%Y/%j
       rinex_conversion:
         rinex_output_dir:
   - session:
-      generality:
-        session_name: &ses_name1 session1
-        session_name_on_receiver: *ses_name1 # if differs from session_name
-        path_structure:  <CODE4>/<GPSWEEK>/<DOW>
-        name_structure:  <CODE9><YYYY><HH>.t02
-        period_length: 3600 # seconds or RINEX convention (01D, 01H etc...)
+      session_name: &ses_name2 session2
+      session_name_on_receiver: *ses_name2 # if differs from session_name
+      path_structure:  <CODE4>/<GPSWEEK>/<DOW>
+      name_structure:  <CODE9><YYYY><HH>.t02
+      period_length: 3600 # seconds or RINEX convention (01D, 01H etc...)
       download:
         raw_output_parent_dir: 
         raw_output_structure: <CODE9>/%Y/%j
