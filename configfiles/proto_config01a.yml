@@ -1,0 +1,59 @@
+station:
+  code4char: toto
+  code9char: TOTO00FRA
+  sitelog_path:
+  geodesyml_path:
+  metadata_priority_list: [sitelog, geodesyml, configfile]
+  receiver:
+    manufacturer: Leica
+    model: GR25
+    serial_number: 
+  antenna:
+    manufacturer: Leica
+    model: AS10
+    serial_number: 
+sessions:
+  - session:
+      generality:
+        session_name: &ses_name1 session1
+        session_name_on_receiver: *ses_name1 # if differs from session_name
+        path_structure:  <CODE9>/%Y/%j
+        name_structure:  <CODE9><YYYY><HH>.t02
+        period_length: 3600 # seconds or RINEX convention (01D, 01H etc...)
+      download:
+        raw_output_parent_dir: 
+        raw_output_structure: <CODE9>/%Y/%j
+      rinex_conversion:
+        rinex_output_dir:
+  - session:
+      generality:
+        session_name: &ses_name1 session1
+        session_name_on_receiver: *ses_name1 # if differs from session_name
+        path_structure:  <CODE4>/<GPSWEEK>/<DOW>
+        name_structure:  <CODE9><YYYY><HH>.t02
+        period_length: 3600 # seconds or RINEX convention (01D, 01H etc...)
+      download:
+        raw_output_parent_dir: 
+        raw_output_structure: <CODE9>/%Y/%j
+      rinex_conversion:
+        rinex_output_dir:
+
+version: 2
+
+models:
+  - name: model_one
+    columns:
+      - name: id
+        tests: # this block
+          - unique
+          - not_null
+      - name: col_a
+      - name: col_b
+  - name: model_two
+    columns:
+      - name: id
+        tests: # is repeated down here
+          - unique
+          - not_null
+      - name: col_c
+      - name: col_d
