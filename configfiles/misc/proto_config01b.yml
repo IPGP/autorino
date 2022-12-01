@@ -1,3 +1,5 @@
+### other structure for the session(s) 
+
 station:
     coder: TOTO00FRA
     sitelog_path:
@@ -18,9 +20,9 @@ station:
             login:
             password:
         sessions:
-          - session:
-                name: &ses_name1 session1
-                name_on_receiver: *ses_name1 # if differs from session_name
+          - session_name: ses1
+            session_content:
+                name_on_receiver: a2 # if differs from session_name
                 path_structure:  <CODE9>/%Y/%j
                 name_structure:  <CODE9><YYYY><HH>.t02
                 file_period: 3600 # seconds or RINEX convention (01D, 01H etc...)
@@ -33,15 +35,8 @@ station:
                     log_parent_dir:
                     log_dir_structure: <CODE9>/%Y/%j  
                     timespan:
-                        mode: relative_to_an_epoch
-                        between_start_end_epochs:
-                            start_epoch: ### must support year/doy, gpsweek/dow, juliandate, classic year/month/day + hours
-                            end_epoch:
-                        relative_to_an_epoch:
-                            before_or_after: before
-                            epoch: now previous_midnight <absolute_value>
-                            duration:
-                        
+                        start_epoch:
+                        end_epoch:    
                 rinex_conversion:
                     active: True
                     output_dir_parent: 
@@ -56,9 +51,9 @@ station:
                     log_dir_structure: <CODE9>/%Y/%j  
                 rinex_decimation:
                 rinex_spliting:
-          - session: 
-                name: &ses_name2 session2
-                name_on_receiver: *ses_name2 # if differs from session_name
+          - session_name: ses2
+            session_content:
+                name_on_receiver: a2 # if differs from session_name
                 path_structure:  <CODE4>/<GPSWEEK>/<DOW>
                 name_structure:  <CODE9><YYYY><HH>.t02
                 period_length: 3600 # seconds or RINEX convention (01D, 01H etc...)
