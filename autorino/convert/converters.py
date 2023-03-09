@@ -559,36 +559,4 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     return str(out_fpath), process_converter
 
 
-p="/home/psakicki/GFZ_WORK/IPGP_WORK/OVS/GNSS_OVS/0010_work_area/2202_DataExemple/ovsg/2021/raw_300/"
-outdir = "/home/psakicki/aaa_FOURBI/convertertest"
-utils.create_dir(outdir)
-
-
-# for fraw in utils.find_recursive(p,"*T02"):
-#     converter_run(fraw, outdir, converter = 'trm2rinex')
-
-# for fraw in utils.find_recursive(p,"*T02"):
-#     converter_run(fraw, outdir, converter = 'runpkr00')
-
-# for fraw in utils.find_recursive(outdir,"*tgd"):
-#     converter_run(fraw, outdir, converter = 'teqc')
-
-# for fraw in utils.find_recursive(p,"*m00"):
-#     converter_run(fraw, outdir, converter = 'mdb2rinex')
-
-# p="/home/psakicki/GFZ_WORK/IPGP_WORK/OVS/GNSS_OVS/0010_work_area/2202_DataExemple/RVAG/Raw/"
-
-# for fraw in utils.find_recursive(p,"*_"):
-#     converter_run(fraw, outdir, converter = 'sbf2rin')    
-
-import rinexmod
-
-for frnx in utils.find_recursive(outdir,"*rnx*"):
-    RNX = rinexmod.RinexFile(frnx,True)
-    RNX.get_longname()
-    RNX.s
-
-
-
-
 
