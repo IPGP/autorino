@@ -21,8 +21,11 @@ import datetime
 import logging
 log = logging.getLogger(__name__)
 
+#############################################################################
+### Low level functions
 
-def find_converted_files(directory, pattern_main, pattern_annex):
+
+def _find_converted_files(directory, pattern_main, pattern_annex):
     now = datetime.datetime.now()
     delta = datetime.timedelta(seconds=30)
     recent_files_main = []
@@ -49,7 +52,7 @@ def find_converted_files(directory, pattern_main, pattern_annex):
 ## https://discourse.ubuntu.com/t/command-structure/18556
 
 
-def kw_options_dict2str(kw_options):
+def _kw_options_dict2str(kw_options):
     cmd_list = []
     
     if utils.is_iterable(kw_options):
@@ -66,7 +69,7 @@ def kw_options_dict2str(kw_options):
     return cmd_list, cmd_str
 
 
-def options_list2str(options):
+def _options_list2str(options):
     cmd_list = []
     for opt in options:
         if type(opt) is str:
@@ -77,6 +80,10 @@ def options_list2str(options):
     cmd_str = " ".join(cmd_list)
     
     return cmd_list, cmd_str
+
+
+###################################################################
+#### command builder functions
 
 
 def cmd_build_generic(program="",
@@ -134,8 +141,8 @@ def cmd_build_trm2rinex(inp_raw_fpath,
     cmd_docker_list = ['docker','run','--rm','-v', str(inp_raw_fpath.parent) + ':/inp','-v', str(out_dir) + ':/out']
     cmd_trm2rinex_list = [bin_path, 'inp/' + inp_raw_fpath.name,'-n','-d','-s','-v','3.04','-p', 'out/']
 
-    cmd_opt_list , _ = options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = kw_options_dict2str(bin_kwoptions_custom)
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
     
     cmd_list = cmd_docker_list + cmd_trm2rinex_list + cmd_opt_list + cmd_kwopt_list
     cmd_list = [str(e) for e in cmd_list]
@@ -160,8 +167,8 @@ def cmd_build_mdb2rinex(inp_raw_fpath,
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
-    cmd_opt_list , _ = options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = kw_options_dict2str(bin_kwoptions_custom)
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
    
     cmd_list = [bin_path,'--out', out_dir,'--files', inp_raw_fpath] + cmd_opt_list + cmd_kwopt_list
     cmd_list = [str(e) for e in cmd_list]
@@ -290,8 +297,8 @@ def cmd_build_sbf2rin(inp_raw_fpath,
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
     
-    cmd_opt_list , _ = options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = kw_options_dict2str(bin_kwoptions_custom)
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
    
     out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_sbf2rin")
    
@@ -341,8 +348,8 @@ def cmd_build_runpkr00(inp_raw_fpath,
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
     
-    cmd_opt_list , _ = options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = kw_options_dict2str(bin_kwoptions_custom)
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
    
     cmd_list = [bin_path,"-g","-d"] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath,out_dir]
     cmd_list = [str(e) for e in cmd_list]
@@ -365,8 +372,8 @@ def cmd_build_teqc(inp_raw_fpath,
 
     out_fpath = out_dir.joinpath(inp_raw_fpath.with_suffix(".rnx_teqc"))   
     
-    cmd_opt_list , _ = options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = kw_options_dict2str(bin_kwoptions_custom)
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
     
     cmd_list = [bin_path,'+out',out_fpath] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
     cmd_list = [str(e) for e in cmd_list]
@@ -375,17 +382,144 @@ def cmd_build_teqc(inp_raw_fpath,
     
     return cmd_use, cmd_list, cmd_str
     
+def cmd_build_convbin(inp_raw_fpath,
+                   out_dir,
+                   bin_options_custom=[],
+                   bin_kwoptions_custom=dict(),
+                   bin_path="/home/psakicki/SOFTWARE/RTKLIB_explorer/RTKLIB/app/consapp/convbin/gcc/convbin"):
+    
+    # Synopsys
+
+    # convbin [option ...] file
+    
+    # Description
+    
+    # Convert RTCM, receiver raw data log and RINEX file to RINEX and SBAS/LEX
+    # message file. SBAS message file complies with RTKLIB SBAS/LEX message
+    # format. It supports the following messages or files.
+    
+    # RTCM 2                : Type 1, 3, 9, 14, 16, 17, 18, 19, 22
+    # RTCM 3                : Type 1002, 1004, 1005, 1006, 1010, 1012, 1019, 1020
+    #                         Type 1071-1127 (MSM except for compact msg)
+    # NovAtel OEMV/4,OEMStar: RANGECMPB, RANGEB, RAWEPHEMB, IONUTCB, RAWWASSFRAMEB
+    # u-blox LEA-4T/5T/6T/8/9  : RXM-RAW, RXM-RAWX, RXM-SFRB
+    # Swift Piksi Multi     : 
+    # Hemisphere            : BIN76, BIN80, BIN94, BIN95, BIN96
+    # SkyTraq S1315F        : msg0xDD, msg0xE0, msg0xDC
+    # GW10                  : msg0x08, msg0x03, msg0x27, msg0x20
+    # Javad                 : [R*],[r*],[*R],[*r],[P*],[p*],[*P],[*p],[D*],[*d],
+    #                         [E*],[*E],[F*],[TC],[GE],[NE],[EN],[QE],[UO],[IO],
+    #                         [WD]
+    # NVS                   : BINR
+    # BINEX                 : big-endian, regular CRC, forward record (0xE2)
+    #                         0x01-01,0x01-02,0x01-03,0x01-04,0x01-06,0x7f-05
+    # Trimble               : RT17
+    # Septentrio            : SBF
+    # RINEX                 : OBS, NAV, GNAV, HNAV, LNAV, QNAV
+    
+    # Options [default]
+    
+    #     file         input receiver binary log file
+    #     -ts y/m/d h:m:s  start time [all]
+    #     -te y/m/d h:m:s  end time [all]
+    #     -tr y/m/d h:m:s  approximated time for RTCM
+    #     -ti tint     observation data interval (s) [all]
+    #     -tt ttol     observation data epoch tolerance (s) [0.005]
+    #     -span span   time span (h) [all]
+    #     -r format    log format type
+    #                  rtcm2= RTCM 2
+    #                  rtcm3= RTCM 3
+    #                  nov  = NovAtel OEM/4/V/6/7,OEMStar
+    #                  ubx  = ublox LEA-4T/5T/6T/7T/M8T/F9
+    #                  sbp  = Swift Navigation SBP
+    #                  hemis= Hemisphere Eclipse/Crescent
+    #                  stq  = SkyTraq S1315F
+    #                  javad= Javad GREIS
+    #                  nvs  = NVS NV08C BINR
+    #                  binex= BINEX
+    #                  rt17 = Trimble RT17
+    #                  sbf  = Septentrio SBF
+    #                  rinex= RINEX
+    #     -ro opt      receiver options
+    #     -f freq      number of frequencies [5]
+    #     -hc comment  rinex header: comment line
+    #     -hm marker   rinex header: marker name
+    #     -hn markno   rinex header: marker number
+    #     -ht marktype rinex header: marker type
+    #     -ho observ   rinex header: oberver name and agency separated by /
+    #     -hr rec      rinex header: receiver number, type and version separated by /
+    #     -ha ant      rinex header: antenna number and type separated by /
+    #     -hp pos      rinex header: approx position x/y/z separated by /
+    #     -hd delta    rinex header: antenna delta h/e/n separated by /
+    #     -v ver       rinex version [3.04]
+    #     -od          include doppler frequency in rinex obs [on]
+    #     -os          include snr in rinex obs [on]
+    #     -oi          include iono correction in rinex nav header [off]
+    #     -ot          include time correction in rinex nav header [off]
+    #     -ol          include leap seconds in rinex nav header [off]
+    #     -halfc       half-cycle ambiguity correction [off]
+    #     -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})
+    #     -nomask [sig[,...]] signal no mask (same as above)
+    #     -x sat       exclude satellite
+    #     -y sys       exclude systems (G:GPS,R:GLO,E:GAL,J:QZS,S:SBS,C:BDS,I:IRN)
+    #     -d dir       output directory [same as input file]
+    #     -c staid     use RINEX file name convention with staid [off]
+    #     -o ofile     output RINEX OBS file
+    #     -n nfile     output RINEX NAV file
+    #     -g gfile     output RINEX GNAV file
+    #     -h hfile     output RINEX HNAV file
+    #     -q qfile     output RINEX QNAV file
+    #     -l lfile     output RINEX LNAV file
+    #     -b cfile     output RINEX CNAV file
+    #     -i ifile     output RINEX INAV file
+    #     -s sfile     output SBAS message file
+    #     -trace level output trace level [off]
+    
+    # If any output file specified, default output files (<file>.obs,
+    # <file>.nav, <file>.gnav, <file>.hnav, <file>.qnav, <file>.lnav,
+    # <file>.cnav, <file>.inav and <file>.sbs) are used. To obtain week number info
+    # for RTCM file, use -tr option to specify the approximated log start time.
+    # Without -tr option, the program obtains the week number from the time-tag file (if it exists) or the last modified time of the log file instead.
+    
+    # If receiver type is not specified, type is recognized by the input
+    # file extension as follows.
+    #     *.rtcm2       RTCM 2
+    #     *.rtcm3       RTCM 3
+    #     *.gps         NovAtel OEM4/V/6/7,OEMStar
+    #     *.ubx         u-blox LEA-4T/5T/6T/7T/M8T/F9
+    #     *.sbp         Swift Navigation SBP
+    #     *.bin         Hemisphere Eclipse/Crescent
+    #     *.stq         SkyTraq S1315F
+    #     *.jps         Javad GREIS
+    #     *.bnx,*binex  BINEX
+    #     *.rt17        Trimble RT17
+    #     *.sbf         Septentrio SBF
+    #     *.obs,*.*o    RINEX OBS
+    #     *.rnx         RINEX OBS     *.nav,*.*n    RINEX NAV
+    
+    #### Convert the paths as Path objects
+    inp_raw_fpath = Path(inp_raw_fpath)
+    out_dir = Path(out_dir)
+    
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
+    
+    cmd_list = [bin_path,'-d',out_dir,'-r','binex'] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
+    cmd_list = [str(e) for e in cmd_list]
+    cmd_str = " ".join(cmd_list)
+    cmd_use = [cmd_str]
+    
+    return cmd_use, cmd_list, cmd_str
+    
 
 
-# conv_regex_void = lambda f: Path(f).name
-# conv_regex_runpkr00 = lambda f: Path(f).with_suffix(".tgd").name
-# conv_regex_teqc = lambda f: Path(f).with_suffix("_teqc_rinex").name
-# conv_regex_trm2rinex = lambda f: Path(f).with_suffix("." + re.search("[0-9]{4}",Path(f).name).group()[2:] + "o").name
 
-# conv_regex_void = lambda f: Path(f).name
-# conv_regex_runpkr00 = lambda f: Path(f).with_suffix(".tgd").name
-# conv_regex_teqc = lambda f: Path(f).with_suffix("_teqc_rinex").name
-# conv_regex_trm2rinex = lambda f: Path(f).with_suffix("." + re.search("[0-9]{4}",Path(f).name).group()[2:] + "o").name
+###################################################################
+#### converted files regular expressions functions
+#### main = the regex for the main file i.e. the Observation RINEX
+#### annex = the regex for the ALL outputed files (Observation RINEX included)
+#### the main with be processed before the annex, 
+#### thus annex regex will finally not include the main
     
 def conv_regex_void(f):
     f = Path(Path(f).name) ### keep the filename only
@@ -432,9 +566,24 @@ def conv_regex_mdb2rnx(f):
     conv_regex_annex  = re.compile(site+doy+".\.[0-9]{2}\w")
     return conv_regex_main , conv_regex_annex
     
+def conv_regex_convbin(f):
+    # Input
+    # NBIM0a20221226.BNX
+    # Output
+    #NBIM0a20221226.obs
+    #NBIM0a20221226.nav
+    #NBIM0a20221226.sbs
+    conv_regex_main = re.compile(f.with_suffix(".obs").name)
+    conv_regex_annex  = re.compile(f.stem)
+    return conv_regex_main , conv_regex_annex
 
-def converter_select(converter_inp,inp_raw_fpath=None):
-    
+
+
+###################################################################
+#### conversion function
+
+
+def _converter_select(converter_inp,inp_raw_fpath=None):
     if converter_inp == "auto" and not inp_raw_fpath:
         raise Exception 
         
@@ -444,7 +593,7 @@ def converter_select(converter_inp,inp_raw_fpath=None):
     else:
         ext = ""
     
-    if ext == ".T02" or converter_inp == "trm2rinex":
+    if ext in (".T00",".T02") or converter_inp == "trm2rinex":
         converter_name = "trm2rinex"
         brand = "Trimble"
         cmd_build_fct = cmd_build_trm2rinex
@@ -456,7 +605,7 @@ def converter_select(converter_inp,inp_raw_fpath=None):
         cmd_build_fct = cmd_build_runpkr00  
         conv_regex_fct = conv_regex_runpkr00
 
-    elif ext == ".tgd" or converter_inp == "teqc":
+    elif ext == ".TGD" or converter_inp == "teqc":
         converter_name = "teqc"
         brand = "Trimble"
         cmd_build_fct = cmd_build_teqc
@@ -473,9 +622,12 @@ def converter_select(converter_inp,inp_raw_fpath=None):
         brand = "Septentrio"
         cmd_build_fct = cmd_build_sbf2rin
         conv_regex_fct = conv_regex_void
-        
-        
-    
+
+    elif ext == ".BNX" or converter_inp == "convbin":
+        converter_name = "convbin"
+        brand = "BINEX"
+        cmd_build_fct = cmd_build_convbin
+        conv_regex_fct = conv_regex_convbin
         
     return converter_name , cmd_build_fct , conv_regex_fct
         
@@ -501,7 +653,8 @@ def converter_run(inp_raw_fpath: Union[Path,str],
         log.error("input file not found: %s", inp_raw_fpath)
         raise FileNotFoundError
          
-    converter_name , cmd_build_fct_use , conv_regex_fct_use = converter_select(converter,inp_raw_fpath)
+    out_conv_sel = _converter_select(converter,inp_raw_fpath)
+    converter_name , cmd_build_fct_use , conv_regex_fct_use = out_conv_sel
     
     #### Force the cmd_build_fct, if any
     if cmd_build_fct:
@@ -536,7 +689,7 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     
     
     #out_fpath = out_dir.joinpath(out_fname)
-    conv_files_main, conv_files_annex = find_converted_files(out_dir,
+    conv_files_main, conv_files_annex = _find_converted_files(out_dir,
                                                                         conv_regex_main, 
                                                                         conv_regex_annex)
 
