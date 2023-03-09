@@ -148,7 +148,7 @@ def cmd_build_mdb2rinex(inp_raw_fpath,
                         out_dir,
                         bin_options_custom=[],
                         bin_kwoptions_custom=dict(),
-                        bin_path="/home/psakicki/SOFTWARE_INSTALL/Leica_mdb2rinex/mdb2rinex"):
+                        bin_path="mdb2rinex"):
   #   Options:
   # -h [ --help ]         Print help messages
   # -v [ --version ]      Print program version
@@ -174,7 +174,7 @@ def cmd_build_sbf2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="/home/psakicki/SOFTWARE/SEPTENTRIO_rxtools/bin/sbf2rin"):
+                      bin_path="sbf2rin"):
     
   #   sbf2rin -f input_file [-o output_file][-l][-O CCC][-R3][-R210][-n type]
   #                     [-MET][-i interval][-b startepoch][-e endepoch]
@@ -307,7 +307,7 @@ def cmd_build_runpkr00(inp_raw_fpath,
                        out_dir,
                        bin_options_custom=[],
                        bin_kwoptions_custom=dict(),
-                       bin_path="/usr/bin/runpkr00"):
+                       bin_path="runpkr00"):
 
     # runpkr00 - Utility to unpack Trimble R00\T00\T01\T02 files, Version 6.03 (Linux) ( t01lib 8.111 )
     # Copyright (c) Trimble Navigation Limited 1992-2015.  All rights reserved.
@@ -356,7 +356,7 @@ def cmd_build_teqc(inp_raw_fpath,
                    out_dir,
                    bin_options_custom=[],
                    bin_kwoptions_custom=dict(),
-                   bin_path="/usr/bin/teqc"):
+                   bin_path="teqc"):
     
     
     #### Convert the paths as Path objects
@@ -557,6 +557,3 @@ def converter_run(inp_raw_fpath: Union[Path,str],
 
 
     return str(out_fpath), process_converter
-
-
-
