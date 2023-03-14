@@ -35,7 +35,7 @@ sitelogs = rinexmod_api._sitelog_input_manage(psitelogs,force=False)
 #### TRIMBLE
 if conv_trm2rinex:
     for fraw in utils.find_recursive(p,"*T02"):
-        frnxtmp = cv.converter_run(fraw, outdir, converter = 'trm2rinex')
+        frnxtmp, _ = cv.converter_run(fraw, outdir_converted, converter = 'trm2rinex')
         rinexmod_api.rinexmod(frnxtmp,outdir_rinexmoded,sitelog=sitelogs,force_rnx_load=True,verbose=verbose)
 
 #### TRIMBLE RUNPKR00
@@ -53,7 +53,7 @@ if conv_trm_teqc:
 #### MDB2RINEX
 if conv_leica_mdb2rinex:
     for fraw in utils.find_recursive(p,"*m00"):
-        converter_run(fraw, outdir, converter = 'mdb2rinex')
+        frnxtmp, _ = cv.converter_run(fraw, outdir_converted, converter = 'mdb2rinex')
         rinexmod_api.rinexmod(frnxtmp,outdir_rinexmoded,sitelog=sitelogs,force_rnx_load=True,verbose=verbose)
 
 #### SBF2RIN
