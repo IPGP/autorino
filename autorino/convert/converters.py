@@ -149,7 +149,7 @@ def converter_run(inp_raw_fpath: Union[Path,str],
 
     #### Force the conv_regex.conv_regex_fct, if any        
     if conv_regex.conv_regex_fct:
-        conv_regex.conv_regex_fct_use = cmd_build.cmd_build_fct    
+        conv_regex.conv_regex_fct_use = cmd_build.conv_regex_fct    
     
     
     #### build the command
