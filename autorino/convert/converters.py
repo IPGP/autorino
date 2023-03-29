@@ -77,46 +77,46 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
     if ext in (".T00",".T02") or converter_inp == "trm2rinex":
         converter_name = "trm2rinex"
         brand = "Trimble"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_trm2rinex
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_trm2rinex
+        cmd_build_fct = cmd_build.cmd_build_trm2rinex
+        conv_regex_fct = conv_regex.conv_regex_trm2rinex
 
     elif ext == ".T02" or converter_inp == "runpkr00":
         converter_name = "runpkr00"
         brand = "Trimble"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_runpkr00  
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_runpkr00
+        cmd_build_fct = cmd_build.cmd_build_runpkr00  
+        conv_regex_fct = conv_regex.conv_regex_runpkr00
 
     elif ext == ".TGD" or converter_inp == "teqc":
         converter_name = "teqc"
         brand = "Trimble"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_teqc
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_teqc
+        cmd_build_fct = cmd_build.cmd_build_teqc
+        conv_regex_fct = conv_regex.conv_regex_teqc
 
     elif ext in (".MDB",".M00") or converter_inp == "mdb2rinex":
         converter_name = "mdb2rinex"
         brand = "Leica"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_mdb2rinex    
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_void
+        cmd_build_fct = cmd_build.cmd_build_mdb2rinex    
+        conv_regex_fct = conv_regex.conv_regex_void
         
     elif re.match("[0-9]{2}_", ext) or converter_inp == "sbf2rin":
         converter_name = "sbf2rin"
         brand = "Septentrio"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_sbf2rin
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_void
+        cmd_build_fct = cmd_build.cmd_build_sbf2rin
+        conv_regex_fct = conv_regex.conv_regex_void
 
     elif ext == ".BNX" or converter_inp == "convbin":
         converter_name = "convbin"
         brand = "Generic BINEX"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_convbin
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_convbin
+        cmd_build_fct = cmd_build.cmd_build_convbin
+        conv_regex_fct = conv_regex.conv_regex_convbin
 
     elif ext == ".TPS" or converter_inp == "tps2rin":
         converter_name = "tps2rin"
         brand = "Topcon"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_tps2rin
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_tps2rin
+        cmd_build_fct = cmd_build.cmd_build_tps2rin
+        conv_regex_fct = conv_regex.conv_regex_tps2rin
         
-    return converter_name , brand, cmd_build.cmd_build_fct , conv_regex.conv_regex_fct
+    return converter_name , brand, cmd_build_fct , conv_regex_fct
         
 
 def converter_run(inp_raw_fpath: Union[Path,str],
@@ -141,19 +141,19 @@ def converter_run(inp_raw_fpath: Union[Path,str],
         raise FileNotFoundError
          
     out_conv_sel = _converter_select(converter,inp_raw_fpath)
-    converter_name,brand,cmd_build.cmd_build_fct_use,conv_regex.conv_regex_fct_use = out_conv_sel
+    converter_name,brand,cmd_build_fct_use,conv_regex_fct_use = out_conv_sel
     
     #### Force the cmd_build.cmd_build_fct, if any
-    if cmd_build.cmd_build_fct:
-        cmd_build.cmd_build_fct_use = cmd_build.cmd_build_fct
+    if cmd_build_fct:
+        cmd_build_fct_use = cmd_build_fct
 
     #### Force the conv_regex.conv_regex_fct, if any        
-    if conv_regex.conv_regex_fct:
-        conv_regex.conv_regex_fct_use = cmd_build.conv_regex_fct    
+    if conv_regex_fct:
+        conv_regex_fct_use = conv_regex_fct    
     
     
     #### build the command
-    cmd_use, cmd_list, cmd_str = cmd_build.cmd_build_fct_use(inp_raw_fpath,
+    cmd_use, cmd_list, cmd_str = cmd_build_fct_use(inp_raw_fpath,
                                                    out_dir,
                                                    bin_options,
                                                    bin_kwoptions)
@@ -171,14 +171,14 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     ##### ADD a warn if return code !!= 0 XXXXXXXXXXxx
     
     #### Theoretical name for the converted file
-    conv_regex.conv_regex_main, conv_regex.conv_regex_annex = conv_regex.conv_regex_fct_use(inp_raw_fpath)
-    log.debug("regex for the converted files (main/annex): %s,%s", conv_regex.conv_regex_main, conv_regex.conv_regex_annex)
+    conv_regex_main, conv_regex_annex = conv_regex_fct_use(inp_raw_fpath)
+    log.debug("regex for the converted files (main/annex): %s,%s", conv_regex_main, conv_regex_annex)
     
     
     #out_fpath = out_dir.joinpath(out_fname)
     conv_files_main, conv_files_annex = _find_converted_files(out_dir,
-                                                                        conv_regex.conv_regex_main, 
-                                                                        conv_regex.conv_regex_annex)
+                                                              conv_regex_main, 
+                                                              conv_regex_annex)
 
     if not conv_files_main:
         out_fpath = ""
