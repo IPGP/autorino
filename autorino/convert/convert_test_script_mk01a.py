@@ -15,7 +15,7 @@ from geodezyx import utils
 import converters as cv
 import rinexmod_api
 
-p="/net/baiededix/ovpf/miroir_ovpf/DonneesAcquisition/geodesie/GPSPermanent/2023" 
+p="/net/baiededix/ovpf/miroir_ovpf/DonneesAcquisition/geodesie/GPSPermanent/" 
 psitelogs = "/work/sitelogs/SITELOGS"
 outdir_converted = "/scratch/convgnss/010_tests_autorino_converters/converted"
 outdir_rinexmoded = "/scratch/convgnss/010_tests_autorino_converters/rinexmoded" 
@@ -33,13 +33,16 @@ nmax = 10
 
 sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
 
+regex_trm2rinex=".*(FEUG|GBNG|GB1G|TRCG|HDLG|GBSG).*T02"
+
+
 #### TRIMBLE
 if conv_trm2rinex:
-    flist = utils.find_recursive(p,"*T02")
+    flist = utils.find_recursive(p,regex_trm2rinex,case_sensitive=False)
     flist = flist[:nmax]
     for fraw in flist:
         frnxtmp, _ = cv.converter_run(fraw, outdir_converted, converter = 'trm2rinex')
-        rinexmod_api.rinexmod(frnxtmp,outdir_rinexmoded,sitelog=sitelogs,force_rnx_load=True,verbose=verbose)
+        rinexmod_api.rinexmod(frnxtmp,outdir_rinexmoded,sitelog=sitelogs,force_rnx_load=True,verbose=verbose,full_history=True)
 
 #### TRIMBLE RUNPKR00
 if conv_trm_runpkr00:

@@ -152,6 +152,11 @@ def cmd_build_trm2rinex(inp_raw_fpath,
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
+    ### out_dir must be writable by root => 777
+    out_dir_access_rights = out_dir.stat().st_mode  
+    out_dir.chmod(0o777)
+
+
     cmd_docker_list = ['docker','run','--rm','-v', str(inp_raw_fpath.parent) + ':/inp','-v', str(out_dir) + ':/out']
     cmd_trm2rinex_list = [bin_path, 'inp/' + inp_raw_fpath.name,'-n','-d','-s','-v','3.04','-p', 'out/']
 
