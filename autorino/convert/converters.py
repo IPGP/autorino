@@ -115,8 +115,13 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         brand = "Topcon"
         cmd_build.cmd_build_fct = cmd_build.cmd_build_tps2rin
         conv_regex.conv_regex_fct = conv_regex.conv_regex_tps2rin
+    else:
+        log.error("unable to find the right converter for %s",
+                  inp_raw_fpath)
+
+    print("AAAAAAAAA",ext,converter_inp)
         
-    return converter_name , brand, cmd_build.cmd_build_fct , conv_regex.conv_regex_fct
+    return converter_name,brand,cmd_build.cmd_build_fct,conv_regex.conv_regex_fct
         
 
 def converter_run(inp_raw_fpath: Union[Path,str],
