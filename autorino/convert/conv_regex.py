@@ -83,9 +83,9 @@ def conv_regex_runpkr00(f):
     """
     
     
-    # PSA1______202110270000A.tgd
+    # PSA1______202110270000A.tgd (option -d -g)
     # PSA1______202110270000A.tg! (opened/working file)
-    # ABD0______202110270000A.dat
+    # ABD0______202110270000A.dat (when not option -g in runpkr)
     f = Path(Path(f).name) ### keep the filename only
     conv_regex_main = re.compile(f.with_suffix(".tgd").name)
     conv_regex_annex  = re.compile(f.stem)
@@ -284,6 +284,11 @@ def conv_regex_tps2rin(f):
     regex_doy_site=r"(\w{4})([0-9]{3})"
     site=re.match(regex_doy_site,f.name).group(1).lower()
     doy=re.match(regex_doy_site,f.name).group(2).lower()
-    conv_regex_main = re.compile(site+doy+".(.|)\.[0-9]{2}o")
-    conv_regex_annex  = re.compile(site+doy+".(.|)\.[0-9]{2}\w")
+    #conv_regex_main = re.compile(site+doy+".(.|)\.[0-9]{2}o")
+    #conv_regex_annex  = re.compile(site+doy+".(.|)\.[0-9]{2}\w")
+    
+    ### the date of the raw file can be actually anything...
+    #doy/month-day/etc..
+    conv_regex_main = re.compile(site+"[0-9]{3}.(.|)\.[0-9]{2}o")
+    conv_regex_annex  = re.compile(site+"[0-9]{3}.(.|)\.[0-9]{2}\w")
     return conv_regex_main , conv_regex_annex

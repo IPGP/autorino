@@ -14,7 +14,7 @@ import re
 import subprocess
 from subprocess import Popen, PIPE
 from geodezyx import utils, operational
-import datetime
+import datetime as dt
 
 from autorino.convert import conv_regex, cmd_build
 
@@ -30,28 +30,38 @@ log = logging.getLogger(__name__)
 
 def _find_converted_files(directory, pattern_main, pattern_annex):
     """
-    Search for the files in a directory recently created (<30sec)
+    Search for the files in a directory recently created (<10sec)
     matching main & annex patterns 
     """
-    now = datetime.datetime.now()
-    delta = datetime.timedelta(seconds=30)
-    recent_files_main = []
-    recent_files_annex = []
+    now = dt.datetime.now()
+    delta = dt.timedelta(seconds=10)
+    files_main = []
+    files_annex = []
+    files_main_time = []
+    files_annex_time = []
     for file in os.listdir(directory):
         filepath = os.path.join(directory, file)
         if os.path.isfile(filepath):
-            created_time = datetime.datetime.fromtimestamp(os.path.getctime(filepath))
+            created_time = dt.datetime.fromtimestamp(os.path.getctime(filepath))
             if now - created_time < delta and re.match(pattern_main, file):
-                recent_files_main.append(filepath)
+                files_main.append(filepath)
+                files_main_time.append(created_time)
             elif now - created_time < delta and re.match(pattern_annex, file):
-                recent_files_annex.append(filepath)
+                files_annex.append(filepath)
+                files_annex_time.append(created_time)
             else:
                 pass
             
-    if len(recent_files_main) > 1:
-        log.warning("several converted main files found %s", recent_files_main)
+    #we sort the files found
+    files_main = [x for _, x in sorted(zip(files_main_time, files_main))]
+    files_annex = [x for _, x in sorted(zip(files_annex_time, files_annex))]
+    
+    if len(files_main) > 1:
+        log.warning("several converted main files found %s", files_main)
+        files_main = [files_main[-1]]
+        log.warning("keep most recent only: %s",files_main[0])
             
-    return recent_files_main, recent_files_annex
+    return files_main, files_annex
 
 
 ## https://stackoverflow.com/questions/36495669/difference-between-terms-option-argument-and-parameter
@@ -86,7 +96,7 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         cmd_build_fct = cmd_build.cmd_build_runpkr00  
         conv_regex_fct = conv_regex.conv_regex_runpkr00
 
-    elif ext == ".TGD" or converter_inp == "teqc":
+    elif ext in (".TGD","TG!") or converter_inp == "teqc":
         converter_name = "teqc"
         brand = "Trimble"
         cmd_build_fct = cmd_build.cmd_build_teqc
@@ -96,7 +106,7 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         converter_name = "mdb2rinex"
         brand = "Leica"
         cmd_build_fct = cmd_build.cmd_build_mdb2rinex    
-        conv_regex_fct = conv_regex.conv_regex_void
+        conv_regex_fct = conv_regex.conv_regex_mdb2rnx
         
     elif re.match("[0-9]{2}_", ext) or converter_inp == "sbf2rin":
         converter_name = "sbf2rin"
@@ -113,20 +123,21 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
     elif ext == ".TPS" or converter_inp == "tps2rin":
         converter_name = "tps2rin"
         brand = "Topcon"
-        cmd_build.cmd_build_fct = cmd_build.cmd_build_tps2rin
-        conv_regex.conv_regex_fct = conv_regex.conv_regex_tps2rin
+        cmd_build_fct = cmd_build.cmd_build_tps2rin
+        conv_regex_fct = conv_regex.conv_regex_tps2rin
     else:
         log.error("unable to find the right converter for %s",
                   inp_raw_fpath)
+        raise Exception
 
-    print("AAAAAAAAA",ext,converter_inp)
-        
     return converter_name , brand, cmd_build_fct , conv_regex_fct
         
+
 
 def converter_run(inp_raw_fpath: Union[Path,str],
                   out_dir: Union[Path,str] = None,
                   converter = 'auto',
+                  timeout=60,
                   bin_options = [],
                   bin_kwoptions = dict(),
                   bin_path: Union[Path,str] = "",
@@ -156,7 +167,6 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     if conv_regex_fct:
         conv_regex_fct_use = conv_regex_fct    
     
-    
     #### build the command
     cmd_use, cmd_list, cmd_str = cmd_build_fct_use(inp_raw_fpath,
                                                    out_dir,
@@ -166,18 +176,42 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     log.debug("conversion command: %s", cmd_str)
 
     ############# run the programm #############
-    process_converter = subprocess.run(cmd_use,
-                                       executable="/bin/bash",
-                                       shell=True,
-                                       stdout=PIPE,
-                                       stderr=PIPE)
+    timeout_reached = False
+    start = dt.datetime.now()
+    try:
+        process_converter = subprocess.run(cmd_use,
+                                           executable="/bin/bash",
+                                           shell=True,
+                                           stdout=PIPE,
+                                           stderr=PIPE,
+                                           timeout=timeout)
+    except subprocess.TimeoutExpired:
+        process_converter = None
+        timeout_reached = True
+    end = dt.datetime.now()
+
     ############################################
+   
+    if timeout_reached:
+        log.error("Error while converting %s",inp_raw_fpath.name)
+        log.error("Timeout reached (%s seconds)",timeout)
+        
+    elif process_converter.returncode != 0:
+        log.error("Error while converting %s",inp_raw_fpath.name)
+        log.error("Converter's error message:")
+        log.error(process_converter.stderr)
     
-    ##### ADD a warn if return code !!= 0 XXXXXXXXXXxx
+    else:
+        exec_time = (end - start).seconds + (end - start).microseconds * 10**-6
+        log.debug("Conversion done (%s sec.). Converter's output:", exec_time)
+        log.debug(process_converter.stdout)
+        
     
     #### Theoretical name for the converted file
     conv_regex_main, conv_regex_annex = conv_regex_fct_use(inp_raw_fpath)
-    log.debug("regex for the converted files (main/annex): %s,%s", conv_regex_main, conv_regex_annex)
+    log.debug("regex for the converted files (main/annex): %s,%s",
+              conv_regex_main,
+              conv_regex_annex)
     
     
     #out_fpath = out_dir.joinpath(out_fname)
@@ -202,3 +236,8 @@ def converter_run(inp_raw_fpath: Union[Path,str],
 
 
     return str(out_fpath), process_converter
+
+
+
+dt.datetime.now() - dt.datetime.now()
+
