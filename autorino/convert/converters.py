@@ -18,11 +18,10 @@ import datetime as dt
 
 from autorino.convert import conv_regex, cmd_build
 
-
-
 #### Import the logger
 import logging
 log = logging.getLogger(__name__)
+log.setLevel("DEBUG")
 
 #############################################################################
 ### Low level functions
@@ -102,13 +101,13 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         cmd_build_fct = cmd_build.cmd_build_teqc
         conv_regex_fct = conv_regex.conv_regex_teqc
 
-    elif ext in (".MDB",".M00") or converter_inp == "mdb2rinex":
+    elif re.match(".(M[0-9]{2}|MDB)",ext) or converter_inp == "mdb2rinex":
         converter_name = "mdb2rinex"
         brand = "Leica"
         cmd_build_fct = cmd_build.cmd_build_mdb2rinex    
         conv_regex_fct = conv_regex.conv_regex_mdb2rnx
         
-    elif re.match("[0-9]{2}_", ext) or converter_inp == "sbf2rin":
+    elif re.match(".[0-9]{2}_", ext) or converter_inp == "sbf2rin":
         converter_name = "sbf2rin"
         brand = "Septentrio"
         cmd_build_fct = cmd_build.cmd_build_sbf2rin
@@ -188,7 +187,9 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     except subprocess.TimeoutExpired:
         process_converter = None
         timeout_reached = True
+        
     end = dt.datetime.now()
+    exec_time = (end - start).seconds + (end - start).microseconds * 10**-6
 
     ############################################
    
@@ -202,14 +203,13 @@ def converter_run(inp_raw_fpath: Union[Path,str],
         log.error(process_converter.stderr)
     
     else:
-        exec_time = (end - start).seconds + (end - start).microseconds * 10**-6
-        log.debug("Conversion done (%s sec.). Converter's output:", exec_time)
+        log.debug("Conversion done (%7.4f sec.). Converter's output:", exec_time)
         log.debug(process_converter.stdout)
         
     
     #### Theoretical name for the converted file
     conv_regex_main, conv_regex_annex = conv_regex_fct_use(inp_raw_fpath)
-    log.debug("regex for the converted files (main/annex): %s,%s",
+    log.debug("regex for the converted files (main/annex.): %s,%s",
               conv_regex_main,
               conv_regex_annex)
     
@@ -225,7 +225,8 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     
     else:
         out_fpath = Path(conv_files_main[0])
-        log.info("✔️ conversion OK, main file/size: %s %s", 
+        log.info("✔️ conversion OK (%7.4f sec.), main file/size: %s %s", 
+                 exec_time,
                  out_fpath, 
                  out_fpath.stat().st_size)
         

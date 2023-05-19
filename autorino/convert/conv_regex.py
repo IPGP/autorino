@@ -193,10 +193,24 @@ def conv_regex_mdb2rnx(f):
     # souf3000.21n
     # souf3000.21l
     # souf3000.21g
+    finp = str(f)
     f = Path(Path(f).name) ### keep the filename only    
-    regex_doy_site=r"(\w{4})([0-9]{3})"
+    if finp.lower().endswith("mdb"):
+        # used in OVSM e.g.
+        # LAJB0a18002.MDB
+        regex_doy_site=r".(\w{4}).([0-9]{2})([0-9]{3})"
+        doygroup = 3 
+    elif finp.lower().endswith("m00"):
+        # used in OVSG e.g.
+        # PAR1323a.m00 
+        regex_doy_site=r"(\w{4})([0-9]{3})"
+        doygroup = 2 
+    else:
+        regex_doy_site=r"(\w{4})([0-9]{3})"
+        doygroup = 2 
+
     site=re.match(regex_doy_site,f.name).group(1).lower()
-    doy=re.match(regex_doy_site,f.name).group(2).lower()
+    doy=re.match(regex_doy_site,f.name).group(doygroup).lower()
     conv_regex_main = re.compile(site+doy+".\.[0-9]{2}o")
     conv_regex_annex  = re.compile(site+doy+".\.[0-9]{2}\w")
     return conv_regex_main , conv_regex_annex
