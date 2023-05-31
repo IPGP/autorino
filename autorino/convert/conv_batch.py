@@ -53,6 +53,9 @@ def converter_batch(input_files,
         sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
                                                      force=False)
     
+    ### get the site (4chars) as a list 
+    site4_list = [s.site4char for s in sitelogs]
+
     ###############################################
     ### def output folders
     outdir_logs = outdir + "/logs"
@@ -107,11 +110,22 @@ def converter_batch(input_files,
     for fraw in flist:  
         fraw = Path(fraw)
         ext = fraw.suffix.upper()
-        
-        if re.match(".BNX",ext):
-            site = fraw.name[1:5]
-        else:
-            site = fraw.name[:4]
+
+        ### since the fraw name can be poorly formatted
+        # we search it w.r.t. the sites from the sitelogs
+
+        def _site_search_from_list(fraw_inp,site4_list_inp):
+            site_out = None
+            for s4 in site4_list_inp:
+                if re.search(s4,fraw_inp.name,re.IGNORECASE):
+                    site_out = s4
+                    break
+            if not site_out: # last chance, get the 4 1st chars of the raw file
+                site_out = fraw_inp.name[:4]
+            return site_out
+
+        site =  _site_search_from_list(fraw,site4_list)       
+
 
         logline = pd.DataFrame([[site,None,None,None,None,
                                  fraw,"","","no comment"]],
