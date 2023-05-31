@@ -156,7 +156,6 @@ def cmd_build_trm2rinex(inp_raw_fpath,
     out_dir_access_rights = out_dir.stat().st_mode  
     out_dir.chmod(0o777)
 
-
     cmd_docker_list = ['docker','run','--rm','-v', str(inp_raw_fpath.parent) + ':/inp','-v', str(out_dir) + ':/out']
     cmd_trm2rinex_list = [bin_path, 'inp/' + inp_raw_fpath.name,'-n','-d','-s','-v','3.04','-p', 'out/']
 
@@ -442,7 +441,7 @@ def cmd_build_convbin(inp_raw_fpath,
                    out_dir,
                    bin_options_custom=[],
                    bin_kwoptions_custom=dict(),
-                   bin_path="/home/psakicki/SOFTWARE/RTKLIB_explorer/RTKLIB/app/consapp/convbin/gcc/convbin"):
+                   bin_path="convbin"):
     
     # Synopsys
 
@@ -566,14 +565,12 @@ def cmd_build_convbin(inp_raw_fpath,
     cmd_use = [cmd_str]
     
     return cmd_use, cmd_list, cmd_str
-    
-
 
 def cmd_build_tps2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="/home/psakicki/SOFTWARE_INSTALL/GNSS_CONVERTERS/Topcon_TPS2RIN/tps2rin.exe"):
+                      bin_path="/opt/softs_gnss/bin/tps2rin.exe"):
     
     # 0100:fixme:heap:RtlSetHeapInformation 00000000005D0000 0 000000000011FE00 4 stub
     # TPS2RIN 1.0.28.3459 Win64 build Jun 01, 2022 (c) Topcon Positioning Systems
