@@ -25,7 +25,7 @@ keywords_path_excl=[]
 
 ########## complete repro 2017-2023 process 
 flist = "/home/sakic/020_TEMP/Raw_all_MQ_mk01a.list"
-outdir = "/scratch/convgnss/060_big_conv_MQ"
+outdir = "/scratch/convgnss/061_big_conv_MQ"
 nyear = 8
 minyear = 2018
 maxyear = 2023

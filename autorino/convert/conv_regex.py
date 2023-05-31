@@ -198,13 +198,17 @@ def conv_regex_mdb2rnx(f):
     if finp.lower().endswith("mdb"):
         # used in OVSM e.g.
         # LAJB0a18002.MDB
-        regex_doy_site=r".(\w{4}).([0-9]{2})([0-9]{3})"
-        doygroup = 3 
+        # LMLM0-Leicaa18233.MDB
+        regex_doy_site=r".(\w{4})(-Leica)?.([0-9]{2})([0-9]{3})"
+        doygroup = 4 
+        # alternativelywe can exclude the group 'Leica-' with ?:
+        # regex_doy_site=r".(\w{4})(?:-Leica)?.([0-9]{2})([0-9]{3})"
+        # doygroup = 3
     elif finp.lower().endswith("m00"):
         # used in OVSG e.g.
         # PAR1323a.m00 
         regex_doy_site=r"(\w{4})([0-9]{3})"
-        doygroup = 2 
+        doygroup = 2
     else:
         regex_doy_site=r"(\w{4})([0-9]{3})"
         doygroup = 2 
