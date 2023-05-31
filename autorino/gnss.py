@@ -81,9 +81,11 @@ class Receiver(ABC):
     '''
     Le constructeur
     '''
-    def __init__(self, hostname, protocol, port):
+    def __init__(self, hostname, protocol, port, user, password):
         self.hostname = hostname
         self.protocol = protocol
+        self.user = user
+        self.password = password
         self.port = port
 
     '''
@@ -121,7 +123,7 @@ class Receiver(ABC):
     def download_period(self, begin, end):
         pass
 
-class GB_1000_Receiver(Receiver):
+class Receiver_Topcon(Receiver):
     '''
     Classe representant les recepteurs GNSS Topcon GB-1000
     '''
@@ -154,7 +156,7 @@ class GB_1000_Receiver(Receiver):
         for i in range(0, 5):
             self.download_file("file" + str(i))
 
-class Polarx5_Receiver(Receiver):
+class Receiver_Septentrio(Receiver):
     '''
     Classe representant les recepteurs GNSS Septentrio PolaRx5
     '''
