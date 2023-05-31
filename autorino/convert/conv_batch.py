@@ -108,8 +108,10 @@ def converter_batch(input_files,
     logger.info("%6i files will be processed", len(flist))
 
     for fraw in flist:  
+
         fraw = Path(fraw)
         ext = fraw.suffix.upper()
+        logger.info("***** input raw file for conversion: %s",fraw.name)
 
         ### since the fraw name can be poorly formatted
         # we search it w.r.t. the sites from the sitelogs
