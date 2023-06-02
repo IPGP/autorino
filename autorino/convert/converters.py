@@ -174,7 +174,7 @@ def converter_run(inp_raw_fpath: Union[Path,str],
                                                    ##### BIN PATH !!!!! XXXXX
     log.debug("conversion command: %s", cmd_str)
 
-    ############# run the programm #############
+    ############# run the external conversion programm #############
     timeout_reached = False
     start = dt.datetime.now()
     try:
@@ -191,30 +191,28 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     end = dt.datetime.now()
     exec_time = (end - start).seconds + (end - start).microseconds * 10**-6
 
-    ############################################
+    #################################################################
    
+    ###### check the output  on the conversion programm
     if timeout_reached:
         log.error("Error while converting %s",inp_raw_fpath.name)
         log.error("Timeout reached (%s seconds)",timeout)
-        
     elif process_converter.returncode != 0:
         log.error("Error while converting %s",inp_raw_fpath.name)
         log.error("Converter's error message:")
         log.error(process_converter.stderr)
-    
     else:
         log.debug("Conversion done (%7.4f sec.). Converter's output:", exec_time)
         log.debug(process_converter.stdout)
         
-    
-    #### Theoretical name for the converted file
+    ###### get the converted file
+    #### generate the regex matching the theoretical name for the converted file
     conv_regex_main, conv_regex_annex = conv_regex_fct_use(inp_raw_fpath)
     log.debug("regex for the converted files (main/annex.): %s,%s",
               conv_regex_main,
               conv_regex_annex)
     
-    
-    #out_fpath = out_dir.joinpath(out_fname)
+    #### find the converted file matching the regex 
     conv_files_main, conv_files_annex = _find_converted_files(out_dir,
                                                               conv_regex_main, 
                                                               conv_regex_annex)
@@ -222,7 +220,6 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     if not conv_files_main:
         out_fpath = ""
         log.error("✘ converted file not found")
-    
     else:
         out_fpath = Path(conv_files_main[0])
         log.info("✔️ conversion OK (%7.4f sec.), main file/size: %s %s", 
@@ -235,10 +232,4 @@ def converter_run(inp_raw_fpath: Union[Path,str],
             os.remove(f)
             log.info("converted annex file removed: %s", f)
 
-
     return str(out_fpath), process_converter
-
-
-
-dt.datetime.now() - dt.datetime.now()
-
