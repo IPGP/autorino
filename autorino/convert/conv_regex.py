@@ -156,7 +156,8 @@ def conv_regex_trm2rinex(f):
     # "/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21g",
     # "/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21n"
     f = Path(Path(f).name) ### keep the filename only
-    yyyy = re.search("[0-9]{4}",f.name).group()
+    date_full = re.search("[0-9]{12}[a-zA-Z]",f.name).group()
+    yyyy = date_full[:4] 
     conv_regex_main = re.compile(f.with_suffix("." + yyyy[2:] + "o").name)
     conv_regex_annex = re.compile(f.with_suffix("." + yyyy[2:]).name)
     return conv_regex_main , conv_regex_annex
