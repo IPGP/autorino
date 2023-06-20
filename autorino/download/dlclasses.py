@@ -12,158 +12,26 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _dir_translator_date(dir_input,date):
-    dir_translated = str(dir_input)
-    dir_translated = date.strftime(dir_translated)
-    return dir_translated
+def _translator_epoch(path_input,epoch):
+    path_translated = str(path_input)
+    path_translated = epoch.strftime(path_translated)
+    return path_translated
 
-def _dir_translator_keywords(dir_input,translator_dict):
-    dir_translated = str(dir_input)
+def _translator_keywords(path_input,translator_dict):
+    path_translated = str(path_input)
     for k,v in translator_dict.items():
-        dir_translated = dir_translated.replace("<"+k+">",v)
-    return dir_translated
+        path_translated = path_translated.replace("<"+k+">",v)
+    return path_translated
     
-class DateRange:
-    def __init__(self,date1,date2,period="01D",round_method="ceil"):
-        self.period = period
-        self.round_method = round_method
-        self.date_start = np.min((date1,date2))
-        self.date_end = np.max((date1,date2))
-        #test sur session period !!!!!!    
-        
-    def __repr__(self):
-        return "date range from {} to {}, period {}".format(self.date_start,self.date_end,self.period)
+def translator(path_input,epoch=None,translator_dict=None):
+    path_translated = str(path_input)
+    if epoch:
+        path_translated = _translator_epoch(path_translated,epoch)
+    if translator_dict:
+        path_translated = _translator_keywords(path_translated,translator_dict)
+    return path_translated
     
-    ############ getters and setters 
-    @property
-    def date_start(self):
-        return self._date_start.ceil(self.period)
-        
-    @date_start.setter
-    def date_start(self,value):
-        self._date_start = pd.Timestamp(value)
     
-    @property
-    def date_end(self):
-        return self._date_end.ceil(self.period)
-        
-    @date_end.setter
-    def date_end(self,value):
-        self._date_end = pd.Timestamp(value)
-        
-    ########### methods
-    def date_range_list(self):
-        daterange=pd.date_range(self.date_start,
-                                self.date_end,
-                                freq=self.period)
-        return list(daterange)
-    
-class RequestGnss():
-    def __init__(self,session,date_range,out_dir):
-        self.date_range = date_range
-        self.session = session
-        self.out_dir = out_dir
-        self.req_remote_files = []
-        self.req_local_files = []
-    
-    ########### methods        
-    def guess_remote_files(self,set_req_remote_files=True):
-        
-        if not self.session.remote_fname:
-            logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
-        
-        rmot_paths_list = []
-        for date in self.date_range.date_range_list():
-            ### guess the potential directories
-            rmot_dir_use = str(self.session.remote_dir)
-            rmot_dir_use = _dir_translator_date(rmot_dir_use,date)
-            rmot_dir_use = _dir_translator_keywords(rmot_dir_use,
-                                                    self.session.translate_dict)
-            ### guess the potential filenames
-            rmot_fname_use = str(self.session.remote_fname)
-            rmot_fname_use = _dir_translator_date(rmot_fname_use,
-                                                  date)
-            rmot_fname_use = _dir_translator_keywords(rmot_fname_use,
-                                                      self.session.translate_dict)
-                                                                                                            
-            rmot_path_use = os.path.join(self.session.hostname,
-                                         rmot_dir_use,
-                                         rmot_fname_use)
-                                                      
-            rmot_paths_list.append(rmot_path_use)
-            
-            logger.debug("remote file/dir guessed: %s",rmot_path_use)
-            
-        rmot_paths_list = sorted(list(set(rmot_paths_list)))
-        
-        if set_req_remote_files:
-            self.req_remote_files = rmot_paths_list
-            
-        logger.info("remote files/dirs guessed: %s",len(rmot_paths_list))
-        return rmot_paths_list
-        
-    def guess_remote_directories(self,set_req_remote_files=True):
-        
-        ### must be merged with fct above
-        
-        rmot_dir_list = []
-        for date in self.date_range.date_range_list():
-            rmot_dir_use = str(self.session.remote_dir)
-            rmot_dir_use = _dir_translator_date(rmot_dir_use,date)
-            rmot_dir_use = _dir_translator_keywords(rmot_dir_use,
-                                                    self.session.translate_dict)
-            rmot_dir_list.append(rmot_dir_use)
-        rmot_dir_list = sorted(list(set(rmot_dir_list)))
-                    
-        return rmot_dir_list
-
-    def ask_remote_files(self,set_req_remote_files=True):
-        rmot_dir_list = self.guess_remote_directories()
-        rmot_files_list = []
-        for rmot_dir_use in rmot_dir_list:
-            if self.session.protocol == "http":
-                list_ = ardl.list_remote_files_http(self.session.hostname,
-                                                  rmot_dir_use)
-                rmot_files_list = rmot_files_list + list_
-            elif self.session.protocol == "ftp":
-                list_ = ardl.list_remote_files_ftp(self.session.hostname,
-                                                 rmot_dir_use,
-                                                 self.session.sta_user,
-                                                 self.session.sta_pass)
-                rmot_files_list = rmot_files_list + list_
-
-            else:
-                logger.error("wrong protocol")
-            logger.debug("remote files found on rec: %s",list_)
-        
-        if set_req_remote_files:
-            self.req_remote_files = rmot_files_list
-        
-        logger.info("remote files found on rec: %s",len(rmot_files_list))
-        return rmot_files_list
-
-    def download_remote_files(self):
-        download_files_list = []
-        rmot_files_list = self.req_remote_files
-                
-        for rmot_file in rmot_files_list:
-            if self.session.protocol == "http":
-                file_dl = ardl.download_file_http(rmot_file,
-                                                  self.out_dir)
-                download_files_list.append(file_dl)
-            elif self.session.protocol == "ftp":
-                file_dl = ardl.download_file_ftp(rmot_file,
-                                               self.out_dir,
-                                               self.session.sta_user,
-                                               self.session.sta_pass)
-                download_files_list.append(file_dl)
-
-            else:
-                logger.error("wrong protocol")
-                
-        self.req_local_files = download_files_list
-        
-        return download_files_list
 
 class SessionGnss:
     def __init__(self,protocol,hostname,remote_dir,remote_fname,
@@ -177,7 +45,7 @@ class SessionGnss:
         self.sta_pass = sta_pass  
         self.site4 = site4           
         self.session_period = session_period
-        self.translate_dict = None ## setter bellow
+        self.translate_dict = self._translate_dict_init()
         
     def __repr__(self):
         return "session {} on {}".format(self.session_period,self.site4)
@@ -196,113 +64,211 @@ class SessionGnss:
         else:
             self._remote_dir = value
     
+    def _translate_dict_init(self):
+        """
+        generate the translation dict based on all the SessionGnss 
+        object attributes
+        """
+        trsltdict = dict()
+        attributes = [a for a in dir(self) if not a.startswith('__') and not callable(getattr(self, a))]
+        for a in attributes:
+            trsltdict[a.upper()] = str(getattr(self, a)).upper()
+            trsltdict[a.lower()] = str(getattr(self, a)).lower()
+        return trsltdict
+
+class EpochRange:
+    def __init__(self,epoch1,epoch2,period="01D",round_method="ceil"):
+        self.period = period
+        self.round_method = round_method
+        self.epoch_start_raw = np.min((epoch1,epoch2))
+        self.epoch_end_raw = np.max((epoch1,epoch2))
+        self.epoch_start = self.epoch_start_raw  ### setter bellow
+        self.epoch_end = self.epoch_end_raw      ### setter bellow
+
+    def __repr__(self):
+        return "epoch range from {} to {}, period {}".format(self.epoch_start,self.epoch_end,self.period)
+    
+    ############ getters and setters 
     @property
-    def translate_dict(self):
-        return self._translate_dict
+    def epoch_start(self):
+        return self._epoch_start
         
-    @translate_dict.setter
-    def translate_dict(self,value):
-        if not value:
-            self._translate_dict = dict()
-            self._translate_dict["SITE4"] = self.site4.upper()
-        else:
-            self._translate_dict = value        
+    @epoch_start.setter
+    def epoch_start(self,value):
+        self._epoch_start = pd.Timestamp(value).ceil(self.period)
+    
+    @property
+    def epoch_end(self):
+        return self._epoch_end
+        
+    @epoch_end.setter
+    def epoch_end(self,value):
+        self._epoch_end = pd.Timestamp(value).ceil(self.period)
+        
+    ########### methods
+    def epoch_range_list(self):
+        epochrange=pd.date_range(self.epoch_start,
+                                 self.epoch_end,
+                                 freq=self.period)
+        return list(epochrange)
+    
+class RequestGnss():
+    def __init__(self,session,epoch_range,out_dir):
+        self.session = session
+        self.epoch_range = epoch_range ### setter bellow
+        self.out_dir = out_dir
+        self.req_table = self._req_table_init()
+        
+    @property
+    def epoch_range(self):
+        return self._epoch_range
+        
+    @epoch_range.setter
+    def epoch_range(self,value):
+        self._epoch_range = value
+        if self._epoch_range.period != self.session.session_period:  
+            logger.warn("Session period (%s) != Epoch Range period (%s)",self.session.session_period,self._epoch_range.period)
+
+    def _req_table_init(self):
+        df = pd.DataFrame(data=None,columns=["epoch","fname",
+                                             "ok_remote",
+                                             "ok_local",
+                                             "fpath_remote",
+                                             "fpath_local"])
+                                   
+        df.epoch = self.epoch_range.epoch_range_list()
+        df.set_index("epoch",inplace=True,drop=True)
+        return df
+    
+    ########### methods        
+    def check_local_files(self):
+        """
+        """
+        return rmot_paths_list
+        
+        
+    def guess_remote_local_files(self):
+        """
+        Guess the paths and name of the remote files based on the 
+        Session and EpochRange attributes of the GnssRequest
+        """
+        
+        if not self.session.remote_fname:
+            logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
+
+        hostname_use = self.session.hostname
+        
+        rmot_paths_list = []
+        
+        
+        
+        
+        
+        
+        
+        for epoch in self.epoch_range.epoch_range_list():
+            ### guess the potential directories
+            rmot_dir_use = str(self.session.remote_dir)
+            rmot_dir_use = translator(rmot_dir_use,
+                                      epoch,
+                                      self.session.translate_dict)
+                                                    
+            ### guess the potential filenames
+            rmot_fname_use = str(self.session.remote_fname)
+            
+            rmot_fname_use = translator(rmot_fname_use,
+                                        epoch,
+                                        self.session.translate_dict)
+
+            rmot_path_use = os.path.join(hostname_use,
+                                         rmot_dir_use,
+                                         rmot_fname_use)
+
+            rmot_paths_list.append(rmot_path_use)
+            self.req_table.loc[epoch,"fname"]        = rmot_fname_use
+            self.req_table.loc[epoch,"fpath_remote"] = rmot_path_use
+                        
+            logger.debug("remote file guessed: %s",rmot_path_use)
+        
+        rmot_paths_list = sorted(list(set(rmot_paths_list)))
+            
+        logger.info("nbr remote files guessed: %s",len(rmot_paths_list))
+        return rmot_paths_list
+        
+        
+    def _guess_remote_directories(self):
+        """
+        this method is specific for ask_remote_files
+        guessing the directories is different than guessing the files:
+        * no hostname
+        * no filename (obviously)
+        """
+        rmot_dir_list = []
+        for epoch in self.epoch_range.epoch_range_list():
+            rmot_dir_use = str(self.session.remote_dir)
+            rmot_dir_use = translator(rmot_dir_use,epoch,
+                                      self.session.translate_dict)
+            rmot_dir_list.append(rmot_dir_use)
+            
+        rmot_dir_list = sorted(list(set(rmot_dir_list)))
                     
-############################################################
-# protocol = "http"
-# hostname="http://gps-abd.terrain.ovsg.univ-ag.fr/"
-# remote_dir="download/Internal/%Y%m/"
-# sta_user=""
-# sta_pass=""
+        return rmot_dir_list
+    
+    def ask_remote_files(self):
+        rmot_dir_list = self._guess_remote_directories()
+        rmot_files_list = []
+        for rmot_dir_use in rmot_dir_list:
+            if self.session.protocol == "http":
+                list_ = ardl.list_remote_files_http(self.session.hostname,
+                                                    rmot_dir_use)
+                rmot_files_list = rmot_files_list + list_
+            elif self.session.protocol == "ftp":
+                list_ = ardl.list_remote_files_ftp(self.session.hostname,
+                                                   rmot_dir_use,
+                                                   self.session.sta_user,
+                                                   self.session.sta_pass)
+                rmot_files_list = rmot_files_list + list_
+            else:
+                logger.error("wrong protocol")
+                
+            logger.debug("remote files found on rec: %s",list_)
+        
+        logger.info("nbr remote files found on rec: %s",len(rmot_files_list))
+        return rmot_files_list
 
-# protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
-# hostname="http://gps-dsd.terrain.ovsg.univ-ag.fr"
-# sta_user=""
-# sta_pass=""
+    def download_remote_files(self):
+        """
+        will download locally the files which have been identified by 
+        the guess_remote_files method
+        
+        exploits the fname_remote column of the RequestGnss.req_table
+        attribute
+        """
+        download_files_list = []
+                
+        for epoch,rmot_file in self.req_table.fpath_remote.items():
+            
+            outdir_use = self.out_dir
+            
+            if  self.session.protocol == "http":
+                file_dl = ardl.download_file_http(rmot_file,
+                                                  outdir_use)
+                download_files_list.append(file_dl)
+                self.req_table.fpath_local.loc[epoch] = file_dl
 
-# protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
-# hostname="http://195.83.190.74"
-# sta_user=""
-# sta_pass=""
+            elif self.session.protocol == "ftp":
+                file_dl = ardl.download_file_ftp(rmot_file,
+                                                 outdir_use,
+                                                 self.session.sta_user,
+                                                 self.session.sta_pass)
+                download_files_list.append(file_dl)
+                self.req_table.fpath_local.loc[epoch] = file_dl
 
-# # HOUE
-# protocol = "ftp"
-# remote_dir="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
-# hostname="gps-houe.terrain.ovsg.univ-ag.fr"
-# sta_user="root"
-# sta_pass="ovsg13;:"
+            else:
+                logger.error("wrong protocol")
+                
+        self.req_local_files = download_files_list
+        
+        return download_files_list
 
-
-
-
-# PSA1
-protocol = "http"
-hostname="http://gps-psa.terrain.ovsg.univ-ag.fr"
-remote_dir="download/Internal/%Y%m/"
-remote_fname="<SITE4>______%Y%m%d%H%MA.T02"
-sta_user=""
-sta_pass=""
-site4="PSA1"
-session_period="1D"
-
-#######' HOUE
-protocol = "ftp"
-hostname="gps-houe.terrain.ovsg.univ-ag.fr"
-remote_dir="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
-remote_fname=""
-sta_user="root"
-sta_pass="ovsg13;:"
-site4="HOUE"
-session_period="1D"
-
-#AGAL
-protocol = "http"
-hostname="http://10.0.76.158"
-remote_dir="download/Internal/%Y%m/"
-remote_fname=""
-sta_user=""
-sta_pass=""
-site4="AGAL"
-session_period="1D"
-
-# ABD0
-protocol = "http"
-hostname="http://gps-abd.terrain.ovsg.univ-ag.fr/"
-remote_dir="download/Internal/%Y%m/"
-remote_fname="<SITE4>______%Y%m%d%H%MA.T02"
-sta_user=""
-sta_pass=""
-site4="ABD0"
-session_period="1D"
-
-########################################################################
-
-SESS = SessionGnss(protocol = protocol,
-remote_dir=remote_dir,
-hostname=hostname,
-sta_user=sta_user,
-sta_pass=sta_pass,
-site4=site4,
-session_period=session_period,
-remote_fname=remote_fname)
-
-output_path = "/home/gps/tests_pierres/dltest"
-
-now = dt.datetime.now() - dt.timedelta(days=10)
-date_interest = now - dt.timedelta(days=2)
-DR = DateRange(date_interest,now)
-
-REQ = RequestGnss(SESS,DR,output_path)
-
-#L = STAT.list_remote_files(DR)
-#L = REQ.ask_remote_files()
-L = REQ.guess_remote_files()
-
-print("AAAAAA",REQ.req_remote_files)
-REQ.download_remote_files()
-
-print(Lguess)
-#STAT.download_remote_files(DR,output_path)
 
