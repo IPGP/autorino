@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import ftplib
 import datetime as dt
 import pandas as pd
 import numpy as np
@@ -10,7 +11,6 @@ from autorino import download as ardl
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
-
 
 def _translator_epoch(path_input,epoch):
     path_translated = str(path_input)
@@ -30,13 +30,10 @@ def translator(path_input,epoch=None,translator_dict=None):
     if translator_dict:
         path_translated = _translator_keywords(path_translated,translator_dict)
     return path_translated
-    
-    
 
 class SessionGnss:
     def __init__(self,protocol,hostname,remote_dir,remote_fname,
                  sta_user,sta_pass,site4,session_period):
-
         self.protocol = protocol
         self.hostname = hostname
         self.remote_dir = remote_dir ## setter bellow
@@ -130,24 +127,22 @@ class RequestGnss():
             logger.warn("Session period (%s) != Epoch Range period (%s)",self.session.session_period,self._epoch_range.period)
 
     def _req_table_init(self):
-        df = pd.DataFrame(data=None,columns=["epoch","fname",
-                                             "ok_remote",
-                                             "ok_local",
-                                             "fpath_remote",
-                                             "fpath_local"])
+        df = pd.DataFrame(columns=["epoch","fname",
+                                   "ok_remote",
+                                   "ok_local",
+                                   "fpath_remote",
+                                   "fpath_local"])
                                    
         df.epoch = self.epoch_range.epoch_range_list()
         df.set_index("epoch",inplace=True,drop=True)
+        df = df.where(pd.notnull(df), None)
+        
         return df
     
     ########### methods        
-    def check_local_files(self):
-        """
-        """
-        return rmot_paths_list
-        
-        
-    def guess_remote_local_files(self):
+    def guess_remote_local_files(self,
+                                 guess_remote=True,
+                                 guess_local=True):
         """
         Guess the paths and name of the remote files based on the 
         Session and EpochRange attributes of the GnssRequest
@@ -159,41 +154,52 @@ class RequestGnss():
         hostname_use = self.session.hostname
         
         rmot_paths_list = []
-        
-        
-        
-        
-        
-        
+        local_paths_list = []
         
         for epoch in self.epoch_range.epoch_range_list():
-            ### guess the potential directories
-            rmot_dir_use = str(self.session.remote_dir)
-            rmot_dir_use = translator(rmot_dir_use,
-                                      epoch,
-                                      self.session.translate_dict)
-                                                    
-            ### guess the potential filenames
-            rmot_fname_use = str(self.session.remote_fname)
-            
-            rmot_fname_use = translator(rmot_fname_use,
-                                        epoch,
-                                        self.session.translate_dict)
+            ### guess the potential remote files
+            if guess_remote:
+                rmot_dir_use = str(self.session.remote_dir)
+                rmot_fname_use = str(self.session.remote_fname)
+                rmot_path_use = os.path.join(hostname_use,
+                                             rmot_dir_use,
+                                             rmot_fname_use)
 
-            rmot_path_use = os.path.join(hostname_use,
-                                         rmot_dir_use,
-                                         rmot_fname_use)
+                rmot_path_use = translator(rmot_path_use,
+                                           epoch,
+                                           self.session.translate_dict)
+                                           
+                rmot_fname_use = os.path.basename(rmot_path_use)
+                                           
+                rmot_paths_list.append(rmot_path_use)
+                self.req_table.loc[epoch,"fname"]        = rmot_fname_use
+                self.req_table.loc[epoch,"fpath_remote"] = rmot_path_use
+                logger.debug("remote file guessed: %s",rmot_path_use)
 
-            rmot_paths_list.append(rmot_path_use)
-            self.req_table.loc[epoch,"fname"]        = rmot_fname_use
-            self.req_table.loc[epoch,"fpath_remote"] = rmot_path_use
-                        
-            logger.debug("remote file guessed: %s",rmot_path_use)
-        
+            ### guess the potential local files
+            if guess_local:
+                local_dir_use = str(self.out_dir)
+                local_fname_use = str(self.session.remote_fname)
+                local_path_use = os.path.join(local_dir_use,
+                                              local_fname_use)
+
+                local_path_use = translator(local_path_use,
+                                            epoch,
+                                            self.session.translate_dict)
+                                            
+                local_fname_use = os.path.basename(local_path_use)
+                                           
+                local_paths_list.append(local_path_use)
+                self.req_table.loc[epoch,"fname"]       = local_fname_use
+                self.req_table.loc[epoch,"fpath_local"] = local_path_use
+                logger.debug("local file guessed: %s",local_path_use)
+      
         rmot_paths_list = sorted(list(set(rmot_paths_list)))
             
         logger.info("nbr remote files guessed: %s",len(rmot_paths_list))
-        return rmot_paths_list
+        logger.info("nbr local files guessed: %s",len(local_paths_list))
+
+        return rmot_paths_list, local_paths_list
         
         
     def _guess_remote_directories(self):
@@ -235,8 +241,25 @@ class RequestGnss():
         
         logger.info("nbr remote files found on rec: %s",len(rmot_files_list))
         return rmot_files_list
+        
+    def check_local_files(self):
+        """
+        check the existence of the local files
+        """
+        
+        local_files_list = []
+        
+        for epoch,local_file in self.req_table.fpath_local.items():
+            if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
+                self.req_table.ok_local.loc[epoch] = True
+                local_files_list.append(local_file)
+            else:
+                self.req_table.ok_local.loc[epoch] = False
+                
+        return local_files_list
+    
 
-    def download_remote_files(self):
+    def download_remote_files(self,force_download=False):
         """
         will download locally the files which have been identified by 
         the guess_remote_files method
@@ -246,29 +269,57 @@ class RequestGnss():
         """
         download_files_list = []
                 
-        for epoch,rmot_file in self.req_table.fpath_remote.items():
-            
-            outdir_use = self.out_dir
-            
-            if  self.session.protocol == "http":
-                file_dl = ardl.download_file_http(rmot_file,
-                                                  outdir_use)
-                download_files_list.append(file_dl)
-                self.req_table.fpath_local.loc[epoch] = file_dl
+        for (epoch,rmot_file),(_,local_file) in zip(self.req_table.fpath_remote.items(),
+                                                    self.req_table.fpath_local.items()):
+            ###### check if the file exists locally
+            if self.req_table.loc[epoch,'ok_local'] == True and not force_download:
+                 logger.info("%s already exists locally, skip",os.path.basename(local_file))
+                 continue
 
-            elif self.session.protocol == "ftp":
-                file_dl = ardl.download_file_ftp(rmot_file,
-                                                 outdir_use,
-                                                 self.session.sta_user,
-                                                 self.session.sta_pass)
-                download_files_list.append(file_dl)
-                self.req_table.fpath_local.loc[epoch] = file_dl
-
-            else:
+            ###### use the guessed local file as destination or the generic directory                
+            if not local_file: #### the local file has not been guessed
+                outdir_use = str(self.out_dir)
+                outdir_use = translator(outdir_use,
+                                        epoch,
+                                        self.session.translate_dict)
+            else: #### the local file has been guessed before
+                outdir_use = os.path.dirname(local_file)
+            
+            ###### create the directory if it does not exists
+            if not os.path.exists(outdir_use):
+                os.makedirs(outdir_use)
+            
+            ###### download the file            
+            if not self.session.protocol in ("ftp","http"):
                 logger.error("wrong protocol")
+                raise Exception
+            elif self.session.protocol == "http":
+                try:
+                    file_dl = ardl.download_file_http(rmot_file,
+                                                      outdir_use)
+                    dl_ok = True
+                except:
+                    pass
+                    
+            elif self.session.protocol == "ftp":
+                try:
+                    file_dl = ardl.download_file_ftp(rmot_file,
+                                                    outdir_use,
+                                                    self.session.sta_user,
+                                                    self.session.sta_pass)
+                except ftplib.error_perm as e:
+                    logger.error("FTP download error: %s",str(e))
+                    dl_ok = False
+                    
+            else: ### this case should never happen since there is a protocol test at the begining
+                pass
+
+            ###### store the results in the req_table
+            if dl_ok:
+                download_files_list.append(file_dl)
+                self.req_table.fpath_local.loc[epoch] = file_dl
+                self.req_table.ok_local.loc[epoch] = True
+            else:
+                self.req_table.ok_local.loc[epoch] = False
                 
-        self.req_local_files = download_files_list
-        
         return download_files_list
-
-

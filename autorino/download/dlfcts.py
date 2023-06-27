@@ -18,11 +18,24 @@ from tqdm import tqdm
 from ftplib import FTP
 import requests
 from bs4 import BeautifulSoup
-
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
+
+
+
+
+
+# *****************************************************************************
+# define Python user-defined exceptions
+class AutorinoError(Exception):
+    pass
+
+class AutorinoDownloadError(AutorinoError):
+    pass
+
 
 ############# list remote files
 
@@ -93,7 +106,7 @@ def size_remote_file_http(url):
 ############# download remote file
 
 def download_file_ftp(url, output_dir,username, password):
-    # Check if URL is HTTP or FTP
+    ##### Check if URL is HTTP or FTP
     url = Path(url)
     url_host = str(url.parts[0])
     url_dir  = str(Path(*url.parts[1:-1]))
@@ -107,6 +120,7 @@ def download_file_ftp(url, output_dir,username, password):
         _ftp_callback.bytes_transferred += len(data)
     
     file_size = ftp.size(filename)
+
     output_path = os.path.join(output_dir, filename)
     with open(output_path, 'wb') as f, tqdm(total=file_size,
                                             unit='B', 
@@ -137,6 +151,7 @@ def download_file_http(url, output_dir):
             pbar.update(len(data))
     
         return output_path
+
 
 
 
