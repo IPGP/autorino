@@ -143,6 +143,67 @@ def converter_run(inp_raw_fpath: Union[Path,str],
                   remove_converted_annex_files=False,
                   cmd_build_fct = None,
                   conv_regex_fct = None):
+    """
+    Generic function to run an external RAW > RINEX conversion program.
+    It will detect automatically which converter has to be executed based on 
+    input RAW file extension, 
+    but this can be customized
+
+    Parameters
+    ----------
+    inp_raw_fpath : Union[Path,str]
+        path of the input RAW file.
+    out_dir : Union[Path,str], optional
+        destination directory of the converted RINEX. The default is None.
+    converter : str, optional
+        name of the converter used.
+        Supports : 
+            'auto' (automatic choice based on the extension),
+            'trm2rnx' (Trimble),
+            'runpkr00' (Trimble legacy),
+            'teqc' (legacy),
+            'mdb2rinex' (Leica),
+            'sbf2rin' (Septentrio),
+            'convbin' (BINEX),
+            'tps2rin' (Topcom),            
+        see `_converter_select` function and `cmd_build` module 
+        for more details.
+        The default is 'auto'.
+    timeout : int, optional
+        timeout in second for the conversion program call.
+        The default is 60.
+    bin_options : list, optional
+        options for the conversion program. The default is [].
+    bin_kwoptions : dict, optional
+        keyword options for the conversion program. The default is dict().
+    bin_path : Union[Path,str], optional
+        path of the conversion program bin. The default is "".
+    remove_converted_annex_files : bool, optional
+        remove or not the 'annex' converted files.
+        i.e. the not navigation files (e.g. the navigtation RINEXs).
+        The default is False.
+    cmd_build_fct : function, optional
+        A custom function which build the command calling
+        the conversion program
+        See `cmd_build` module for more details.
+        The default is None.
+    conv_regex_fct : function, optional
+        A custom function which build the regular expression to find
+        the RINEX created during the conversion.
+        See `cmd_regex` module for more details.
+        The default is None.
+
+    Raises
+    ------
+    FileNotFoundError
+
+    Returns
+    -------
+    out_fpath
+        the path of the converted RINEX.
+    process_converter
+        The subprocess object which ran the conversion (for debug purposes).
+    """
     
     #### Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
@@ -219,10 +280,10 @@ def converter_run(inp_raw_fpath: Union[Path,str],
 
     if not conv_files_main:
         out_fpath = ""
-        log.error("✘ converted file not found")
+        log.error("✗ converted file not found")
     else:
         out_fpath = Path(conv_files_main[0])
-        log.info("✔️ conversion OK (%7.4f sec.), main file/size: %s %s", 
+        log.info("✓ conversion OK (%7.4f sec.), main file/size: %s %s", 
                  exec_time,
                  out_fpath, 
                  out_fpath.stat().st_size)
