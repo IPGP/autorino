@@ -48,7 +48,7 @@ print(colorized_df)
 
 p="/home/sakic/031_SCRATCH_CONV/052_big_conv_GL_2017/rinexmoded"
 start = dt.datetime(2017,2,1)
-end = dt.datetime(2017,2,20)
+end = dt.datetime(2017,2,5)
 
 list_rnx_all = opera.rinex_finder(p)
 sites_all = pd.Series(list(set([os.path.basename(e)[:4] for e in list_rnx_all])))
