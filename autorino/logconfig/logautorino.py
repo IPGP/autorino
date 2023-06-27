@@ -32,23 +32,28 @@ log_config_dict = {
             "level":"DEBUG",
         },
         "console_gyxz":{
-            "formatter":"fmtgzyx1",
+            "formatter":"fmtgzyx2",
             "class":"logging.StreamHandler",
             "level":"DEBUG",
         }
     },
     "formatters":{
-        "fmtgzyx1": {
-            "format": "%(asctime)s.%(msecs)03d|%(log_color)s%(levelname).1s%(reset)s|%(log_color)s%(funcName)-15s%(reset)s|%(message)s",
-			'()': 'colorlog.ColoredFormatter',
+        # "fmtgzyx1": {
+            # "format": "%(asctime)s.%(msecs)03d|%(log_color)s%(levelname).1s%(reset)s|%(log_color)s%(funcName)-15s%(reset)s|%(message)s",
+			# '()': 'colorlog.ColoredFormatter',
+            # "datefmt":"%y%m%dT%H:%M:%S",
+            # "log_colors":{
+	        	# 'DEBUG':    'cyan',
+        		# 'INFO':     'green',
+        		# 'WARNING':  'yellow',
+        		# 'ERROR':    'red',
+        		# 'CRITICAL': 'red,bg_white',
+            	# },
+        # },
+        
+       "fmtgzyx2": {
+            "format": "%(asctime)s.%(msecs)03d|%(levelname).1s|%(funcName)-15s|%(message)s",
             "datefmt":"%y%m%dT%H:%M:%S",
-            "log_colors":{
-	        	'DEBUG':    'cyan',
-        		'INFO':     'green',
-        		'WARNING':  'yellow',
-        		'ERROR':    'red',
-        		'CRITICAL': 'red,bg_white',
-            	},
         }
     },
 }
