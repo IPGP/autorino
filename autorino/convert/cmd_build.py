@@ -71,6 +71,11 @@ def cmd_build_generic(program="",
                       arguments="",
                       options_bis=[""],
                       kw_options_bis=dict()): 
+    """
+    Build a command to launch a generic converter
+    It has to be used for developement purposes only
+    """
+    
     cmd = []
 
     if utils.is_iterable(program):
@@ -667,126 +672,158 @@ def cmd_build_tps2rin(inp_raw_fpath,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
                       bin_path="/opt/softs_gnss/bin/tps2rin.exe"):
+    """
+    Build a command to launch tps2rin, for Topcon
     
-    # 0100:fixme:heap:RtlSetHeapInformation 00000000005D0000 0 000000000011FE00 4 stub
-    # TPS2RIN 1.0.28.3459 Win64 build Jun 01, 2022 (c) Topcon Positioning Systems
-    # Conversion of TPS file to RINEX.
-    # Usage :  TPS2RIN  [<sw> [ <sw>]]  <input file name> [<sw> [ <sw>]]
-    # <Switches(sw)>:
-    #  -h, -?, --help     Display help screen.
-    #  -v <version>       Set RINEX version. Valid are 2.10, 2.11, 2.12, 3.00, 3.01, 3
-    # .02, 3.03, 3.04, 3.05, 4.00 versions.
-    #                     Default version is 3.05.
-    #  -o <output dir>    Output directory. Current directory used by default.
-    #  -p <Profile name>  For detailed help type 'TPS2RIN -p ?'.
-    #  -i <input file>    Specify input file name. Required if <input file> starts wit
-    # h '-' or '+'.
-    #  -s <StartTime>     Start date/time. For detailed help type 'TPS2RIN -s ?'.
-    #  -f <FinishTime>    Finish date/time. For detailed help type 'TPS2RIN -f ?'.
-    #  --date <CurrTime>  Current date/time. For detailed help type 'TPS2RIN --date ?'
-    # .
-    #  -G                 Exclude all GPS satellites.
-    #  -G<nn>,-g <nn>     Exclude GPS satellite G##.
-    #  +G<nn>,+g <nn>     Include GPS satellite G## (used after -G).
-    #  -R                 Exclude all GLONASS satellites.
-    #  -R<nn>,-r <nn>     Exclude GLONASS satellite R##.
-    #  +R<nn>,+r <nn>     Include GLONASS satellite R## (used after -R).
-    #  -E                 Exclude all GALILEO satellites.
-    #  -E<nn>             Exclude GALILEO satellite E##.
-    #  +E<nn>             Include GALILEO satellite E## (used after -E).
-    #  -C                 Exclude all BeiDou satellites.
-    #  -C<nn>             Exclude BeiDou satellite C##.
-    #  +C<nn>             Include BeiDou satellite C## (used after -C).
-    #  -W                 Exclude all SBAS (WAAS) satellites, including QZSS 183-192.
-    #  -W<nn>,-S<nn>,-w <nn> Exclude SBAS (WAAS) satellite. Use Rinex ID or PRN: S20-S
-    # 58 or S120-S158.
-    #  +W<nn>,+S<nn>,+w <nn> Include SBAS (WAAS) satellite (used after -W). Use Rinex 
-    # ID or PRN: S20-S58 or S120-S158.
-    #  -J                 Exclude all QZSS satellites.
-    #  -J<nn>             Exclude QZSS satellite J##. Use Rinex ID or PRN: J01-J10, J1
-    # 93-J202, J183-J192.
-    #  +J<nn>             Include QZSS satellite J## (used after -J). Use Rinex ID or 
-    # PRN: J01-J10, J193-J202, J183-J192.
-    #  -IRN               Exclude all IRNSS satellites.
-    #  -IRN7              7 IRNSS satellites support only.
-    #  -I<nn>             Exclude IRNSS satellite I##.
-    #  +I<nn>             Include IRNSS satellite I## (used after -IRN).
-    #  -1,-2,..,-5, ..,-9 Exclude all selected band measurements from output RINEX. (F
-    # or example, -1 exludes C1, L1, P1, D1, S1).
-    #  -C2                Ignore all L2C channel measurements (GPS/GLONASS only).
-    #  --no-L1C           Ignore L1-C/A carrier phase/doppler/SNR (GPS/GLONASS only).
-    #  --no-L1P           Ignore L1-P carrier phase/doppler/SNR (GPS/GLONASS only).
-    #  --no-L2C           Ignore L2-C/A carrier phase/doppler/SNR (GPS/GLONASS only).
-    #  --no-L2P           Ignore L2-P carrier phase/doppler/SNR (GPS/GLONASS only).
-    #  --no-C1C           Ignore L1-C/A pseudorange (GPS/GLONASS only).
-    #  --no-C1P           Ignore L1-P pseudorange (GPS/GLONASS only).
-    #  --no-C2C           Ignore L2-C/A pseudorange (GPS/GLONASS only).
-    #  --no-C2P           Ignore L2-P pseudorange (GPS/GLONASS only).
-    #  --no-rM            Skip rM messages. Same as --skip rM.
-    #  --no-rD            Skip rD messages. Same as --skip rD.
-    #  --no-rL            Skip rL messages. Same as --skip rL.
-    #  --no-rS            Skip rS messages. Same as --skip rS.
-    #  --use-rM           Ignore all regular TPS messages, use rM messages.
-    #  --use-rD           Ignore all regular TPS messages, use rD messages.
-    #  --skip <Id[,Id]>   Skip list of TPS messages.
-    #  -I <sec>           Interval in seconds. Floating point value is OK.
-    #  -L <n>             If Leap Seconds information is missing, force Leap Seconds t
-    # o <n>.
-    #  -D                 Exclude Doppler.
-    #  -O                 Include Receiver Clock Offset in epoch header lines.
-    #  --apply-clock-bias Apply Receiver Clock Offset to epoch time, carrier phases an
-    # d pseudoranges.
-    #  --keep-epoch-time  Option --apply-clock-bias applied to carrier phases and pseu
-    # doranges using doppler.
-    #  -S                 Include observation types S1,S2. Units: dB*Hz.
-    #  -~                 Apply Smoothing to pseudoranges.
-    #  -M <Name>          Override any Marker Name found in profile or input file.
-    #  -m <Number>        Override any Marker Number found in profile or input file.
-    #  -T <Type>          Override any Marker Type found in profile (GEODETIC and NON_
-    # GEODETIC mean static survey mode).
-    #  -A <Name>          Override Antenna type name. For details type 'TPS2RIN -A ?'.
-    #  -a <Number>        Override Antenna Serial # found in profile or input file.
-    #  --slant <r>,<v>    Convert antenna height from SLANT to VERTICAL: r - radius, m
-    # m; v - C1-A1, mm.
-    #  --meteo-model <model>
-    #  -Met.Model <model> Override Meteo Device Model found in profile.
-    #  --meteo-type <type>
-    #  -Met.Type <type>   Override Meteo Device Type found in profile.
-    #  --sn               Prefer to output receiver serial number instead of receiver 
-    # id.
-    #  -=                 Ignore User Events. For details type .TPS2RIN -= ?'.
-    #  -XYZ <X> <Y> <Z>   Override approximate XYZ calculated from raw position or giv
-    # en in profile.
-    #  -c                 Use Hatanaka Compression.
-    #  -N <ABCD>          Short Marker Name alias for Marker Name.
-    #  --lfn <R,CAN,00>   Use long file name format. R is data source, CAN - country c
-    # ode,
-    #                     00 - station code (monument 0-9 and receiver 0-9 numbers).
-    #  --file-period <n>  Rotation File period in seconds for file name generation.
-    #  --doi              Digital Object Identifier (DOI) for data citation.
-    #  --license          Name of the license or link to the specific version of the l
-    # icense.
-    #  --station-info     The link to persistent URL with the station metadata.
-    #  --no-cnav          Don't use common navigational file for RINEX 3.0.
-    #  --no-obs           Don't create observation file.
-    #  --no-eph           Don't create ephemeris files.
-    #  --no-meteo         Don't create meteo file.
-    #  --no-tilt          Don't create angular file.
-    #  --no-extra         Don't create any extra files except observation and ephemeri
-    # s.
-    #  --sort             Sort satellites in epochs.
-    #  --keep-eph         Keep all present ephemeris.
-    #  --sort-eph         Sort ephemeris by satellites and time.
-    #  --binex            Input stream contains BINEX messages.
-    #  --binex-use <##>   Select measurements from given subrecord ## of record 7F.
-    #                     Subrecords 00, 02, 03 and 05 are supported.
-    #  --binex-skip <##>  Skip record ##. May use several times.
-    #  --binex-7F05-fmt   Format for record 7F subrecord 05 RxClkOff field.
-    #                     Valid values are "s+21b" or "2c22b" (default).
-    #  --log <log file>   Write log file. Use '-' for writing to stdout.
-    #  --preview          Scan the file and print a short summary.
-    #  --print            Print all TPS messages to the log file.
-    #  --utf8             Log file has UTF-8 charset.
+    It has the same behavior as all the `cmd_build` functions
+
+    Parameters
+    ----------
+    inp_raw_fpath : str or Path
+        the path of the input Raw GNSS file.
+    out_dir : str or Path
+        the path of the output directory.
+    bin_options_custom : list, optional
+        a list for custom option arguments. The default is [].
+    bin_kwoptions_custom : dict, optional
+        a dictionary for custom keywords arguments. The default is dict().
+    bin_path : str, optional
+        the path the executed binary.
+        The default is "tps2rin".
+
+    Returns
+    -------
+    cmd_use : list of string
+        the command as a mono-string in list (singleton).
+        Ready to be used by subprocess.run
+    cmd_list : list of strings
+        the command as a list of strings, splited for each element.
+    cmd_str : string
+        the command as a concatenated string.
+        
+    Note
+    ----
+    Usage of `tps2rin`
+    
+    TPS2RIN 1.0.28.3459 Win64 build Jun 01, 2022 (c) Topcon Positioning Systems
+    Conversion of TPS file to RINEX.
+    Usage :  TPS2RIN  [<sw> [ <sw>]]  <input file name> [<sw> [ <sw>]]
+    <Switches(sw)>:
+      -h, -?, --help     Display help screen.
+      -v <version>       Set RINEX version. Valid are 2.10, 2.11, 2.12, 3.00, 3.01, 3
+    .02, 3.03, 3.04, 3.05, 4.00 versions.
+                        Default version is 3.05.
+      -o <output dir>    Output directory. Current directory used by default.
+      -p <Profile name>  For detailed help type 'TPS2RIN -p ?'.
+      -i <input file>    Specify input file name. Required if <input file> starts wit
+    h '-' or '+'.
+      -s <StartTime>     Start date/time. For detailed help type 'TPS2RIN -s ?'.
+      -f <FinishTime>    Finish date/time. For detailed help type 'TPS2RIN -f ?'.
+      --date <CurrTime>  Current date/time. For detailed help type 'TPS2RIN --date ?'
+    .
+      -G                 Exclude all GPS satellites.
+      -G<nn>,-g <nn>     Exclude GPS satellite G##.
+      +G<nn>,+g <nn>     Include GPS satellite G## (used after -G).
+      -R                 Exclude all GLONASS satellites.
+      -R<nn>,-r <nn>     Exclude GLONASS satellite R##.
+      +R<nn>,+r <nn>     Include GLONASS satellite R## (used after -R).
+      -E                 Exclude all GALILEO satellites.
+      -E<nn>             Exclude GALILEO satellite E##.
+      +E<nn>             Include GALILEO satellite E## (used after -E).
+      -C                 Exclude all BeiDou satellites.
+      -C<nn>             Exclude BeiDou satellite C##.
+      +C<nn>             Include BeiDou satellite C## (used after -C).
+      -W                 Exclude all SBAS (WAAS) satellites, including QZSS 183-192.
+      -W<nn>,-S<nn>,-w <nn> Exclude SBAS (WAAS) satellite. Use Rinex ID or PRN: S20-S
+    58 or S120-S158.
+      +W<nn>,+S<nn>,+w <nn> Include SBAS (WAAS) satellite (used after -W). Use Rinex 
+    ID or PRN: S20-S58 or S120-S158.
+      -J                 Exclude all QZSS satellites.
+      -J<nn>             Exclude QZSS satellite J##. Use Rinex ID or PRN: J01-J10, J1
+    93-J202, J183-J192.
+      +J<nn>             Include QZSS satellite J## (used after -J). Use Rinex ID or 
+    PRN: J01-J10, J193-J202, J183-J192.
+      -IRN               Exclude all IRNSS satellites.
+      -IRN7              7 IRNSS satellites support only.
+      -I<nn>             Exclude IRNSS satellite I##.
+      +I<nn>             Include IRNSS satellite I## (used after -IRN).
+      -1,-2,..,-5, ..,-9 Exclude all selected band measurements from output RINEX. (F
+    or example, -1 exludes C1, L1, P1, D1, S1).
+      -C2                Ignore all L2C channel measurements (GPS/GLONASS only).
+      --no-L1C           Ignore L1-C/A carrier phase/doppler/SNR (GPS/GLONASS only).
+      --no-L1P           Ignore L1-P carrier phase/doppler/SNR (GPS/GLONASS only).
+      --no-L2C           Ignore L2-C/A carrier phase/doppler/SNR (GPS/GLONASS only).
+      --no-L2P           Ignore L2-P carrier phase/doppler/SNR (GPS/GLONASS only).
+      --no-C1C           Ignore L1-C/A pseudorange (GPS/GLONASS only).
+      --no-C1P           Ignore L1-P pseudorange (GPS/GLONASS only).
+      --no-C2C           Ignore L2-C/A pseudorange (GPS/GLONASS only).
+      --no-C2P           Ignore L2-P pseudorange (GPS/GLONASS only).
+      --no-rM            Skip rM messages. Same as --skip rM.
+      --no-rD            Skip rD messages. Same as --skip rD.
+      --no-rL            Skip rL messages. Same as --skip rL.
+      --no-rS            Skip rS messages. Same as --skip rS.
+      --use-rM           Ignore all regular TPS messages, use rM messages.
+      --use-rD           Ignore all regular TPS messages, use rD messages.
+      --skip <Id[,Id]>   Skip list of TPS messages.
+      -I <sec>           Interval in seconds. Floating point value is OK.
+      -L <n>             If Leap Seconds information is missing, force Leap Seconds t
+    o <n>.
+      -D                 Exclude Doppler.
+      -O                 Include Receiver Clock Offset in epoch header lines.
+      --apply-clock-bias Apply Receiver Clock Offset to epoch time, carrier phases an
+    d pseudoranges.
+      --keep-epoch-time  Option --apply-clock-bias applied to carrier phases and pseu
+    doranges using doppler.
+      -S                 Include observation types S1,S2. Units: dB*Hz.
+      -~                 Apply Smoothing to pseudoranges.
+      -M <Name>          Override any Marker Name found in profile or input file.
+      -m <Number>        Override any Marker Number found in profile or input file.
+      -T <Type>          Override any Marker Type found in profile (GEODETIC and NON_
+    GEODETIC mean static survey mode).
+      -A <Name>          Override Antenna type name. For details type 'TPS2RIN -A ?'.
+      -a <Number>        Override Antenna Serial # found in profile or input file.
+      --slant <r>,<v>    Convert antenna height from SLANT to VERTICAL: r - radius, m
+    m; v - C1-A1, mm.
+      --meteo-model <model>
+      -Met.Model <model> Override Meteo Device Model found in profile.
+      --meteo-type <type>
+      -Met.Type <type>   Override Meteo Device Type found in profile.
+      --sn               Prefer to output receiver serial number instead of receiver 
+    id.
+      -=                 Ignore User Events. For details type .TPS2RIN -= ?'.
+      -XYZ <X> <Y> <Z>   Override approximate XYZ calculated from raw position or giv
+    en in profile.
+      -c                 Use Hatanaka Compression.
+      -N <ABCD>          Short Marker Name alias for Marker Name.
+      --lfn <R,CAN,00>   Use long file name format. R is data source, CAN - country c
+    ode,
+                        00 - station code (monument 0-9 and receiver 0-9 numbers).
+      --file-period <n>  Rotation File period in seconds for file name generation.
+      --doi              Digital Object Identifier (DOI) for data citation.
+      --license          Name of the license or link to the specific version of the l
+    icense.
+      --station-info     The link to persistent URL with the station metadata.
+      --no-cnav          Don't use common navigational file for RINEX 3.0.
+      --no-obs           Don't create observation file.
+      --no-eph           Don't create ephemeris files.
+      --no-meteo         Don't create meteo file.
+      --no-tilt          Don't create angular file.
+      --no-extra         Don't create any extra files except observation and ephemeri
+    s.
+      --sort             Sort satellites in epochs.
+      --keep-eph         Keep all present ephemeris.
+      --sort-eph         Sort ephemeris by satellites and time.
+      --binex            Input stream contains BINEX messages.
+      --binex-use <##>   Select measurements from given subrecord ## of record 7F.
+                        Subrecords 00, 02, 03 and 05 are supported.
+      --binex-skip <##>  Skip record ##. May use several times.
+      --binex-7F05-fmt   Format for record 7F subrecord 05 RxClkOff field.
+                        Valid values are "s+21b" or "2c22b" (default).
+      --log <log file>   Write log file. Use '-' for writing to stdout.
+      --preview          Scan the file and print a short summary.
+      --print            Print all TPS messages to the log file.
+      --utf8             Log file has UTF-8 charset.
+    """
     
     #### Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
