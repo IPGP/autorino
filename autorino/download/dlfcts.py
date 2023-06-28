@@ -151,7 +151,3 @@ def download_file_http(url, output_dir):
             pbar.update(len(data))
     
         return output_path
-
-
-
-
