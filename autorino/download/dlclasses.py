@@ -6,18 +6,27 @@ import datetime as dt
 import pandas as pd
 import numpy as np
 import os
+import dateparser
 from autorino import download as ardl
+
+pd.options.mode.chained_assignment = 'warn'
 
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
 
 def _translator_epoch(path_input,epoch):
+    """
+    set the correct epoch in path_input string the with the strftime aliases
+    https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+    """
     path_translated = str(path_input)
     path_translated = epoch.strftime(path_translated)
     return path_translated
 
 def _translator_keywords(path_input,translator_dict):
+    """
+    """
     path_translated = str(path_input)
     for k,v in translator_dict.items():
         path_translated = path_translated.replace("<"+k+">",v)
@@ -32,15 +41,18 @@ def translator(path_input,epoch=None,translator_dict=None):
     return path_translated
 
 class SessionGnss:
-    def __init__(self,protocol,hostname,remote_dir,remote_fname,
-                 sta_user,sta_pass,site4,session_period):
+    def __init__(self,name,protocol,hostname,remote_dir,
+                 remote_fname, sta_user,sta_pass,site,session_period):
+        self.name = name
         self.protocol = protocol
         self.hostname = hostname
         self.remote_dir = remote_dir ## setter bellow
         self.remote_fname = remote_fname
         self.sta_user = sta_user
         self.sta_pass = sta_pass  
-        self.site4 = site4           
+        self.site = site ## setter bellow
+        self.site4 = site  ## setter bellow       
+        self.site9 = site   ## setter bellow         
         self.session_period = session_period
         self.translate_dict = self._translate_dict_init()
         
@@ -60,27 +72,101 @@ class SessionGnss:
             self._remote_dir = "".join(list(value)[1:])
         else:
             self._remote_dir = value
-    
+
+    @property
+    def site4(self):
+        return self._site4
+    @site4.setter
+    def site4(self,value):
+        self._site4 = value[:4]
+
+    @property
+    def site9(self):
+        return self._site9
+    @site9.setter
+    def site9(self,value):
+        if len(value) == 9:
+            self._site9 = value
+        elif len(value) == 4:
+            self._site9 = value + "00XXX"
+        else:
+            raise Exception("given site code != 9 or 4 chars.: " + value)
+            
+    ############ methods
     def _translate_dict_init(self):
         """
         generate the translation dict based on all the SessionGnss 
         object attributes
+        
+        site code have 2 declinations: 
+        <site> (lowercase) and <SITE> (uppercase)
         """
         trsltdict = dict()
         attributes = [a for a in dir(self) if not a.startswith('__') and not callable(getattr(self, a))]
         for a in attributes:
-            trsltdict[a.upper()] = str(getattr(self, a)).upper()
-            trsltdict[a.lower()] = str(getattr(self, a)).lower()
+            trsltdict[a] = str(getattr(self, a)).upper()
+            if a.lower() in ('site','site4','site9'):
+                trsltdict[a.upper()] = str(getattr(self, a)).upper()
+                trsltdict[a.lower()] = str(getattr(self, a)).lower()
         return trsltdict
 
+
+def dateparser_frontend(date_in,tz="UTC"):
+    """
+    Frontend function to parse a string/datetime 
+    to a Pandas Timestamp 
+    (standard used for the RequestGnss object)
+    Also apply a timezone (UTC per default)
+    
+    NB: the rounding will not take place here
+    rounding is not a parsing operation
+    """
+    if type(date_in) is str:
+        date_out = pd.Timestamp(dateparser.parse(date_in))
+    else:
+         date_out = pd.Timestamp(date_in)
+    
+    if not date_out.tz:
+        date_out = pd.Timestamp(date_out, tz=tz)
+    
+    return date_out
+    
+def dateround_frontend(date_in,period,round_method="ceil"):
+    """    
+    Frontend function to round a Pandas Timestamp 
+    according to the "ceil", "floor" or "round" approach
+    """
+    if round_method == "ceil":
+        date_out = date_in.ceil(period)
+    elif round_method == "floor":
+        date_out = date_in.floor(period)        
+    elif round_method == "round":
+        date_out = date_in.ceil(period)
+    else:
+        raise Exception
+        
+    return date_out
+        
+
 class EpochRange:
-    def __init__(self,epoch1,epoch2,period="01D",round_method="ceil"):
+    def __init__(self,epoch1,epoch2,
+                 period="01D",
+                 round_method="ceil",
+                 tz="UTC"):
         self.period = period
         self.round_method = round_method
-        self.epoch_start_raw = np.min((epoch1,epoch2))
-        self.epoch_end_raw = np.max((epoch1,epoch2))
-        self.epoch_start = self.epoch_start_raw  ### setter bellow
-        self.epoch_end = self.epoch_end_raw      ### setter bellow
+        self.tz = tz
+
+        self._epoch1_raw = epoch1
+        self._epoch2_raw = epoch2
+    
+        _epoch1tmp = dateparser_frontend(self._epoch1_raw)
+        _epoch2tmp = dateparser_frontend(self._epoch2_raw)
+        _epoch_min_tmp = np.min((_epoch1tmp,_epoch2tmp))
+        _epoch_max_tmp = np.max((_epoch1tmp,_epoch2tmp))
+        
+        self.epoch_start = _epoch_min_tmp  ### setter bellow
+        self.epoch_end   = _epoch_max_tmp  ### setter bellow
 
     def __repr__(self):
         return "epoch range from {} to {}, period {}".format(self.epoch_start,self.epoch_end,self.period)
@@ -89,19 +175,21 @@ class EpochRange:
     @property
     def epoch_start(self):
         return self._epoch_start
-        
     @epoch_start.setter
     def epoch_start(self,value):
-        self._epoch_start = pd.Timestamp(value).ceil(self.period)
-    
+        self._epoch_start = dateparser_frontend(value,tz=self.tz)
+        self._epoch_start = dateround_frontend(self._epoch_start,
+                                               self.period,
+                                               self.round_method) 
     @property
     def epoch_end(self):
         return self._epoch_end
-        
     @epoch_end.setter
     def epoch_end(self,value):
-        self._epoch_end = pd.Timestamp(value).ceil(self.period)
-        
+        self._epoch_end = dateparser_frontend(value,tz=self.tz) 
+        self._epoch_end = dateround_frontend(self._epoch_end,
+                                             self.period,
+                                             self.round_method) 
     ########### methods
     def epoch_range_list(self):
         epochrange=pd.date_range(self.epoch_start,
@@ -116,6 +204,7 @@ class RequestGnss():
         self.out_dir = out_dir
         self.req_table = self._req_table_init()
         
+    ######## getter and setter 
     @property
     def epoch_range(self):
         return self._epoch_range
@@ -126,12 +215,14 @@ class RequestGnss():
         if self._epoch_range.period != self.session.session_period:  
             logger.warn("Session period (%s) != Epoch Range period (%s)",self.session.session_period,self._epoch_range.period)
 
+    ######## internal methods 
     def _req_table_init(self):
         df = pd.DataFrame(columns=["epoch","fname",
                                    "ok_remote",
                                    "ok_local",
                                    "fpath_remote",
-                                   "fpath_local"])
+                                   "fpath_local",
+                                   "size_local"])
                                    
         df.epoch = self.epoch_range.epoch_range_list()
         df.set_index("epoch",inplace=True,drop=True)
@@ -244,7 +335,8 @@ class RequestGnss():
         
     def check_local_files(self):
         """
-        check the existence of the local files
+        check the existence of the local files, and set the corresponding
+        booleans in the ok_local column
         """
         
         local_files_list = []
@@ -252,12 +344,31 @@ class RequestGnss():
         for epoch,local_file in self.req_table.fpath_local.items():
             if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
                 self.req_table.ok_local.loc[epoch] = True
+                self.req_table.size_local.loc[epoch] = os.path.getsize(local_file)
+
                 local_files_list.append(local_file)
             else:
                 self.req_table.ok_local.loc[epoch] = False
                 
         return local_files_list
-    
+        
+    def invalidate_small_local_files(self,threshold=.80):
+        """
+        if the local file is smaller than threshold * median 
+        of the considered local files in the request table
+        the ok_local boolean is set at False, and the local file 
+        is redownloaded
+        
+        check_local_files must be launched 1st
+        """
+        
+        med = self.req_table.size_local.median(skipna=True)
+        valid_bool = threshold * med < self.req_table.size_local
+        self.req_table.loc[:,"ok_local"] = valid_bool
+        invalid_local_files_list = list(self.req_table.fpath_local[valid_bool])
+
+        return invalid_local_files_list
+
 
     def download_remote_files(self,force_download=False):
         """
@@ -298,15 +409,17 @@ class RequestGnss():
                     file_dl = ardl.download_file_http(rmot_file,
                                                       outdir_use)
                     dl_ok = True
-                except:
-                    pass
+                except Exception as e:
+                    logger.error("HTTP download error: %s",str(e))
+                    dl_ok = False
                     
             elif self.session.protocol == "ftp":
                 try:
                     file_dl = ardl.download_file_ftp(rmot_file,
-                                                    outdir_use,
-                                                    self.session.sta_user,
-                                                    self.session.sta_pass)
+                                                     outdir_use,
+                                                     self.session.sta_user,
+                                                     self.session.sta_pass)
+                    dl_ok = True
                 except ftplib.error_perm as e:
                     logger.error("FTP download error: %s",str(e))
                     dl_ok = False
@@ -317,9 +430,9 @@ class RequestGnss():
             ###### store the results in the req_table
             if dl_ok:
                 download_files_list.append(file_dl)
-                self.req_table.fpath_local.loc[epoch] = file_dl
-                self.req_table.ok_local.loc[epoch] = True
+                self.req_table.loc[epoch,"ok_local"] = True
+                self.req_table.loc[epoch,"fpath_local"] = file_dl
             else:
-                self.req_table.ok_local.loc[epoch] = False
+                self.req_table.loc[epoch,"ok_local"] = False
                 
         return download_files_list

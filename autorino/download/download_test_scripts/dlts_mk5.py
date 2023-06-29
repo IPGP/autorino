@@ -68,6 +68,7 @@ site4="ABD0"
 session_period="01D"
 
 
+
 #######' HOUE
 protocol = "ftp"
 hostname="gps-houe.terrain.ovsg.univ-ag.fr"
@@ -77,6 +78,7 @@ sta_user="root"
 sta_pass="ovsg13;:"
 site4="HOUE"
 session_period="01D"
+
 
 # PSA1
 protocol = "http"
@@ -90,12 +92,14 @@ session_period="01D"
 
 ###########################################################################################
 
-SESS = ardl.SessionGnss(protocol = protocol,
+SESS = ardl.SessionGnss(
+name="toto",
+protocol = protocol,
 remote_dir=remote_dir,
 hostname=hostname,
 sta_user=sta_user,
 sta_pass=sta_pass,
-site4=site4,
+site=site4,
 session_period=session_period,
 remote_fname=remote_fname)
 

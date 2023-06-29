@@ -19,7 +19,7 @@ from ftplib import FTP
 import requests
 from bs4 import BeautifulSoup
 from tqdm.contrib.logging import logging_redirect_tqdm
-
+import io
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
@@ -36,6 +36,26 @@ class AutorinoError(Exception):
 class AutorinoDownloadError(AutorinoError):
     pass
 
+
+
+
+
+class TqdmToLogger(io.StringIO):
+    """
+        Output stream for TQDM which will output to logger module instead of
+        the StdOut.
+    """
+    logger = None
+    level = None
+    buf = ''
+    def __init__(self,logger,level=None):
+        super(TqdmToLogger, self).__init__()
+        self.logger = logger
+        self.level = level or logging.INFO
+    def write(self,buf):
+        self.buf = buf.strip('\r\n\t ')
+    def flush(self):
+        self.logger.log(self.level, self.buf)
 
 ############# list remote files
 
@@ -122,15 +142,20 @@ def download_file_ftp(url, output_dir,username, password):
     file_size = ftp.size(filename)
 
     output_path = os.path.join(output_dir, filename)
-    with open(output_path, 'wb') as f, tqdm(total=file_size,
-                                            unit='B', 
-                                            unit_scale=True,
-                                            desc=filename) as pbar:
+    f = open(output_path, 'wb')
+
+    #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
+    with tqdm(total=file_size,
+               unit='B', 
+               unit_scale=True,
+               desc=filename) as pbar:
+                    
         _ftp_callback.bytes_transferred = 0
         ftp.retrbinary('RETR ' + filename, lambda data: (f.write(data), pbar.update(len(data))), 1024)
         ftp.quit()
-    
-        return output_path
+        
+    f.close()
+    return output_path
 
 
 def download_file_http(url, output_dir):
@@ -142,12 +167,15 @@ def download_file_http(url, output_dir):
     output_path = os.path.join(output_dir, filename)
     # Download file with progress bar
     response = requests.get(url, stream=True)
-    with open(output_path, 'wb') as f, tqdm(total=file_size,
-                                            unit='B', 
-                                            unit_scale=True,
-                                            desc=filename) as pbar:
+    
+    f = open(output_path, 'wb')
+    
+    #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
+    with tqdm(total=file_size, unit='B',
+              unit_scale=True, desc=filename) as pbar:
         for data in response.iter_content(chunk_size=1024):
             f.write(data)
             pbar.update(len(data))
-    
-        return output_path
+                
+    f.close()
+    return output_path
