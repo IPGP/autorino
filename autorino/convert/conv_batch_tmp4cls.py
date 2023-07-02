@@ -151,41 +151,12 @@ def converter_batch(input_files,
         frnxtmp, _ = arcv.converter_run(fraw,
                                         outdir_converted,
                                         converter = conve)
-        
         if frnxtmp:
             logline.frnx_tmp = frnxtmp
             logline.ok_conv = True
             logline.date, _ = operational.rinex_start_end(frnxtmp)
         else:
             logline.ok_conv = False
-
-
-        #############################################################
-        #### RINEXMOD            
-        try:
-            frinfin = rinexmod_api.rinexmod(frnxtmp,
-                                            outdir_rinexmoded_use,
-                                            marker=site,
-                                            compression="gz",
-                                            longname=True,
-                                            sitelog=sitelogs,
-                                            force_rnx_load=True,
-                                            verbose=False,
-                                            full_history=True)
-            logline.ok_rnxmod = True
-            logline.frnx_fin = frinfin
-            logline.to_csv(log_table,mode="a",index=False,header=False)
-            
-            #utils.write_in_file(str(fraw), log_raw_ok,append=True)
-            #utils.write_in_file(str(frnxtmp), log_rnx_ok,append=True)
-        except:
-            
-            logline.ok_rnxmod = False
-            logline.to_csv(log_table,mode="a",index=False,header=False)
-            
-            #utils.write_in_file(str(fraw), log_rnx_fail,append=True)
-            #utils.write_in_file(str(frnxtmp), log_rnx_fail2,append=True)
-            continue
 
     return None
 
