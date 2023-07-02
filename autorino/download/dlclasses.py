@@ -115,7 +115,7 @@ def dateparser_frontend(date_in,tz="UTC"):
     """
     Frontend function to parse a string/datetime 
     to a Pandas Timestamp 
-    (standard used for the RequestGnss object)
+    (standard used for the DownloadGnss object)
     Also apply a timezone (UTC per default)
     
     NB: the rounding will not take place here
@@ -196,13 +196,32 @@ class EpochRange:
                                  self.epoch_end,
                                  freq=self.period)
         return list(epochrange)
-    
-class RequestGnss():
+
+
+
+
+class WorkflowGnss():
+    def __init__(self,session,epoch_range):
+        self.session = session
+        self.epoch_range = epoch_range ### setter bellow
+        self.out_dir = out_dir
+        self.table = self._table_init()
+
+class ConvertGnss():
+    def __init__():
+        pass
+
+class RinexHeaderModGnss():
+    def __init__():
+        pass
+
+
+class DownloadGnss():
     def __init__(self,session,epoch_range,out_dir):
         self.session = session
         self.epoch_range = epoch_range ### setter bellow
         self.out_dir = out_dir
-        self.req_table = self._req_table_init()
+        self.table = self._table_init()
         
     ######## getter and setter 
     @property
@@ -216,7 +235,7 @@ class RequestGnss():
             logger.warn("Session period (%s) != Epoch Range period (%s)",self.session.session_period,self._epoch_range.period)
 
     ######## internal methods 
-    def _req_table_init(self):
+    def _table_init(self):
         df = pd.DataFrame(columns=["epoch","fname",
                                    "ok_remote",
                                    "ok_local",
@@ -236,7 +255,7 @@ class RequestGnss():
                                  guess_local=True):
         """
         Guess the paths and name of the remote files based on the 
-        Session and EpochRange attributes of the GnssRequest
+        Session and EpochRange attributes of the DownloadGnss
         """
         
         if not self.session.remote_fname:
@@ -263,8 +282,8 @@ class RequestGnss():
                 rmot_fname_use = os.path.basename(rmot_path_use)
                                            
                 rmot_paths_list.append(rmot_path_use)
-                self.req_table.loc[epoch,"fname"]        = rmot_fname_use
-                self.req_table.loc[epoch,"fpath_remote"] = rmot_path_use
+                self.table.loc[epoch,"fname"]        = rmot_fname_use
+                self.table.loc[epoch,"fpath_remote"] = rmot_path_use
                 logger.debug("remote file guessed: %s",rmot_path_use)
 
             ### guess the potential local files
@@ -281,8 +300,8 @@ class RequestGnss():
                 local_fname_use = os.path.basename(local_path_use)
                                            
                 local_paths_list.append(local_path_use)
-                self.req_table.loc[epoch,"fname"]       = local_fname_use
-                self.req_table.loc[epoch,"fpath_local"] = local_path_use
+                self.table.loc[epoch,"fname"]       = local_fname_use
+                self.table.loc[epoch,"fpath_local"] = local_path_use
                 logger.debug("local file guessed: %s",local_path_use)
       
         rmot_paths_list = sorted(list(set(rmot_paths_list)))
@@ -341,14 +360,14 @@ class RequestGnss():
         
         local_files_list = []
         
-        for epoch,local_file in self.req_table.fpath_local.items():
+        for epoch,local_file in self.table.fpath_local.items():
             if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
-                self.req_table.ok_local.loc[epoch] = True
-                self.req_table.size_local.loc[epoch] = os.path.getsize(local_file)
+                self.table.ok_local.loc[epoch] = True
+                self.table.size_local.loc[epoch] = os.path.getsize(local_file)
 
                 local_files_list.append(local_file)
             else:
-                self.req_table.ok_local.loc[epoch] = False
+                self.table.ok_local.loc[epoch] = False
                 
         return local_files_list
         
@@ -362,10 +381,10 @@ class RequestGnss():
         check_local_files must be launched 1st
         """
         
-        med = self.req_table.size_local.median(skipna=True)
-        valid_bool = threshold * med < self.req_table.size_local
-        self.req_table.loc[:,"ok_local"] = valid_bool
-        invalid_local_files_list = list(self.req_table.fpath_local[valid_bool])
+        med = self.table.size_local.median(skipna=True)
+        valid_bool = threshold * med < self.table.size_local
+        self.table.loc[:,"ok_local"] = valid_bool
+        invalid_local_files_list = list(self.table.fpath_local[valid_bool])
 
         return invalid_local_files_list
 
@@ -375,15 +394,15 @@ class RequestGnss():
         will download locally the files which have been identified by 
         the guess_remote_files method
         
-        exploits the fname_remote column of the RequestGnss.req_table
+        exploits the fname_remote column of the DownloadGnss.table
         attribute
         """
         download_files_list = []
                 
-        for (epoch,rmot_file),(_,local_file) in zip(self.req_table.fpath_remote.items(),
-                                                    self.req_table.fpath_local.items()):
+        for (epoch,rmot_file),(_,local_file) in zip(self.table.fpath_remote.items(),
+                                                    self.table.fpath_local.items()):
             ###### check if the file exists locally
-            if self.req_table.loc[epoch,'ok_local'] == True and not force_download:
+            if self.table.loc[epoch,'ok_local'] == True and not force_download:
                  logger.info("%s already exists locally, skip",os.path.basename(local_file))
                  continue
 
@@ -427,12 +446,12 @@ class RequestGnss():
             else: ### this case should never happen since there is a protocol test at the begining
                 pass
 
-            ###### store the results in the req_table
+            ###### store the results in the table
             if dl_ok:
                 download_files_list.append(file_dl)
-                self.req_table.loc[epoch,"ok_local"] = True
-                self.req_table.loc[epoch,"fpath_local"] = file_dl
+                self.table.loc[epoch,"ok_local"] = True
+                self.table.loc[epoch,"fpath_local"] = file_dl
             else:
-                self.req_table.loc[epoch,"ok_local"] = False
+                self.table.loc[epoch,"ok_local"] = False
                 
         return download_files_list
