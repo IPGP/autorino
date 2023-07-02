@@ -15,7 +15,7 @@ Created on Wed Mar  8 18:45:58 2023
 """
 
 from geodezyx import utils,  operational
-import autorino.convert.converters as cv
+import autorino.convert as arcv
 import rinexmod_api
 from pathlib import Path
 import os
@@ -148,9 +148,9 @@ def converter_batch(input_files,
         #### CONVERSION
         logline.ok_init = True
 
-        frnxtmp, _ = cv.converter_run(fraw,
-                                      outdir_converted,
-                                      converter = conve)
+        frnxtmp, _ = arcv.converter_run(fraw,
+                                        outdir_converted,
+                                        converter = conve)
         
         if frnxtmp:
             logline.frnx_tmp = frnxtmp
