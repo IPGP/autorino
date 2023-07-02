@@ -39,11 +39,11 @@ maxyear = 2023
 
 ########## process ALL
 flist = "/home/sakic/020_TEMP/Raw_all_GL_mk01a.list"
-outdir = "/scratch/convgnss/051_big_conv_GL_2022a"
+outdir = "/scratch/convgnss/053_big_conv_GL_2016"
 regex=".*(ABD0|ABG0|ADE0|AGAL|AMC0|ASF0|BULG|CBE0|CRA2|DEHA|DHS0|DSD0|F562|F8O2|FFE0|FNA0|FNG0|HOUE|LDIS|LEN0|MAD0|MGL0|PAR1|PSA1|SBL0|SOUF|STG0|STMT|TAR1|TDB0).*"
 nyear = 6
-minyear = 2022
-maxyear = 2023
+minyear = 2016
+maxyear = 2016
 
 ##################################################################
 raw_excl_list = tuple(utils.find_recursive(outdir,'*_rnx_fail.log'))
