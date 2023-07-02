@@ -18,18 +18,53 @@ from tqdm import tqdm
 from ftplib import FTP
 import requests
 from bs4 import BeautifulSoup
-
-
+from tqdm.contrib.logging import logging_redirect_tqdm
+import io
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
 
+
+
+
+
+# *****************************************************************************
+# define Python user-defined exceptions
+class AutorinoError(Exception):
+    pass
+
+class AutorinoDownloadError(AutorinoError):
+    pass
+
+
+
+
+
+class TqdmToLogger(io.StringIO):
+    """
+        Output stream for TQDM which will output to logger module instead of
+        the StdOut.
+    """
+    logger = None
+    level = None
+    buf = ''
+    def __init__(self,logger,level=None):
+        super(TqdmToLogger, self).__init__()
+        self.logger = logger
+        self.level = level or logging.INFO
+    def write(self,buf):
+        self.buf = buf.strip('\r\n\t ')
+    def flush(self):
+        self.logger.log(self.level, self.buf)
+
 ############# list remote files
 
 def list_remote_files_ftp(host_name, remote_dir, username, password):
-    # clean hostname
+    # clean hostname & remote_dir
+    remote_dir = remote_dir.replace(host_name,"")
     host_name = host_name.replace('ftp://',"")
     host_name = host_name.replace('/',"")
+    remote_dir = remote_dir.replace(host_name,"")
     
     # connect to FTP server
     ftp = ftplib.FTP(host_name)
@@ -91,7 +126,7 @@ def size_remote_file_http(url):
 ############# download remote file
 
 def download_file_ftp(url, output_dir,username, password):
-    # Check if URL is HTTP or FTP
+    ##### Check if URL is HTTP or FTP
     url = Path(url)
     url_host = str(url.parts[0])
     url_dir  = str(Path(*url.parts[1:-1]))
@@ -105,16 +140,22 @@ def download_file_ftp(url, output_dir,username, password):
         _ftp_callback.bytes_transferred += len(data)
     
     file_size = ftp.size(filename)
+
     output_path = os.path.join(output_dir, filename)
-    with open(output_path, 'wb') as f, tqdm(total=file_size,
-                                            unit='B', 
-                                            unit_scale=True,
-                                            desc=filename) as pbar:
+    f = open(output_path, 'wb')
+
+    #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
+    with tqdm(total=file_size,
+               unit='B', 
+               unit_scale=True,
+               desc=filename) as pbar:
+                    
         _ftp_callback.bytes_transferred = 0
         ftp.retrbinary('RETR ' + filename, lambda data: (f.write(data), pbar.update(len(data))), 1024)
         ftp.quit()
-    
-        return output_path
+        
+    f.close()
+    return output_path
 
 
 def download_file_http(url, output_dir):
@@ -126,12 +167,15 @@ def download_file_http(url, output_dir):
     output_path = os.path.join(output_dir, filename)
     # Download file with progress bar
     response = requests.get(url, stream=True)
-    with open(output_path, 'wb') as f, tqdm(total=file_size,
-                                            unit='B', 
-                                            unit_scale=True,
-                                            desc=filename) as pbar:
+    
+    f = open(output_path, 'wb')
+    
+    #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
+    with tqdm(total=file_size, unit='B',
+              unit_scale=True, desc=filename) as pbar:
         for data in response.iter_content(chunk_size=1024):
             f.write(data)
             pbar.update(len(data))
-    
-        return output_path
+                
+    f.close()
+    return output_path
