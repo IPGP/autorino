@@ -116,16 +116,6 @@ def converter_batch(input_files,
         ### since the fraw name can be poorly formatted
         # we search it w.r.t. the sites from the sitelogs
 
-        def _site_search_from_list(fraw_inp,site4_list_inp):
-            site_out = None
-            for s4 in site4_list_inp:
-                if re.search(s4,fraw_inp.name,re.IGNORECASE):
-                    site_out = s4
-                    break
-            if not site_out: # last chance, get the 4 1st chars of the raw file
-                site_out = fraw_inp.name[:4]
-            return site_out
-
         site =  _site_search_from_list(fraw,site4_list)       
 
 
@@ -138,7 +128,7 @@ def converter_batch(input_files,
         utils.create_dir(outdir_rinexmoded_use)
         
         ### find the right converter
-        conve = _converter_select_batch(ext)
+        conve = _converter_select_batch(fraw)
         
         logger.info("extension/converter: %s/%s",ext,conve)
     
@@ -292,13 +282,29 @@ def _filter_prev_table(flist,
 
     return list(DFflist_rerun)
 
+def _site_search_from_list(fraw_inp,site4_list_inp):
+    """
+    from a raw file with an approximate site name and a list of correct site names, search the correct site name of the raw file
+    """
+    site_out = None
+    for s4 in site4_list_inp:
+        if re.search(s4,fraw_inp.name,re.IGNORECASE):
+            site_out = s4
+            break
+    if not site_out: # last chance, get the 4 1st chars of the raw file
+        site_out = fraw_inp.name[:4]
+    return site_out
 
-def _converter_select_batch(ext):
+def _converter_select_batch(fraw_inp):
+
+    fraw = Path(fraw_inp)
+    ext = fraw.suffix.upper()
+
     if not ext or len(ext) == 0:
         conve = "tps2rin"
     elif re.match(".M[0-9][0-9]", ext):
         conve = "mdb2rinex"
-    ### here we skip all the wierd files
+    ### here we skip all the weird files
     elif re.match(".TG!$",ext) or re.match(".DAT",ext) or re.match(".Z",ext) or re.match(".BCK",ext) or re.match("^.[0-9]{3}$",ext) or re.match(".A$",ext) or re.match("Trimble",ext):
         conve = None
     else:
