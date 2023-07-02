@@ -68,11 +68,6 @@ def converter_batch(input_files,
     ### def output logs
     ts = utils.get_timestamp()
     ### the legacy OK/fail listare disabled, everything is in the table files
-    #log_raw_fail  = os.path.join(outdir_logs,ts + "_raw_fail.log")
-    #log_raw_ok    = os.path.join(outdir_logs,ts + "_raw_ok.log")
-    #log_rnx_fail  = os.path.join(outdir_logs,ts + "_rnx_fail.log")
-    #log_rnx_fail2 = os.path.join(outdir_logs,ts + "_rnx_fail2.log")
-    #log_rnx_ok    = os.path.join(outdir_logs,ts + "_rnx_ok.log")
     log_table     = os.path.join(outdir_logs,ts + "_table.log")
     table_cols = ["site","date",
                   "ok_init","ok_conv","ok_rnxmod",
