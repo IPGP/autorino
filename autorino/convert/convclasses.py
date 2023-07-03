@@ -31,6 +31,173 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
+
+
+
+def site_list_from_sitelogs(sitelogs_inp):
+    
+    ###############################################
+    ### read sitelogs        
+    if os.path.isdir(sitelogs_inp):
+        sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
+                                                     force=False)
+    
+    ### get the site (4chars) as a list 
+    site4_list = [s.site4char for s in sitelogs]
+    
+    return site4_list
+
+
+
+
+
+
+class ConvertRinexModGnss():
+    def __init__(self,session,epoch_range,out_dir,tmp_dir,sitelogs):
+        self.session = session
+        self.epoch_range = epoch_range ### setter bellow
+        self.out_dir = out_dir
+        self.tmp_dir = tmp_dir
+        self.table = self._table_init()
+        self.sitelogs = sitelogs 
+        
+    ######## getter and setter 
+    @property
+    def epoch_range(self):
+        return self._epoch_range
+        
+    @epoch_range.setter
+    def epoch_range(self,value):
+        self._epoch_range = value
+        if self._epoch_range.period != self.session.session_period:  
+            logger.warn("Session period (%s) != Epoch Range period (%s)",self.session.session_period,self._epoch_range.period)
+
+    ######## internal methods 
+    def _table_init(self):
+        # df = pd.DataFrame(columns=["epoch","fname",
+        #                            "ok_remote",
+        #                            "ok_local",
+        #                            "fpath_remote",
+        #                            "fpath_local",
+        #                            "size_local"])
+                                   
+        # df.epoch = self.epoch_range.epoch_range_list()
+        # df.set_index("epoch",inplace=True,drop=True)
+        # df = df.where(pd.notnull(df), None)        
+        
+        table_cols = ["site","date",
+                      "ok_init","ok_conv","ok_rnxmod",
+                      "fraw", "frnx_tmp", "frnx_fin",
+                      "note"]
+        
+        df = pd.DataFrame([], columns=table_cols)
+        
+        return df
+    
+    
+    ####### 
+    def load_table_from_filelist(self,
+                                 input_files,
+                                 inp_regex=".*"):
+        flist = _input_files_reader(input_files,
+                                    inp_regex)
+        
+        self.table["fraw"] = flist
+        
+        return flist
+        
+        
+    def convert_rinexmod_files(self):
+        
+        ###############################################
+        ### def output folders
+        outdir_logs = self.outdir + "/logs"
+        outdir_converted =  self.outdir + "/converted"
+        outdir_rinexmoded =  self.outdir + "/rinexmoded" 
+
+        utils.create_dir(outdir_logs)
+        utils.create_dir(outdir_converted)
+        
+        site4_list = site_list_from_sitelogs(self.sitelogs)
+                
+        for irow,row in self.table.iterrows():  
+            
+            fraw = row["fraw"]
+            
+            fraw = Path(fraw)
+            ext = fraw.suffix.upper()
+            logger.info("***** input raw file for conversion: %s",fraw.name)
+    
+            ### since the fraw name can be poorly formatted
+            # we search it w.r.t. the sites from the sitelogs
+    
+            site =  _site_search_from_list(fraw,
+                                           site4_list)       
+    
+            # logline = pd.DataFrame([[site,None,None,None,None,
+            #                          fraw,"","","no comment"]],
+            #                          columns=table_cols)
+    
+            outdir_rinexmoded_use = os.path.join(outdir_rinexmoded,
+                                                 site.upper())
+            utils.create_dir(outdir_rinexmoded_use)
+
+
+            ### find the right converter
+            conve = _converter_select_batch(fraw)
+            
+            logger.info("extension/converter: %s/%s",ext,conve)
+        
+            if not conve:
+                logger.info("file skipped, no converter found: %s",fraw)
+                #utils.write_in_file(str(fraw), log_raw_fail, append=True)
+                row.note = "no converter found"
+                row.ok_init = False
+                row.to_csv(self.table,mode="a",index=False,header=False)
+                continue
+            
+            ### a fonction to stop the docker conteners running for too long
+            # (for trimble conversion)
+            stop_long_running_containers()
+            
+            #############################################################
+            #### CONVERSION
+            row.ok_init = True
+    
+            frnxtmp, _ = arcv.converter_run(fraw,
+                                            outdir_converted,
+                                            converter = conve)
+            if frnxtmp:
+                row.frnx_tmp = frnxtmp
+                row.ok_conv = True
+                row.date, _ = operational.rinex_start_end(frnxtmp)
+            else:
+                row.ok_conv = False
+    
+    
+            #############################################################
+            #### RINEXMOD            
+            try:
+                frinfin = rinexmod_api.rinexmod(frnxtmp,
+                                                outdir_rinexmoded_use,
+                                                marker=site,
+                                                compression="gz",
+                                                longname=True,
+                                                sitelog=self.sitelogs,
+                                                force_rnx_load=True,
+                                                verbose=False,
+                                                full_history=True)
+                row.ok_rnxmod = True
+                row.frnx_fin = frinfin
+                #row.to_csv(log_table,mode="a",index=False,header=False) #### XXXMOD
+            except:
+                row.ok_rnxmod = False
+                #row.to_csv(log_table,mode="a",index=False,header=False) #### XXXMOD
+                continue
+    
+        return None
+    
+
 def converter_batch(input_files,
                     outdir,
                     inp_regex=".*",
@@ -44,116 +211,48 @@ def converter_batch(input_files,
     
     ###############################################
     ### read input lists or regex
-    flist = _input_files_reader(input_files,inp_regex)
+
     
 
-    ###############################################
-    ### read sitelogs        
-    if os.path.isdir(sitelogs_inp):
-        sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
-                                                     force=False)
+    # ##############################################
+    # ### def output logs
+    # ts = utils.get_timestamp()
+    # ### the legacy OK/fail listare disabled, everything is in the table files
+    # #log_raw_fail  = os.path.join(outdir_logs,ts + "_raw_fail.log")
+    # #log_raw_ok    = os.path.join(outdir_logs,ts + "_raw_ok.log")
+    # #log_rnx_fail  = os.path.join(outdir_logs,ts + "_rnx_fail.log")
+    # #log_rnx_fail2 = os.path.join(outdir_logs,ts + "_rnx_fail2.log")
+    # #log_rnx_ok    = os.path.join(outdir_logs,ts + "_rnx_ok.log")
+    # log_table     = os.path.join(outdir_logs,ts + "_table.log")
+
+    # logline.to_csv(log_table,mode="w",index=False)
+
+    # ##############################################
+    # ### find and read previous OK list files
+    # prev_raw_ok_logs = utils.find_recursive(outdir_logs,'*_raw_ok.log')    
+    # prev_raw_ok = _input_files_reader(tuple(prev_raw_ok_logs))
+
+    # ##############################################
+    # ### find and read manual exclu list files
+    # prev_raw_exclu = _input_files_reader(raw_excl_list)
+
+    # ##############################################
+    # ### find and read previous table log files
+    # prev_table_logs = utils.find_recursive(outdir_logs,'*table.log')    
+    # DF_prev_tbl = pd.concat([pd.read_csv(f) for f in prev_table_logs])
+    # DF_prev_tbl.reset_index(inplace=True,drop=True)
     
-    ### get the site (4chars) as a list 
-    site4_list = [s.site4char for s in sitelogs]
-
-    ###############################################
-    ### def output folders
-    outdir_logs = outdir + "/logs"
-    outdir_converted =  outdir + "/converted"
-    outdir_rinexmoded =  outdir + "/rinexmoded" 
-
-    utils.create_dir(outdir_logs)
+    # ##############################################
+    # ### filtering the input list
+    # flist = _filter_year_min_max(flist, year_in_inp_path, year_min_max)
+    # flist = _filter_prev_table(flist, DF_prev_tbl)
+    # flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_ok,False) ### must be disabled at one point
+    # flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_exclu,True)
+    # flist = _filter_bad_keywords(flist, keywords_path_excl)
     
-    ##############################################
-    ### def output logs
-    ts = utils.get_timestamp()
-    ### the legacy OK/fail listare disabled, everything is in the table files
-    log_table     = os.path.join(outdir_logs,ts + "_table.log")
-    table_cols = ["site","date",
-                  "ok_init","ok_conv","ok_rnxmod",
-                  "fraw", "frnx_tmp", "frnx_fin",
-                  "note"]
-    
-    logline = pd.DataFrame([], columns=table_cols)
-    logline.to_csv(log_table,mode="w",index=False)
-
-    ##############################################
-    ### find and read previous OK list files
-    prev_raw_ok_logs = utils.find_recursive(outdir_logs,'*_raw_ok.log')    
-    prev_raw_ok = _input_files_reader(tuple(prev_raw_ok_logs))
-
-    ##############################################
-    ### find and read manual exclu list files
-    prev_raw_exclu = _input_files_reader(raw_excl_list)
-
-    ##############################################
-    ### find and read previous table log files
-    prev_table_logs = utils.find_recursive(outdir_logs,'*table.log')    
-    DF_prev_tbl = pd.concat([pd.read_csv(f) for f in prev_table_logs])
-    DF_prev_tbl.reset_index(inplace=True,drop=True)
-    
-    ##############################################
-    ### filtering the input list
-    flist = _filter_year_min_max(flist, year_in_inp_path, year_min_max)
-    flist = _filter_prev_table(flist, DF_prev_tbl)
-    flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_ok,False) ### must be disabled at one point
-    flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_exclu,True)
-    flist = _filter_bad_keywords(flist, keywords_path_excl)
-    
-    logger.info("%6i files will be processed", len(flist))
-
-    for fraw in flist:  
-
-        fraw = Path(fraw)
-        ext = fraw.suffix.upper()
-        logger.info("***** input raw file for conversion: %s",fraw.name)
-
-        ### since the fraw name can be poorly formatted
-        # we search it w.r.t. the sites from the sitelogs
-
-        site =  _site_search_from_list(fraw,site4_list)       
+    # logger.info("%6i files will be processed", len(flist))
 
 
-        logline = pd.DataFrame([[site,None,None,None,None,
-                                 fraw,"","","no comment"]],
-                                 columns=table_cols)
-
-        outdir_rinexmoded_use = os.path.join(outdir_rinexmoded,site.upper())
-        utils.create_dir(outdir_converted)
-        utils.create_dir(outdir_rinexmoded_use)
-        
-        ### find the right converter
-        conve = _converter_select_batch(fraw)
-        
-        logger.info("extension/converter: %s/%s",ext,conve)
-    
-        if not conve:
-            logger.info("file skipped, no converter found: %s",fraw)
-            #utils.write_in_file(str(fraw), log_raw_fail, append=True)
-            logline.note = "no converter found"
-            logline.ok_init = False
-            logline.to_csv(log_table,mode="a",index=False,header=False)
-            continue
-        
-        ### a fonction to stop the docker conteners running for too long
-        # (for trimble conversion)
-        stop_long_running_containers()
-        
-        #############################################################
-        #### CONVERSION
-        logline.ok_init = True
-
-        frnxtmp, _ = arcv.converter_run(fraw,
-                                        outdir_converted,
-                                        converter = conve)
-        if frnxtmp:
-            logline.frnx_tmp = frnxtmp
-            logline.ok_conv = True
-            logline.date, _ = operational.rinex_start_end(frnxtmp)
-        else:
-            logline.ok_conv = False
-
-    return None
 
 def _filter_prev_raw_ok_or_exclu(flist,prev_raw_ok,
                                  message_manu_exclu=False):
@@ -250,7 +349,8 @@ def _filter_prev_table(flist,
 
 def _site_search_from_list(fraw_inp,site4_list_inp):
     """
-    from a raw file with an approximate site name and a list of correct site names, search the correct site name of the raw file
+    from a raw file with an approximate site name and a list of correct 
+    site names, search the correct site name of the raw file
     """
     site_out = None
     for s4 in site4_list_inp:
