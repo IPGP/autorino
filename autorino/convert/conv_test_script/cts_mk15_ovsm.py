@@ -25,11 +25,21 @@ keywords_path_excl=[]
 
 ########## complete repro 2017-2023 process 
 flist = "/home/sakic/020_TEMP/Raw_all_MQ_mk01a.list"
-outdir = "/scratch/convgnss/062_big_conv_MQ_2017"
+
+outdir = "/scratch/convgnss/063_big_conv_MQ_2017"
 nyear = 8
 minyear = 2017
 maxyear = 2017
 
+outdir = "/scratch/convgnss/064_big_conv_MQ_2018"
+nyear = 8
+minyear = 2018
+maxyear = 2018
+
+outdir = "/scratch/convgnss/061_big_conv_MQ_2019_23"
+nyear = 8
+minyear = 2019
+maxyear = 2023
 ##################################################################
 raw_excl_list = tuple(utils.find_recursive(outdir,'*_rnx_fail.log'))
 

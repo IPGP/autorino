@@ -17,7 +17,6 @@ import urllib.request
 from tqdm import tqdm
 from ftplib import FTP
 import requests
-from bs4 import BeautifulSoup
 from tqdm.contrib.logging import logging_redirect_tqdm
 import io
 # Create a logger object.
