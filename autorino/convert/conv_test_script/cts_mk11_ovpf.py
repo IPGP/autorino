@@ -71,9 +71,9 @@ maxyear = 2023
 flist="/home/sakic/020_TEMP/Raw_PF_mk04a.list"
 ##  regex=".*(BOMG|BORG|C98G|CASG|CRAG|DERG|DSRG|ENCG|ENOG|FERG|FEUG|FJAG|FOAG|FREG|GB1G|GBNG|GBSG|GITG|GLOR|GPNG|GPSG|HDLG|KNKL|MABE|MAIG|MANB|MTSB|PBRG|PMZI|PRAG|PVDG|RVAG|RVLG|SAND|SNEG|TRCG).*"
 regex=".*"
-outdir = "/scratch/convgnss/042_big_conv_PF_2017"
-minyear = 2017
-maxyear = 2017
+outdir = "/scratch/convgnss/044_big_conv_PF_2018"
+minyear = 2018
+maxyear = 2018
 
 
 

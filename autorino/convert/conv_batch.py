@@ -4,14 +4,11 @@
 Created on Fri Apr  7 12:07:18 2023
 
 @author: psakicki
-"""
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Mar  8 18:45:58 2023
 
-@author: psakicki
+WILL  BE DISCONTINUED WHEN CLASSES WILL BE OPE
+
+
 """
 
 from geodezyx import utils,  operational
