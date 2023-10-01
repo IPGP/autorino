@@ -119,7 +119,8 @@ def conv_regex_teqc(f):
     thus annex regex will finally not include the main one
     """
     f = Path(Path(f).name) ### keep the filename only
-    conv_regex_main = re.compile(f.with_suffix(".rnx_teqc").name)
+    #conv_regex_main = re.compile(f.with_suffix(".rnx_teqc").name)
+    conv_regex_main = re.compile(f.name + ".rnx_teqc")   
     conv_regex_annex  = conv_regex_main
     return conv_regex_main , conv_regex_annex
 
