@@ -302,7 +302,8 @@ def _converter_select_batch(fraw_inp):
     elif re.match(".M[0-9][0-9]", ext):
         conve = "mdb2rinex"
     ### here we skip all the weird files
-    elif re.match(".TG!$",ext) or re.match(".DAT",ext) or re.match(".Z",ext) or re.match(".BCK",ext) or re.match("^.[0-9]{3}$",ext) or re.match(".A$",ext) or re.match("Trimble",ext):
+    elif re.match(".TG!$",ext) or re.match(".DAT",ext) or re.match(".Z",ext) or re.match(".BCK",ext) or re.match(".A$",ext) or re.match("Trimble",ext) or re.match(".orig",ext):
+        ### re.match("^.[0-9]{3}$",ext) 
         conve = None
     else:
         conve = "auto"

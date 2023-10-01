@@ -83,6 +83,7 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
     else:
         ext = ""
     
+    ##### TRIMBLE
     if ext in (".T00",".T02") or converter_inp == "trm2rinex":
         converter_name = "trm2rinex"
         brand = "Trimble"
@@ -101,24 +102,35 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         cmd_build_fct = arcv.cmd_build_teqc
         conv_regex_fct = arcv.conv_regex_teqc
 
+    ##### ASHTECH 
+    elif re.match(".([0-9]{3})",ext) or converter_inp == "teqc":
+        converter_name = "teqc"
+        brand = "Ashtech"
+        cmd_build_fct = arcv.cmd_build_teqc
+        conv_regex_fct = arcv.conv_regex_teqc
+ 
+    ##### LEICA 
     elif re.match(".(M[0-9]{2}|MDB)",ext) or converter_inp == "mdb2rinex":
         converter_name = "mdb2rinex"
         brand = "Leica"
         cmd_build_fct = arcv.cmd_build_mdb2rinex    
         conv_regex_fct = arcv.conv_regex_mdb2rnx
         
+    ##### SEPTENTRIO  
     elif re.match(".[0-9]{2}_", ext) or converter_inp == "sbf2rin":
         converter_name = "sbf2rin"
         brand = "Septentrio"
         cmd_build_fct = arcv.cmd_build_sbf2rin
         conv_regex_fct = arcv.conv_regex_void
 
+    ##### GENERIC BINEX  
     elif ext == ".BNX" or converter_inp == "convbin":
         converter_name = "convbin"
         brand = "Generic BINEX"
         cmd_build_fct = arcv.cmd_build_convbin
         conv_regex_fct = arcv.conv_regex_convbin
 
+    ##### TOPCON
     elif ext == ".TPS" or converter_inp == "tps2rin":
         converter_name = "tps2rin"
         brand = "Topcon"
