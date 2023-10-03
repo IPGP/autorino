@@ -83,12 +83,16 @@ maxyear = 2023
 ########## process old ashtech 2000-2016
 flist = "/home/sakic/090_TEMP/Raw_all_GL_mk01a.list"
 outdir = "/scratch/convgnss/058_big_conv_GL_old_ashtech"
+outdir = "/scratch/convgnss/075_HOUE_week_corr_ON"
+outdir = "/scratch/convgnss/076_HOUE_week_corr_OFF"
 # HOUE et SOUF excluded
 #regex=".*(ABD0|ABG0|ADE0|AGAL|AMC0|ASF0|BULG|CBE0|CRA2|DEHA|DHS0|DSD0|F562|F8O2|FFE0|FNA0|FNG0|LDIS|LEN0|MAD0|MGL0|PAR1|PSA1|SBL0|STG0|STMT|TAR1|TDB0).*"
-regex=".*(HOUE).*"
+regex=".*(R|B|U)(ADE0|HOUE|FNA0|FFE0|SOUF).*"
+regex=".*(R|B|U)(HOUE).*"
+#regex=".*(R|B|U)(ADE0|HOUE).*"
 nyear = 6
 minyear = 2000
-maxyear = 2016
+maxyear = 2010
 
 
 
