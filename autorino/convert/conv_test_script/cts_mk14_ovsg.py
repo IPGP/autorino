@@ -94,6 +94,22 @@ nyear = 6
 minyear = 2000
 maxyear = 2010
 
+########## process SOUF 2013-2015
+flist = "/home/sakic/090_TEMP/Raw_all_GL_mk01a.list"
+outdir = "/scratch/convgnss/051_big_conv_GL_SOUF_2013_15"
+regex=".*(SOUF).*"
+nyear = 6
+minyear = 2013
+maxyear = 2015
+
+########## process SOUF 2013-2015
+flist = "/home/sakic/090_TEMP/Raw_GL_manu1_ready1.list"
+outdir = "/scratch/convgnss/053_big_conv_GL_manu1"
+regex=".*"
+nyear = 5
+minyear = 2010
+maxyear = 2100
+
 
 
 ##################################################################
