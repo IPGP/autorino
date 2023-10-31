@@ -25,8 +25,8 @@ if 0:
     regex=".*(BOMG|BORG|C98G|CASG|CRAG|DERG|DSRG|ENCG|ENOG|FERG|FEUG|FJAG|FOAG|FREG|GB1G|GBNG|GBSG|GITG|GLOR|GPNG|GPSG|HDLG|KNKL|MABE|MAIG|MANB|MTSB|PBRG|PMZI|PRAG|PVDG|RVAG|RVLG|SAND|SNEG|TRCG).*"
     flist = utils.find_recursive(p,regex,case_sensitive=False)
 elif 1:
-    flist="/home/sakic/020_TEMP/Raw_PF_mk01a.list"
-    flist="/home/sakic/020_TEMP/Raw_PF_mk02a.list"
+    flist="/home/sakic/090_TEMP/Raw_PF_mk01a.list"
+    flist="/home/sakic/090_TEMP/Raw_PF_mk02a.list"
     regex=".*"
 else:
     print("toto")
@@ -46,14 +46,14 @@ keywords_path_excl=['Problem','Rinex','ZIP',"MAIG","MABE","MANB","SAND"]
 
 
 ########## 2022 process 
-#flist = "/home/sakic/020_TEMP/Raw_PF_mk02a_2022.list"
+#flist = "/home/sakic/090_TEMP/Raw_PF_mk02a_2022.list"
 #outdir = "/scratch/convgnss/042_big_conv_PF_2022"
 #minyear = 2022
 #maxyear = 2022
 
 
 ########## 2023 process 
-flist="/home/sakic/020_TEMP/Raw_PF_mk04a.list"
+flist="/home/sakic/090_TEMP/Raw_PF_mk04a.list"
 ##  regex=".*(BOMG|BORG|C98G|CASG|CRAG|DERG|DSRG|ENCG|ENOG|FERG|FEUG|FJAG|FOAG|FREG|GB1G|GBNG|GBSG|GITG|GLOR|GPNG|GPSG|HDLG|KNKL|MABE|MAIG|MANB|MTSB|PBRG|PMZI|PRAG|PVDG|RVAG|RVLG|SAND|SNEG|TRCG).*"
 outdir = "/scratch/convgnss/042_big_conv_PF_2023"
 minyear = 2023
@@ -61,20 +61,29 @@ maxyear = 2023
 
 
 ########## GLOR test process 
-flist="/home/sakic/020_TEMP/Raw_PF_mk04a.list"
+flist="/home/sakic/090_TEMP/Raw_PF_mk04a.list"
 regex=".*(GLOR).*"
 outdir = "/scratch/convgnss/043_PF_test_GLOR_2023"
 minyear = 2023
 maxyear = 2023
 
 ########## 2017 process 
-flist="/home/sakic/020_TEMP/Raw_PF_mk04a.list"
+flist="/home/sakic/090_TEMP/Raw_PF_mk04a.list"
 ##  regex=".*(BOMG|BORG|C98G|CASG|CRAG|DERG|DSRG|ENCG|ENOG|FERG|FEUG|FJAG|FOAG|FREG|GB1G|GBNG|GBSG|GITG|GLOR|GPNG|GPSG|HDLG|KNKL|MABE|MAIG|MANB|MTSB|PBRG|PMZI|PRAG|PVDG|RVAG|RVLG|SAND|SNEG|TRCG).*"
-regex=".*"
+regex=".*DSRG20180509.*"
+##  regex=".*(BOMG|BORG|C98G|CASG|CRAG|DERG|DSRG|ENCG|ENOG|FERG|FEUG|FJAG|FOAG|FREG|GB1G|GBNG|GBSG|GITG|GLOR|GPNG|GPSG|HDLG|KNKL|MABE|MAIG|MANB|MTSB|PBRG|PMZI|PRAG|PVDG|RVAG|RVLG|SAND|SNEG|TRCG).*"
 outdir = "/scratch/convgnss/044_big_conv_PF_2018"
 minyear = 2018
 maxyear = 2018
 
+########### ASHTECH GB1G
+
+flist="/home/sakic/090_TEMP/Raw_PF_mk04a.list"
+regex=".*(R|B|U)(GB1G).*"
+
+outdir = "/scratch/convgnss/046_big_conv_PF_GB1G_2017_18"
+minyear = 2017
+maxyear = 2018
 
 
 ##################################################################
