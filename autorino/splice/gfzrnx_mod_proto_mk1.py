@@ -24,19 +24,26 @@ p = "/home/sakic/031_SCRATCH_CONV/046_big_conv_PF_GB1G_2017_18/"
 pinp = p + "/gfzrnxed"  
 pout = p + "/gfzrnxed_clean"  
 
+p="/work/work/TERIA_DATA/"
+pinp = p + "/012_from_RGP_rnx3conv"
+pout = p + "/013_from_RGP_rnx3conv_clean"
+
 
 utils.create_dir(pout)
-
 
 L = operational.rinex_finder(pinp,compressed=False)
 DF = operational.read_rinex_list_table(L)
 
 DF["day"] = DF.date.dt.floor("D") 
 
-
 print(DF)
 
 DFgrp = DF.groupby(["site","day"])
+
+sysobs3char = dict()
+sysobs3char["G"] = ["C","W"] 
+sysobs3char["R"] = ["C","P"] 
+
 
 for (site,day),df in DFgrp:
     print(df.name)
@@ -50,33 +57,26 @@ for (site,day),df in DFgrp:
     sysobs,_ = R.get_sys_obs_types()
 
     systems = sysobs.keys()
-
-    
-
-    sysobsG = sysobs["G"]
-    sysobsGout  = []
-    for e in  sysobsG:
-        if len(e) == 2:
-            if e[1] == "2":
-                sysobsGout.append(e + "W")
-            elif e[1] == "1":
-                sysobsGout.append(e + "C")
-            else:
-                sysobsGout.append(e)
-        else:
-            sysobsGout.append(e)
-
-
-
-    
-    print(sysobsG) 
-    print(sysobsGout) 
-
-
     dicsysout = dict()
-    dicsysout["G"] = sysobsGout 
+    
+    for sys in systems:
+        sysobsinp = sysobs[sys]
+        sysobsout  = []
+        for e in  sysobsinp:
+            if len(e) == 2:
+                if e[1] in ("1","2"):
+                    sysobsout.append(e + sysobs3char[sys][int(e[1]) -1])
+                else:
+                    sysobsout.append(e)
+            else:
+                sysobsout.append(e)
+    
+        print("obs inp",sys,sysobsinp) 
+        print("obs out",sys,sysobsout) 
 
-    R.mod_sys_obs_types({"G" : sysobsGout })
+        dicsysout[sys] = sysobsout 
+
+    R.mod_sys_obs_types(dicsysout)
 
     R.get_longname(inplace_set=True)
     print("Final Filename",R.filename)
