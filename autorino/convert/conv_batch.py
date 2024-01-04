@@ -4,14 +4,11 @@
 Created on Fri Apr  7 12:07:18 2023
 
 @author: psakicki
-"""
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Mar  8 18:45:58 2023
 
-@author: psakicki
+WILL  BE DISCONTINUED WHEN CLASSES WILL BE OPE
+
+
 """
 
 from geodezyx import utils,  operational
@@ -100,7 +97,9 @@ def converter_batch(input_files,
     ##############################################
     ### filtering the input list
     flist = _filter_year_min_max(flist, year_in_inp_path, year_min_max)
+    print(len(flist) , "AAAAAAAAAAAAAAAAAAAAAAA")
     flist = _filter_prev_table(flist, DF_prev_tbl)
+    print(len(flist) , "AAAAAAAAAAAAAAAAAAAAAAA")
     flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_ok,False) ### must be disabled at one point
     flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_exclu,True)
     flist = _filter_bad_keywords(flist, keywords_path_excl)
@@ -305,7 +304,8 @@ def _converter_select_batch(fraw_inp):
     elif re.match(".M[0-9][0-9]", ext):
         conve = "mdb2rinex"
     ### here we skip all the weird files
-    elif re.match(".TG!$",ext) or re.match(".DAT",ext) or re.match(".Z",ext) or re.match(".BCK",ext) or re.match("^.[0-9]{3}$",ext) or re.match(".A$",ext) or re.match("Trimble",ext):
+    elif re.match(".TG!$",ext) or re.match(".DAT",ext) or re.match(".Z",ext) or re.match(".BCK",ext) or re.match(".A$",ext) or re.match("Trimble",ext) or re.match(".ORIG",ext):
+        ### re.match("^.[0-9]{3}$",ext) 
         conve = None
     else:
         conve = "auto"
