@@ -32,6 +32,8 @@ pout = p + "/gfzrnxed"
 pinp = "/work/work/TERIA_DATA/010_from_RGP"
 pout = "/work/work/TERIA_DATA/012_from_RGP_rnx3conv"
 
+pinp = "/home/sakic/090_TEMP/GL_miss2to3/010_rnx2"
+pout = "/home/sakic/090_TEMP/GL_miss2to3/020_rnx3conv"
 
 utils.create_dir(pout)
 

@@ -71,14 +71,6 @@ regex=".*"
 nyear = 6
 minyear = 2023
 maxyear = 2023
-########## process 2023 100-231 for FrBe  
-flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_231_forFB_mk01a.list" 
-flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_246_forFB_mk02a.list" 
-outdir = "/scratch/convgnss/056_big_conv_GL_2023_100-231"
-regex = ".*"
-nyear = 6
-minyear = 2023
-maxyear = 2023
 
 ########## process old ashtech 2000-2016
 flist = "/home/sakic/090_TEMP/Raw_all_GL_mk01a.list"
@@ -109,6 +101,18 @@ regex=".*"
 nyear = 5
 minyear = 2010
 maxyear = 2100
+
+########## process 2023 100-231 for FrBe  
+flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_231_forFB_mk01a.list" 
+flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_246_forFB_mk02a.list" 
+flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_346_forFB_mk03a.list" 
+outdir = "/scratch/convgnss/056_big_conv_GL_2023_100-231"
+regex = ".*"
+nyear = 6
+minyear = 2023
+maxyear = 2023
+keywords_path_excl=["tgd"]
+
 
 
 
