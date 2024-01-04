@@ -8,6 +8,7 @@ Created on Tue Mar 14 12:05:28 2023
 
 #### Import star style
 from pathlib import Path
+#from pathlib3x import Path
 from geodezyx import utils
 
 
@@ -495,7 +496,8 @@ def cmd_build_teqc(inp_raw_fpath,
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
-    out_fpath = out_dir.joinpath(inp_raw_fpath.with_suffix(".rnx_teqc"))   
+    #out_fpath = out_dir.joinpath(inp_raw_fpath.with_suffix(".rnx_teqc").name)   
+    out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_teqc")   
     
     cmd_opt_list , _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
@@ -660,7 +662,7 @@ def cmd_build_convbin(inp_raw_fpath,
     cmd_opt_list , _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
     
-    cmd_list = [bin_path,'-d',out_dir,'-r','binex'] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
+    cmd_list = [bin_path,'-d',out_dir,'-os','-od','-r','binex'] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
