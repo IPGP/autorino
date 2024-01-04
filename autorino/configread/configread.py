@@ -11,36 +11,35 @@ import pandas as pd
 import numpy as np
 import os
 from autorino import download as ardl
-from autorino import configread as arcfg
 
 import yaml
 
-def session_request_from_configfile(configfile_path):
+def session_download_from_configfile(configfile_path):
     
-    Y1 = yaml.safe_load(open(configfile_path))
+    y1 = yaml.safe_load(open(configfile_path))
     
-    Ystation = Y1["station"]
+    ystat = y1["station"]
 
-    protocol = Ystation["access"]["protocol"]
-    hostname = Ystation["access"]["hostname"]
-    sta_user = Ystation["access"]["login"]
-    sta_pass = Ystation["access"]["password"]
-    site = Ystation["site"]    
+    protocol = ystat["access"]["protocol"]
+    hostname = ystat["access"]["hostname"]
+    sta_user = ystat["access"]["login"]
+    sta_pass = ystat["access"]["password"]
+    site = ystat["site"]    
     
-    Ysession_list = Ystation["sessions_list"]
+    ysess_lst = ystat["sessions_list"]
     
-    Sess_stk, Req_stk = [], []
+    sess_stk, dwnld_stk = [], []
     
-    for Yses0 in Ysession_list:
-        ########### Session
-        Yses = Yses0["session"]
-        name   = Yses["name"]
+    for yses_i in ysess_lst:
+        ########### session
+        yses = yses_i["session"]
+        name   = yses["name"]
         
-        session_period = Yses["file_period"]
-        remote_dir     = Yses["remote_dir"]
-        remote_fname   = Yses["remote_fname"]    
+        session_period = yses["file_period"]
+        remote_dir     = yses["remote_dir"]
+        remote_fname   = yses["remote_fname"]    
         
-        Sess = ardl.SessionGnss(
+        sess = ardl.SessionGnss(
         name = name,
         protocol = protocol,
         remote_dir=remote_dir,
@@ -51,28 +50,30 @@ def session_request_from_configfile(configfile_path):
         session_period=session_period,
         remote_fname=remote_fname)
         
-        Sess_stk.append(Sess)
+        sess_stk.append(sess)
+
+        ##### Epoch rang
+        Yepochrang = yses_i["epoch_range"]        
+        rang = ardl.EpochRange(Yepochrang["epoch1"],
+                               Yepochrang["epoch2"],
+                               session_period)
+
+        ############ Workflow
+        Ywfl = yses_i["workflow"]
+        ydwnld = Ywfl["download"]
         
-        ############ Request
-        Yreq = Yses0["request"]
-        Ydownload = Yreq["download"]
-        
-        output_dir_parent = Ydownload["output_dir_parent"] 
-        output_dir_struture = Ydownload["output_dir_structure"] 
+        output_dir_parent = ydwnld["output_dir_parent"] 
+        output_dir_struture = ydwnld["output_dir_structure"] 
         output_path = os.path.join(output_dir_parent,
                                    output_dir_struture)
 
-        ##### Epoch Range
-        Yepochrange = Ydownload["epoch_range"]        
-        Range = ardl.EpochRange(Yepochrange["epoch1"],
-                                Yepochrange["epoch2"],
-                                session_period)
+
         
-        Req = ardl.DownloadGnss(Sess,Range,output_path)
+        dwnld = ardl.DownloadGnss(sess,rang,output_path)
         
-        Req_stk.append(Req)
+        dwnld_stk.append(dwnld)
         
-    if len(Sess_stk) < 2:
-        return Sess_stk[0], Req_stk[0]
-    else:
-        return Sess_stk, Req_stk
+    # if len(sess_stk) < 2:
+        # return sess_stk[0], req_stk[0]
+    # else:
+    return sess_stk, dwnld_stk

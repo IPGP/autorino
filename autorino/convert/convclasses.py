@@ -6,14 +6,6 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Mar  8 18:45:58 2023
-
-@author: psakicki
-"""
-
 from geodezyx import utils,  operational
 import autorino.convert as arcv
 import rinexmod_api
@@ -30,8 +22,6 @@ import pandas as pd
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
-
-
 
 
 def site_list_from_sitelogs(sitelogs_inp):
