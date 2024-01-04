@@ -11,6 +11,7 @@ import os
 import datetime as dt 
 import hashlib
 import urllib
+from urllib.parse import urlparse
 import pandas
 from pathlib import Path
 import urllib.request                 
@@ -25,9 +26,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
-
-
 # *****************************************************************************
 # define Python user-defined exceptions
 class AutorinoError(Exception):
@@ -35,9 +33,6 @@ class AutorinoError(Exception):
 
 class AutorinoDownloadError(AutorinoError):
     pass
-
-
-
 
 
 class TqdmToLogger(io.StringIO):
@@ -56,11 +51,37 @@ class TqdmToLogger(io.StringIO):
         self.buf = buf.strip('\r\n\t ')
     def flush(self):
         self.logger.log(self.level, self.buf)
+        
+        
+def join_url(protocol_inp,hostname_inp,dir_inp,fname_inp):
+    """
+    a wrapper to classical join to format correctly the URL
+    """
+    
+    ### add the protocol if missing
+    if not (hostname_inp.startswith('http') or hostname_inp.startswith('ftp')):
+        prot_n_host = protocol_inp + '://' + hostname_inp
+    else:
+        prot_n_host = hostname_inp
+            
+    ### remove (strip) slashs in the dir path
+    dirr = dir_inp.strip("/")
+    
+    ### safty warning to check a stupid cpoy/paste
+    if fname_inp in dirr:
+        logger.warn("%s file's name also appears in dir name, check your config file",fname_inp)
+        
+    url_out = os.path.join(prot_n_host,
+                           dirr,
+                           fname_inp)
+                           
+    return url_out
 
 ############# list remote files
 
 def list_remote_files_ftp(host_name, remote_dir, username, password):
     # clean hostname & remote_dir
+    # MUST BE IMPROVED !!!
     remote_dir = remote_dir.replace(host_name,"")
     host_name = host_name.replace('ftp://',"")
     host_name = host_name.replace('/',"")
@@ -126,15 +147,19 @@ def size_remote_file_http(url):
 ############# download remote file
 
 def download_file_ftp(url, output_dir,username, password):
-    ##### Check if URL is HTTP or FTP
-    url = Path(url)
-    url_host = str(url.parts[0])
-    url_dir  = str(Path(*url.parts[1:-1]))
+    # MUST BE IMPROVED !!! (url parsing part)
+    urlp = urlparse(url)
     
+    url_host = urlp.netloc
+    url_dir = os.path.dirname(urlp.path)[1:]
+    url_fname = os.path.basename(urlp.path)
+    
+    print("AAAAAAAAAAAA",url_host,  url_dir)
+
     ftp = ftplib.FTP(url_host)
     ftp.login(username, password)
     ftp.cwd(url_dir)
-    filename = url.name
+    filename = url_fname 
     
     def _ftp_callback(data):
         _ftp_callback.bytes_transferred += len(data)
