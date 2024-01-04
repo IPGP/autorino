@@ -28,6 +28,11 @@ p="/work/work/TERIA_DATA/"
 pinp = p + "/012_from_RGP_rnx3conv"
 pout = p + "/013_from_RGP_rnx3conv_clean"
 
+p="/home/sakic/090_TEMP/GL_miss2to3/"
+pinp = p + "/020_rnx3conv"
+pout = p + "/030_rnx3conv_clean"
+
+
 
 utils.create_dir(pout)
 

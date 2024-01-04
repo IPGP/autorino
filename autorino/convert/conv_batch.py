@@ -97,7 +97,9 @@ def converter_batch(input_files,
     ##############################################
     ### filtering the input list
     flist = _filter_year_min_max(flist, year_in_inp_path, year_min_max)
+    print(len(flist) , "AAAAAAAAAAAAAAAAAAAAAAA")
     flist = _filter_prev_table(flist, DF_prev_tbl)
+    print(len(flist) , "AAAAAAAAAAAAAAAAAAAAAAA")
     flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_ok,False) ### must be disabled at one point
     flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_exclu,True)
     flist = _filter_bad_keywords(flist, keywords_path_excl)
