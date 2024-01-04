@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import os
 import dateparser
-from autorino import download as ardl
+from autorino import download as arodl
 
 pd.options.mode.chained_assignment = 'warn'
 
@@ -124,7 +124,7 @@ def dateparser_frontend(date_in,tz="UTC"):
     if type(date_in) is str:
         date_out = pd.Timestamp(dateparser.parse(date_in))
     else:
-         date_out = pd.Timestamp(date_in)
+        date_out = pd.Timestamp(date_in)
     
     if not date_out.tz:
         date_out = pd.Timestamp(date_out, tz=tz)
@@ -197,9 +197,6 @@ class EpochRange:
                                  freq=self.period)
         return list(epochrange)
 
-
-
-
 class WorkflowGnss():
     def __init__(self,session,epoch_range):
         self.session = session
@@ -214,7 +211,6 @@ class ConvertGnss():
 class RinexHeaderModGnss():
     def __init__():
         pass
-
 
 class DownloadGnss():
     def __init__(self,session,epoch_range,out_dir):
@@ -271,9 +267,11 @@ class DownloadGnss():
             if guess_remote:
                 rmot_dir_use = str(self.session.remote_dir)
                 rmot_fname_use = str(self.session.remote_fname)
-                rmot_path_use = os.path.join(hostname_use,
-                                             rmot_dir_use,
-                                             rmot_fname_use)
+                
+                rmot_path_use = arodl.join_url(self.session.protocol,
+                                              hostname_use,
+                                              rmot_dir_use,
+                                              rmot_fname_use)
 
                 rmot_path_use = translator(rmot_path_use,
                                            epoch,
@@ -335,11 +333,11 @@ class DownloadGnss():
         rmot_files_list = []
         for rmot_dir_use in rmot_dir_list:
             if self.session.protocol == "http":
-                list_ = ardl.list_remote_files_http(self.session.hostname,
+                list_ = arodl.list_remote_files_http(self.session.hostname,
                                                     rmot_dir_use)
                 rmot_files_list = rmot_files_list + list_
             elif self.session.protocol == "ftp":
-                list_ = ardl.list_remote_files_ftp(self.session.hostname,
+                list_ = arodl.list_remote_files_ftp(self.session.hostname,
                                                    rmot_dir_use,
                                                    self.session.sta_user,
                                                    self.session.sta_pass)
@@ -425,7 +423,7 @@ class DownloadGnss():
                 raise Exception
             elif self.session.protocol == "http":
                 try:
-                    file_dl = ardl.download_file_http(rmot_file,
+                    file_dl = arodl.download_file_http(rmot_file,
                                                       outdir_use)
                     dl_ok = True
                 except Exception as e:
@@ -434,7 +432,7 @@ class DownloadGnss():
                     
             elif self.session.protocol == "ftp":
                 try:
-                    file_dl = ardl.download_file_ftp(rmot_file,
+                    file_dl = arodl.download_file_ftp(rmot_file,
                                                      outdir_use,
                                                      self.session.sta_user,
                                                      self.session.sta_pass)
