@@ -7,7 +7,7 @@ Created on Fri Apr  7 12:07:18 2023
 """
 
 from geodezyx import utils,  operational
-import autorino.convert as arcv
+import autorino.convert as arocnv
 import rinexmod_api
 from pathlib import Path
 import os
@@ -17,11 +17,15 @@ import datetime as dt
 import dateutil
 import docker
 import pandas as pd
+import shutil
+
+from autorino import general as arogen
 
 #### Import the logger
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
+
 
 
 def site_list_from_sitelogs(sitelogs_inp):
@@ -78,48 +82,44 @@ def input_list_reader(inp_fil,inp_regex=".*"):
     return flist
 
 
-class ConvertRinexModGnss():
-    def __init__(self,session,epoch_range,out_dir,tmp_dir,sitelogs):
+class ConvertRinexModGnss(arogen.WorkflowGnss):
+    def __init__(self,session,epoch_range,out_dir,tmp_dir,sitelogs=None):
         self.session = session
         self.epoch_range = epoch_range ### setter bellow
         self.out_dir = out_dir
         self.tmp_dir = tmp_dir
         self.table = self._table_init()
         
-        self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs,
-                                                          force=False)   
-    ######## getter and setter 
-    @property
-    def epoch_range(self):
-        return self._epoch_range
-        
-    @epoch_range.setter
-    def epoch_range(self,value):
-        self._epoch_range = value
-        if self._epoch_range.period != self.session.session_period:  
-            logger.warn("Session period (%s) != Epoch Range period (%s)",self.session.session_period,self._epoch_range.period)
+        if sitelogs:
+            self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs,
+                                                              force=False)   
 
     ######## internal methods 
-    def _table_init(self):
-        # df = pd.DataFrame(columns=["epoch","fname",
-        #                            "ok_remote",
-        #                            "ok_local",
-        #                            "fpath_remote",
-        #                            "fpath_local",
-        #                            "size_local"])
+    # def _table_init(self,table_cols=):
+        # # df = pd.DataFrame(columns=["epoch","fname",
+        # #                            "ok_remote",
+        # #                            "ok_local",
+        # #                            "fpath_remote",
+        # #                            "fpath_local",
+        # #                            "size_local"])
                                    
-        # df.epoch = self.epoch_range.epoch_range_list()
-        # df.set_index("epoch",inplace=True,drop=True)
-        # df = df.where(pd.notnull(df), None)        
+        # # df.epoch = self.epoch_range.epoch_range_list()
+        # # df.set_index("epoch",inplace=True,drop=True)
+        # # df = df.where(pd.notnull(df), None)        
         
-        table_cols = ["fraw","site","epoch",
-                      "ok_init","ok_conv","ok_rnxmod",
-                      "frnx_tmp", "frnx_fin",
-                      "note"]
+        # table_cols = ['fraw',
+                      # 'site',
+                      # 'epoch',
+                      # 'ok_inp',
+                      # 'ok_conv',
+                      # 'ok_rnxmod',
+                      # 'frnx_tmp',
+                      # 'frnx_fin',
+                      # 'note']
         
-        df = pd.DataFrame([], columns=table_cols)
+        # df = pd.DataFrame([], columns=table_cols)
         
-        return df
+        # return df
     
     
     def load_table_from_filelist(self,
@@ -130,38 +130,50 @@ class ConvertRinexModGnss():
         flist = input_list_reader(input_files,
                                   inp_regex)
                 
-        self.table.fraw = flist
-        self.table.ok_init = self.table.fraw.apply(os.path.isfile)
+        self.table['fraw'] = flist
+        self.table['ok_inp'] = self.table['fraw'].apply(os.path.isfile)
         
         return flist
+        
+    def load_table_from_download_table(self,
+                                       input_table):
+                                           
+        self.table['fpath_inp'] = input_table['fpath_out'].values
+        self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
+        self.table['site'] = input_table['site'].values
+        self.table['epoch'] = input_table['epoch'].values
+        self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
+        
+        return None
+
         
     def filter_bad_keywords(self,keywords_path_excl):
         """
         Filter a list of raw files if the full path contains certain keywords
         
-        modify the boolean "ok_init" of the object's table
+        modify the boolean "ok_inp" of the object's table
         returns the filtered raw files in a list
         """
         flist_out = []
-        ok_init_bool_stk = []
+        ok_inp_bool_stk = []
         nfil = 0 
         for irow,row in self.table.iterrows():
-            f = row.fraw
+            f = row['fname']
             boolbad = utils.patterns_in_string_checker(f,*keywords_path_excl)
             if boolbad:
-                self.table.iloc[irow,'ok_init'] = False
+                self.table.iloc[irow,'ok_inp'] = False
                 logger.debug("file filtered, contains an excluded keyword: %s",
                              f)
                 nfil += 1
             else:
-                if not row.ok_init: ### ok_init is already false
-                    ok_init_bool_stk.append(False)
+                if not row.ok_inp: ### ok_inp is already false
+                    ok_inp_bool_stk.append(False)
                 else:
-                    ok_init_bool_stk.append(True)
+                    ok_inp_bool_stk.append(True)
                     flist_out.append(f)
                     
         ### final replace of ok init
-        self.table.ok_init = ok_init_bool_stk
+        self.table['ok_inp'] = ok_inp_bool_stk
                     
         logger.info("%6i files filtered, their paths contain bad keywords",
                     nfil)
@@ -188,13 +200,13 @@ class ConvertRinexModGnss():
         
         year min and year max are included in the range
         
-        modify the boolean "ok_init" of the object's table
+        modify the boolean "ok_inp" of the object's table
         returns the filtered raw files in a list
         """
         flist_out = []
         nfil = 0 
         
-        ok_init_bool_stk = []
+        ok_inp_bool_stk = []
         
         def _year_detect(fpath_inp,year_in_inp_path=None):
             try:
@@ -209,20 +221,20 @@ class ConvertRinexModGnss():
                                fpath_inp)
                 return np.nan
             
-        years = self.table.fraw.apply(_year_detect,args=(year_in_inp_path,))
+        years = self.table['fraw'].apply(_year_detect,args=(year_in_inp_path,))
         
         bool_out_range = (years < year_min) | (years > year_max)
         bool_in_range = np.logical_not(bool_out_range)
         
         #############################'
     
-        ok_init_bool_stk = bool_in_range & self.table.ok_init 
+        ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
         nfil_total = sum(bool_out_range)
         ### logical inhibition a.\overline{b}
-        nfil_spec = sum(np.logical_and(bool_out_range, self.table.ok_init))
+        nfil_spec = sum(np.logical_and(bool_out_range, self.table['ok_inp']))
         
         ### final replace of ok init
-        self.table.ok_init = ok_init_bool_stk
+        self.table['ok_inp'] = ok_inp_bool_stk
 
         logger.info("%6i/%6i files filtered (total/specific) not in the year min/max range (%4i/%4i)",
                     nfil_total, nfil_spec ,year_min,year_max)
@@ -237,30 +249,30 @@ class ConvertRinexModGnss():
         Filter a list of raw files if they are present in a text file list 
         e.g. an OK log or manual exclusion list
         
-        modify the boolean "ok_init" of the object's table
+        modify the boolean "ok_inp" of the object's table
         returns the filtered raw files in a list
         """
         
         flist_exclu = input_list_reader(filelist_exclu_inp)
         
         flist_out = []
-        ok_init_bool_stk = []
+        ok_inp_bool_stk = []
         
         nfil = 0 
         for irow,row in self.table.iterrows():
             f = row.fraw
             if f in flist_exclu:
                 nfil += 1
-                ok_init_bool_stk.append(False)
+                ok_inp_bool_stk.append(False)
                 if not message_manu_exclu:
                     logger.debug("file filtered, was OK during a previous run (legacy simple list): %s",f)
                 else:
                     logger.debug("file filtered manually in the exclusion list: %s",f)
             else:
-                if not row.ok_init: ### ok_init is already false
-                    ok_init_bool_stk.append(False)
+                if not row.ok_inp: ### ok_inp is already false
+                    ok_inp_bool_stk.append(False)
                 else:
-                    ok_init_bool_stk.append(True)
+                    ok_inp_bool_stk.append(True)
                     flist_out.append(f)
             
         if not message_manu_exclu:
@@ -269,7 +281,7 @@ class ConvertRinexModGnss():
             logger.info("%6i files manually filtered in the exclusion list,", nfil)
             
         ### final replace of ok init
-        self.table.ok_init = ok_init_bool_stk
+        self.table['ok_inp'] = ok_inp_bool_stk
     
         return flist_out    
     
@@ -279,11 +291,11 @@ class ConvertRinexModGnss():
         Filter a list of raw files if they are present in previous 
         conversion tables stored as log
         
-        modify the boolean "ok_init" of the object's table
+        modify the boolean "ok_inp" of the object's table
         returns the filtered raw files in a list
         """
         
-        col_ok_names = ["ok_init","ok_conv","ok_rnxmod"]
+        col_ok_names = ["ok_inp","ok_conv","ok_rnxmod"]
         
         #### previous files when everthing was ok
         prev_bool_ok = DF_prev_tab[col_ok_names].apply(np.logical_and.reduce,
@@ -292,78 +304,84 @@ class ConvertRinexModGnss():
         prev_files_ok = DF_prev_tab[prev_bool_ok].fraw
         
         ### current files which have been already OK and which have already 
-        ### ok_init == False
+        ### ok_inp == False
         ### here the boolean value are inverted compared to the table:
         # True = skip me / False = keep me 
         # a logical not inverts everything at the end
-        curr_files_ok_prev = self.table.fraw.isin(prev_files_ok)
-        curr_files_off_already = np.logical_not(self.table.ok_init)
+        curr_files_ok_prev = self.table['fraw'].isin(prev_files_ok)
+        curr_files_off_already = np.logical_not(self.table['ok_inp'])
         
         curr_files_skip = np.logical_or(curr_files_ok_prev,
                                         curr_files_off_already)
 
-        self.table.ok_init = np.logical_not(curr_files_skip)
+        self.table['ok_inp'] = np.logical_not(curr_files_skip)
         
         logger.info("%6i files filtered, were OK during a previous run (table list)",
                     curr_files_ok_prev.sum())
         
-        flist_out = list(self.table.fraw[self.table.ok_init])
+        flist_out = list(self.table['fraw',self.table['ok_inp']])
 
         return flist_out
     
-    def filter_purge(self,inplace=False):
+    def filter_purge(self,col='ok_inp',inplace=False):
+        """
+        filter the table according to a "ok" column
+        i.e. remove all the values with a False values
+        """
         if inplace:
-            self.table = self.table[self.table.ok_init]
-            out = list(self.table.fraw)
+            self.table = self.table[self.table[col]]
+            out = list(self.table['fraw'])
         else:
-            out = self.table[self.table.ok_init]
+            out = self.table[self.table[col]]
         return out
     
     def conv_rnxmod_files(self):
         
         ###############################################
-        ### def output folders
-        outdir_logs = self.out_dir + "/logs"
-        outdir_converted =  self.out_dir + "/converted"
-        outdir_rinexmoded =  self.out_dir + "/rinexmoded" 
-
-        utils.create_dir(outdir_logs)
-        utils.create_dir(outdir_converted)
+        ### def temp folders
+        tmpdir_logs = self.session.tmp_dir + "/logs"
+        tmpdir_converted = self.session.tmp_dir + "/converted"
+        tmpdir_rinexmoded = self.session.tmp_dir + "/rinexmoded" 
         
+        utils.create_dir(tmpdir_logs)
+        utils.create_dir(tmpdir_converted)
+                
         site4_list = site_list_from_sitelogs(self.sitelogs)
         
         ### initialize the table as log
         ts = utils.get_timestamp()
-        log_table = os.path.join(outdir_logs,ts + "_conv_table.log")
+        log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
         log_table_df_void = pd.DataFrame([], columns=self.table.columns)
         log_table_df_void.to_csv(log_table,mode="w",index=False)
         
-        ### get a table with only the good files (ok_init == True)
+        ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
-        n_ok_init = (self.table.ok_init).sum()
-        n_not_ok_init = np.logical_not(self.table.ok_init).sum()
+        n_ok_inp = (self.table['ok_inp']).sum()
+        n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
         
         logger.info("******** RINEX conversion / Header mod ('rinexmod') for %6i files",
-                    n_ok_init)        
+                    n_ok_inp)        
         
         logger.info("%6i files are excluded",
-                    n_not_ok_init)
+                    n_not_ok_inp)
         
-        for irow,row in table_init_ok.iterrows():  
-            
-            fraw = Path(row.fraw)
+        for irow,row in table_init_ok.iterrows(): 
+             
+            fraw = Path(row['fpath_inp'])
             ext = fraw.suffix.upper()
-            logger.info("***** input raw file for conversion: %s",fraw.name)
+            logger.info("***** input raw file for conversion: %s",
+                        fraw.name)
     
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
             site =  _site_search_from_list(fraw,
-                                           site4_list)       
+                                           site4_list)     
 
-            outdir_rinexmoded_use = os.path.join(outdir_rinexmoded,
+            tmpdir_rinexmoded_use = os.path.join(tmpdir_rinexmoded,
                                                  site.upper())
-            utils.create_dir(outdir_rinexmoded_use)
-
+                                                 
+            utils.create_dir(tmpdir_rinexmoded_use)
+            
             ### find the right converter
             conve = select_converter_batch(fraw)
             
@@ -372,7 +390,7 @@ class ConvertRinexModGnss():
             if not conve:
                 logger.info("file skipped, no converter found: %s",fraw)
                 row.note = "no converter found"
-                row.ok_init = False
+                row.ok_inp = False
                 row.to_csv(log_table, mode="a", index=False, header=False)
                 continue
             
@@ -382,24 +400,23 @@ class ConvertRinexModGnss():
             
             #############################################################
             #### CONVERSION
-            row.ok_init = True
+            self.table.loc[irow,'ok_inp'] = True
     
-            frnxtmp, _ = arcv.converter_run(fraw,
-                                            outdir_converted,
+            frnxtmp, _ = arocnv.converter_run(fraw,
+                                            tmpdir_converted,
                                             converter = conve)
             if frnxtmp:
-                row.frnx_tmp = frnxtmp
-                row.ok_conv = True
-                row.date, _ = operational.rinex_start_end(frnxtmp)
+                self.table.loc[irow,'fpath_out'] = frnxtmp
+                self.table.loc[irow,'ok_out'] = True
+                self.table.loc[irow,'epoch'] , _ = operational.rinex_start_end(frnxtmp)
             else:
-                row.ok_conv = False
-    
+                self.table.loc[irow,'ok_out'] = False
     
             #############################################################
             #### RINEXMOD            
             try:
                 frinfin = rinexmod_api.rinexmod(frnxtmp,
-                                                outdir_rinexmoded_use,
+                                                tmpdir_rinexmoded_use,
                                                 marker=site,
                                                 compression="gz",
                                                 longname=True,
@@ -407,57 +424,32 @@ class ConvertRinexModGnss():
                                                 force_rnx_load=True,
                                                 verbose=False,
                                                 full_history=True)
-                row.ok_rnxmod = True
-                row.frnx_fin = frinfin
+                self.table.loc[irow,'ok_out'] = True
+                self.table.loc[irow,'fpath_out'] = frinfin
+                self.table.loc[irow,'size_out'] = os.path.getsize(frinfin)
                 
                 pd.DataFrame(row).T.to_csv(log_table,mode="a",
                                            index=False,header=False) 
-            except:
-                row.ok_rnxmod = False
+                                           
+                ### def output folders        
+                outdir_use = arogen.translator(self.out_dir,
+                                               row.epoch,
+                                               self.session.translate_dict)
+                utils.create_dir(outdir_use)
+                shutil.copy(frinfin,outdir_use)
+                
+            except Exception as e:
+                logger.warn(e)
+                self.table.loc[irow,'ok_out'] = False
                 pd.DataFrame(row).T.to_csv(log_table,mode="a",
                                            index=False,header=False) 
                 continue
-    
+        
         return None
-    
-
-# def converter_batch(input_files,
-#                     outdir,
-#                     inp_regex=".*",
-#                     sitelogs_inp=None,
-#                     year_in_inp_path=None,
-#                     year_min_max=(1980,2099),
-#                     files_idx_minmax=(None,None),
-#                     keywords_path_excl=['Problem','Rinex','ZIP'],
-#                     raw_excl_list=None):
-    
-    # ##############################################
-    # ### def output logs
-    # ts = utils.get_timestamp()
-    # log_table = os.path.join(outdir_logs,ts + "_table.log")
-
-    # logline.to_csv(log_table,mode="w",index=False)
-
-    # ##############################################
-    # ### find and read previous OK list files
-    # prev_raw_ok_logs = utils.find_recursive(outdir_logs,'*_raw_ok.log')    
-    # prev_raw_ok = _input_files_reader(tuple(prev_raw_ok_logs))
-
-    # ##############################################
-    # ### find and read manual exclu list files
-    # prev_raw_exclu = _input_files_reader(raw_excl_list)
-
-    # ##############################################
-
-    # ##############################################
-    # ### filtering the input list
-    # flist = _filter_prev_table(flist, DF_prev_tbl)
-    # flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_ok,False) ### must be disabled at one point
-    # flist = _filter_prev_raw_ok_or_exclu(flist, prev_raw_exclu,True)
-    
-    # logger.info("%6i files will be processed", len(flist))
 
 
+#########################################################################
+#### Misc functions 
 def _site_search_from_list(fraw_inp,site4_list_inp):
     """
     from a raw file with an approximate site name and a list of correct 
@@ -479,7 +471,8 @@ def select_converter_batch(fraw_inp,
                                          ".BCK",
                                          "^.[0-9]{3}$",
                                          ".A$",
-                                         "Trimble"]):
+                                         "Trimble",
+                                         ".ORIG"]):
     """
     do a high level case matching to identify the right converter 
     for raw file with an unconventional extension, or exclude the file
@@ -507,7 +500,11 @@ def stop_long_running_containers(max_running_time=120):
     kill Docker container running for a too long time
     Useful for the trm2rinex dockers
     """
-    client = docker.from_env()
+    try:
+        client = docker.from_env()
+    except docker.errors.DockerException:
+        logger.warn('Permission denied for Docker')
+        return None
     containers = client.containers.list()
 
     for container in containers:
@@ -549,13 +546,13 @@ def stop_long_running_containers(max_running_time=120):
         
     #     year min and year max are included in the range
         
-    #     modify the boolean "ok_init" of the object's table
+    #     modify the boolean "ok_inp" of the object's table
     #     returns the filtered raw files in a list
     #     """
     #     flist_out = []
     #     nfil = 0 
         
-    #     ok_init_bool_stk = []
+    #     ok_inp_bool_stk = []
         
     #     for irow,row in self.table.iterrows():
     #         f = row.fraw
@@ -573,17 +570,17 @@ def stop_long_running_containers(max_running_time=120):
     #             logger.debug("file filtered, not in year range (%s): %s",
     #                          year_folder,f)
     #             nfil += 1
-    #             ok_init_bool_stk.append(False)
+    #             ok_inp_bool_stk.append(False)
 
     #         else:
-    #             if not row.ok_init: ### ok_init is already false
-    #                 ok_init_bool_stk.append(False)
+    #             if not row.ok_inp: ### ok_inp is already false
+    #                 ok_inp_bool_stk.append(False)
     #             else:
-    #                 ok_init_bool_stk.append(True)
+    #                 ok_inp_bool_stk.append(True)
     #                 flist_out.append(f)
 
     #     ### final replace of ok init
-    #     self.table.ok_init = ok_init_bool_stk
+    #     self.table.ok_inp = ok_inp_bool_stk
 
     #     logger.info("%6i files filtered, not in the year min/max range (%4i/%4i)",
     #                 nfil,year_min,year_max)
