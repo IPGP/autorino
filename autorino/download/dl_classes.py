@@ -9,7 +9,7 @@ import os
 import dateparser
 import shutil
 from autorino import download as arodl
-from autorino import configread as arocfg
+from autorino import general as arogen
 
 pd.options.mode.chained_assignment = 'warn'
 
@@ -17,214 +17,32 @@ pd.options.mode.chained_assignment = 'warn'
 import logging
 logger = logging.getLogger(__name__)
 
-
-
-class SessionGnss:
-    def __init__(self,name,protocol,hostname,remote_dir,tmp_dir,
-                 remote_fname, sta_user,sta_pass,site,session_period):
-        self.name = name
-        self.protocol = protocol
-        self.hostname = hostname
-        self.remote_dir = remote_dir ## setter bellow
-        self.tmp_dir = tmp_dir
-        self.remote_fname = remote_fname
-        self.sta_user = sta_user
-        self.sta_pass = sta_pass  
-        self.site = site ## setter bellow
-        self.site4 = site  ## setter bellow       
-        self.site9 = site   ## setter bellow         
-        self.session_period = session_period
-        self.translate_dict = self._translate_dict_init()
-        
-    def __repr__(self):
-        return "session {} on {}".format(self.session_period,self.site4)
-        
-    #test sur session period !!!!!! sur protocol !!!
-
-    ############ getters and setters 
-    @property
-    def remote_dir(self):
-        return self._remote_dir
-    
-    @remote_dir.setter
-    def remote_dir(self,value):
-        if value[0] == "/":
-            self._remote_dir = "".join(list(value)[1:])
-        else:
-            self._remote_dir = value
-
-    @property
-    def site4(self):
-        return self._site4
-    @site4.setter
-    def site4(self,value):
-        self._site4 = value[:4]
-
-    @property
-    def site9(self):
-        return self._site9
-    @site9.setter
-    def site9(self,value):
-        if len(value) == 9:
-            self._site9 = value
-        elif len(value) == 4:
-            self._site9 = value + "00XXX"
-        else:
-            raise Exception("given site code != 9 or 4 chars.: " + value)
-            
-    ############ methods
-    def _translate_dict_init(self):
-        """
-        generate the translation dict based on all the SessionGnss 
-        object attributes
-        
-        site code have 2 declinations: 
-        <site> (lowercase) and <SITE> (uppercase)
-        """
-        trsltdict = dict()
-        attributes = [a for a in dir(self) if not a.startswith('__') and not callable(getattr(self, a))]
-        for a in attributes:
-            trsltdict[a] = str(getattr(self, a)).upper()
-            if a.lower() in ('site','site4','site9'):
-                trsltdict[a.upper()] = str(getattr(self, a)).upper()
-                trsltdict[a.lower()] = str(getattr(self, a)).lower()
-        return trsltdict
-
-
-def dateparser_frontend(date_in,tz="UTC"):
-    """
-    Frontend function to parse a string/datetime 
-    to a Pandas Timestamp 
-    (standard used for the DownloadGnss object)
-    Also apply a timezone (UTC per default)
-    
-    NB: the rounding will not take place here
-    rounding is not a parsing operation
-    """
-    if type(date_in) is str:
-        date_out = pd.Timestamp(dateparser.parse(date_in))
-    else:
-        date_out = pd.Timestamp(date_in)
-    
-    if not date_out.tz:
-        date_out = pd.Timestamp(date_out, tz=tz)
-    
-    return date_out
-    
-def dateround_frontend(date_in,period,round_method="ceil"):
-    """    
-    Frontend function to round a Pandas Timestamp 
-    according to the "ceil", "floor" or "round" approach
-    """
-    if round_method == "ceil":
-        date_out = date_in.ceil(period)
-    elif round_method == "floor":
-        date_out = date_in.floor(period)        
-    elif round_method == "round":
-        date_out = date_in.ceil(period)
-    else:
-        raise Exception
-        
-    return date_out
-        
-
-class EpochRange:
-    def __init__(self,epoch1,epoch2,
-                 period="01D",
-                 round_method="ceil",
-                 tz="UTC"):
-        self.period = period
-        self.round_method = round_method
-        self.tz = tz
-
-        self._epoch1_raw = epoch1
-        self._epoch2_raw = epoch2
-    
-        _epoch1tmp = dateparser_frontend(self._epoch1_raw)
-        _epoch2tmp = dateparser_frontend(self._epoch2_raw)
-        _epoch_min_tmp = np.min((_epoch1tmp,_epoch2tmp))
-        _epoch_max_tmp = np.max((_epoch1tmp,_epoch2tmp))
-        
-        self.epoch_start = _epoch_min_tmp  ### setter bellow
-        self.epoch_end   = _epoch_max_tmp  ### setter bellow
-
-    def __repr__(self):
-        return "epoch range from {} to {}, period {}".format(self.epoch_start,self.epoch_end,self.period)
-    
-    ############ getters and setters 
-    @property
-    def epoch_start(self):
-        return self._epoch_start
-    @epoch_start.setter
-    def epoch_start(self,value):
-        self._epoch_start = dateparser_frontend(value,tz=self.tz)
-        self._epoch_start = dateround_frontend(self._epoch_start,
-                                               self.period,
-                                               self.round_method) 
-    @property
-    def epoch_end(self):
-        return self._epoch_end
-    @epoch_end.setter
-    def epoch_end(self,value):
-        self._epoch_end = dateparser_frontend(value,tz=self.tz) 
-        self._epoch_end = dateround_frontend(self._epoch_end,
-                                             self.period,
-                                             self.round_method) 
-    ########### methods
-    def epoch_range_list(self):
-        epochrange=pd.date_range(self.epoch_start,
-                                 self.epoch_end,
-                                 freq=self.period)
-        return list(epochrange)
-
-class WorkflowGnss():
-    def __init__(self,session,epoch_range):
-        self.session = session
-        self.epoch_range = epoch_range ### setter bellow
-        self.out_dir = out_dir
-        self.table = self._table_init()
-
-class ConvertGnss():
-    def __init__():
-        pass
-
-class RinexHeaderModGnss():
-    def __init__():
-        pass
-
-class DownloadGnss():
+class DownloadGnss(arogen.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir):
         self.session = session
         self.epoch_range = epoch_range ### setter bellow
         self.out_dir = out_dir
         self.tmp_dir = session.tmp_dir
         self.table = self._table_init()
-        
-    ######## getter and setter 
-    @property
-    def epoch_range(self):
-        return self._epoch_range
-        
-    @epoch_range.setter
-    def epoch_range(self,value):
-        self._epoch_range = value
-        if self._epoch_range.period != self.session.session_period:  
-            logger.warn("Session period (%s) != Epoch Range period (%s)",self.session.session_period,self._epoch_range.period)
 
-    ######## internal methods 
-    def _table_init(self):
-        df = pd.DataFrame(columns=["epoch","fname",
-                                   "ok_remote",
-                                   "ok_local",
-                                   "fpath_remote",
-                                   "fpath_local",
-                                   "size_local"])
+    # ######## internal methods 
+    # def _table_init(self):
+        # df = pd.DataFrame(columns=['epoch',
+                                   # 'site',
+                                   # 'fname',
+                                   # 'ok_remote',
+                                   # 'ok_out',
+                                   # 'fpath_inp',
+                                   # 'fpath_out',
+                                   # 'size_out'])
                                    
-        df.epoch = self.epoch_range.epoch_range_list()
-        df.set_index("epoch",inplace=True,drop=True)
-        df = df.where(pd.notnull(df), None)
+        # df['epoch'] = self.epoch_range.epoch_range_list()
+        # df['site'] = self.session.site
+        # df.set_index('epoch',inplace=True,drop=True)
+        # df = df.where(pd.notnull(df), None)
         
-        return df
+        # return df
+
     
     ########### methods        
     def guess_remote_local_files(self,
@@ -254,15 +72,18 @@ class DownloadGnss():
                                               rmot_dir_use,
                                               rmot_fname_use)
 
-                rmot_path_use = arocfg.translator(rmot_path_use,
+                rmot_path_use = arogen.translator(rmot_path_use,
                                                   epoch,
                                                   self.session.translate_dict)
                                            
                 rmot_fname_use = os.path.basename(rmot_path_use)
                                            
                 rmot_paths_list.append(rmot_path_use)
-                self.table.loc[epoch,"fname"]        = rmot_fname_use
-                self.table.loc[epoch,"fpath_remote"] = rmot_path_use
+                
+                iepoch = self.table[self.table['epoch'] == epoch].index[0]
+                                                
+                self.table.loc[iepoch,'fname']     = rmot_fname_use
+                self.table.loc[iepoch,'fpath_inp'] = rmot_path_use
                 logger.debug("remote file guessed: %s",rmot_path_use)
 
             ### guess the potential local files
@@ -272,15 +93,18 @@ class DownloadGnss():
                 local_path_use = os.path.join(local_dir_use,
                                               local_fname_use)
 
-                local_path_use = arocfg.translator(local_path_use,
+                local_path_use = arogen.translator(local_path_use,
                                                    epoch,
                                                    self.session.translate_dict)
                                             
                 local_fname_use = os.path.basename(local_path_use)
                                            
                 local_paths_list.append(local_path_use)
-                self.table.loc[epoch,"fname"]       = local_fname_use
-                self.table.loc[epoch,"fpath_local"] = local_path_use
+
+                iepoch = self.table[self.table['epoch'] == epoch].index
+
+                self.table.loc[iepoch,'fname']       = local_fname_use
+                self.table.loc[iepoch,'fpath_out'] = local_path_use
                 logger.debug("local file guessed: %s",local_path_use)
       
         rmot_paths_list = sorted(list(set(rmot_paths_list)))
@@ -289,7 +113,6 @@ class DownloadGnss():
         logger.info("nbr local files guessed: %s",len(local_paths_list))
 
         return rmot_paths_list, local_paths_list
-        
         
     def _guess_remote_directories(self):
         """
@@ -301,7 +124,7 @@ class DownloadGnss():
         rmot_dir_list = []
         for epoch in self.epoch_range.epoch_range_list():
             rmot_dir_use = str(self.session.remote_dir)
-            rmot_dir_use = arocfg.translator(rmot_dir_use,epoch,
+            rmot_dir_use = arogen.translator(rmot_dir_use,epoch,
                                              self.session.translate_dict)
             rmot_dir_list.append(rmot_dir_use)
             
@@ -334,19 +157,19 @@ class DownloadGnss():
     def check_local_files(self):
         """
         check the existence of the local files, and set the corresponding
-        booleans in the ok_local column
+        booleans in the ok_out column
         """
         
         local_files_list = []
         
-        for epoch,local_file in self.table.fpath_local.items():
+        for irow,row in self.table.iterrows():
+            local_file = row['fpath_out']
             if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
-                self.table.ok_local.loc[epoch] = True
-                self.table.size_local.loc[epoch] = os.path.getsize(local_file)
-
+                self.table.loc[irow,'ok_out'] = True
+                self.table.loc[irow,'size_out'] = os.path.getsize(local_file)
                 local_files_list.append(local_file)
             else:
-                self.table.ok_local.loc[epoch] = False
+                self.table.loc[irow,'ok_out'] = False
                 
         return local_files_list
         
@@ -354,16 +177,16 @@ class DownloadGnss():
         """
         if the local file is smaller than threshold * median 
         of the considered local files in the request table
-        the ok_local boolean is set at False, and the local file 
+        the ok_out boolean is set at False, and the local file 
         is redownloaded
         
         check_local_files must be launched 1st
         """
         
-        med = self.table.size_local.median(skipna=True)
-        valid_bool = threshold * med < self.table.size_local
-        self.table.loc[:,"ok_local"] = valid_bool
-        invalid_local_files_list = list(self.table.fpath_local[valid_bool])
+        med = self.table['size_out'].median(skipna=True)
+        valid_bool = threshold * med < self.table['size_out']
+        self.table.loc[:,'ok_out'] = valid_bool
+        invalid_local_files_list = list(self.table.loc[valid_bool,'fpath_out'])
 
         return invalid_local_files_list
 
@@ -378,13 +201,14 @@ class DownloadGnss():
         """
         download_files_list = []
                 
-        for epoch, row in self.table.iterrows():
+        for irow, row in self.table.iterrows():
             
-            rmot_file = row.fpath_remote
-            local_file = row.fpath_local
+            epoch = row['epoch']
+            rmot_file = row['fpath_inp']
+            local_file = row['fpath_out']
                                                                     
             ###### check if the file exists locally
-            if row.ok_local == True and not force_download:
+            if row.ok_out == True and not force_download:
                  logger.info("%s already exists locally, skip",
                              os.path.basename(local_file))
                  continue
@@ -392,7 +216,7 @@ class DownloadGnss():
             ###### use the guessed local file as destination or the generic directory                
             if not local_file: #### the local file has not been guessed
                 outdir_use = str(self.out_dir)
-                outdir_use = arocfg.translator(outdir_use,
+                outdir_use = arogen.translator(outdir_use,
                                                epoch,
                                                self.session.translate_dict)
             else: #### the local file has been guessed before
@@ -438,9 +262,9 @@ class DownloadGnss():
             ###### store the results in the table
             if dl_ok:
                 download_files_list.append(file_dl)
-                self.table.loc[epoch,"ok_local"] = True
-                self.table.loc[epoch,"fpath_local"] = file_dl
+                self.table.loc[irow,"ok_out"] = True
+                self.table.loc[irow,"fpath_out"] = file_dl
             else:
-                self.table.loc[epoch,"ok_local"] = False
+                self.table.loc[irow,"ok_out"] = False
                 
         return download_files_list
