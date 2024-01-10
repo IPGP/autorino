@@ -86,6 +86,8 @@ def list_remote_files_ftp(host_name, remote_dir, username, password):
     host_name = host_name.replace('/',"")
     remote_dir = remote_dir.replace(host_name,"")
     
+    join_url()
+    
     # connect to FTP server
     ftp = ftplib.FTP(host_name)
     ftp.login(username, password)
@@ -146,15 +148,12 @@ def size_remote_file_http(url):
 ############# download remote file
 
 def download_file_ftp(url, output_dir,username, password):
-    # MUST BE IMPROVED !!! (url parsing part)
     urlp = urlparse(url)
     
     url_host = urlp.netloc
     url_dir = os.path.dirname(urlp.path)[1:]
     url_fname = os.path.basename(urlp.path)
     
-    print("AAAAAAAAAAAA",url_host,  url_dir)
-
     ftp = ftplib.FTP(url_host)
     ftp.login(username, password)
     ftp.cwd(url_dir)
