@@ -11,8 +11,6 @@ import dateparser
 import pandas as pd
 import numpy as np
 
-
-
 def dateparser_frontend(date_in,tz="UTC"):
     """
     Frontend function to parse a string/datetime 
@@ -72,7 +70,9 @@ class EpochRange:
         self.epoch_end   = _epoch_max_tmp  ### setter bellow
 
     def __repr__(self):
-        return "epoch range from {} to {}, period {}".format(self.epoch_start,self.epoch_end,self.period)
+        return "epoch range from {} to {}, period {}".format(self.epoch_start,
+                                                             self.epoch_end,
+                                                             self.period)
     
     ############ getters and setters 
     @property
