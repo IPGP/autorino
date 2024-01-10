@@ -18,33 +18,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 class DownloadGnss(arogen.WorkflowGnss):
-    def __init__(self,session,epoch_range,out_dir):
-        self.session = session
-        self.epoch_range = epoch_range ### setter bellow
-        self.out_dir = out_dir
-        self.tmp_dir = session.tmp_dir
-        self.table = self._table_init()
-
-    # ######## internal methods 
-    # def _table_init(self):
-        # df = pd.DataFrame(columns=['epoch',
-                                   # 'site',
-                                   # 'fname',
-                                   # 'ok_remote',
-                                   # 'ok_out',
-                                   # 'fpath_inp',
-                                   # 'fpath_out',
-                                   # 'size_out'])
-                                   
-        # df['epoch'] = self.epoch_range.epoch_range_list()
-        # df['site'] = self.session.site
-        # df.set_index('epoch',inplace=True,drop=True)
-        # df = df.where(pd.notnull(df), None)
-        
-        # return df
-
     
-    ########### methods        
+    def __init__(self,session,epoch_range,out_dir):
+        super().__init__(session,epoch_range,out_dir)
+    
+    ########### DownloadGnss specific methods        
     def guess_remote_local_files(self,
                                  guess_remote=True,
                                  guess_local=True):
@@ -80,7 +58,7 @@ class DownloadGnss(arogen.WorkflowGnss):
                                            
                 rmot_paths_list.append(rmot_path_use)
                 
-                iepoch = self.table[self.table['epoch'] == epoch].index[0]
+                iepoch = self.table[self.table['epoch_srt'] == epoch].index[0]
                                                 
                 self.table.loc[iepoch,'fname']     = rmot_fname_use
                 self.table.loc[iepoch,'fpath_inp'] = rmot_path_use
@@ -101,7 +79,7 @@ class DownloadGnss(arogen.WorkflowGnss):
                                            
                 local_paths_list.append(local_path_use)
 
-                iepoch = self.table[self.table['epoch'] == epoch].index
+                iepoch = self.table[self.table['epoch_srt'] == epoch].index
 
                 self.table.loc[iepoch,'fname']       = local_fname_use
                 self.table.loc[iepoch,'fpath_out'] = local_path_use
@@ -203,7 +181,7 @@ class DownloadGnss(arogen.WorkflowGnss):
                 
         for irow, row in self.table.iterrows():
             
-            epoch = row['epoch']
+            epoch = row['epoch_srt']
             rmot_file = row['fpath_inp']
             local_file = row['fpath_out']
                                                                     
