@@ -7,7 +7,7 @@ Created on Tue Feb 21 16:23:06 2023
 """
 
 
-from typing import Union
+from typing import Union, List
 from pathlib import Path
 import os
 import re
@@ -184,7 +184,7 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
     return converter_name , brand, cmd_build_fct , conv_regex_fct , bin_options , bin_kwoptions         
 
 
-def converter_run(inp_raw_fpath: Union[Path,str],
+def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
                   out_dir: Union[Path,str] = None,
                   converter = 'auto',
                   timeout=60,
@@ -204,6 +204,7 @@ def converter_run(inp_raw_fpath: Union[Path,str],
     ----------
     inp_raw_fpath : Union[Path,str]
         path of the input RAW file.
+        for RINEX Handeling (splice) a list of path is allowed.
     out_dir : Union[Path,str], optional
         destination directory of the converted RINEX. The default is None.
     converter : str, optional
