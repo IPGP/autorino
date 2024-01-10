@@ -3,11 +3,31 @@
 """
 Created on Tue Mar 14 12:05:28 2023
 
-@author: psakicki
+@author: psakic
+
+This module contains the functions to build the generic commands 
+needed to run a GNSS conversion
+
+one function per converter, one  converter per manufacturer
+
+all the functions here have the same returns:
+
+Returns
+-------
+cmd_use : list of string
+    the command as a mono-string in list (singleton).
+    Ready to be used by subprocess.run
+cmd_list : list of strings
+    the command as a list of strings, splited for each element.
+cmd_str : string
+    the command as a concatenated string.
+
+
 """
 
 #### Import star style
 from pathlib import Path
+#from pathlib3x import Path
 from geodezyx import utils
 
 
@@ -495,7 +515,8 @@ def cmd_build_teqc(inp_raw_fpath,
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
-    out_fpath = out_dir.joinpath(inp_raw_fpath.with_suffix(".rnx_teqc"))   
+    #out_fpath = out_dir.joinpath(inp_raw_fpath.with_suffix(".rnx_teqc").name)   
+    out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_teqc")   
     
     cmd_opt_list , _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
@@ -507,11 +528,40 @@ def cmd_build_teqc(inp_raw_fpath,
     
     return cmd_use, cmd_list, cmd_str
     
+    
+def cmd_build_gfzrnx(inp_raw_fpath,
+                     out_dir,
+                     bin_options_custom=[],
+                     bin_kwoptions_custom=dict(),
+                     bin_path="gfzrnx"):
+        
+    #### Convert the paths as Path objects
+    inp_raw_fpath = Path(inp_raw_fpath)
+    out_dir = Path(out_dir)
+    
+    if  type(inp_raw_fpath) is str:
+        raw_fpath_lst = [inp_raw_fpath]
+    else
+        raw_fpath_lst = list(inp_raw_fpath)
+        
+    out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_gfzrnx")   
+    
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
+    
+    cmd_list = [bin_path,'-inp'] + raw_fpath_lst  + ['-out', out_fpath] + cmd_opt_list + cmd_kwopt_list
+    cmd_list = [str(e) for e in cmd_list]
+    cmd_str = " ".join(cmd_list)
+    cmd_use = [cmd_str]
+    
+    return cmd_use, cmd_list, cmd_str
+    
+    
 def cmd_build_convbin(inp_raw_fpath,
-                   out_dir,
-                   bin_options_custom=[],
-                   bin_kwoptions_custom=dict(),
-                   bin_path="convbin"):    
+                      out_dir,
+                      bin_options_custom=[],
+                      bin_kwoptions_custom=dict(),
+                      bin_path="convbin"):    
     """
     Build a command to launch convbin, the RTKLIB converter, for BINEX
     
@@ -660,7 +710,7 @@ def cmd_build_convbin(inp_raw_fpath,
     cmd_opt_list , _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
     
-    cmd_list = [bin_path,'-d',out_dir,'-r','binex'] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
+    cmd_list = [bin_path,'-d',out_dir,'-os','-od','-r','binex'] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
@@ -671,7 +721,7 @@ def cmd_build_tps2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="/opt/softs_gnss/bin/tps2rin.exe"):
+                      bin_path="tps2rin.exe"):
     """
     Build a command to launch tps2rin, for Topcon
     
@@ -840,6 +890,9 @@ def cmd_build_tps2rin(inp_raw_fpath,
     return cmd_use, cmd_list, cmd_str
     
 
+
+
+                    
 
 
 
