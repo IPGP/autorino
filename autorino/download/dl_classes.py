@@ -2,11 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import ftplib
-import datetime as dt
 import pandas as pd
-import numpy as np
 import os
-import dateparser
 import shutil
 from autorino import download as arodl
 from autorino import general as arogen

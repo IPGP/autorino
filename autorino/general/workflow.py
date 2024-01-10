@@ -10,7 +10,10 @@ Created on Mon Jan  8 16:53:51 2024
 import logging
 import pandas as pd
 import numpy as np
-import os 
+import os
+import re
+ 
+from geodezyx import utils
 
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
@@ -63,15 +66,15 @@ class WorkflowGnss():
 
     ######## internal methods 
 
-  # _______    _     _                                                                    _   
- # |__   __|  | |   | |                                                                  | |  
-    # | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_ 
-    # | |/ _` | '_ \| |/ _ \ | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|
-    # | | (_| | |_) | |  __/ | | | | | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_ 
-    # |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
-                                                         # __/ |                              
-                                                        # |___/     
-    
+# _______    _     _                                                                    _   
+#|__   __|  | |   | |                                                                  | |  
+#   | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_ 
+#   | |/ _` | '_ \| |/ _ \ | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|
+#   | | (_| | |_) | |  __/ | | | | | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_ 
+#   |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
+#                                                        __/ |                              
+#                                                       |___/     
+  
         
     def print_table(self,silent=False,max_colwidth=33):
         
@@ -130,13 +133,13 @@ class WorkflowGnss():
         
         return None
 
-  # ______ _ _ _              _        _     _      
- # |  ____(_) | |            | |      | |   | |     
- # | |__   _| | |_ ___ _ __  | |_ __ _| |__ | | ___ 
- # |  __| | | | __/ _ \ '__| | __/ _` | '_ \| |/ _ \
- # | |    | | | ||  __/ |    | || (_| | |_) | |  __/
- # |_|    |_|_|\__\___|_|     \__\__,_|_.__/|_|\___|
-                                                  
+#  ______ _ _ _              _        _     _      
+# |  ____(_) | |            | |      | |   | |     
+# | |__   _| | |_ ___ _ __  | |_ __ _| |__ | | ___ 
+# |  __| | | | __/ _ \ '__| | __/ _` | '_ \| |/ _ \
+# | |    | | | ||  __/ |    | || (_| | |_) | |  __/
+# |_|    |_|_|\__\___|_|     \__\__,_|_.__/|_|\___|
+                                                
            
     def filter_bad_keywords(self,keywords_path_excl):
         """
@@ -195,7 +198,7 @@ class WorkflowGnss():
         returns the filtered raw files in a list
         """
         flist_out = []
-        nfil = 0 
+        #nfil = 0 
         
         ok_inp_bool_stk = []
         
@@ -326,3 +329,43 @@ class WorkflowGnss():
             out = self.table[self.table[col]]
         return out
 
+
+
+
+
+def input_list_reader(inp_fil,inp_regex=".*"):
+    """
+    Handles mutiples types of input lists (in a general sense)  
+    and returns a python list of the input
+    
+    inp_fil can be:
+        * a python list (then nothing is done)
+        * a text file path containing a list of files 
+        (readed as a python list)
+        * a tuple containing several text files path 
+        (recursive version of the previous point)
+        * a directory path (all the files matching inp_regex are readed)
+    """
+
+    if not inp_fil:
+        flist  = []
+    elif type(inp_fil) is tuple and os.path.isfile(inp_fil[0]):
+        flist = list(np.hstack([open(f,"r+").readlines() for f in inp_fil]))
+        flist = [f.strip() for f in flist]
+    elif type(inp_fil) is list:
+        flist = inp_fil
+    elif os.path.isfile(inp_fil):
+        flist = open(inp_fil,"r+").readlines()
+        flist = [f.strip() for f in flist]
+    elif os.path.isdir(inp_fil):
+        flist = utils.find_recursive(inp_fil,
+                                     inp_regex,
+                                     case_sensitive=False)
+    else:
+        flist = []
+        logger.warning("the filelist is empty") 
+        
+    if inp_regex != ".*":
+        flist = [f for f in flist if re.match(inp_regex, f)]
+        
+    return flist
