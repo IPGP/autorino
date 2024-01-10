@@ -11,25 +11,82 @@ import os
 import datetime as dt 
 import hashlib
 import urllib
+from urllib.parse import urlparse
 import pandas
 from pathlib import Path
 import urllib.request                 
 from tqdm import tqdm
 from ftplib import FTP
 import requests
-from bs4 import BeautifulSoup
-
-
+from tqdm.contrib.logging import logging_redirect_tqdm
+import io
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
 
+
+# *****************************************************************************
+# define Python user-defined exceptions
+class AutorinoError(Exception):
+    pass
+
+class AutorinoDownloadError(AutorinoError):
+    pass
+
+
+class TqdmToLogger(io.StringIO):
+    """
+        Output stream for TQDM which will output to logger module instead of
+        the StdOut.
+    """
+    logger = None
+    level = None
+    buf = ''
+    def __init__(self,logger,level=None):
+        super(TqdmToLogger, self).__init__()
+        self.logger = logger
+        self.level = level or logging.INFO
+    def write(self,buf):
+        self.buf = buf.strip('\r\n\t ')
+    def flush(self):
+        self.logger.log(self.level, self.buf)
+        
+        
+def join_url(protocol_inp,hostname_inp,dir_inp,fname_inp):
+    """
+    a wrapper to classical join to format correctly the URL
+    """
+    
+    ### add the protocol if missing
+    if not (hostname_inp.startswith('http') or hostname_inp.startswith('ftp')):
+        prot_n_host = protocol_inp + '://' + hostname_inp
+    else:
+        prot_n_host = hostname_inp
+            
+    ### remove (strip) slashs in the dir path
+    dirr = dir_inp.strip("/")
+    
+    ### safty warning to check a stupid cpoy/paste
+    if fname_inp in dirr:
+        logger.warn("%s file's name also appears in dir name, check your config file",fname_inp)
+        
+    url_out = os.path.join(prot_n_host,
+                           dirr,
+                           fname_inp)
+                           
+    return url_out
+
 ############# list remote files
 
 def list_remote_files_ftp(host_name, remote_dir, username, password):
-    # clean hostname
+    # clean hostname & remote_dir
+    # MUST BE IMPROVED !!!
+    remote_dir = remote_dir.replace(host_name,"")
     host_name = host_name.replace('ftp://',"")
     host_name = host_name.replace('/',"")
+    remote_dir = remote_dir.replace(host_name,"")
+    
+    join_url()
     
     # connect to FTP server
     ftp = ftplib.FTP(host_name)
@@ -91,30 +148,37 @@ def size_remote_file_http(url):
 ############# download remote file
 
 def download_file_ftp(url, output_dir,username, password):
-    # Check if URL is HTTP or FTP
-    url = Path(url)
-    url_host = str(url.parts[0])
-    url_dir  = str(Path(*url.parts[1:-1]))
+    urlp = urlparse(url)
+    
+    url_host = urlp.netloc
+    url_dir = os.path.dirname(urlp.path)[1:]
+    url_fname = os.path.basename(urlp.path)
     
     ftp = ftplib.FTP(url_host)
     ftp.login(username, password)
     ftp.cwd(url_dir)
-    filename = url.name
+    filename = url_fname 
     
     def _ftp_callback(data):
         _ftp_callback.bytes_transferred += len(data)
     
     file_size = ftp.size(filename)
+
     output_path = os.path.join(output_dir, filename)
-    with open(output_path, 'wb') as f, tqdm(total=file_size,
-                                            unit='B', 
-                                            unit_scale=True,
-                                            desc=filename) as pbar:
+    f = open(output_path, 'wb')
+
+    #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
+    with tqdm(total=file_size,
+               unit='B', 
+               unit_scale=True,
+               desc=filename) as pbar:
+                    
         _ftp_callback.bytes_transferred = 0
         ftp.retrbinary('RETR ' + filename, lambda data: (f.write(data), pbar.update(len(data))), 1024)
         ftp.quit()
-    
-        return output_path
+        
+    f.close()
+    return output_path
 
 
 def download_file_http(url, output_dir):
@@ -126,12 +190,15 @@ def download_file_http(url, output_dir):
     output_path = os.path.join(output_dir, filename)
     # Download file with progress bar
     response = requests.get(url, stream=True)
-    with open(output_path, 'wb') as f, tqdm(total=file_size,
-                                            unit='B', 
-                                            unit_scale=True,
-                                            desc=filename) as pbar:
+    
+    f = open(output_path, 'wb')
+    
+    #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
+    with tqdm(total=file_size, unit='B',
+              unit_scale=True, desc=filename) as pbar:
         for data in response.iter_content(chunk_size=1024):
             f.write(data)
             pbar.update(len(data))
-    
-        return output_path
+                
+    f.close()
+    return output_path
