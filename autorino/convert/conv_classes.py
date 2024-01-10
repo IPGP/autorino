@@ -43,45 +43,6 @@ def site_list_from_sitelogs(sitelogs_inp):
     return site4_list
 
 
-
-def input_list_reader(inp_fil,inp_regex=".*"):
-    """
-    Handles mutiples types of input lists (in a general sense)  
-    and returns a python list of the input
-    
-    inp_fil can be:
-        * a python list (then nothing is done)
-        * a text file path containing a list of files 
-        (readed as a python list)
-        * a tuple containing several text files path 
-        (recursive version of the previous point)
-        * a directory path (all the files matching inp_regex are readed)
-    """
-
-    if not inp_fil:
-        flist  = []
-    elif type(inp_fil) is tuple and os.path.isfile(inp_fil[0]):
-        flist = list(np.hstack([open(f,"r+").readlines() for f in inp_fil]))
-        flist = [f.strip() for f in flist]
-    elif type(inp_fil) is list:
-        flist = inp_fil
-    elif os.path.isfile(inp_fil):
-        flist = open(inp_fil,"r+").readlines()
-        flist = [f.strip() for f in flist]
-    elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil,
-                                     inp_regex,
-                                     case_sensitive=False)
-    else:
-        flist = []
-        logger.warning("the filelist is empty") 
-        
-    if inp_regex != ".*":
-        flist = [f for f in flist if re.match(inp_regex, f)]
-        
-    return flist
-
-
 class ConvertRinexModGnss(arogen.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)

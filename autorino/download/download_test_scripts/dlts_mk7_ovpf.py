@@ -5,6 +5,7 @@ import os
 from autorino import download as arodl
 from autorino import convert as arocnv
 from autorino import general as arogen
+from autorino import configread as arocfg
 
 import yaml
 
@@ -17,7 +18,7 @@ pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05c_RVAG.yml'
 
 Y1 = yaml.safe_load(open(pconfig))
 
-ses_lst, dwl_lst = arogen.session_download_from_configfile(pconfig)
+ses_lst, dwl_lst = arocfg.session_download_from_configfile(pconfig)
 dwl = dwl_lst[0]
 ses = ses_lst[0]
 #req = req_lst
