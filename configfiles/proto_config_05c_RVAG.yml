@@ -1,0 +1,56 @@
+### other structure for the session(s) 
+
+station:
+    site: RVAG00REU 
+    sitelog_path:
+    antenna:
+        device_attributes_from_sitelog: True
+        manufacturer: NA
+        model: NA
+        serial_number: NA
+    receiver: 
+        device_attributes_from_sitelog: True
+        manufacturer: AUTO_FROM_SITELOG # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        model: AUTO_FROM_SITELOG
+        serial_number: NA 
+    access:
+        protocol: "ftp"
+        hostname: "***REMOVED***"   
+        login: "***REMOVED***"
+        password: "***REMOVED***"
+    sessions_list:
+      - session:
+            name: NA 
+            remote_dir: "/DSK1/SSN/LOG1_A/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+            remote_fname:  "<SITE4>%j0.%y_" 
+            file_period: "01D" # RINEX convention (01D, 01H etc...)
+            data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+            tmp_dir: "/home/sysop/workflow_tests/temp"
+        epoch_range:
+            epoch1: '1 days ago at 14:00'
+            epoch2: '2 days ago at midnight'
+            round_method: "ceil"
+            tz : 'UTC'
+        workflow:
+            log_parent_dir:
+            log_dir_structure: <SITE9>/%Y/%j  
+            download:
+                active: True
+                output_dir_parent: /home/sysop/workflow_tests/download_tests/ 
+                output_dir_structure: <SITE4>/%Y/%j
+                epoch_range:
+                    epoch1: '2 days ago at 14:00'
+                    epoch2: '3 days ago at midnight'
+                    round_method: "ceil"
+                    tz : 'UTC'
+            rinex_conversion:
+                active: True
+                converter : auto
+                output_dir_parent: /home/sysop/workflow_tests/conv_tests/
+                output_dir_structure: <SITE9>/%Y/%j
+                log_dir_parent:
+                log_dir_structure: <SITE9>/%Y/%j      
+            rinex_header_mod:
+                active: True
+                output_dir_parent: 
+                output_dir_structure: <SITE9>/%Y/%j

@@ -1,2 +1,2 @@
-from .dlfcts    import *
-from .dlclasses import *
+from .dl_fcts    import *
+from .dl_classes import *
