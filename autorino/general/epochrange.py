@@ -56,6 +56,7 @@ class EpochRange:
                  round_method="ceil",
                  tz="UTC"):
         self.period = period
+        #see also self.period_values, the period int and str values
         self.round_method = round_method
         self.tz = tz
 
@@ -88,13 +89,28 @@ class EpochRange:
         return self._epoch_end
     @epoch_end.setter
     def epoch_end(self,value):
-        self._epoch_end = dateparser_frontend(value,tz=self.tz) 
+        self._epoch_end = dateparser_frontend(value) #,tz=self.tz) 
         self._epoch_end = dateround_frontend(self._epoch_end,
                                              self.period,
-                                             self.round_method) 
+                                             self.round_method)
+    @property
+    def period_values(self):
+        return int(self.period[:-1]), str(self.period[-1])
+                                             
+    
     ########### methods
-    def epoch_range_list(self):
-        epochrange=pd.date_range(self.epoch_start,
-                                 self.epoch_end,
-                                 freq=self.period)
+    def epoch_range_list(self,end_bound=False):
+        if not end_bound: ### start bound
+            epochrange_srt=pd.date_range(self.epoch_start,
+                                         self.epoch_end,
+                                         freq=self.period)
+            epochrange = epochrange_srt
+        else: ### end bound
+            plus_one = np.timedelta64(*self.period_values)
+            epochrange_end=pd.date_range(self.epoch_start,
+                                         self.epoch_end+plus_one,
+                                         freq=self.period)
+            epochrange = epochrange_end[1:] - np.timedelta64(1,'s')
+            
+
         return list(epochrange)
