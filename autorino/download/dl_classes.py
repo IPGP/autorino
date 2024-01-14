@@ -6,6 +6,7 @@ import pandas as pd
 import os
 import shutil
 from autorino import download as arodl
+from autorino import configread as arocfg
 from autorino import general as arogen
 
 pd.options.mode.chained_assignment = 'warn'
@@ -47,7 +48,7 @@ class DownloadGnss(arogen.WorkflowGnss):
                                               rmot_dir_use,
                                               rmot_fname_use)
 
-                rmot_path_use = arogen.translator(rmot_path_use,
+                rmot_path_use = arocfg.translator(rmot_path_use,
                                                   epoch,
                                                   self.session.translate_dict)
                                            
@@ -68,7 +69,7 @@ class DownloadGnss(arogen.WorkflowGnss):
                 local_path_use = os.path.join(local_dir_use,
                                               local_fname_use)
 
-                local_path_use = arogen.translator(local_path_use,
+                local_path_use = arocfg.translator(local_path_use,
                                                    epoch,
                                                    self.session.translate_dict)
                                             
