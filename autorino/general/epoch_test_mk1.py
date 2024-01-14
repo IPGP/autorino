@@ -21,7 +21,6 @@ epoch2 = dt.datetime(2023,1,6,7,45)
 e = aaaa.EpochRange(epoch1, epoch2,'5min')
 
 
-
 l = e.epoch_range_list()
 
 s = pd.Series(l)

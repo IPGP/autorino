@@ -23,7 +23,7 @@ station:
             name: NA 
             remote_dir: "/DSK1/SSN/LOG1_A/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
             remote_fname:  "<SITE4>%j0.%y_" 
-            file_period: "01D" # RINEX convention (01D, 01H etc...)
+            file_period: "1h" # RINEX convention (01D, 01H etc...)
             data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
             tmp_dir: "/home/sysop/workflow_tests/temp"
         epoch_range:

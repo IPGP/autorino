@@ -541,7 +541,7 @@ def cmd_build_gfzrnx(inp_raw_fpath,
     
     if  type(inp_raw_fpath) is str:
         raw_fpath_lst = [inp_raw_fpath]
-    else
+    else:
         raw_fpath_lst = list(inp_raw_fpath)
         
     out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_gfzrnx")   

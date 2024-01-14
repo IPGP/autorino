@@ -48,6 +48,60 @@ def dateround_frontend(date_in,period,round_method="ceil"):
     return date_out
         
 
+
+def epochs_round(epochs_inp,
+                 period = '1d',
+                 rolling_period=False,
+                 rolling_ref=-1):
+    """
+    Round several epochs to a common one.
+    Useful to splice RINEX
+    
+    Use it with pandas .groupby in a further step
+
+    Parameters
+    ----------
+    epochs_inp : iterable
+        The input epochs expected to be rounded.
+    period : str, optional
+        the rounding period. Use the numpy convention. The default is '1d'.
+    rolling_period : bool, optional
+        The rounding depends on a referece epoch definied with rolling_ref.
+        The default is False.
+    rolling_ref : datetime-like or int, optional
+        If datetime-like object, use this epoch as reference.
+        If integer, use the epoch of the corresponding index  
+        Use -1 for the last epoch for instance.
+        The default is -1.
+
+    Returns
+    -------
+    epochs_rnd : pandas Serie of Timestamp or Timedelta 
+    """
+
+    
+    epochs_use = pd.Series(epochs_inp)
+    
+    if not rolling_period:
+        epochs_rnd = epochs_use.dt.floor(period)
+    else:
+        if type(rolling_ref) is int:
+            rolling_ref_use = epochs_use.iloc[rolling_ref]
+        else:
+            rolling_ref_use = rolling_ref
+        
+        ### add one second to be sure that the rolling_ref is included in a group
+        rolling_ref_use = rolling_ref_use + np.timedelta64(1,'s')
+        
+        roll_diff = epochs_use - rolling_ref_use
+        epochs_rnd = roll_diff.dt.floor(period)
+        
+    return epochs_rnd        
+        
+        
+    
+
+
 class EpochRange:
     def __init__(self,epoch1,epoch2,
                  period="01D",
