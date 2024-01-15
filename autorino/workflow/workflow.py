@@ -15,6 +15,8 @@ import re
  
 from geodezyx import utils
 
+import autorino.epochrange as aroepo
+
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
@@ -63,7 +65,6 @@ class WorkflowGnss():
             df['site'] = self.session.site 
         return df
         
-
     ######## internal methods 
 
 # _______    _     _                                                                    _   
@@ -132,6 +133,53 @@ class WorkflowGnss():
         self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
         
         return None
+    
+    
+    def guess_local_files(self,
+                          guess_remote=True,
+                          guess_local=True):
+        """
+        Guess the paths and name of the local files based on the 
+        Session and EpochRange attributes of the DownloadGnss
+        
+        see also method guess_remote_files(), 
+        a specific method for DownloadGnss objects 
+        """
+        
+        if not self.session.remote_fname:
+            logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
+        
+        rmot_paths_list = []
+        local_paths_list = []
+        
+        for epoch in self.epoch_range.epoch_range_list():
+
+        ### guess the potential local files
+            local_dir_use = str(self.out_dir)
+            local_fname_use = str(self.session.remote_fname)
+            local_path_use = os.path.join(local_dir_use,
+                                          local_fname_use)
+
+            local_path_use = translator(local_path_use,
+                                        epoch,
+                                        self.session.translate_dict)
+                                        
+            local_fname_use = os.path.basename(local_path_use)
+                                       
+            local_paths_list.append(local_path_use)
+
+            iepoch = self.table[self.table['epoch_srt'] == epoch].index
+
+            self.table.loc[iepoch,'fname']       = local_fname_use
+            self.table.loc[iepoch,'fpath_out'] = local_path_use
+            logger.debug("local file guessed: %s",local_path_use)
+  
+        rmot_paths_list = sorted(list(set(rmot_paths_list)))
+            
+        logger.info("nbr local files guessed: %s",len(local_paths_list))
+
+        return local_paths_list
+        
 
 #  ______ _ _ _              _        _     _      
 # |  ____(_) | |            | |      | |   | |     
@@ -220,7 +268,7 @@ class WorkflowGnss():
         bool_out_range = (years < year_min) | (years > year_max)
         bool_in_range = np.logical_not(bool_out_range)
         
-        #############################'
+        #############################
     
         ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
         nfil_total = sum(bool_out_range)
@@ -328,9 +376,49 @@ class WorkflowGnss():
         else:
             out = self.table[self.table[col]]
         return out
+    
+    
+    def round_epochs_for_group(self,
+                               period='1d'):
+        self.table['epoch_rnd'] = aroepo.round_epochs(self.table['epoch_srt'],
+                                                      period=period)
+        
+        
+        
+        
 
+#  __  __ _               __                  _   _                  
+# |  \/  (_)             / _|                | | (_)                 
+# | \  / |_ ___  ___    | |_ _   _ _ __   ___| |_ _  ___  _ __  ___  
+# | |\/| | / __|/ __|   |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __| 
+# | |  | | \__ \ (__ _  | | | |_| | | | | (__| |_| | (_) | | | \__ \ 
+# |_|  |_|_|___/\___(_) |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/ 
+                                                                 
 
+def _translator_epoch(path_inp,epoch_inp):
+    """
+    set the correct epoch in path_input string the with the strftime aliases
+    https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+    """
+    path_translated = str(path_inp)
+    path_translated = epoch_inp.strftime(path_translated)
+    return path_translated
 
+def _translator_keywords(path_inp,translator_dict):
+    """
+    """
+    path_translated = str(path_inp)
+    for k,v in translator_dict.items():
+        path_translated = path_translated.replace("<"+k+">",v)
+    return path_translated
+    
+def translator(path_inp,epoch_inp=None,translator_dict=None):
+    path_translated = str(path_inp)
+    if epoch_inp:
+        path_translated = _translator_epoch(path_translated,epoch_inp)
+    if translator_dict:
+        path_translated = _translator_keywords(path_translated,translator_dict)
+    return path_translated
 
 
 def input_list_reader(inp_fil,inp_regex=".*"):

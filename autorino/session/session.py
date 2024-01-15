@@ -78,3 +78,28 @@ class SessionGnss:
         return trsltdict
 
 
+def create_dummy_session():
+    """
+    Create a fake/dummy SessionGnss object
+    for test/developpement purpose
+
+    Returns
+    -------
+    ses :  SessionGnss object
+        dummy SessionGnss object.
+
+    """
+    
+    ses = SessionGnss(name='XXXX',
+                      protocol='ftp',
+                      hostname='remote.address.net',
+                      remote_dir='SES1',
+                      tmp_dir='/tmp/',
+                      remote_fname='<SITE4>%Y%m%d%H%MA.T02',
+                      sta_user='admin',
+                      sta_pass='admin',
+                      site='SITE00FRA',
+                      session_period='15min')
+    
+    return ses
+
