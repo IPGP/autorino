@@ -6,6 +6,10 @@ Created on Wed Jan 10 15:00:40 2024
 @author: psakic
 """
 
+import numpy as np
+import pandas as pd
+
+
 import autorino.general as arogen
 import autorino.workflow as arowkf
 import autorino.epochrange as aroepo
@@ -24,10 +28,15 @@ class HandleGnss(arowkf.WorkflowGnss):
 epo = aroepo.create_dummy_epochrange()
 ses = aroses.create_dummy_session()
 
-
 H = HandleGnss(ses, epo, out_dir='/tmp/')
 
 H.guess_local_files()   
-H.round_epochs_for_group() 
+wrkflw_grp_lis = H.group_epochs() 
+
+W = wrkflw_grp_lis[0]
+W.update_epoch_range_from_table()
+
+for t in H.table.groupby('epoch_rnd'):
+    print(t)
 
 H.print_table()

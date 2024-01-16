@@ -11,6 +11,8 @@ import dateparser
 import pandas as pd
 import numpy as np
 import re
+from pandas.tseries.frequencies import to_offset
+
 
 class EpochRange:
     def __init__(self,epoch1,epoch2,
@@ -27,7 +29,6 @@ class EpochRange:
         Pandas' frequency aliases memo
         https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
         """
-        
         
         self.period = period
         #see also self.period_values, the period int and str values
@@ -49,7 +50,6 @@ class EpochRange:
         return "epoch range from {} to {}, period {}".format(self.epoch_start,
                                                              self.epoch_end,
                                                              self.period)
-    
     ############ getters and setters 
     @property
     def epoch_start(self):
@@ -236,8 +236,13 @@ def round_epochs(epochs_inp,
         roll_diff = epochs_use - rolling_ref_use
         epochs_rnd = _round_date(roll_diff,period,round_method)
         
-    return epochs_rnd        
-        
+    return epochs_rnd      
+
+
+def timedelta2freqency_alias(timedelta_in):
+    offset = to_offset(pd.Timedelta(timedelta_in))
+    return offset.freqstr
+
 
 def create_dummy_epochrange():
     """
