@@ -37,7 +37,7 @@ sitelog_dir = '/home/sysop/sitelogs/OVPF'
 
 conv = arocnv.ConvertRinexModGnss(ses,dwl.epoch_range,out,sitelog_dir)
 
-conv.load_table_from_table(dwl.table)
+conv.load_table_from_prev_step_table(dwl.table)
 conv.print_table()
 conv.conv_rnxmod_files()
 conv.print_table()

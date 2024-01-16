@@ -12,13 +12,14 @@ import pandas as pd
 import numpy as np
 import os
 import re
+import copy
  
 from geodezyx import utils
 
 import autorino.epochrange as aroepo
 
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel("DEBUG")
 
 class WorkflowGnss():
     
@@ -28,6 +29,11 @@ class WorkflowGnss():
         self.out_dir = out_dir
         self.tmp_dir = session.tmp_dir
         self.table = self._table_init()
+        
+    def __repr__(self):
+        name = type(self).__name__
+        out = "{} {}/{}".format(name, self.session.site, self.epoch_range)
+        return out
     
     ######## getter and setter 
     @property
@@ -38,9 +44,17 @@ class WorkflowGnss():
     def epoch_range(self,value):
         self._epoch_range = value
         if self._epoch_range.period != self.session.session_period:  
-            logger.warn("Session period (%s) != Epoch Range period (%s)",
+            logger.warn("Session period (%s) ≠ Epoch Range period (%s)",
             self.session.session_period,self._epoch_range.period)
-            
+
+    @property
+    def table(self):
+        return self._table
+        
+    @table.setter
+    def table(self,value):
+        self._table = value
+        #### designed for future safety tests
         
     def _table_init(self,
                     table_cols=['fname',
@@ -66,6 +80,36 @@ class WorkflowGnss():
         return df
         
     ######## internal methods 
+    
+    def duplicate(self):
+        """
+        return a duplicate (deep copy) of the current object
+        """
+        return copy.deepcopy(self)
+    
+    
+    def update_epoch_range_from_table(self):
+        epomin = self.table['epoch_srt'].min()
+        epomax = self.table['epoch_srt'].max()
+        
+        self.epoch_range.epoch1 = epomin
+        self.epoch_range.epoch1 = epomax
+        
+        tdelta_arr = self.table['epoch_srt'].diff().dropna().unique()
+        
+        if len(tdelta_arr) > 1:
+            logger.warn("the period spacing of %s is not uniform".self)
+            ##### be sure to keep the 1st one!!!
+        
+        period_new = aroepo.timedelta2freqency_alias(tdelta_arr[0])
+        self.epoch_range.period = period_new
+        
+        print("TOTOTTO")
+        logger.debug("new %s",self.epoch_range)
+        
+        
+        
+
 
 # _______    _     _                                                                    _   
 #|__   __|  | |   | |                                                                  | |  
@@ -121,8 +165,9 @@ class WorkflowGnss():
         
         return flist
         
-    def load_table_from_table(self,
-                              input_table):
+    
+    def load_table_from_prev_step_table(self,
+                                        input_table):
                                            
         self.table['fpath_inp'] = input_table['fpath_out'].values
         self.table['size_inp'] = input_table['size_out'].values
@@ -133,7 +178,6 @@ class WorkflowGnss():
         self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
         
         return None
-    
     
     def guess_local_files(self,
                           guess_remote=True,
@@ -378,10 +422,42 @@ class WorkflowGnss():
         return out
     
     
-    def round_epochs_for_group(self,
-                               period='1d'):
-        self.table['epoch_rnd'] = aroepo.round_epochs(self.table['epoch_srt'],
-                                                      period=period)
+    def group_epochs(self,
+                     period = '1d',
+                     rolling_period=False,
+                     rolling_ref=-1,
+                     round_method = 'floor'):
+        
+        epoch_rnd = aroepo.round_epochs(self.table['epoch_srt'],
+                                        period=period,
+                                        rolling_period=rolling_period,
+                                        rolling_ref=rolling_ref,
+                                        round_method=round_method)
+             
+        self.table['epoch_rnd'] = epoch_rnd
+        
+        grps = self.table.groupby('epoch_rnd')
+        
+        wrkflw_lis_out = []
+        
+        for tgrp, tabgrp in grps:
+            wrkflw = self.duplicate()
+            wrkflw.table = tabgrp
+            wrkflw_lis_out.append(wrkflw)
+    
+        return wrkflw_lis_out   
+
+    
+        
+
+        
+        
+        
+        
+        
+        
+        
+            
         
         
         
