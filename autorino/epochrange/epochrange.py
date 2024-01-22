@@ -238,8 +238,28 @@ def round_epochs(epochs_inp,
         
     return epochs_rnd      
 
-
 def timedelta2freqency_alias(timedelta_in):
+    """
+    Time representation conversion
+    
+    Timedelta (from datetime, numpy or pandas) => Pandas' Frequency alias
+
+    Parameters
+    ----------
+    timedelta_in : timedelta-like
+        POSIX Time.  Can *NOT YET* handle several timedelta in a list.
+        
+    Returns
+    -------
+    offset : string 
+        Converted pandas' frequency alias
+    
+    Note
+    ----
+    Pandas' frequency aliases memo
+    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+    
+    """
     offset = to_offset(pd.Timedelta(timedelta_in))
     return offset.freqstr
 

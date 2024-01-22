@@ -120,8 +120,8 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             self.table.loc[irow,'ok_inp'] = True
     
             frnxtmp, _ = arocnv.converter_run(fraw,
-                                            tmpdir_converted,
-                                            converter = conve)
+                                              tmpdir_converted,
+                                              converter = conve)
             if frnxtmp:
                 self.table.loc[irow,'fpath_out'] = frnxtmp
                 self.table.loc[irow,'epoch_srt'],self.table.loc[irow,'epoch_end'] = operational.rinex_start_end(frnxtmp)
@@ -181,15 +181,15 @@ def _site_search_from_list(fraw_inp,site4_list_inp):
         site_out = fraw_inp.name[:4]
     return site_out
 
-def select_converter_batch(fraw_inp,
-                           ext_excluded=[".TG!$",
-                                         ".DAT",
-                                         ".Z",
-                                         ".BCK",
-                                         "^.[0-9]{3}$",
-                                         ".A$",
-                                         "Trimble",
-                                         ".ORIG"]):
+def select_converter_odd_file(fraw_inp,
+                              ext_excluded=[".TG!$",
+                                            ".DAT",
+                                            ".Z",
+                                            ".BCK",
+                                            "^.[0-9]{3}$",
+                                            ".A$",
+                                            "Trimble",
+                                            ".ORIG"]):
     """
     do a high level case matching to identify the right converter 
     for raw file with an unconventional extension, or exclude the file
@@ -204,12 +204,17 @@ def select_converter_batch(fraw_inp,
     elif re.match(".M[0-9][0-9]", ext):
         conve = "mdb2rinex"
     ### here we skip all the weird files    
-    elif np.any([bool(re.match(exclu,ext)) for exclu in ext_excluded]):
-        conve = None
     else:
-        ### per default
+    ### per default
         conve = "auto"
-        
+        for ext_exl in ext_excluded:
+            if re.match(ext_exl,ext):
+                conve = None    
+                logger.warn("%s will be skipped, excluded extention %s",
+                            fraw.name,
+                            ext_exl)
+                break
+            
     return conve
 
 def stop_long_running_containers(max_running_time=120):
