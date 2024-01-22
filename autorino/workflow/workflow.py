@@ -19,7 +19,7 @@ from geodezyx import utils
 import autorino.epochrange as aroepo
 
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+logger.setLevel("INFO")
 
 class WorkflowGnss():
     
@@ -104,8 +104,7 @@ class WorkflowGnss():
         period_new = aroepo.timedelta2freqency_alias(tdelta_arr[0])
         self.epoch_range.period = period_new
         
-        print("TOTOTTO")
-        logger.debug("new %s",self.epoch_range)
+        logger.info("new %s",self.epoch_range)
         
         
         
@@ -121,7 +120,10 @@ class WorkflowGnss():
 #                                                       |___/     
   
         
-    def print_table(self,silent=False,max_colwidth=33):
+    def print_table(self,
+                    no_print=False,
+                    no_return=True,
+                    max_colwidth=33):
         
         def _shrink_str(str_inp,maxlen=max_colwidth):
             if len(str_inp) <= maxlen:
@@ -141,16 +143,20 @@ class WorkflowGnss():
 
         str_out = self.table.to_string(max_colwidth=max_colwidth+1,
                                        formatters=form)
-                                       ### add +1 in max_colwidth for safety
-                                    
-        if not silent:
+                                       ### add +1 in max_colwidth for safety                                    
+        if not no_print:
             ### print it in the logger (if silent , just return it)
             name = type(self).__name__
             logger.info("%s %s/%s\n%s",name,
                                        self.session.site,
                                        self.epoch_range,
                                        str_out)
-        return str_out
+        if no_return:
+            return None
+        else:
+            return output
+
+        
         
     def load_table_from_filelist(self,
                                  input_files,
@@ -442,7 +448,8 @@ class WorkflowGnss():
         
         for tgrp, tabgrp in grps:
             wrkflw = self.duplicate()
-            wrkflw.table = tabgrp
+            tabgrp_bis = tabgrp.drop('epoch_rnd',axis=1)
+            wrkflw.table = tabgrp_bis
             wrkflw_lis_out.append(wrkflw)
     
         return wrkflw_lis_out   
