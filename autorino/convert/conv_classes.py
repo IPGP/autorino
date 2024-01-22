@@ -19,13 +19,13 @@ import docker
 import pandas as pd
 import shutil
 
-from autorino import general as arogen
+#from autorino import general as arogen
+import autorino.workflow as arowkf
 
 #### Import the logger
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
-
 
 
 def site_list_from_sitelogs(sitelogs_inp):
@@ -43,7 +43,7 @@ def site_list_from_sitelogs(sitelogs_inp):
     return site4_list
 
 
-class ConvertRinexModGnss(arogen.WorkflowGnss):
+class ConvertRinexModGnss(arowkf.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)
         
