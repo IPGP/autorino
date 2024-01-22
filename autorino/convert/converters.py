@@ -68,6 +68,12 @@ def _find_converted_files(directory, pattern_main, pattern_annex):
 ## https://discourse.ubuntu.com/t/command-structure/18556
 
 def _ashtech_name_2_date(inp_raw_fpath):
+    """
+    get the record date from an ASHTECH file name
+    returns the year, day of year, GPS week, and day of week, and 
+    Python datetime
+    """
+    
     inp_raw_fpath = Path(inp_raw_fpath)
     doy = int(inp_raw_fpath.suffix[1:])
     yy = int(inp_raw_fpath.stem[-2:])
@@ -84,16 +90,21 @@ def _ashtech_name_2_date(inp_raw_fpath):
     
     return yyyy,doy,week,dow,date
 
-
-
-
 ###################################################################
 #### conversion function
 
 
 def _converter_select(converter_inp,inp_raw_fpath=None):
+
     if converter_inp == "auto" and not inp_raw_fpath:
+        log.error("not converter nor input file given, \
+                  unable to returns the right conversion fcts")
         raise Exception 
+        
+    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    ## thus we just keep the 1st elt
+    if utils.is_iterable(inp_raw_fpath):
+        inp_raw_fpath = inp_raw_fpath[0]
         
     if converter_inp == "auto":
         inp_raw_fpath = Path(inp_raw_fpath)
@@ -204,7 +215,7 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
     ----------
     inp_raw_fpath : Union[Path,str]
         path of the input RAW file.
-        for RINEX Handeling (splice) a list of path is allowed.
+        for RINEX Handeling (e.g. splice) a list of path is allowed.
     out_dir : Union[Path,str], optional
         destination directory of the converted RINEX. The default is None.
     converter : str, optional
@@ -213,11 +224,12 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
             'auto' (automatic choice based on the extension),
             'trm2rnx' (Trimble),
             'runpkr00' (Trimble legacy),
-            'teqc' (legacy),
+            'teqc' (legacy conversion & RINEX Handeling),
             'mdb2rinex' (Leica),
             'sbf2rin' (Septentrio),
             'convbin' (BINEX),
-            'tps2rin' (Topcom),            
+            'tps2rin' (Topcon),       
+            'gfzrnx' (RINEX Handeling)
         see `_converter_select` function and `cmd_build` module 
         for more details.
         The default is 'auto'.
@@ -258,18 +270,30 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
     """
     
     #### Convert the paths as Path objects
-    inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
-
-    log.info("input file: %s", inp_raw_fpath)
+    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    if utils.is_iterable(inp_raw_fpath):
+        raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
+        raw_fpath_mono = raw_fpath_multi[0]
+        raw_fpath = raw_fpath_multi 
+    else: # a single  file, most common case
+        raw_fpath_multi = [Path(inp_raw_fpath)]
+        raw_fpath_mono = Path(inp_raw_fpath)
+        raw_fpath = raw_fpath_mono
+           
 
     #### Check if input file exists
-    if not inp_raw_fpath.is_file():
-        log.error("input file not found: %s", inp_raw_fpath)
-        raise FileNotFoundError
-         
-    out_conv_sel = _converter_select(converter,inp_raw_fpath)
-    converter_name,brand,cmd_build_fct_use,conv_regex_fct_use,bin_options_use,bin_kwoptions_use = out_conv_sel
+    for f in raw_fpath_multi:
+        log.info("input file: %s", f)
+        if not f.is_file():
+            log.error("input file not found: %s", f)
+            raise FileNotFoundError
+    
+    
+    # _converter_select can manage both a raw_fpath_mono or raw_fpath_multi
+    out_conv_sel = _converter_select(converter,raw_fpath)
+    converter_name,brand,cmd_build_fct_use,conv_regex_fct_use,\
+        bin_options_use,bin_kwoptions_use = out_conv_sel
     
     #### Force the arcv.cmd_build_fct, if any
     if cmd_build_fct:
@@ -277,7 +301,7 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
 
     #### Force the arcv.conv_regex_fct, if any        
     if conv_regex_fct:
-        conv_regex_fct_use = conv_regex_fct    
+        conv_regex_fct_use = conv_regex_fct
 
     #### Force the bin_options if any        
     if bin_options:
@@ -288,7 +312,7 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
         bin_kwoptions_use = bin_kwoptions
 
     #### build the command
-    cmd_use, cmd_list, cmd_str = cmd_build_fct_use(inp_raw_fpath,
+    cmd_use, cmd_list, cmd_str = cmd_build_fct_use(raw_fpath,
                                                    out_dir,
                                                    bin_options_use,
                                                    bin_kwoptions_use)
@@ -316,10 +340,10 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
    
     ###### check the output  on the conversion programm
     if timeout_reached:
-        log.error("Error while converting %s",inp_raw_fpath.name)
+        log.error("Error while converting %s",raw_fpath_mono.name)
         log.error("Timeout reached (%s seconds)",timeout)
     elif process_converter.returncode != 0:
-        log.error("Error while converting %s",inp_raw_fpath.name)
+        log.error("Error while converting %s",raw_fpath_mono.name)
         log.error("Converter's error message:")
         log.error(process_converter.stderr)
     else:
@@ -328,7 +352,8 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
         
     ###### get the converted file
     #### generate the regex matching the theoretical name for the converted file
-    conv_regex_main, conv_regex_annex = conv_regex_fct_use(inp_raw_fpath)
+    #### if a list of input file is given, the 1st one is used as output name
+    conv_regex_main, conv_regex_annex = conv_regex_fct_use(raw_fpath_mono)
     log.debug("regex for the converted files (main/annex.): %s,%s",
               conv_regex_main,
               conv_regex_annex)
