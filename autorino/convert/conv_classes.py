@@ -83,7 +83,6 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
                     n_not_ok_inp)
         
         for irow,row in table_init_ok.iterrows(): 
-             
             fraw = Path(row['fpath_inp'])
             ext = fraw.suffix.upper()
             logger.info("***** input raw file for conversion: %s",
@@ -100,7 +99,7 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
             utils.create_dir(tmpdir_rinexmoded_use)
             
             ### find the right converter
-            conve = select_converter_batch(fraw)
+            conve = select_conv_for_odd_file(fraw)
             
             logger.info("extension/converter: %s/%s",ext,conve)
         
@@ -181,15 +180,15 @@ def _site_search_from_list(fraw_inp,site4_list_inp):
         site_out = fraw_inp.name[:4]
     return site_out
 
-def select_converter_odd_file(fraw_inp,
-                              ext_excluded=[".TG!$",
-                                            ".DAT",
-                                            ".Z",
-                                            ".BCK",
-                                            "^.[0-9]{3}$",
-                                            ".A$",
-                                            "Trimble",
-                                            ".ORIG"]):
+def select_conv_for_odd_file(fraw_inp,
+                             ext_excluded=[".TG!$",
+                                           ".DAT",
+                                           ".Z",
+                                           ".BCK",
+                                           "^.[0-9]{3}$",
+                                           ".A$",
+                                           "Trimble",
+                                           ".ORIG"]):
     """
     do a high level case matching to identify the right converter 
     for raw file with an unconventional extension, or exclude the file
