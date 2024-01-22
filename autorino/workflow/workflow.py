@@ -28,7 +28,7 @@ class WorkflowGnss():
         self.epoch_range = epoch_range ### setter bellow
         self.out_dir = out_dir
         self.tmp_dir = session.tmp_dir
-        self.table = self._table_init()
+        self._table_init()
         
     def __repr__(self):
         name = type(self).__name__
@@ -77,6 +77,8 @@ class WorkflowGnss():
             df['epoch_end'] = self.epoch_range.epoch_range_list(end_bound=True)   
             
             df['site'] = self.session.site 
+        
+        self.table = df
         return df
         
     ######## internal methods 
@@ -160,21 +162,26 @@ class WorkflowGnss():
         
     def load_table_from_filelist(self,
                                  input_files,
-                                 inp_regex=".*"):
-        
+                                 inp_regex=".*",
+                                 reset_table=True):
+        if reset_table:
+            self._table_init(init_epoch=False)
         
         flist = input_list_reader(input_files,
                                   inp_regex)
                 
-        self.table['fraw'] = flist
-        self.table['ok_inp'] = self.table['fraw'].apply(os.path.isfile)
+        self.table['fpath_inp'] = flist
+        self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
         
         return flist
         
     
     def load_table_from_prev_step_table(self,
-                                        input_table):
-                                           
+                                        input_table,
+                                        reset_table=True):
+        if reset_table:
+            self._table_init(init_epoch=False)
+                          
         self.table['fpath_inp'] = input_table['fpath_out'].values
         self.table['size_inp'] = input_table['size_out'].values
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
