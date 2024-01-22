@@ -6,42 +6,11 @@ Created on Thu Dec  1 15:47:05 2022
 @author: psakicki
 """
 
-import datetime as dt
-import pandas as pd
-import numpy as np
 import os
-from autorino import general as arogen
-from autorino import download as arodwl
+import autorino.general as arogen
+import autorino.download as arodwl
 
 import yaml
-
-
-
-def _translator_epoch(path_inp,epoch_inp):
-    """
-    set the correct epoch in path_input string the with the strftime aliases
-    https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
-    """
-    path_translated = str(path_inp)
-    path_translated = epoch_inp.strftime(path_translated)
-    return path_translated
-
-def _translator_keywords(path_inp,translator_dict):
-    """
-    """
-    path_translated = str(path_inp)
-    for k,v in translator_dict.items():
-        path_translated = path_translated.replace("<"+k+">",v)
-    return path_translated
-    
-def translator(path_inp,epoch_inp=None,translator_dict=None):
-    path_translated = str(path_inp)
-    if epoch_inp:
-        path_translated = _translator_epoch(path_translated,epoch_inp)
-    if translator_dict:
-        path_translated = _translator_keywords(path_translated,translator_dict)
-    return path_translated
-
 
 def session_download_from_configfile(configfile_path):
     
