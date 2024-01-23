@@ -166,8 +166,8 @@ class WorkflowGnss():
         flist = input_list_reader(input_files,
                                   inp_regex)
                 
-        self.table['fraw'] = flist
-        self.table['ok_inp'] = self.table['fraw'].apply(os.path.isfile)
+        self.table['fpath_inp'] = flist
+        self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
         
         return flist
         
