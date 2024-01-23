@@ -10,7 +10,13 @@ Created on Mon Jan  8 16:53:51 2024
 import logging
 import pandas as pd
 import numpy as np
-import os 
+import os
+import re
+import copy
+ 
+from geodezyx import utils
+
+import autorino.epochrange as aroepo
 
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
@@ -22,7 +28,12 @@ class WorkflowGnss():
         self.epoch_range = epoch_range ### setter bellow
         self.out_dir = out_dir
         self.tmp_dir = session.tmp_dir
-        self.table = self._table_init()
+        self._table_init()
+        
+    def __repr__(self):
+        name = type(self).__name__
+        out = "{} {}/{}".format(name, self.session.site, self.epoch_range)
+        return out
     
     ######## getter and setter 
     @property
@@ -33,9 +44,17 @@ class WorkflowGnss():
     def epoch_range(self,value):
         self._epoch_range = value
         if self._epoch_range.period != self.session.session_period:  
-            logger.warn("Session period (%s) != Epoch Range period (%s)",
+            logger.warn("Session period (%s) ≠ Epoch Range period (%s)",
             self.session.session_period,self._epoch_range.period)
-            
+
+    @property
+    def table(self):
+        return self._table
+        
+    @table.setter
+    def table(self,value):
+        self._table = value
+        #### designed for future safety tests
         
     def _table_init(self,
                     table_cols=['fname',
@@ -58,22 +77,55 @@ class WorkflowGnss():
             df['epoch_end'] = self.epoch_range.epoch_range_list(end_bound=True)   
             
             df['site'] = self.session.site 
+        
+        self.table = df
         return df
         
-
     ######## internal methods 
-
-  # _______    _     _                                                                    _   
- # |__   __|  | |   | |                                                                  | |  
-    # | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_ 
-    # | |/ _` | '_ \| |/ _ \ | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|
-    # | | (_| | |_) | |  __/ | | | | | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_ 
-    # |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
-                                                         # __/ |                              
-                                                        # |___/     
     
+    def duplicate(self):
+        """
+        return a duplicate (deep copy) of the current object
+        """
+        return copy.deepcopy(self)
+    
+    
+    def update_epoch_range_from_table(self):
+        epomin = self.table['epoch_srt'].min()
+        epomax = self.table['epoch_srt'].max()
         
-    def print_table(self,silent=False,max_colwidth=33):
+        self.epoch_range.epoch1 = epomin
+        self.epoch_range.epoch1 = epomax
+        
+        tdelta_arr = self.table['epoch_srt'].diff().dropna().unique()
+        
+        if len(tdelta_arr) > 1:
+            logger.warn("the period spacing of %s is not uniform".self)
+            ##### be sure to keep the 1st one!!!
+        
+        period_new = aroepo.timedelta2freqency_alias(tdelta_arr[0])
+        self.epoch_range.period = period_new
+        
+        logger.info("new %s",self.epoch_range)
+        
+        
+        
+
+
+# _______    _     _                                                                    _   
+#|__   __|  | |   | |                                                                  | |  
+#   | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_ 
+#   | |/ _` | '_ \| |/ _ \ | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|
+#   | | (_| | |_) | |  __/ | | | | | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_ 
+#   |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
+#                                                        __/ |                              
+#                                                       |___/     
+  
+        
+    def print_table(self,
+                    no_print=False,
+                    no_return=True,
+                    max_colwidth=33):
         
         def _shrink_str(str_inp,maxlen=max_colwidth):
             if len(str_inp) <= maxlen:
@@ -93,33 +145,43 @@ class WorkflowGnss():
 
         str_out = self.table.to_string(max_colwidth=max_colwidth+1,
                                        formatters=form)
-                                       ### add +1 in max_colwidth for safety
-                                    
-        if not silent:
+                                       ### add +1 in max_colwidth for safety                                    
+        if not no_print:
             ### print it in the logger (if silent , just return it)
             name = type(self).__name__
             logger.info("%s %s/%s\n%s",name,
                                        self.session.site,
                                        self.epoch_range,
                                        str_out)
-        return str_out
+        if no_return:
+            return None
+        else:
+            return output
+
+        
         
     def load_table_from_filelist(self,
                                  input_files,
-                                 inp_regex=".*"):
-        
+                                 inp_regex=".*",
+                                 reset_table=True):
+        if reset_table:
+            self._table_init(init_epoch=False)
         
         flist = input_list_reader(input_files,
                                   inp_regex)
                 
-        self.table['fraw'] = flist
-        self.table['ok_inp'] = self.table['fraw'].apply(os.path.isfile)
+        self.table['fpath_inp'] = flist
+        self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
         
         return flist
         
-    def load_table_from_table(self,
-                              input_table):
-                                           
+    
+    def load_table_from_prev_step_table(self,
+                                        input_table,
+                                        reset_table=True):
+        if reset_table:
+            self._table_init(init_epoch=False)
+                          
         self.table['fpath_inp'] = input_table['fpath_out'].values
         self.table['size_inp'] = input_table['size_out'].values
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
@@ -129,14 +191,60 @@ class WorkflowGnss():
         self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
         
         return None
+    
+    def guess_local_files(self,
+                          guess_remote=True,
+                          guess_local=True):
+        """
+        Guess the paths and name of the local files based on the 
+        Session and EpochRange attributes of the DownloadGnss
+        
+        see also method guess_remote_files(), 
+        a specific method for DownloadGnss objects 
+        """
+        
+        if not self.session.remote_fname:
+            logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
+        
+        rmot_paths_list = []
+        local_paths_list = []
+        
+        for epoch in self.epoch_range.epoch_range_list():
 
-  # ______ _ _ _              _        _     _      
- # |  ____(_) | |            | |      | |   | |     
- # | |__   _| | |_ ___ _ __  | |_ __ _| |__ | | ___ 
- # |  __| | | | __/ _ \ '__| | __/ _` | '_ \| |/ _ \
- # | |    | | | ||  __/ |    | || (_| | |_) | |  __/
- # |_|    |_|_|\__\___|_|     \__\__,_|_.__/|_|\___|
-                                                  
+        ### guess the potential local files
+            local_dir_use = str(self.out_dir)
+            local_fname_use = str(self.session.remote_fname)
+            local_path_use = os.path.join(local_dir_use,
+                                          local_fname_use)
+
+            local_path_use = translator(local_path_use,
+                                        epoch,
+                                        self.session.translate_dict)
+                                        
+            local_fname_use = os.path.basename(local_path_use)
+                                       
+            local_paths_list.append(local_path_use)
+
+            iepoch = self.table[self.table['epoch_srt'] == epoch].index
+
+            self.table.loc[iepoch,'fname']       = local_fname_use
+            self.table.loc[iepoch,'fpath_out'] = local_path_use
+            logger.debug("local file guessed: %s",local_path_use)
+  
+        rmot_paths_list = sorted(list(set(rmot_paths_list)))
+            
+        logger.info("nbr local files guessed: %s",len(local_paths_list))
+
+        return local_paths_list
+        
+
+#  ______ _ _ _              _        _     _      
+# |  ____(_) | |            | |      | |   | |     
+# | |__   _| | |_ ___ _ __  | |_ __ _| |__ | | ___ 
+# |  __| | | | __/ _ \ '__| | __/ _` | '_ \| |/ _ \
+# | |    | | | ||  __/ |    | || (_| | |_) | |  __/
+# |_|    |_|_|\__\___|_|     \__\__,_|_.__/|_|\___|
+                                                
            
     def filter_bad_keywords(self,keywords_path_excl):
         """
@@ -195,7 +303,7 @@ class WorkflowGnss():
         returns the filtered raw files in a list
         """
         flist_out = []
-        nfil = 0 
+        #nfil = 0 
         
         ok_inp_bool_stk = []
         
@@ -217,7 +325,7 @@ class WorkflowGnss():
         bool_out_range = (years < year_min) | (years > year_max)
         bool_in_range = np.logical_not(bool_out_range)
         
-        #############################'
+        #############################
     
         ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
         nfil_total = sum(bool_out_range)
@@ -325,4 +433,117 @@ class WorkflowGnss():
         else:
             out = self.table[self.table[col]]
         return out
+    
+    
+    def group_epochs(self,
+                     period = '1d',
+                     rolling_period=False,
+                     rolling_ref=-1,
+                     round_method = 'floor'):
+        
+        epoch_rnd = aroepo.round_epochs(self.table['epoch_srt'],
+                                        period=period,
+                                        rolling_period=rolling_period,
+                                        rolling_ref=rolling_ref,
+                                        round_method=round_method)
+             
+        self.table['epoch_rnd'] = epoch_rnd
+        
+        grps = self.table.groupby('epoch_rnd')
+        
+        wrkflw_lis_out = []
+        
+        for tgrp, tabgrp in grps:
+            wrkflw = self.duplicate()
+            tabgrp_bis = tabgrp.drop('epoch_rnd',axis=1)
+            wrkflw.table = tabgrp_bis
+            wrkflw_lis_out.append(wrkflw)
+    
+        return wrkflw_lis_out   
 
+    
+        
+
+        
+        
+        
+        
+        
+        
+        
+            
+        
+        
+        
+        
+
+#  __  __ _               __                  _   _                  
+# |  \/  (_)             / _|                | | (_)                 
+# | \  / |_ ___  ___    | |_ _   _ _ __   ___| |_ _  ___  _ __  ___  
+# | |\/| | / __|/ __|   |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __| 
+# | |  | | \__ \ (__ _  | | | |_| | | | | (__| |_| | (_) | | | \__ \ 
+# |_|  |_|_|___/\___(_) |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/ 
+                                                                 
+
+def _translator_epoch(path_inp,epoch_inp):
+    """
+    set the correct epoch in path_input string the with the strftime aliases
+    https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+    """
+    path_translated = str(path_inp)
+    path_translated = epoch_inp.strftime(path_translated)
+    return path_translated
+
+def _translator_keywords(path_inp,translator_dict):
+    """
+    """
+    path_translated = str(path_inp)
+    for k,v in translator_dict.items():
+        path_translated = path_translated.replace("<"+k+">",v)
+    return path_translated
+    
+def translator(path_inp,epoch_inp=None,translator_dict=None):
+    path_translated = str(path_inp)
+    if epoch_inp:
+        path_translated = _translator_epoch(path_translated,epoch_inp)
+    if translator_dict:
+        path_translated = _translator_keywords(path_translated,translator_dict)
+    return path_translated
+
+
+def input_list_reader(inp_fil,inp_regex=".*"):
+    """
+    Handles mutiples types of input lists (in a general sense)  
+    and returns a python list of the input
+    
+    inp_fil can be:
+        * a python list (then nothing is done)
+        * a text file path containing a list of files 
+        (readed as a python list)
+        * a tuple containing several text files path 
+        (recursive version of the previous point)
+        * a directory path (all the files matching inp_regex are readed)
+    """
+
+    if not inp_fil:
+        flist  = []
+    elif type(inp_fil) is tuple and os.path.isfile(inp_fil[0]):
+        flist = list(np.hstack([open(f,"r+").readlines() for f in inp_fil]))
+        flist = [f.strip() for f in flist]
+    elif type(inp_fil) is list:
+        flist = inp_fil
+    elif os.path.isfile(inp_fil):
+        flist = open(inp_fil,"r+").readlines()
+        flist = [f.strip() for f in flist]
+    elif os.path.isdir(inp_fil):
+        flist = utils.find_recursive(inp_fil,
+                                     inp_regex,
+                                     case_sensitive=False)
+    else:
+        flist = []
+        logger.warning("the filelist is empty") 
+        
+    if inp_regex != ".*":
+        flist = [f for f in flist if re.match(inp_regex, f)]
+        
+    return flist
