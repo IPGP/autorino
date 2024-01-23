@@ -6,7 +6,7 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-from geodezyx import utils,  operational
+from geodezyx import utils,operational
 import autorino.convert as arocnv
 from rinexmod import rinexmod_api
 from pathlib import Path
@@ -123,7 +123,9 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
                                               converter = conve)
             if frnxtmp:
                 self.table.loc[irow,'fpath_out'] = frnxtmp
-                self.table.loc[irow,'epoch_srt'],self.table.loc[irow,'epoch_end'] = operational.rinex_start_end(frnxtmp)
+                epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
+                self.table.loc[irow,'epoch_srt'],\
+                    self.table.loc[irow,'epoch_end'] = epo_srt_ok, epo_end_ok 
                 self.table.loc[irow,'ok_out'] = True
             else:
                 self.table.loc[irow,'ok_out'] = False
@@ -131,7 +133,7 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
             #############################################################
             #### RINEXMOD            
             try:
-                frinfin = rinexmod_api.rinexmod(frnxtmp,
+                frnxfin = rinexmod_api.rinexmod(frnxtmp,
                                                 tmpdir_rinexmoded_use,
                                                 marker=site,
                                                 compression="gz",
@@ -141,26 +143,26 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
                                                 verbose=False,
                                                 full_history=True)
                 self.table.loc[irow,'ok_out'] = True
-                self.table.loc[irow,'fpath_out'] = frinfin
-                self.table.loc[irow,'size_out'] = os.path.getsize(frinfin)
+                self.table.loc[irow,'fpath_out'] = frnxfin
+                self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
                 
-                pd.DataFrame(row).T.to_csv(log_table,mode="a",
+                pd.DataFrame(row).T.to_csv(log_table,mode='a',
                                            index=False,header=False) 
-                                           
-                ### def output folders        
-                outdir_use = arogen.translator(self.out_dir,
-                                               row.epoch,
-                                               self.session.translate_dict)
-                utils.create_dir(outdir_use)
-                shutil.copy(frinfin,outdir_use)
-                
             except Exception as e:
-                logger.warn(e)
+                logger.error(e)
                 self.table.loc[irow,'ok_out'] = False
                 pd.DataFrame(row).T.to_csv(log_table,mode="a",
-                                           index=False,header=False) 
+                                            index=False,header=False) 
                 continue
-        
+                                           
+            ### def output folders        
+            outdir_use = arowkf.translator(self.out_dir,
+                                           self.table.loc[irow,'epoch_srt'], 
+                                           self.session.translate_dict)
+            utils.create_dir(outdir_use)
+            shutil.copy(frnxfin,outdir_use)
+                
+       
         return None
 
 
