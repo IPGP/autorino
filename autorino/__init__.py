@@ -17,3 +17,17 @@ if os.path.isfile(log_file_path):
     logging.config.dictConfig(logconfig.logautorino.log_config_dict)
 else:
     print("ERR:logger config file",log_file_path,"is missing")
+
+
+# from .general     import * 
+# from .epochrange  import * 
+# from .old         import * 
+# from .session     import * 
+# from .workflow    import * 
+# from .check       import * 
+# from .configread  import * 
+# from .logconfig   import * 
+# from .handle      import * 
+# from .download    import * 
+# from .convert     import * 
+
