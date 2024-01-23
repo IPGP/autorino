@@ -99,7 +99,7 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
             utils.create_dir(tmpdir_rinexmoded_use)
             
             ### find the right converter
-            conve = select_conv_for_odd_file(fraw)
+            conve = _select_conv_odd_file(fraw)
             
             logger.info("extension/converter: %s/%s",ext,conve)
         
@@ -115,23 +115,25 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
             stop_long_running_containers()
             
             #############################################################
-            #### CONVERSION
+            ###### CONVERSION
             self.table.loc[irow,'ok_inp'] = True
     
             frnxtmp, _ = arocnv.converter_run(fraw,
                                               tmpdir_converted,
                                               converter = conve)
             if frnxtmp:
+                ### update table if things go well
                 self.table.loc[irow,'fpath_out'] = frnxtmp
                 epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
                 self.table.loc[irow,'epoch_srt'],\
                     self.table.loc[irow,'epoch_end'] = epo_srt_ok, epo_end_ok 
                 self.table.loc[irow,'ok_out'] = True
             else:
+                ### update table if things go wrong
                 self.table.loc[irow,'ok_out'] = False
     
             #############################################################
-            #### RINEXMOD            
+            ###### RINEXMOD            
             try:
                 frnxfin = rinexmod_api.rinexmod(frnxtmp,
                                                 tmpdir_rinexmoded_use,
@@ -142,6 +144,7 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
                                                 force_rnx_load=True,
                                                 verbose=False,
                                                 full_history=True)
+                ### update table if things go well
                 self.table.loc[irow,'ok_out'] = True
                 self.table.loc[irow,'fpath_out'] = frnxfin
                 self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
@@ -149,16 +152,21 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
                 pd.DataFrame(row).T.to_csv(log_table,mode='a',
                                            index=False,header=False) 
             except Exception as e:
+                ### update table if things go wrong
                 logger.error(e)
                 self.table.loc[irow,'ok_out'] = False
                 pd.DataFrame(row).T.to_csv(log_table,mode="a",
                                             index=False,header=False) 
                 continue
-                                           
+
+            #############################################################
+            ###### FINAL MOVE                             
             ### def output folders        
+            #### !!!!! ADDD THE EXCEPTION AND TABLE UPDATE !!!!
             outdir_use = arowkf.translator(self.out_dir,
                                            self.table.loc[irow,'epoch_srt'], 
                                            self.session.translate_dict)
+            ### do the move 
             utils.create_dir(outdir_use)
             shutil.copy(frnxfin,outdir_use)
                 
@@ -182,15 +190,15 @@ def _site_search_from_list(fraw_inp,site4_list_inp):
         site_out = fraw_inp.name[:4]
     return site_out
 
-def select_conv_for_odd_file(fraw_inp,
-                             ext_excluded=[".TG!$",
-                                           ".DAT",
-                                           ".Z",
-                                           ".BCK",
-                                           "^.[0-9]{3}$",
-                                           ".A$",
-                                           "Trimble",
-                                           ".ORIG"]):
+def _select_conv_odd_file(fraw_inp,
+                          ext_excluded=[".TG!$",
+                                        ".DAT",
+                                        ".Z",
+                                        ".BCK",
+                                        "^.[0-9]{3}$",
+                                        ".A$",
+                                        "Trimble",
+                                        ".ORIG"]):
     """
     do a high level case matching to identify the right converter 
     for raw file with an unconventional extension, or exclude the file
