@@ -502,7 +502,6 @@ def cmd_build_runpkr00(inp_raw_fpath,
     cmd_use = [cmd_str]
     
     return cmd_use, cmd_list, cmd_str
-   
     
 def cmd_build_convbin(inp_raw_fpath,
                       out_dir,
