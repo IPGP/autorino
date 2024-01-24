@@ -108,10 +108,6 @@ class WorkflowGnss():
         self.epoch_range.period = period_new
         
         logger.info("new %s",self.epoch_range)
-        
-        
-        
-
 
 # _______    _     _                                                                    _   
 #|__   __|  | |   | |                                                                  | |  
@@ -158,9 +154,31 @@ class WorkflowGnss():
             return None
         else:
             return output
+            
+    
+    def set_table_log(self,
+                      out_dir=self.session.tmp_dir,
+                      step_suffix=''):
+                          
+        ts = utils.get_timestamp()
+        talo_name = "_".join(ts , step_suffix , "table.log")
+        talo_path = os.path.join(out_dir,talo_name)
+        
+        ### initalize with a void table
+        talo_df_void = pd.DataFrame([], columns=self.table.columns)
+        talo_df_void.to_csv(log_table,mode="w",index=False)
+        
+        self.table_log_path = talo_path
+        
+        return talo_path
+    
+    def write_in_table_log(self,row_in):    
+        pd.DataFrame(row_in).T.to_csv(self.table_log_path,
+                                      mode='a',
+                                      index=False,
+                                      header=False) 
+        return None
 
-        
-        
     def load_table_from_filelist(self,
                                  input_files,
                                  inp_regex=".*",
