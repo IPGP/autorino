@@ -52,7 +52,7 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
                                                               force=False)       
     ########### ConvertRinexModGnss specific methods        
 
-    def conv_rnxmod_files(self):
+    def convert_rnxmod(self):
         
         ###############################################
         ### def temp folders
