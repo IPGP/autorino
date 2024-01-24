@@ -19,8 +19,10 @@ import docker
 import pandas as pd
 import shutil
 
-#from autorino import general as arogen
-import autorino.workflow as arowkf
+import autorino.general as arogen
+#import autorino.workflow as arowkf
+
+
 
 #### Import the logger
 import logging
@@ -43,7 +45,7 @@ def site_list_from_sitelogs(sitelogs_inp):
     return site4_list
 
 
-class ConvertRinexModGnss(arowkf.WorkflowGnss):
+class ConvertRinexModGnss(arogen.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)
         
@@ -163,7 +165,7 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
             ###### FINAL MOVE                             
             ### def output folders        
             #### !!!!! ADDD THE EXCEPTION AND TABLE UPDATE !!!!
-            outdir_use = arowkf.translator(self.out_dir,
+            outdir_use = arogen.translator(self.out_dir,
                                            self.table.loc[irow,'epoch_srt'], 
                                            self.session.translate_dict)
             ### do the move 
