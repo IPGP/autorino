@@ -38,6 +38,7 @@ psitelogs = "/work/sitelogs/SITELOGS"
 SES = aroses.create_dummy_session()
 EPOC = aroepo.create_dummy_epochrange()
 
+SES.tmp_dir = "/home/sakic/020_TEMP/tmp_conv"
 
 CONV = arcv.ConvertRinexModGnss(SES,
                                 EPOC,
@@ -67,7 +68,7 @@ CONV.print_table()
 # if prev_table_logs:
 #     CONV.filter_previous_tables(DF_prev_tbl)
 
-CONV.conv_rnxmod_files()
+CONV.convert_rnxmod()
 
 
 
