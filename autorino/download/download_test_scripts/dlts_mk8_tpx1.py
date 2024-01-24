@@ -24,7 +24,8 @@ ses = ses_lst[0]
 #req = req_lst
 
 #L = REQ.ask_remote_files()
-L = dwl.guess_remote_local_files(guess_local=1)
+L = dwl.guess_remote_files()
+L = dwl.guess_local_files()
 L = dwl.check_local_files()
 L = dwl.invalidate_small_local_files()
 
