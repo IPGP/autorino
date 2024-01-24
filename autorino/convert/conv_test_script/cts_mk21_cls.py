@@ -34,13 +34,13 @@ Y1 = yaml.safe_load(open(pconfig))
 #REQ = REQlist
 #EPOC = REQ.epoch_range
 
-pout = "/home/sakic/020_TEMP/convcls_test"
+pout = "/home/sakic/090_TEMP/convcls_test"
 psitelogs = "/work/sitelogs/SITELOGS"
 
 SES = arogen.create_dummy_session()
 EPOC = arogen.create_dummy_epochrange()
 
-SES.tmp_dir = "/home/sakic/020_TEMP/tmp_conv"
+SES.tmp_dir =  pout + "/tmp_conv"
 
 CONV = arcv.ConvertRinexModGnss(SES,
                                 EPOC,

@@ -30,6 +30,7 @@ class WorkflowGnss():
         self.out_dir = out_dir
         self.tmp_dir = session.tmp_dir
         self._table_init()
+        self.set_logfile()
         
     def __repr__(self):
         name = type(self).__name__
@@ -109,6 +110,25 @@ class WorkflowGnss():
         
         logger.info("new %s",self.epoch_range)
 
+
+    #### logger
+    def set_logfile(self,
+                    out_dir=None):
+                        
+        if not out_dir:
+            out_dir=self.session.tmp_dir
+        
+        ts = utils.get_timestamp()
+        log_name = "_".join((ts , "table.log"))
+        log_path = os.path.join(out_dir,log_name)
+        
+        log_file = logging.FileHandler(log_path)
+        logger.addHandler(log_file)
+
+        return log_file
+
+
+
 # _______    _     _                                                                    _   
 #|__   __|  | |   | |                                                                  | |  
 #   | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_ 
@@ -117,7 +137,6 @@ class WorkflowGnss():
 #   |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
 #                                                        __/ |                              
 #                                                       |___/     
-  
         
     def print_table(self,
                     no_print=False,
@@ -157,16 +176,18 @@ class WorkflowGnss():
             
     
     def set_table_log(self,
-                      out_dir=self.session.tmp_dir,
+                      out_dir=None, 
                       step_suffix=''):
+        if not out_dir:
+            out_dir=self.session.tmp_dir
                           
         ts = utils.get_timestamp()
-        talo_name = "_".join(ts , step_suffix , "table.log")
+        talo_name = "_".join((ts , step_suffix , "table.log"))
         talo_path = os.path.join(out_dir,talo_name)
         
         ### initalize with a void table
         talo_df_void = pd.DataFrame([], columns=self.table.columns)
-        talo_df_void.to_csv(log_table,mode="w",index=False)
+        talo_df_void.to_csv(talo_path,mode="w",index=False)
         
         self.table_log_path = talo_path
         
@@ -255,7 +276,7 @@ class WorkflowGnss():
         logger.info("nbr local files guessed: %s",len(local_paths_list))
 
         return local_paths_list
-        
+
 
 #  ______ _ _ _              _        _     _      
 # |  ____(_) | |            | |      | |   | |     
@@ -480,16 +501,7 @@ class WorkflowGnss():
     
         return wrkflw_lis_out   
 
-    
-        
 
-        
-        
-        
-        
-        
-        
-        
             
         
         
