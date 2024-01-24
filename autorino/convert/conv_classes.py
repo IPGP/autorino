@@ -49,7 +49,7 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)
         ### temp dirs init
-        self._set_tmp_dirs_paths() 
+        self._set_conv_tmp_dirs_paths() 
 
         ### sitelog init
         if sitelogs:
@@ -57,20 +57,23 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
                                                               force=False)       
     ########### ConvertRinexModGnss specific methods        
 
-    def _set_tmp_dirs_paths(self, 
-                            tmp_dir_main_inp=None,
-                            tmp_subdir_logs='logs',
-                            tmp_subdir_conv='converted',
-                            tmp_subdir_rnxmod='rinexmoded'):
+    def _set_conv_tmp_dirs_paths(self, 
+                                 tmp_dir_main_inp=None,
+                                 tmp_subdir_logs='logs',
+                                 tmp_subdir_conv='converted',
+                                 tmp_subdir_rnxmod='rinexmoded'):
 
         if not tmp_dir_main_inp:
-            self.tmp_dir_main = self.session.tmp_dir + "/logs"
+            self.tmp_dir_main = self.session.tmp_dir 
         else:
             self.tmp_dir_main = tmp_dir_main_inp
 
-        self.tmp_dir_logs = os.path.join(self.tmp_dir_main,tmp_subdir_logs)
-        self.tmp_dir_converted = os.path.join(self.tmp_dir_main,tmp_subdir_conv)
-        self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir_main,tmp_subdir_rnxmod) 
+        self.tmp_dir_logs = os.path.join(self.tmp_dir_main,
+                                         tmp_subdir_logs)
+        self.tmp_dir_converted = os.path.join(self.tmp_dir_main,
+                                              tmp_subdir_conv)
+        self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir_main,
+                                               tmp_subdir_rnxmod) 
 
         utils.create_dir(self.tmp_dir_logs)
         utils.create_dir(self.tmp_dir_converted)
@@ -85,7 +88,7 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
         
         ### initialize the table as log
 
-        self.set_table_log()
+        self.set_table_log(out_dir=self.tmp_dir_logs)
         # ts = utils.get_timestamp()
         # log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
         # log_table_df_void = pd.DataFrame([], columns=self.table.columns)
@@ -125,9 +128,9 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
         
             if not conve:
                 logger.info("file skipped, no converter found: %s",fraw)
-                row.note = "no converter found"
-                row.ok_inp = False
-                row.to_csv(log_table, mode="a", index=False, header=False)
+                self.table.loc[irow,'note'] = "no converter found"
+                self.table.loc[irow,'ok_inp'] = False 
+                self.write_in_table_log(self.table.loc[irow])
                 continue
             
             ### a fonction to stop the docker conteners running for too long
@@ -182,7 +185,7 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             #############################################################
             ###### FINAL MOVE                             
             ### def output folders        
-            #### !!!!! ADDD THE EXCEPTION AND TABLE UPDATE !!!!
+            #### !!!!! ADD THE EXCEPTION AND TABLE UPDATE !!!!
             outdir_use = arogen.translator(self.out_dir,
                                            self.table.loc[irow,'epoch_srt'], 
                                            self.session.translate_dict)
