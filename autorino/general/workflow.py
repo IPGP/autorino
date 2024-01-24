@@ -16,7 +16,8 @@ import copy
  
 from geodezyx import utils
 
-import autorino.epochrange as aroepo
+#import autorino.epochrange as aroepo
+import autorino.general as arogen
 
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
@@ -103,7 +104,7 @@ class WorkflowGnss():
             logger.warn("the period spacing of %s is not uniform".self)
             ##### be sure to keep the 1st one!!!
         
-        period_new = aroepo.timedelta2freqency_alias(tdelta_arr[0])
+        period_new = arogen.timedelta2freqency_alias(tdelta_arr[0])
         self.epoch_range.period = period_new
         
         logger.info("new %s",self.epoch_range)
@@ -441,7 +442,7 @@ class WorkflowGnss():
                      rolling_ref=-1,
                      round_method = 'floor'):
         
-        epoch_rnd = aroepo.round_epochs(self.table['epoch_srt'],
+        epoch_rnd = arogen.round_epochs(self.table['epoch_srt'],
                                         period=period,
                                         rolling_period=rolling_period,
                                         rolling_ref=rolling_ref,

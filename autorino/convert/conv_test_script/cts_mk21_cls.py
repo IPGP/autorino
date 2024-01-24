@@ -13,8 +13,10 @@ from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 import autorino.convert as arcv
 from autorino import configread as arcfg
-from autorino import epochrange as aroepo
-from autorino import  session as aroses
+#from autorino import epochrange as aroepo
+#from autorino import  session as aroses
+import autorino.general as arogen
+
 import yaml
 
 import timeit
@@ -35,8 +37,8 @@ Y1 = yaml.safe_load(open(pconfig))
 pout = "/home/sakic/020_TEMP/convcls_test"
 psitelogs = "/work/sitelogs/SITELOGS"
 
-SES = aroses.create_dummy_session()
-EPOC = aroepo.create_dummy_epochrange()
+SES = arogen.create_dummy_session()
+EPOC = arogen.create_dummy_epochrange()
 
 SES.tmp_dir = "/home/sakic/020_TEMP/tmp_conv"
 
