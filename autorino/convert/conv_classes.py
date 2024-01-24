@@ -68,10 +68,11 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
         site4_list = site_list_from_sitelogs(self.sitelogs)
         
         ### initialize the table as log
-        ts = utils.get_timestamp()
-        log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
-        log_table_df_void = pd.DataFrame([], columns=self.table.columns)
-        log_table_df_void.to_csv(log_table,mode="w",index=False)
+        self.set_table_log()
+        # ts = utils.get_timestamp()
+        # log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
+        # log_table_df_void = pd.DataFrame([], columns=self.table.columns)
+        # log_table_df_void.to_csv(log_table,mode="w",index=False)
         
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
@@ -150,15 +151,15 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
                 self.table.loc[irow,'ok_out'] = True
                 self.table.loc[irow,'fpath_out'] = frnxfin
                 self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
+                                           
+                self.write_in_table_log(self.table.loc[irow])
                 
-                pd.DataFrame(row).T.to_csv(log_table,mode='a',
-                                           index=False,header=False) 
             except Exception as e:
                 ### update table if things go wrong
                 logger.error(e)
                 self.table.loc[irow,'ok_out'] = False
-                pd.DataFrame(row).T.to_csv(log_table,mode="a",
-                                            index=False,header=False) 
+                self.write_in_table_log(self.table.loc[irow])
+
                 continue
 
             #############################################################
