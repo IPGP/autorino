@@ -18,9 +18,10 @@ from geodezyx import utils
 
 #import autorino.epochrange as aroepo
 import autorino.general as arogen
+from autorino import logconfig
 
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel("DEBUG")
 
 class WorkflowGnss():
     
@@ -113,20 +114,36 @@ class WorkflowGnss():
 
     #### logger
     def set_logfile(self,
-                    out_dir=None):
+                    out_dir=None,
+                    step_suffix=''):
                         
         if not out_dir:
             out_dir=self.session.tmp_dir
         
-        ts = utils.get_timestamp()
-        log_name = "_".join((ts , "table.log"))
-        log_path = os.path.join(out_dir,log_name)
+        _logger = logging.getLogger('autorino')
         
-        log_file = logging.FileHandler(log_path)
-        logger.addHandler(log_file)
+        ts = utils.get_timestamp()
+        log_name = "_".join((ts , ".log"))
+        log_path = os.path.join(out_dir,log_name)
 
-        return log_file
+        log_cfg_dic = logconfig.logconfig.log_config_dict
+        fmt_dic = log_cfg_dic['formatters']['fmtgzyx_nocolor']
 
+        logfile_handler = logging.FileHandler(log_path)
+
+        fileformatter = logging.Formatter(**fmt_dic)
+        
+        logfile_handler.setFormatter(fileformatter)
+        logfile_handler.setLevel('DEBUG')
+        
+        
+        #### the root logger 
+        # https://stackoverflow.com/questions/48712206/what-is-the-name-of-pythons-root-logger
+        #### the heritage for loggers
+        # https://stackoverflow.com/questions/29069655/python-logging-with-a-common-logger-class-mixin-and-class-inheritance
+        _logger.addHandler(logfile_handler)
+        
+        return logfile_handler
 
 
 # _______    _     _                                                                    _   
@@ -172,7 +189,7 @@ class WorkflowGnss():
         if no_return:
             return None
         else:
-            return output
+            return str_out
             
     
     def set_table_log(self,
@@ -267,7 +284,7 @@ class WorkflowGnss():
 
             iepoch = self.table[self.table['epoch_srt'] == epoch].index
 
-            self.table.loc[iepoch,'fname']       = local_fname_use
+            self.table.loc[iepoch,'fname']     = local_fname_use
             self.table.loc[iepoch,'fpath_out'] = local_path_use
             logger.debug("local file guessed: %s",local_path_use)
   

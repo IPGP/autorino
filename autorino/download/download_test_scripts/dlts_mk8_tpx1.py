@@ -1,10 +1,10 @@
-import datetime as dt
-import pandas as pd
-import numpy as np
-import os
-from autorino import download as arodl
-from autorino import convert as arocnv
-from autorino import general as arogen
+# import datetime as dt
+# import pandas as pd
+# import numpy as np
+# import os
+# from autorino import download as arodl
+# from autorino import convert as arocnv
+# from autorino import general as arogen
 from autorino import configread as arocfg
 
 import yaml
@@ -15,6 +15,7 @@ import yaml
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05b_BOMG.yml'
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05c_BOMG.yml'
 pconfig='/home/psakicki/CODES/IPGP/autorino/configfiles/proto_config_05c_RVAG.yml'
+pconfig='/home/psakicki/CODES/IPGP/autorino/configfiles/proto_config_05d_RVAG_dummy_on_tpx1.yml'
 
 Y1 = yaml.safe_load(open(pconfig))
 
@@ -30,10 +31,6 @@ L = dwl.check_local_files()
 L = dwl.invalidate_small_local_files()
 
 dwl.print_table()
-
-      
-        
-
 
     
 
