@@ -48,28 +48,44 @@ def site_list_from_sitelogs(sitelogs_inp):
 class ConvertRinexModGnss(arogen.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)
-        
+        ### temp dirs init
+        self._set_tmp_dirs_paths() 
+
+        ### sitelog init
         if sitelogs:
             self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs,
                                                               force=False)       
     ########### ConvertRinexModGnss specific methods        
 
+    def _set_tmp_dirs_paths(self, 
+                            tmp_dir_main_inp=None,
+                            tmp_subdir_logs='logs',
+                            tmp_subdir_conv='converted',
+                            tmp_subdir_rnxmod='rinexmoded'):
+
+        if not tmp_dir_main_inp:
+            self.tmp_dir_main = self.session.tmp_dir + "/logs"
+        else:
+            self.tmp_dir_main = tmp_dir_main_inp
+
+        self.tmp_dir_logs = os.path.join(self.tmp_dir_main,tmp_subdir_logs)
+        self.tmp_dir_converted = os.path.join(self.tmp_dir_main,tmp_subdir_conv)
+        self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir_main,tmp_subdir_rnxmod) 
+
+        utils.create_dir(self.tmp_dir_logs)
+        utils.create_dir(self.tmp_dir_converted)
+        utils.create_dir(self.tmp_dir_rinexmoded)
+
+        return self.tmp_dir_main, self.tmp_dir_logs,\
+            self.tmp_dir_converted, self.tmp_dir_rinexmoded 
+        
     def convert_rnxmod(self):
-        
         ###############################################
-        ### def temp folders
-        tmpdir_logs = self.session.tmp_dir + "/logs"
-        tmpdir_converted = self.session.tmp_dir + "/converted"
-        tmpdir_rinexmoded = self.session.tmp_dir + "/rinexmoded" 
-        
-        utils.create_dir(tmpdir_logs)
-        utils.create_dir(tmpdir_converted)
-                
         site4_list = site_list_from_sitelogs(self.sitelogs)
         
         ### initialize the table as log
         ts = utils.get_timestamp()
-        log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
+        log_table = os.path.join(self.tmp_dir_logs,ts + "_conv_table.log")
         log_table_df_void = pd.DataFrame([], columns=self.table.columns)
         log_table_df_void.to_csv(log_table,mode="w",index=False)
         
@@ -95,12 +111,12 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             site =  _site_search_from_list(fraw,
                                            site4_list)     
 
-            tmpdir_rinexmoded_use = os.path.join(tmpdir_rinexmoded,
-                                                 site.upper())
+            tmp_dir_rinexmoded_use = os.path.join(self.tmp_dir_rinexmoded,
+                                                  site.upper())
                                                  
-            utils.create_dir(tmpdir_rinexmoded_use)
+            utils.create_dir(tmp_dir_rinexmoded_use)
             
-            ### find the right converter
+            ### do a first converter selection by removing odd files 
             conve = _select_conv_odd_file(fraw)
             
             logger.info("extension/converter: %s/%s",ext,conve)
@@ -121,7 +137,7 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             self.table.loc[irow,'ok_inp'] = True
     
             frnxtmp, _ = arocnv.converter_run(fraw,
-                                              tmpdir_converted,
+                                              self.tmp_dir_converted,
                                               converter = conve)
             if frnxtmp:
                 ### update table if things go well
@@ -138,7 +154,7 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             ###### RINEXMOD            
             try:
                 frnxfin = rinexmod_api.rinexmod(frnxtmp,
-                                                tmpdir_rinexmoded_use,
+                                                tmp_dir_rinexmoded_use,
                                                 marker=site,
                                                 compression="gz",
                                                 longname=True,
