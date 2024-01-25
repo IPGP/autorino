@@ -3,8 +3,7 @@
 
 import os
 from os import remove, close, path
-import logging
-#import logging.config
+import logging.config
 
 #### IMPORT CONFIG FOR LOGGER
 log_file_path = os.path.join(path.dirname(path.abspath(__file__)),

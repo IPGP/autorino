@@ -110,6 +110,11 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         inp_raw_fpath = Path(inp_raw_fpath)
         ext = inp_raw_fpath.suffix.upper()
         fname = inp_raw_fpath.name.upper()
+        if ext in ('.GZ','.7Z','.7ZIP','.ZIP','.Z'):
+            logger.debug("%s is compressed",fname)
+            ext = Path(Path(fname).stem).suffix.upper()
+            fname = Path(Path(fname).stem).name.upper()
+            
     else:
         ext = ""
     
