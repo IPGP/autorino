@@ -9,6 +9,8 @@ Created on Thu Dec  1 15:47:05 2022
 import os
 import autorino.general as arogen
 import autorino.download as arodwl
+#import autorino.session as aroses
+#import autorino.epochrange as aroepo
 
 import yaml
 
@@ -39,15 +41,15 @@ def session_download_from_configfile(configfile_path):
         remote_fname = yses["remote_fname"]    
         
         sess = arogen.SessionGnss(name = name,
-                                protocol = protocol,
-                                remote_dir=remote_dir,
-                                tmp_dir=tmp_dir,
-                                hostname=hostname,
-                                sta_user=sta_user,
-                                sta_pass=sta_pass,
-                                site=site,
-                                session_period=session_period,
-                                remote_fname=remote_fname)
+                                  protocol = protocol,
+                                  remote_dir=remote_dir,
+                                  tmp_dir=tmp_dir,
+                                  hostname=hostname,
+                                  sta_user=sta_user,
+                                  sta_pass=sta_pass,
+                                  site=site,
+                                  session_period=session_period,
+                                  remote_fname=remote_fname)
         
         sess_stk.append(sess)
 
