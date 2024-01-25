@@ -7,7 +7,7 @@ Created on Thu Dec  1 15:47:05 2022
 """
 
 import os
-#import autorino.general as arogen
+import autorino.general as arogen
 import autorino.download as arodwl
 import autorino.session as aroses
 import autorino.epochrange as aroepo

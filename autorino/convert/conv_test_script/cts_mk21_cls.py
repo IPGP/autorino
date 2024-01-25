@@ -13,8 +13,10 @@ from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 import autorino.convert as arcv
 from autorino import configread as arcfg
-from autorino import epochrange as aroepo
-from autorino import  session as aroses
+#from autorino import epochrange as aroepo
+#from autorino import  session as aroses
+import autorino.general as arogen
+
 import yaml
 
 import timeit
@@ -32,12 +34,13 @@ Y1 = yaml.safe_load(open(pconfig))
 #REQ = REQlist
 #EPOC = REQ.epoch_range
 
-pout = "/home/sakic/020_TEMP/convcls_test"
+pout = "/home/sakic/090_TEMP/convcls_test"
 psitelogs = "/work/sitelogs/SITELOGS"
 
-SES = aroses.create_dummy_session()
-EPOC = aroepo.create_dummy_epochrange()
+SES = arogen.create_dummy_session()
+EPOC = arogen.create_dummy_epochrange()
 
+SES.tmp_dir =  pout + "/tmp_conv"
 
 CONV = arcv.ConvertRinexModGnss(SES,
                                 EPOC,
@@ -67,7 +70,7 @@ CONV.print_table()
 # if prev_table_logs:
 #     CONV.filter_previous_tables(DF_prev_tbl)
 
-CONV.conv_rnxmod_files()
+CONV.convert_rnxmod()
 
 
 

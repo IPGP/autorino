@@ -6,7 +6,7 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-from geodezyx import utils,  operational
+from geodezyx import utils,operational
 import autorino.convert as arocnv
 from rinexmod import rinexmod_api
 from pathlib import Path
@@ -19,8 +19,10 @@ import docker
 import pandas as pd
 import shutil
 
-#from autorino import general as arogen
-import autorino.workflow as arowkf
+import autorino.general as arogen
+#import autorino.workflow as arowkf
+
+
 
 #### Import the logger
 import logging
@@ -43,34 +45,55 @@ def site_list_from_sitelogs(sitelogs_inp):
     return site4_list
 
 
-class ConvertRinexModGnss(arowkf.WorkflowGnss):
+class ConvertRinexModGnss(arogen.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)
-        
+        ### temp dirs init
+        self._set_conv_tmp_dirs_paths() 
+
+        ### sitelog init
         if sitelogs:
             self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs,
                                                               force=False)       
     ########### ConvertRinexModGnss specific methods        
 
-    def conv_rnxmod_files(self):
+    def _set_conv_tmp_dirs_paths(self, 
+                                 tmp_dir_main_inp=None,
+                                 tmp_subdir_logs='logs',
+                                 tmp_subdir_conv='converted',
+                                 tmp_subdir_rnxmod='rinexmoded'):
+
+        if not tmp_dir_main_inp:
+            self.tmp_dir_main = self.session.tmp_dir 
+        else:
+            self.tmp_dir_main = tmp_dir_main_inp
+
+        self.tmp_dir_logs = os.path.join(self.tmp_dir_main,
+                                         tmp_subdir_logs)
+        self.tmp_dir_converted = os.path.join(self.tmp_dir_main,
+                                              tmp_subdir_conv)
+        self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir_main,
+                                               tmp_subdir_rnxmod) 
+
+        utils.create_dir(self.tmp_dir_logs)
+        utils.create_dir(self.tmp_dir_converted)
+        utils.create_dir(self.tmp_dir_rinexmoded)
+
+        return self.tmp_dir_main, self.tmp_dir_logs,\
+            self.tmp_dir_converted, self.tmp_dir_rinexmoded 
         
+    def convert_rnxmod(self):
         ###############################################
-        ### def temp folders
-        tmpdir_logs = self.session.tmp_dir + "/logs"
-        tmpdir_converted = self.session.tmp_dir + "/converted"
-        tmpdir_rinexmoded = self.session.tmp_dir + "/rinexmoded" 
-        
-        utils.create_dir(tmpdir_logs)
-        utils.create_dir(tmpdir_converted)
-                
         site4_list = site_list_from_sitelogs(self.sitelogs)
         
         ### initialize the table as log
-        ts = utils.get_timestamp()
-        log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
-        log_table_df_void = pd.DataFrame([], columns=self.table.columns)
-        log_table_df_void.to_csv(log_table,mode="w",index=False)
-        
+
+        self.set_table_log(out_dir=self.tmp_dir_logs)
+        # ts = utils.get_timestamp()
+        # log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
+        # log_table_df_void = pd.DataFrame([], columns=self.table.columns)
+        # log_table_df_void.to_csv(log_table,mode="w",index=False)
+
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table['ok_inp']).sum()
@@ -93,21 +116,21 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
             site =  _site_search_from_list(fraw,
                                            site4_list)     
 
-            tmpdir_rinexmoded_use = os.path.join(tmpdir_rinexmoded,
-                                                 site.upper())
+            tmp_dir_rinexmoded_use = os.path.join(self.tmp_dir_rinexmoded,
+                                                  site.upper())
                                                  
-            utils.create_dir(tmpdir_rinexmoded_use)
+            utils.create_dir(tmp_dir_rinexmoded_use)
             
-            ### find the right converter
-            conve = select_conv_for_odd_file(fraw)
+            ### do a first converter selection by removing odd files 
+            conve = _select_conv_odd_file(fraw)
             
             logger.info("extension/converter: %s/%s",ext,conve)
         
             if not conve:
                 logger.info("file skipped, no converter found: %s",fraw)
-                row.note = "no converter found"
-                row.ok_inp = False
-                row.to_csv(log_table, mode="a", index=False, header=False)
+                self.table.loc[irow,'note'] = "no converter found"
+                self.table.loc[irow,'ok_inp'] = False 
+                self.write_in_table_log(self.table.loc[irow])
                 continue
             
             ### a fonction to stop the docker conteners running for too long
@@ -115,24 +138,28 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
             stop_long_running_containers()
             
             #############################################################
-            #### CONVERSION
+            ###### CONVERSION
             self.table.loc[irow,'ok_inp'] = True
     
             frnxtmp, _ = arocnv.converter_run(fraw,
-                                              tmpdir_converted,
+                                              self.tmp_dir_converted,
                                               converter = conve)
             if frnxtmp:
+                ### update table if things go well
                 self.table.loc[irow,'fpath_out'] = frnxtmp
-                self.table.loc[irow,'epoch_srt'],self.table.loc[irow,'epoch_end'] = operational.rinex_start_end(frnxtmp)
+                epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
+                self.table.loc[irow,'epoch_srt'],\
+                    self.table.loc[irow,'epoch_end'] = epo_srt_ok, epo_end_ok 
                 self.table.loc[irow,'ok_out'] = True
             else:
+                ### update table if things go wrong
                 self.table.loc[irow,'ok_out'] = False
     
             #############################################################
-            #### RINEXMOD            
+            ###### RINEXMOD            
             try:
-                frinfin = rinexmod_api.rinexmod(frnxtmp,
-                                                tmpdir_rinexmoded_use,
+                frnxfin = rinexmod_api.rinexmod(frnxtmp,
+                                                tmp_dir_rinexmoded_use,
                                                 marker=site,
                                                 compression="gz",
                                                 longname=True,
@@ -140,27 +167,33 @@ class ConvertRinexModGnss(arowkf.WorkflowGnss):
                                                 force_rnx_load=True,
                                                 verbose=False,
                                                 full_history=True)
+                ### update table if things go well
                 self.table.loc[irow,'ok_out'] = True
-                self.table.loc[irow,'fpath_out'] = frinfin
-                self.table.loc[irow,'size_out'] = os.path.getsize(frinfin)
-                
-                pd.DataFrame(row).T.to_csv(log_table,mode="a",
-                                           index=False,header=False) 
+                self.table.loc[irow,'fpath_out'] = frnxfin
+                self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
                                            
-                ### def output folders        
-                outdir_use = arogen.translator(self.out_dir,
-                                               row.epoch,
-                                               self.session.translate_dict)
-                utils.create_dir(outdir_use)
-                shutil.copy(frinfin,outdir_use)
+                self.write_in_table_log(self.table.loc[irow])
                 
             except Exception as e:
-                logger.warn(e)
+                ### update table if things go wrong
+                logger.error(e)
                 self.table.loc[irow,'ok_out'] = False
-                pd.DataFrame(row).T.to_csv(log_table,mode="a",
-                                           index=False,header=False) 
+                self.write_in_table_log(self.table.loc[irow])
+
                 continue
-        
+
+            #############################################################
+            ###### FINAL MOVE                             
+            ### def output folders        
+            #### !!!!! ADD THE EXCEPTION AND TABLE UPDATE !!!!
+            outdir_use = arogen.translator(self.out_dir,
+                                           self.table.loc[irow,'epoch_srt'], 
+                                           self.session.translate_dict)
+            ### do the move 
+            utils.create_dir(outdir_use)
+            shutil.copy(frnxfin,outdir_use)
+                
+       
         return None
 
 
@@ -180,15 +213,15 @@ def _site_search_from_list(fraw_inp,site4_list_inp):
         site_out = fraw_inp.name[:4]
     return site_out
 
-def select_conv_for_odd_file(fraw_inp,
-                             ext_excluded=[".TG!$",
-                                           ".DAT",
-                                           ".Z",
-                                           ".BCK",
-                                           "^.[0-9]{3}$",
-                                           ".A$",
-                                           "Trimble",
-                                           ".ORIG"]):
+def _select_conv_odd_file(fraw_inp,
+                          ext_excluded=[".TG!$",
+                                        ".DAT",
+                                        ".Z",
+                                        ".BCK",
+                                        "^.[0-9]{3}$",
+                                        ".A$",
+                                        "Trimble",
+                                        ".ORIG"]):
     """
     do a high level case matching to identify the right converter 
     for raw file with an unconventional extension, or exclude the file
