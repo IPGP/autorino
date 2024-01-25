@@ -35,7 +35,9 @@ class WorkflowGnss():
         
     def __repr__(self):
         name = type(self).__name__
-        out = "{} {}/{}".format(name, self.session.site, self.epoch_range)
+        out = "{} {}/{}".format(name,
+                                self.session.site,
+                                self.epoch_range)
         return out
     
     ######## getter and setter 
