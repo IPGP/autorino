@@ -16,14 +16,14 @@ import pandas as pd
 
 
 import autorino.general as arogen
-import autorino.workflow as arowkf
-import autorino.epochrange as aroepo
-import autorino.session as aroses
+#import autorino.workflow as arowkf
+#import autorino.epochrange as aroepo
+#import autorino.session as aroses
 import autorino.handle as arohdl
 
 
-epo = aroepo.create_dummy_epochrange()
-ses = aroses.create_dummy_session()
+epo = arogen.create_dummy_epochrange()
+ses = arogen.create_dummy_session()
 
 H = arohdl.HandleGnss(ses, epo, out_dir='/tmp/')
 
