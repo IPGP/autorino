@@ -15,6 +15,7 @@ import yaml
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05b_BOMG.yml'
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05c_BOMG.yml'
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05c_RVAG.yml'
+pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05d_CNFG.yml'
 
 Y1 = yaml.safe_load(open(pconfig))
 
@@ -40,5 +41,5 @@ conv = arocnv.ConvertRinexModGnss(ses,dwl.epoch_range,out,sitelog_dir)
 
 conv.load_table_from_prev_step_table(dwl.table)
 conv.print_table()
-conv.conv_rnxmod_files()
+conv.convert_rnxmod()
 conv.print_table()
