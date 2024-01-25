@@ -16,10 +16,12 @@ import copy
  
 from geodezyx import utils
 
-import autorino.epochrange as aroepo
+#import autorino.epochrange as aroepo
+import autorino.general as arogen
+from autorino import logconfig
 
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel("DEBUG")
 
 class WorkflowGnss():
     
@@ -29,6 +31,7 @@ class WorkflowGnss():
         self.out_dir = out_dir
         self.tmp_dir = session.tmp_dir
         self._table_init()
+        self.set_logfile()
         
     def __repr__(self):
         name = type(self).__name__
@@ -36,6 +39,7 @@ class WorkflowGnss():
         return out
     
     ######## getter and setter 
+    #### epoch_range
     @property
     def epoch_range(self):
         return self._epoch_range
@@ -46,7 +50,8 @@ class WorkflowGnss():
         if self._epoch_range.period != self.session.session_period:  
             logger.warn("Session period (%s) ≠ Epoch Range period (%s)",
             self.session.session_period,self._epoch_range.period)
-
+    
+    #### table
     @property
     def table(self):
         return self._table
@@ -55,7 +60,7 @@ class WorkflowGnss():
     def table(self,value):
         self._table = value
         #### designed for future safety tests
-        
+
     def _table_init(self,
                     table_cols=['fname',
                                 'site',
@@ -81,35 +86,117 @@ class WorkflowGnss():
         self.table = df
         return df
         
-    ######## internal methods 
+
+ #   _____                           _                  _   _               _     
+ #  / ____|                         | |                | | | |             | |    
+ # | |  __  ___ _ __   ___ _ __ __ _| |  _ __ ___   ___| |_| |__   ___   __| |___ 
+ # | | |_ |/ _ \ '_ \ / _ \ '__/ _` | | | '_ ` _ \ / _ \ __| '_ \ / _ \ / _` / __|
+ # | |__| |  __/ | | |  __/ | | (_| | | | | | | | |  __/ |_| | | | (_) | (_| \__ \
+ #  \_____|\___|_| |_|\___|_|  \__,_|_| |_| |_| |_|\___|\__|_| |_|\___/ \__,_|___/
+                                                                                                                                                          
     
-    def duplicate(self):
+    def copy(self):
         """
         return a duplicate (deep copy) of the current object
         """
         return copy.deepcopy(self)
     
     
-    def update_epoch_range_from_table(self):
-        epomin = self.table['epoch_srt'].min()
-        epomax = self.table['epoch_srt'].max()
+    def update_epoch_range_from_table(self,
+                                      column='epoch_srt'):
+        """
+        update the EpochRange of the WorkflowGnss object with 
+        the min/max of the epochs in the object's table
+        """
+        epomin = self.table[column].min()
+        epomax = self.table[column].max()
         
         self.epoch_range.epoch1 = epomin
         self.epoch_range.epoch1 = epomax
         
-        tdelta_arr = self.table['epoch_srt'].diff().dropna().unique()
+        tdelta_arr = self.table[column].diff().dropna().unique()
         
         if len(tdelta_arr) > 1:
             logger.warn("the period spacing of %s is not uniform".self)
             ##### be sure to keep the 1st one!!!
         
-        period_new = aroepo.timedelta2freqency_alias(tdelta_arr[0])
+        period_new = arogen.timedelta2freqency_alias(tdelta_arr[0])
         self.epoch_range.period = period_new
         
         logger.info("new %s",self.epoch_range)
+
+
+
+ #  _                       _             
+ # | |                     (_)            
+ # | |     ___   __ _  __ _ _ _ __   __ _ 
+ # | |    / _ \ / _` |/ _` | | '_ \ / _` |
+ # | |___| (_) | (_| | (_| | | | | | (_| |
+ # |______\___/ \__, |\__, |_|_| |_|\__, |
+ #               __/ | __/ |         __/ |
+ #              |___/ |___/         |___/
+              
+
+    def set_logfile(self,
+                    out_dir=None,
+                    step_suffix=''):
+        """
+        set logging in a file 
+        """
+                        
+        if not out_dir:
+            out_dir=self.session.tmp_dir
+        
+        _logger = logging.getLogger('autorino')
+        
+        ts = utils.get_timestamp()
+        log_name = "_".join((ts , ".log"))
+        log_path = os.path.join(out_dir,log_name)
+
+        log_cfg_dic = logconfig.logconfig.log_config_dict
+        fmt_dic = log_cfg_dic['formatters']['fmtgzyx_nocolor']
+
+        logfile_handler = logging.FileHandler(log_path)
+
+        fileformatter = logging.Formatter(**fmt_dic)
+        
+        logfile_handler.setFormatter(fileformatter)
+        logfile_handler.setLevel('DEBUG')
         
         
+        #### the root logger 
+        # https://stackoverflow.com/questions/48712206/what-is-the-name-of-pythons-root-logger
+        #### the heritage for loggers
+        # https://stackoverflow.com/questions/29069655/python-logging-with-a-common-logger-class-mixin-and-class-inheritance
+        _logger.addHandler(logfile_handler)
         
+        return logfile_handler
+    
+    def set_table_log(self,
+                      out_dir=None, 
+                      step_suffix=''):
+        if not out_dir:
+            out_dir=self.session.tmp_dir
+                          
+        ts = utils.get_timestamp()
+        talo_name = "_".join((ts , step_suffix , "table.log"))
+        talo_path = os.path.join(out_dir,talo_name)
+        
+        ### initalize with a void table
+        talo_df_void = pd.DataFrame([], columns=self.table.columns)
+        talo_df_void.to_csv(talo_path,mode="w",index=False)
+        
+        self.table_log_path = talo_path
+        
+        return talo_path
+    
+    def write_in_table_log(self,row_in):    
+        pd.DataFrame(row_in).T.to_csv(self.table_log_path,
+                                      mode='a',
+                                      index=False,
+                                      header=False) 
+        return None
+    
 
 
 # _______    _     _                                                                    _   
@@ -120,7 +207,6 @@ class WorkflowGnss():
 #   |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
 #                                                        __/ |                              
 #                                                       |___/     
-  
         
     def print_table(self,
                     no_print=False,
@@ -156,10 +242,9 @@ class WorkflowGnss():
         if no_return:
             return None
         else:
-            return output
+            return str_out
+            
 
-        
-        
     def load_table_from_filelist(self,
                                  input_files,
                                  inp_regex=".*",
@@ -227,7 +312,7 @@ class WorkflowGnss():
 
             iepoch = self.table[self.table['epoch_srt'] == epoch].index
 
-            self.table.loc[iepoch,'fname']       = local_fname_use
+            self.table.loc[iepoch,'fname']     = local_fname_use
             self.table.loc[iepoch,'fpath_out'] = local_path_use
             logger.debug("local file guessed: %s",local_path_use)
   
@@ -236,7 +321,7 @@ class WorkflowGnss():
         logger.info("nbr local files guessed: %s",len(local_paths_list))
 
         return local_paths_list
-        
+
 
 #  ______ _ _ _              _        _     _      
 # |  ____(_) | |            | |      | |   | |     
@@ -441,7 +526,7 @@ class WorkflowGnss():
                      rolling_ref=-1,
                      round_method = 'floor'):
         
-        epoch_rnd = aroepo.round_epochs(self.table['epoch_srt'],
+        epoch_rnd = arogen.round_epochs(self.table['epoch_srt'],
                                         period=period,
                                         rolling_period=rolling_period,
                                         rolling_ref=rolling_ref,
@@ -454,27 +539,12 @@ class WorkflowGnss():
         wrkflw_lis_out = []
         
         for tgrp, tabgrp in grps:
-            wrkflw = self.duplicate()
+            wrkflw = self.copy()
             tabgrp_bis = tabgrp.drop('epoch_rnd',axis=1)
             wrkflw.table = tabgrp_bis
             wrkflw_lis_out.append(wrkflw)
     
-        return wrkflw_lis_out   
-
-    
-        
-
-        
-        
-        
-        
-        
-        
-        
-            
-        
-        
-        
+        return wrkflw_lis_out          
         
 
 #  __  __ _               __                  _   _                  
