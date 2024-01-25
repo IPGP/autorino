@@ -14,6 +14,22 @@ import autorino.download as arodwl
 
 import yaml
 
+
+def read_configfile(configfile_path):
+    
+    y = yaml.safe_load(open(configfile_path))
+    
+    y_station = y["station"]
+    y_access = y["access"]
+    
+
+
+    
+    
+    
+
+
+
 def session_download_from_configfile(configfile_path):
     
     y1 = yaml.safe_load(open(configfile_path))

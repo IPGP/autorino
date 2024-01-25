@@ -7,7 +7,6 @@ import os
 import shutil
 import autorino.download as arodl
 import autorino.configread as arocfg
-#import autorino.workflow as arowkf
 import autorino.general as arogen
 
 pd.options.mode.chained_assignment = 'warn'
@@ -16,7 +15,7 @@ pd.options.mode.chained_assignment = 'warn'
 import logging
 logger = logging.getLogger(__name__)
 
-class DownloadGnss(arogen.WorkflowGnss):
+class DownloadGnss(arogen.StepGnss):
     
     def __init__(self,session,epoch_range,out_dir):
         super().__init__(session,epoch_range,out_dir)
@@ -27,7 +26,7 @@ class DownloadGnss(arogen.WorkflowGnss):
         Session and EpochRange attributes of the DownloadGnss
         
         see also method guess_local_files(), a general method for all 
-        WorkflowGnss objects
+        StepGnss objects
         """
         
         if not self.session.remote_fname:
