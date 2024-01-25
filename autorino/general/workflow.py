@@ -564,6 +564,15 @@ def _translator_epoch(path_inp,epoch_inp):
     """
     path_translated = str(path_inp)
     path_translated = epoch_inp.strftime(path_translated)
+
+    #the <HOURCHAR> and <hourchar> alias in a time information,
+    #thus must be managed here 
+
+    ichar = epoch_inp.hour
+    path_translated = path_translated.replace('<HOURCHAR>',utils.alphabet(ichar).upper()) 
+    path_translated = path_translated.replace('<hourchar>',utils.alphabet(ichar).lower()) 
+
+
     return path_translated
 
 def _translator_keywords(path_inp,translator_dict):
