@@ -10,6 +10,7 @@ from geodezyx import utils,operational
 import autorino.convert as arocnv
 from rinexmod import rinexmod_api
 from pathlib import Path
+import gzip
 import os
 import re 
 import numpy as np
@@ -60,6 +61,7 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
     def _set_conv_tmp_dirs_paths(self, 
                                  tmp_dir_main_inp=None,
                                  tmp_subdir_logs='logs',
+                                 tmp_subdir_unzip='unzipped',
                                  tmp_subdir_conv='converted',
                                  tmp_subdir_rnxmod='rinexmoded'):
 
@@ -70,16 +72,19 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
 
         self.tmp_dir_logs = os.path.join(self.tmp_dir_main,
                                          tmp_subdir_logs)
+        self.tmp_dir_unzipped = os.path.join(self.tmp_dir_main,
+                                         tmp_subdir_unzip)
         self.tmp_dir_converted = os.path.join(self.tmp_dir_main,
                                               tmp_subdir_conv)
         self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir_main,
                                                tmp_subdir_rnxmod) 
 
         utils.create_dir(self.tmp_dir_logs)
+        utils.create_dir(self.tmp_dir_unzipped)
         utils.create_dir(self.tmp_dir_converted)
         utils.create_dir(self.tmp_dir_rinexmoded)
 
-        return self.tmp_dir_main, self.tmp_dir_logs,\
+        return self.tmp_dir_main, self.tmp_dir_logs, self.tmp_dir_unzipped, \
             self.tmp_dir_converted, self.tmp_dir_rinexmoded 
         
     def convert_rnxmod(self):
@@ -110,7 +115,12 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             ext = fraw.suffix.upper()
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
-    
+
+            ### manage compressed files
+            if ext in ('.GZ','.7Z','.7ZIP','.ZIP','.Z'):
+                logger.debug("%s is compressed",fraw)
+                fraw = Path(gunzip(fraw, self.tmp_dir_unzipped))
+ 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
             site =  _site_search_from_list(fraw,
@@ -274,6 +284,24 @@ def stop_long_running_containers(max_running_time=120):
             logger.warning(f'Stopped container {container.name} after {elapsed_time} seconds.')
             
     return None
+
+def gunzip(gzip_file_inp, out_dir_inp = None):
+    gzip_file = Path(gzip_file_inp)
+
+    if not out_dir_inp:
+        out_dir = gzip_file.parent
+    else:
+        out_dir = Path(out_dir_inp)
+
+    file_out = out_dir.joinpath(gzip_file.stem)
+
+    with gzip.open(gzip_file_inp, 'rb') as f_in:
+        with open(file_out, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+    return str(file_out)
+
+
 
 
 #################################################
