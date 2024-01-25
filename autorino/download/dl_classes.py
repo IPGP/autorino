@@ -7,7 +7,8 @@ import os
 import shutil
 import autorino.download as arodl
 import autorino.configread as arocfg
-import autorino.workflow as arowkf
+#import autorino.workflow as arowkf
+import autorino.general as arogen
 
 pd.options.mode.chained_assignment = 'warn'
 
@@ -15,7 +16,7 @@ pd.options.mode.chained_assignment = 'warn'
 import logging
 logger = logging.getLogger(__name__)
 
-class DownloadGnss(arowkf.WorkflowGnss):
+class DownloadGnss(arogen.WorkflowGnss):
     
     def __init__(self,session,epoch_range,out_dir):
         super().__init__(session,epoch_range,out_dir)
@@ -46,7 +47,7 @@ class DownloadGnss(arowkf.WorkflowGnss):
                                           rmot_dir_use,
                                           rmot_fname_use)
 
-            rmot_path_use = arowkf.translator(rmot_path_use,
+            rmot_path_use = arogen.translator(rmot_path_use,
                                               epoch,
                                               self.session.translate_dict)
                                        
@@ -77,7 +78,7 @@ class DownloadGnss(arowkf.WorkflowGnss):
         rmot_dir_list = []
         for epoch in self.epoch_range.epoch_range_list():
             rmot_dir_use = str(self.session.remote_dir)
-            rmot_dir_use = arowkf.translator(rmot_dir_use,epoch,
+            rmot_dir_use = arogen.translator(rmot_dir_use,epoch,
                                              self.session.translate_dict)
             rmot_dir_list.append(rmot_dir_use)
             
@@ -169,7 +170,7 @@ class DownloadGnss(arowkf.WorkflowGnss):
             ###### use the guessed local file as destination or the generic directory                
             if not local_file: #### the local file has not been guessed
                 outdir_use = str(self.out_dir)
-                outdir_use = arowkf.translator(outdir_use,
+                outdir_use = arogen.translator(outdir_use,
                                                epoch,
                                                self.session.translate_dict)
             else: #### the local file has been guessed before
