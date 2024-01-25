@@ -21,7 +21,6 @@ import pandas as pd
 import shutil
 
 import autorino.general as arogen
-#import autorino.workflow as arowkf
 
 
 
@@ -46,7 +45,7 @@ def site_list_from_sitelogs(sitelogs_inp):
     return site4_list
 
 
-class ConvertRinexModGnss(arogen.WorkflowGnss):
+class ConvertRinexModGnss(arogen.StepGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)
         ### temp dirs init
