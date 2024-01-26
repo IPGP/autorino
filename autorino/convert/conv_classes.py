@@ -76,6 +76,14 @@ class ConvertRinexModGnss(arogen.StepGnss):
                                   tmp_subdir_unzip='unzipped',
                                   tmp_subdir_conv='converted',
                                   tmp_subdir_rnxmod='rinexmoded'):
+        
+        """
+        initialize temp dirs, but keeps their generic form, with <...> and %X,
+        and without creating them 
+        
+        sees set_conv_tmp_dirs_paths() for the effective translation and 
+        creation of these temp dirs
+        """
  
         self.tmp_dir_logs = os.path.join(self.tmp_dir,
                                          tmp_subdir_logs)
@@ -92,6 +100,9 @@ class ConvertRinexModGnss(arogen.StepGnss):
             
             
     def set_conv_tmp_dirs_paths(self):
+        """
+        effective translation and creation of temp dirs
+        """
         tmp_dir_logs_set = self.translate_path(self.tmp_dir_logs)
         tmp_dir_unzipped_set = self.translate_path(self.tmp_dir_unzipped)
         tmp_dir_converted_set = self.translate_path(self.tmp_dir_converted)
