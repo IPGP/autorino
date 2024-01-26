@@ -190,8 +190,8 @@ class StepGnss():
                 
         ### site have a specific loop
         for s in ('site_id','site_id4','site_id9'):
-            trsltdict[s.upper()] = str(getattr(self, s)).upper()
-            trsltdict[s.lower()] = str(getattr(self, s)).lower()        
+            trsltdict[s.upper()] = str(getattr(self,s)).upper()
+            trsltdict[s.lower()] = str(getattr(self,s)).lower()        
                 
         return trsltdict
 
@@ -411,7 +411,7 @@ class StepGnss():
 
             ### guess the potential local files
             local_dir_use = str(self.out_dir)
-            local_fname_use = str(self.session.remote_fname)
+            local_fname_use = str(self.remote_fname)
             local_path_use = os.path.join(local_dir_use,
                                           local_fname_use)
 
