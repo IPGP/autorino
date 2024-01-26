@@ -46,36 +46,42 @@ def site_list_from_sitelogs(sitelogs_inp):
 
 
 class ConvertRinexModGnss(arogen.StepGnss):
-    def __init__(self,session,epoch_range,out_dir,sitelogs=None):
-        super().__init__(session,epoch_range,out_dir)
+    def __init__(self,out_dir,tmp_dir,log_dir,
+                 epoch_range,
+                 site=None,
+                 session=None,
+                 site_id=None,
+                 sitelogs=None):
+    
+        super().__init__(out_dir,tmp_dir,log_dir,
+                         epoch_range,
+                         site=site,
+                         session=session,
+                         site_id=site_id)
+
         ### temp dirs init
         self._set_conv_tmp_dirs_paths() 
 
         ### sitelog init
         if sitelogs:
             self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs,
-                                                              force=False)       
+                                                              force=False)
+            
     ########### ConvertRinexModGnss specific methods        
 
     def _set_conv_tmp_dirs_paths(self, 
-                                 tmp_dir_main_inp=None,
                                  tmp_subdir_logs='logs',
                                  tmp_subdir_unzip='unzipped',
                                  tmp_subdir_conv='converted',
                                  tmp_subdir_rnxmod='rinexmoded'):
 
-        if not tmp_dir_main_inp:
-            self.tmp_dir_main = self.session.tmp_dir 
-        else:
-            self.tmp_dir_main = tmp_dir_main_inp
-
-        self.tmp_dir_logs = os.path.join(self.tmp_dir_main,
+        self.tmp_dir_logs = os.path.join(self.tmp_dir,
                                          tmp_subdir_logs)
-        self.tmp_dir_unzipped = os.path.join(self.tmp_dir_main,
+        self.tmp_dir_unzipped = os.path.join(self.tmp_dir,
                                          tmp_subdir_unzip)
-        self.tmp_dir_converted = os.path.join(self.tmp_dir_main,
+        self.tmp_dir_converted = os.path.join(self.tmp_dir,
                                               tmp_subdir_conv)
-        self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir_main,
+        self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir,
                                                tmp_subdir_rnxmod) 
 
         utils.create_dir(self.tmp_dir_logs)
@@ -83,7 +89,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
         utils.create_dir(self.tmp_dir_converted)
         utils.create_dir(self.tmp_dir_rinexmoded)
 
-        return self.tmp_dir_main, self.tmp_dir_logs, self.tmp_dir_unzipped, \
+        return self.tmp_dir_logs, self.tmp_dir_unzipped, \
             self.tmp_dir_converted, self.tmp_dir_rinexmoded 
         
     def convert_rnxmod(self):
@@ -197,7 +203,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
             #### !!!!! ADD THE EXCEPTION AND TABLE UPDATE !!!!
             outdir_use = arogen.translator(self.out_dir,
                                            self.table.loc[irow,'epoch_srt'], 
-                                           self.session.translate_dict)
+                                           self.translate_dict)
             ### do the move 
             utils.create_dir(outdir_use)
             shutil.copy(frnxfin,outdir_use)

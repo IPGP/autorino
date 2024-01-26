@@ -15,7 +15,9 @@ from pandas.tseries.frequencies import to_offset
 
 
 class EpochRange:
-    def __init__(self,epoch1,epoch2,
+    def __init__(self,
+                 epoch1,
+                 epoch2,
                  period="1d",
                  round_method="floor",
                  tz="UTC"):

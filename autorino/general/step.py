@@ -25,22 +25,72 @@ logger.setLevel("DEBUG")
 
 class StepGnss():
     
-    def __init__(self,session,epoch_range,out_dir):
-        self.session = session
-        self.epoch_range = epoch_range ### setter bellow
+    def __init__(self,
+                 out_dir,tmp_dir,log_dir,
+                 epoch_range,
+                 site=None,
+                 session=None,
+                 site_id=None):
+        
         self.out_dir = out_dir
-        self.tmp_dir = session.tmp_dir
-        self._table_init()
+        self.tmp_dir = tmp_dir
+        self.log_dir = log_dir
+        self.epoch_range = epoch_range ### setter bellow
+        
+        self._init_site(site)
+        self._init_session(session)
+        self._init_site_id(site_id)
+        self._init_table()
+        
+        self.translate_dict = self._set_translate_dict()
+
         self.set_logfile()
         
     def __repr__(self):
         name = type(self).__name__
         out = "{} {}/{}".format(name,
-                                self.session.site,
+                                self.site_id,
                                 self.epoch_range)
         return out
     
     ######## getter and setter 
+    #### site_id
+    @property
+    def site_id(self):
+        return self._site_id
+    @site_id.setter
+    def site_id(self,value):
+        self._site_id = value
+
+    @property
+    def site_id4(self):
+        return self._site_id[:4]
+    
+    # @site_id4.setter
+    # def site_id4(self,value):
+    #     self._site_id4 = value[:4]
+
+    @property
+    def site_id9(self):
+        if len(self._site_id) == 9:
+            return self._site_id
+        elif len(self._site_id) == 4:
+            return self._site_id + "00XXX"
+        else:
+            return self._site_id[:4]  + "00XXX"
+        
+        
+    #     return self._site_id9
+    # @site_id9.setter
+    # def site_id9(self,value):
+    #     if len(value) == 9:
+    #         self._site_id9 = value
+    #     elif len(value) == 4:
+    #         self._site_id9 = value + "00XXX"
+    #     else:
+    #         raise Exception("given site code != 9 or 4 chars.: " + value)
+    
+    
     #### epoch_range
     @property
     def epoch_range(self):
@@ -49,9 +99,10 @@ class StepGnss():
     @epoch_range.setter
     def epoch_range(self,value):
         self._epoch_range = value
-        if self._epoch_range.period != self.session.session_period:  
-            logger.warn("Session period (%s) ≠ Epoch Range period (%s)",
-            self.session.session_period,self._epoch_range.period)
+        ## this test becones useless after session class suppression (240126)
+        # if self._epoch_range.period != self.session.session_period:  
+        #     logger.warn("Session period (%s) ≠ Epoch Range period (%s)",
+        #     self.session.session_period,self._epoch_range.period)
     
     #### table
     @property
@@ -63,7 +114,7 @@ class StepGnss():
         self._table = value
         #### designed for future safety tests
 
-    def _table_init(self,
+    def _init_table(self,
                     table_cols=['fname',
                                 'site',
                                 'epoch_srt',
@@ -83,10 +134,67 @@ class StepGnss():
             df['epoch_srt'] = self.epoch_range.epoch_range_list()
             df['epoch_end'] = self.epoch_range.epoch_range_list(end_bound=True)   
             
-            df['site'] = self.session.site 
+            df['site'] = self.site_id
         
         self.table = df
         return df
+    
+    def _init_site(self,site):
+        """
+        if a site dict is not given, create a dummy one
+        """
+        
+        if not site:
+            logger.warn('no site dict given, a dummy one will be created')
+            self.site = create_dummy_site_dic()
+        else:
+            self.site = site
+
+    def _init_session(self,session):
+        """
+        if a session dict is not given, create a dummy one
+        """
+        
+        if not session:
+            logger.warn('no session dict given, a dummy one will be created')
+            self.session = create_dummy_session_dic()
+        else:
+            self.session = session
+
+    def _init_site_id(self,site_id):
+        """
+        if a site id is not explicitely given, take the one from the site dict 
+        A dummy site dict  will be created in the worst case, ensuring that 
+        site_id will be always initialized
+        """
+        if not site_id:
+            self.site_id = self.site['site_id']
+        else:
+            self.site_id = site_id
+
+
+    def _set_translate_dict(self):
+        """
+        generate the translation dict based on the access and session dicts 
+        object attributes + site id
+        
+        site code have 2x3 declinations: 
+        <site_id(4|9|)> (lowercase) and <SITE_ID(4|9|)> (uppercase)
+        """
+        trsltdict = dict()
+        
+        for dic in (self.site ,
+                    self.session):
+            for k,v in dic.items():
+                trsltdict[k] = v
+                
+        ### site have a specific loop
+        for s in ('site_id','site_id4','site_id9'):
+            trsltdict[s.upper()] = str(getattr(self, s)).upper()
+            trsltdict[s.lower()] = str(getattr(self, s)).lower()        
+                
+        return trsltdict
+
         
 
  #   _____                           _                  _   _               _     
@@ -140,20 +248,27 @@ class StepGnss():
               
 
     def set_logfile(self,
-                    out_dir=None,
+                    log_dir_inp=None,
                     step_suffix=''):
         """
         set logging in a file 
         """
                         
-        if not out_dir:
-            out_dir=self.session.tmp_dir
+        if not log_dir_inp:
+            log_dir = self.log_dir
+        else:
+            log_dir = log_dir_inp
+            
+            
+        log_dir_use = arogen.translator(log_dir,
+                                        None, 
+                                        self.translate_dict)
         
         _logger = logging.getLogger('autorino')
         
         ts = utils.get_timestamp()
         log_name = "_".join((ts , ".log"))
-        log_path = os.path.join(out_dir,log_name)
+        log_path = os.path.join(log_dir_use,log_name)
 
         log_cfg_dic = logconfig.logconfig.log_config_dict
         fmt_dic = log_cfg_dic['formatters']['fmtgzyx_nocolor']
@@ -178,7 +293,7 @@ class StepGnss():
                       out_dir=None, 
                       step_suffix=''):
         if not out_dir:
-            out_dir=self.session.tmp_dir
+            out_dir=self.tmp_dir
                           
         ts = utils.get_timestamp()
         talo_name = "_".join((ts , step_suffix , "table.log"))
@@ -238,7 +353,7 @@ class StepGnss():
             ### print it in the logger (if silent , just return it)
             name = type(self).__name__
             logger.info("%s %s/%s\n%s",name,
-                                       self.session.site,
+                                       self.site_id,
                                        self.epoch_range,
                                        str_out)
         if no_return:
@@ -252,7 +367,7 @@ class StepGnss():
                                  inp_regex=".*",
                                  reset_table=True):
         if reset_table:
-            self._table_init(init_epoch=False)
+            self._init_table(init_epoch=False)
         
         flist = input_list_reader(input_files,
                                   inp_regex)
@@ -267,7 +382,7 @@ class StepGnss():
                                         input_table,
                                         reset_table=True):
         if reset_table:
-            self._table_init(init_epoch=False)
+            self._init_table(init_epoch=False)
                           
         self.table['fpath_inp'] = input_table['fpath_out'].values
         self.table['size_inp'] = input_table['size_out'].values
@@ -280,7 +395,6 @@ class StepGnss():
         return None
     
     def guess_local_files(self,
-                          guess_remote=True,
                           guess_local=True):
         """
         Guess the paths and name of the local files based on the 
@@ -289,9 +403,6 @@ class StepGnss():
         see also method guess_remote_files(), 
         a specific method for DownloadGnss objects 
         """
-        
-        if not self.session.remote_fname:
-            logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
         
         rmot_paths_list = []
         local_paths_list = []
@@ -306,7 +417,7 @@ class StepGnss():
 
             local_path_use = arogen.translator(local_path_use,
                                                epoch,
-                                               self.session.translate_dict)
+                                               self.translate_dict)
                                         
             local_fname_use = os.path.basename(local_path_use)
                                        
@@ -323,7 +434,6 @@ class StepGnss():
         logger.info("nbr local files guessed: %s",len(local_paths_list))
 
         return local_paths_list
-
 
 #  ______ _ _ _              _        _     _      
 # |  ____(_) | |            | |      | |   | |     
@@ -556,6 +666,33 @@ class StepGnss():
 # | |  | | \__ \ (__ _  | | | |_| | | | | (__| |_| | (_) | | | \__ \ 
 # |_|  |_|_|___/\___(_) |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/ 
                                                                  
+
+def create_dummy_site_dic():
+    d = dict()   
+    
+    d['name'] = 'RVAG'
+    d['id'] = 'RVAG00REU'
+    d['domes'] = '00000X000'
+    d['sitelog_path'] = '/null'
+    d['position_xyz'] = (1,2,3)
+    
+    return d
+
+
+def create_dummy_session_dic():
+    
+    d = dict()
+    
+    d['name'] = 'NA' 
+    d['data_frequency'] =    "30S" 
+    d['tmp_dir_parent'] =    '/home/sysop/workflow_tests/temp'
+    d['tmp_dir_structure'] = '<site_id9>/%Y/%j'  
+    d['log_parent_dir'] =  '/home/sysop/workflow_tests/log'
+    d['log_dir_structure'] = '<site_id9>/%Y/%j'
+    d['out_dir_parent'] =    '/home/sysop/workflow_tests/conv_tests/'
+    d['out_dir_structure'] = '<site_id9>/%Y/%j'
+    
+    return d
 
 
 def input_list_reader(inp_fil,inp_regex=".*"):
