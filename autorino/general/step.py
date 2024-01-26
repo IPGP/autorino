@@ -235,8 +235,8 @@ class StepGnss():
         
         logger.info("new %s",self.epoch_range)
         
-    def translate_path(self,path_inp):
-        return arogen.translator(path_inp,self.translate_dict,epoch_inp=None)
+    def translate_path(self,path_inp,epoch_inp=None):
+        return arogen.translator(path_inp,self.translate_dict,epoch_inp)
         
         
         

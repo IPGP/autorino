@@ -103,32 +103,30 @@ class ConvertRinexModGnss(arogen.StepGnss):
         """
         effective translation and creation of temp dirs
         """
+        tmp_dir_logs_set = self.translate_path(self.tmp_dir_logs)
         tmp_dir_unzipped_set = self.translate_path(self.tmp_dir_unzipped)
         tmp_dir_converted_set = self.translate_path(self.tmp_dir_converted)
         tmp_dir_rinexmoded_set = self.translate_path(self.tmp_dir_rinexmoded)
         
-        utils.create_dir(self.tmp_dir_unzipped_set)
-        utils.create_dir(self.tmp_dir_converted_set)
-        utils.create_dir(self.tmp_dir_rinexmoded_set)
+        utils.create_dir(tmp_dir_logs_set)
+        utils.create_dir(tmp_dir_unzipped_set)
+        utils.create_dir(tmp_dir_converted_set)
+        utils.create_dir(tmp_dir_rinexmoded_set)
         
-        return tmp_dir_unzipped_set, tmp_dir_converted_set, tmp_dir_rinexmoded_set
+        return tmp_dir_logs_set, tmp_dir_unzipped_set, tmp_dir_converted_set, tmp_dir_rinexmoded_set
+    
+    ###############################################
 
-        
-        
-        
     def convert_rnxmod(self):
-        ###############################################
         if self.sitelogs:
             site4_list = site_list_from_sitelogs(self.sitelogs)
         else:
             site4_list = []
         
+        tmp_dir_logs_use,_,_,_ = self.set_conv_tmp_dirs_paths()
+
         ### initialize the table as log
-        self.set_table_log(out_dir=self.tmp_dir_logs)
-        # ts = utils.get_timestamp()
-        # log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
-        # log_table_df_void = pd.DataFrame([], columns=self.table.columns)
-        # log_table_df_void.to_csv(log_table,mode="w",index=False)
+        self.set_table_log(out_dir=tmp_dir_logs_use)
 
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
@@ -137,8 +135,6 @@ class ConvertRinexModGnss(arogen.StepGnss):
         
         logger.info("******** RINEX conversion / Header mod ('rinexmod') for %6i files",
                     n_ok_inp)        
-        
-        tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_conv_tmp_dirs_paths()
         
         logger.info("%6i files are excluded",
                     n_not_ok_inp)
@@ -149,8 +145,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
-
-
+            _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_conv_tmp_dirs_paths()
             ### manage compressed files
             if ext in ('.GZ','.7Z','.7ZIP','.ZIP','.Z'):
                 logger.debug("%s is compressed",fraw)
@@ -160,7 +155,6 @@ class ConvertRinexModGnss(arogen.StepGnss):
             # we search it w.r.t. the sites from the sitelogs
             site =  _site_search_from_list(fraw,
                                            site4_list)     
-
 
             utils.create_dir(tmp_dir_rinexmoded_use)
             
