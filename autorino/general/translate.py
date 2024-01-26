@@ -45,12 +45,12 @@ def _translator_keywords(path_inp,translator_dict):
     path_translated = str(path_inp)
     
     ### replace system envionnemt variables
-    if re.match('<\$.*>',path_translated):
+    if re.search('<\$.*>',path_translated):
         for k,v in os.environ.items():
             path_translated = path_translated.replace("<$"+k+">",str(v))
         
     ### replace autorino variable (without a <$....>)
-    if re.match('<(?!.*\$).*>',path_translated):    
+    if re.search('<(?!.*\$).*>',path_translated):    
         for k,v in translator_dict.items():
             path_translated = path_translated.replace("<"+k+">",str(v))
             

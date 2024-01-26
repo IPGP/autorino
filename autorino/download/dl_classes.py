@@ -32,6 +32,8 @@ class DownloadGnss(arogen.StepGnss):
                          site_id=site_id)
 
         self.access = access
+        self.remote_dir = remote_dir
+        self.remote_fname = remote_fname
                 
     def guess_remote_files(self):
         """
@@ -62,6 +64,8 @@ class DownloadGnss(arogen.StepGnss):
             rmot_path_use = arogen.translator(rmot_path_use,
                                               epoch,
                                               self.translate_dict)
+
+            print("AAAAAAAAAAAAAAA",self.translate_dict,rmot_path_use)
                                        
             rmot_fname_use = os.path.basename(rmot_path_use)
                                        
@@ -109,8 +113,8 @@ class DownloadGnss(arogen.StepGnss):
             elif self.access['protocol'] == "ftp":
                 list_ = arodl.list_remoteo_files_ftp(self.access['hostname'],
                                                    rmot_dir_use,
-                                                   self.access['sta_user'],
-                                                   self.access['sta_user'])
+                                                   self.access['login'],
+                                                   self.access['password'])
                 rmot_files_list = rmot_files_list + list_
             else:
                 logger.error("wrong protocol")
@@ -214,8 +218,8 @@ class DownloadGnss(arogen.StepGnss):
                 try:
                     file_dl = arodl.download_file_ftp(rmot_file,
                                                       tmpdir_use,
-                                                      self.access['sta_user'],
-                                                      self.access['sta_pass'])
+                                                      self.access['login'],
+                                                      self.access['password'])
                     shutil.copy(file_dl,outdir_use)
                     dl_ok = True
                 except ftplib.error_perm as e:
