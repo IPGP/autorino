@@ -66,6 +66,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
         if sitelogs:
             self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs,
                                                               force=False)
+        else:
+            self.sitelogs = None
             
     ########### ConvertRinexModGnss specific methods        
 
@@ -94,10 +96,12 @@ class ConvertRinexModGnss(arogen.StepGnss):
         
     def convert_rnxmod(self):
         ###############################################
-        site4_list = site_list_from_sitelogs(self.sitelogs)
+        if self.sitelogs:
+            site4_list = site_list_from_sitelogs(self.sitelogs)
+        else:
+            site4_list = []
         
         ### initialize the table as log
-
         self.set_table_log(out_dir=self.tmp_dir_logs)
         # ts = utils.get_timestamp()
         # log_table = os.path.join(tmpdir_logs,ts + "_conv_table.log")
@@ -208,7 +212,6 @@ class ConvertRinexModGnss(arogen.StepGnss):
             utils.create_dir(outdir_use)
             shutil.copy(frnxfin,outdir_use)
                 
-       
         return None
 
 
