@@ -12,7 +12,7 @@ import os
 
 ##### Frontend function
 
-def translator(path_inp,epoch_inp=None,translator_dict=None):
+def translator(path_inp,translator_dict=None,epoch_inp=None):
     path_translated = str(path_inp)
     if epoch_inp:
         path_translated = _translator_epoch(path_translated,epoch_inp)
