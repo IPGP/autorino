@@ -234,6 +234,12 @@ class StepGnss():
         self.epoch_range.period = period_new
         
         logger.info("new %s",self.epoch_range)
+        
+    def translate_path(self,path_inp):
+        return arogen.translator(path_inp,self.translate_dict,epoch_inp=None)
+        
+        
+        
 
 
 
@@ -260,9 +266,7 @@ class StepGnss():
             log_dir = log_dir_inp
             
             
-        log_dir_use = arogen.translator(log_dir,
-                                        None, 
-                                        self.translate_dict)
+        log_dir_use = self.translate_path(log_dir)
         
         _logger = logging.getLogger('autorino')
         
@@ -415,9 +419,8 @@ class StepGnss():
             local_path_use = os.path.join(local_dir_use,
                                           local_fname_use)
 
-            local_path_use = arogen.translator(local_path_use,
-                                               epoch,
-                                               self.translate_dict)
+            local_path_use = self.translate_path(local_path_use,
+                                                 epoch)
                                         
             local_fname_use = os.path.basename(local_path_use)
                                        
