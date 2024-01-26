@@ -86,13 +86,24 @@ class ConvertRinexModGnss(arogen.StepGnss):
         self.tmp_dir_rinexmoded = os.path.join(self.tmp_dir,
                                                tmp_subdir_rnxmod) 
 
-        utils.create_dir(self.tmp_dir_logs)
-        utils.create_dir(self.tmp_dir_unzipped)
-        utils.create_dir(self.tmp_dir_converted)
-        utils.create_dir(self.tmp_dir_rinexmoded)
 
         return self.tmp_dir_logs, self.tmp_dir_unzipped, \
             self.tmp_dir_converted, self.tmp_dir_rinexmoded 
+            
+            
+    def set_conv_tmp_dirs_paths(self):
+        tmp_dir_unzipped_set = self.translate_path(self.tmp_dir_unzipped)
+        tmp_dir_converted_set = self.translate_path(self.tmp_dir_converted)
+        tmp_dir_rinexmoded_set = self.translate_path(self.tmp_dir_rinexmoded)
+        
+        utils.create_dir(self.tmp_dir_unzipped_set)
+        utils.create_dir(self.tmp_dir_converted_set)
+        utils.create_dir(self.tmp_dir_rinexmoded_set)
+        
+        return tmp_dir_unzipped_set, tmp_dir_converted_set, tmp_dir_rinexmoded_set
+
+        
+        
         
     def convert_rnxmod(self):
         ###############################################
@@ -116,6 +127,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
         logger.info("******** RINEX conversion / Header mod ('rinexmod') for %6i files",
                     n_ok_inp)        
         
+        tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_conv_tmp_dirs_paths()
+        
         logger.info("%6i files are excluded",
                     n_not_ok_inp)
         
@@ -125,15 +138,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
-            tmp_dir_unzipped_use = arogen.translator(self.tmp_dir_unzipped, 
-                                                      epoch_inp=None,
-                                                      translator_dict=self.translate_dict)
-            tmp_dir_converted_use = arogen.translator(self.tmp_dir_converted, 
-                                                      epoch_inp=None,
-                                                      translator_dict=self.translate_dict)
-            tmp_dir_rinexmoded_use = arogen.translator(self.tmp_dir_rinexmoded, 
-                                                       epoch_inp=None,
-                                                       translator_dict=self.translate_dict)
+
 
             ### manage compressed files
             if ext in ('.GZ','.7Z','.7ZIP','.ZIP','.Z'):
@@ -214,9 +219,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
             ###### FINAL MOVE                             
             ### def output folders        
             #### !!!!! ADD THE EXCEPTION AND TABLE UPDATE !!!!
-            outdir_use = arogen.translator(self.out_dir,
-                                           self.table.loc[irow,'epoch_srt'], 
-                                           self.translate_dict)
+            outdir_use = self.translate_path(self.out_dir,
+                                             self.table.loc[irow,'epoch_srt'])
             ### do the move 
             utils.create_dir(outdir_use)
             shutil.copy(frnxfin,outdir_use)

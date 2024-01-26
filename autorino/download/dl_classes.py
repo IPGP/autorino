@@ -61,11 +61,9 @@ class DownloadGnss(arogen.StepGnss):
                                            rmot_dir_use,
                                            rmot_fname_use)
 
-            rmot_path_use = arogen.translator(rmot_path_use,
-                                              epoch,
-                                              self.translate_dict)
+            rmot_path_use = self.translate_path(rmot_path_use,
+                                                epoch)
 
-            print("AAAAAAAAAAAAAAA",self.translate_dict,rmot_path_use)
                                        
             rmot_fname_use = os.path.basename(rmot_path_use)
                                        
@@ -94,8 +92,8 @@ class DownloadGnss(arogen.StepGnss):
         rmot_dir_list = []
         for epoch in self.epoch_range.epoch_range_list():
             rmot_dir_use = str(self.remote_dir)
-            rmot_dir_use = arogen.translator(rmot_dir_use,epoch,
-                                             self.translate_dict)
+            rmot_dir_use = self.translate_path(rmot_dir_use,
+                                               epoch)
             rmot_dir_list.append(rmot_dir_use)
             
         rmot_dir_list = sorted(list(set(rmot_dir_list)))
@@ -186,9 +184,8 @@ class DownloadGnss(arogen.StepGnss):
             ###### use the guessed local file as destination or the generic directory                
             if not local_file: #### the local file has not been guessed
                 outdir_use = str(self.out_dir)
-                outdir_use = arogen.translator(outdir_use,
-                                               epoch,
-                                               self.translate_dict)
+                outdir_use = self.translate_path(outdir_use,
+                                                 epoch)
             else: #### the local file has been guessed before
                 outdir_use = os.path.dirname(local_file)
                 
