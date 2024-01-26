@@ -60,7 +60,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
                          site_id=site_id)
 
         ### temp dirs init
-        self._set_conv_tmp_dirs_paths() 
+        self._init_conv_tmp_dirs_paths() 
 
         ### sitelog init
         if sitelogs:
@@ -71,12 +71,12 @@ class ConvertRinexModGnss(arogen.StepGnss):
             
     ########### ConvertRinexModGnss specific methods        
 
-    def _set_conv_tmp_dirs_paths(self, 
-                                 tmp_subdir_logs='logs',
-                                 tmp_subdir_unzip='unzipped',
-                                 tmp_subdir_conv='converted',
-                                 tmp_subdir_rnxmod='rinexmoded'):
-
+    def _init_conv_tmp_dirs_paths(self, 
+                                  tmp_subdir_logs='logs',
+                                  tmp_subdir_unzip='unzipped',
+                                  tmp_subdir_conv='converted',
+                                  tmp_subdir_rnxmod='rinexmoded'):
+ 
         self.tmp_dir_logs = os.path.join(self.tmp_dir,
                                          tmp_subdir_logs)
         self.tmp_dir_unzipped = os.path.join(self.tmp_dir,
@@ -125,19 +125,27 @@ class ConvertRinexModGnss(arogen.StepGnss):
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
+            tmp_dir_unzipped_use = arogen.translator(self.tmp_dir_unzipped, 
+                                                      epoch_inp=None,
+                                                      translator_dict=self.translate_dict)
+            tmp_dir_converted_use = arogen.translator(self.tmp_dir_converted, 
+                                                      epoch_inp=None,
+                                                      translator_dict=self.translate_dict)
+            tmp_dir_rinexmoded_use = arogen.translator(self.tmp_dir_rinexmoded, 
+                                                       epoch_inp=None,
+                                                       translator_dict=self.translate_dict)
+
             ### manage compressed files
             if ext in ('.GZ','.7Z','.7ZIP','.ZIP','.Z'):
                 logger.debug("%s is compressed",fraw)
-                fraw = Path(gunzip(fraw, self.tmp_dir_unzipped))
+                fraw = Path(gunzip(fraw, tmp_dir_unzipped_use))
  
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
             site =  _site_search_from_list(fraw,
                                            site4_list)     
 
-            tmp_dir_rinexmoded_use = os.path.join(self.tmp_dir_rinexmoded,
-                                                  site.upper())
-                                                 
+
             utils.create_dir(tmp_dir_rinexmoded_use)
             
             ### do a first converter selection by removing odd files 
@@ -161,7 +169,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
             self.table.loc[irow,'ok_inp'] = True
     
             frnxtmp, _ = arocnv.converter_run(fraw,
-                                              self.tmp_dir_converted,
+                                              tmp_dir_converted_use, 
                                               converter = conve)
             if frnxtmp:
                 ### update table if things go well
@@ -185,6 +193,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
                                                 sitelog=self.sitelogs,
                                                 force_rnx_load=True,
                                                 verbose=False,
+                                                tolerant_file_period=True,
                                                 full_history=True)
                 ### update table if things go well
                 self.table.loc[irow,'ok_out'] = True
