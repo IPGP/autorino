@@ -202,6 +202,15 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         bin_options = [] 
         bin_kwoptions = dict() 
         
+    ##### GFZRNX
+    elif converter_inp == 'converto':
+        converter_name = "converto"
+        brand = "RINEX Handeling (IGN)"
+        cmd_build_fct = arcv.cmd_build_converto
+        conv_regex_fct = arcv.conv_regex_converto
+        bin_options = [] 
+        bin_kwoptions = dict() 
+    
         
     else:
         logger.error("unable to find the right converter for %s",
@@ -339,6 +348,7 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
                                                    bin_options_use,
                                                    bin_kwoptions_use)
                                                    ##### BIN PATH !!!!! XXXXX
+                                                   
     logger.debug("conversion command: %s", cmd_str)
 
     ############# run the external conversion programm #############
