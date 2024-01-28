@@ -6,7 +6,7 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-from geodezyx import utils,operational
+from geodezyx import utils,operational,conv
 import autorino.convert as arocnv
 from rinexmod import rinexmod_api
 from pathlib import Path
@@ -19,7 +19,7 @@ import dateutil
 import docker
 import pandas as pd
 import shutil
-
+import hatanaka
 import autorino.general as arogen
 
 
@@ -28,9 +28,6 @@ import autorino.general as arogen
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
-
-
-
 
 class ConvertRinexModGnss(arogen.StepGnss):
     def __init__(self,out_dir,tmp_dir,log_dir,
@@ -128,22 +125,22 @@ class ConvertRinexModGnss(arogen.StepGnss):
         
         for irow,row in table_init_ok.iterrows(): 
             fraw = Path(row['fpath_inp'])
-            ext = fraw.suffix.upper()
+            ext = fraw.suffix.lower()
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
             _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_conv_tmp_dirs_paths()
+
             ### manage compressed files
-            if ext in ('.GZ','.7Z','.7ZIP','.ZIP','.Z'):
+            if ext in ('.gz',):
                 logger.debug("%s is compressed",fraw)
-                fraw = Path(gunzip(fraw, tmp_dir_unzipped_use))
+                fraw = Path(decompress(fraw, tmp_dir_unzipped_use))
  
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
             site =  _site_search_from_list(fraw,
                                            site4_list)     
 
-            utils.create_dir(tmp_dir_rinexmoded_use)
             
             ### do a first converter selection by removing odd files 
             conve = _select_conv_odd_file(fraw)
@@ -172,8 +169,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
                 ### update table if things go well
                 self.table.loc[irow,'fpath_out'] = frnxtmp
                 epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
-                self.table.loc[irow,'epoch_srt'],\
-                    self.table.loc[irow,'epoch_end'] = epo_srt_ok, epo_end_ok 
+                self.table.loc[irow,'epoch_srt'] = epo_srt_ok
+                self.table.loc[irow,'epoch_end'] = epo_end_ok 
                 self.table.loc[irow,'ok_out'] = True
             else:
                 ### update table if things go wrong
@@ -319,23 +316,61 @@ def stop_long_running_containers(max_running_time=120):
             
     return None
 
-def gunzip(gzip_file_inp, out_dir_inp = None):
-    gzip_file = Path(gzip_file_inp)
+def _decompress_gzip(gzip_file_inp, out_dir_inp = None):
+    gzip_file2 = Path(gzip_file_inp)
 
     if not out_dir_inp:
-        out_dir = gzip_file.parent
+        out_dir = gzip_file2.parent
     else:
         out_dir = Path(out_dir_inp)
 
-    file_out = out_dir.joinpath(gzip_file.stem)
+    file_out = out_dir.joinpath(gzip_file2.stem)
 
     with gzip.open(gzip_file_inp, 'rb') as f_in:
         with open(file_out, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
+            
+    logger.debug("decompress (gzip): %s > %s", gzip_file2.name, file_out)
 
     return str(file_out)
 
 
+def _decompress_hatanaka(crx_file_inp,out_dir_inp = None):
+    
+    crx_file_inp2 = Path(crx_file_inp)
+    
+    if out_dir_inp:
+        crx_file = shutil.copy2(crx_file_inp, out_dir_inp)
+        dell = True
+    else:
+        crx_file = crx_file_inp
+        dell = False
+    
+    rnx_file_out = hatanaka.decompress_on_disk(crx_file,delete=dell)
+    logger.debug("decompress (hatanaka): %s > %s", crx_file_inp2.name,
+                 rnx_file_out)
+    
+    return str(rnx_file_out)
+    
+
+def decompress(file_inp,
+               out_dir_inp = None):
+    
+    file_inp2 = Path(file_inp)
+    
+    ### RINEX Case
+    if conv.rinex_regex_search_tester(file_inp,compressed=True):
+        file_out = _decompress_hatanaka(file_inp,out_dir_inp)
+    ### Generic gzipped case (e.g. RAW file)
+    elif file_inp2.ext == ".gz":
+        file_out = _decompress_gzip(file_inp,out_dir_inp)
+    else:
+        logger.info("no valid compression for %s, nothing is done", 
+                    file_inp2.name)
+        file_out = file_inp
+        
+    return file_out
+    
 
 
 #################################################
