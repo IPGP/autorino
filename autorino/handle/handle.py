@@ -43,8 +43,13 @@ class HandleGnss(arogen.StepGnss):
         
         frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
                                           tmp_dir_use,
-                                          'gfzrnx',
-                                          bin_options=['-f'])
+                                          'converto',
+                                          bin_options=['-cat'])
+        
+        # frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+        #                                   tmp_dir_use,
+        #                                   'converto',
+        #                                   bin_options=['-cat'])
         
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
