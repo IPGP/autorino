@@ -15,6 +15,10 @@ import autorino.convert as arocnv
 #import autorino.epochrange as aroepo
 
 import yaml
+
+# Create a logger object.
+import logging
+logger = logging.getLogger(__name__)
     
 def read_configfile(configfile_path):
     y = yaml.safe_load(open(configfile_path))
@@ -28,8 +32,12 @@ def read_configfile(configfile_path):
     y_sessions_list = y_station["sessions_list"]
     
     for yses in y_sessions_list:
+        
+        _check_parent_dir_existence(yses['tmp_dir_parent'])
         tmp_dir = os.path.join(yses['session']['tmp_dir_parent'],
                                yses['session']['tmp_dir_structure'])
+
+        _check_parent_dir_existence(yses['log_dir_parent'])
         log_dir = os.path.join(yses['session']['log_dir_parent'],
                                yses['session']['log_dir_structure'])
         
@@ -45,6 +53,7 @@ def read_configfile(configfile_path):
         y_workflow =  yses['workflow']    
         for k_step, ywkf in y_workflow.items():
                     
+            _check_parent_dir_existence(ywkf['out_dir_parent'])
             out_dir = os.path.join(ywkf['out_dir_parent'],
                                    ywkf['out_dir_structure'])
             
@@ -77,70 +86,82 @@ def read_configfile(configfile_path):
     return workflow_lis, y_site, y_device, y_access
                 
     
+def _check_parent_dir_existence(parent_dir_inp):
+    """
+    will translate it with the environnement variable first
+
+    """
+    parent_dir_out = arogen.translator(parent_dir_inp)
+    
+    if  not os.path.isdir(parent_dir_out):
+        logger.error("%s do not exists, create it first")
+        raise Exception
+    else:
+        return None
 ###################### FUNCTION GRAVEYARD
 
 
 
-def session_download_from_configfile(configfile_path):
+# def session_download_from_configfile(configfile_path):
     
-    y1 = yaml.safe_load(open(configfile_path))
+#     y1 = yaml.safe_load(open(configfile_path))
     
-    ystat = y1["station"]
+#     ystat = y1["station"]
 
-    protocol = ystat["access"]["protocol"]
-    hostname = ystat["access"]["hostname"]
-    sta_user = ystat["access"]["login"]
-    sta_pass = ystat["access"]["password"]
-    site = ystat["site"]    
+#     protocol = ystat["access"]["protocol"]
+#     hostname = ystat["access"]["hostname"]
+#     sta_user = ystat["access"]["login"]
+#     sta_pass = ystat["access"]["password"]
+#     site = ystat["site"]    
     
-    ysess_lst = ystat["sessions_list"]
+#     ysess_lst = ystat["sessions_list"]
     
-    sess_stk, dwnld_stk = [], []
+#     sess_stk, dwnld_stk = [], []
     
-    for yses_i in ysess_lst:
-        ########### session
-        yses = yses_i["session"]
-        name = yses["name"]
+#     for yses_i in ysess_lst:
+#         ########### session
+#         yses = yses_i["session"]
+#         name = yses["name"]
         
-        session_period = yses["file_period"]
-        remote_dir = yses["remote_dir"]
-        tmp_dir = yses["tmp_dir"]
-        remote_fname = yses["remote_fname"]    
+#         session_period = yses["file_period"]
+#         remote_dir = yses["remote_dir"]
+#         tmp_dir = yses["tmp_dir"]
+#         remote_fname = yses["remote_fname"]    
         
-        sess = arogen.SessionGnss(name = name,
-                                  protocol = protocol,
-                                  remote_dir=remote_dir,
-                                  tmp_dir=tmp_dir,
-                                  hostname=hostname,
-                                  sta_user=sta_user,
-                                  sta_pass=sta_pass,
-                                  site=site,
-                                  session_period=session_period,
-                                  remote_fname=remote_fname)
+#         sess = arogen.SessionGnss(name = name,
+#                                   protocol = protocol,
+#                                   remote_dir=remote_dir,
+#                                   tmp_dir=tmp_dir,
+#                                   hostname=hostname,
+#                                   sta_user=sta_user,
+#                                   sta_pass=sta_pass,
+#                                   site=site,
+#                                   session_period=session_period,
+#                                   remote_fname=remote_fname)
         
-        sess_stk.append(sess)
+#         sess_stk.append(sess)
 
-        ##### Epoch rang
-        Yepochrang = yses_i["epoch_range"]        
-        rang = arogen.EpochRange(Yepochrang["epoch1"],
-                                 Yepochrang["epoch2"],
-                                 session_period)
+#         ##### Epoch rang
+#         Yepochrang = yses_i["epoch_range"]        
+#         rang = arogen.EpochRange(Yepochrang["epoch1"],
+#                                  Yepochrang["epoch2"],
+#                                  session_period)
 
-        ############ Workflow
-        ##### Download
-        Ywfl = yses_i["workflow"]
-        ydwnld = Ywfl["download"]
+#         ############ Workflow
+#         ##### Download
+#         Ywfl = yses_i["workflow"]
+#         ydwnld = Ywfl["download"]
         
-        output_dir_parent = ydwnld["output_dir_parent"] 
-        output_dir_struture = ydwnld["output_dir_structure"] 
-        output_path = os.path.join(output_dir_parent,
-                                   output_dir_struture)
+#         output_dir_parent = ydwnld["output_dir_parent"] 
+#         output_dir_struture = ydwnld["output_dir_structure"] 
+#         output_path = os.path.join(output_dir_parent,
+#                                    output_dir_struture)
        
-        dwnld = arodwl.DownloadGnss(sess,rang,output_path)
+#         dwnld = arodwl.DownloadGnss(sess,rang,output_path)
         
-        dwnld_stk.append(dwnld)
+#         dwnld_stk.append(dwnld)
         
-    # if len(sess_stk) < 2:
-        # return sess_stk[0], req_stk[0]
-    # else:
-    return sess_stk, dwnld_stk
+#     # if len(sess_stk) < 2:
+#         # return sess_stk[0], req_stk[0]
+#     # else:
+#     return sess_stk, dwnld_stk

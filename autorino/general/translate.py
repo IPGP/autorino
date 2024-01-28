@@ -14,6 +14,7 @@ import os
 
 def translator(path_inp,translator_dict=None,epoch_inp=None):
     path_translated = str(path_inp)
+    path_translated = _translator_env_variables(path_translated)
     if epoch_inp:
         path_translated = _translator_epoch(path_translated,epoch_inp)
     if translator_dict:
@@ -43,11 +44,6 @@ def _translator_epoch(path_inp,epoch_inp):
 
 def _translator_keywords(path_inp,translator_dict):
     path_translated = str(path_inp)
-    
-    ### replace system envionnemt variables
-    if re.search('<\$.*>',path_translated):
-        for k,v in os.environ.items():
-            path_translated = path_translated.replace("<$"+k+">",str(v))
         
     ### replace autorino variable (without a <$....>)
     if re.search('<(?!.*\$).*>',path_translated):    
@@ -55,4 +51,16 @@ def _translator_keywords(path_inp,translator_dict):
             path_translated = path_translated.replace("<"+k+">",str(v))
             
     return path_translated
+
+
+def _translator_env_variables(path_inp):
+    path_translated = str(path_inp)
     
+    ### replace system envionnemt variables
+    if re.search('<\$.*>',path_translated):
+        for k,v in os.environ.items():
+            path_translated = path_translated.replace("<$"+k+">",str(v))
+    
+    return path_translated
+
+

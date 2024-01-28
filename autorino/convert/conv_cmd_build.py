@@ -901,7 +901,7 @@ def cmd_build_gfzrnx(inp_raw_fpath,
                      out_dir,
                      bin_options_custom=[],
                      bin_kwoptions_custom=dict(),
-                     bin_path="gfzrnx"):
+                     bin_path="/home/psakicki/SOFTWARE/GFZRNX/GFZRNX"):
     """
     Build a command to launch gfzrnx, for RINEX Handeling
     
@@ -1177,13 +1177,13 @@ def cmd_build_gfzrnx(inp_raw_fpath,
         raw_fpath_multi = [Path(inp_raw_fpath)]
         raw_fpath_mono = Path(inp_raw_fpath)
            
-    raw_fpath_str_lst = [e.name for e in raw_fpath_multi]
+    raw_fpath_str_lst = [str(e) for e in raw_fpath_multi]
     out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_gfzrnx")   
     
     cmd_opt_list , _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
     
-    cmd_list = [bin_path,'-inp'] + raw_fpath_str_lst  + ['-out', out_fpath] + cmd_opt_list + cmd_kwopt_list
+    cmd_list = [bin_path,'-finp'] + raw_fpath_str_lst  + ['-fout', out_fpath] + cmd_opt_list + cmd_kwopt_list
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]

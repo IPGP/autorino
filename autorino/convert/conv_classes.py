@@ -30,19 +30,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
 
-def site_list_from_sitelogs(sitelogs_inp):
-    ###############################################
-    ### read sitelogs        
-    if not type(sitelogs_inp) is list and os.path.isdir(sitelogs_inp):
-        sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
-                                                     force=False)
-    else:
-        sitelogs = sitelogs_inp
-    
-    ### get the site (4chars) as a list 
-    site4_list = [s.site4char for s in sitelogs]
-    
-    return site4_list
 
 
 class ConvertRinexModGnss(arogen.StepGnss):
@@ -235,6 +222,24 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
 #########################################################################
 #### Misc functions 
+
+def site_list_from_sitelogs(sitelogs_inp):
+    """
+    From a list of sitelogs, get a site id list (4 chars)
+    """
+    ###############################################
+    ### read sitelogs        
+    if not type(sitelogs_inp) is list and os.path.isdir(sitelogs_inp):
+        sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
+                                                     force=False)
+    else:
+        sitelogs = sitelogs_inp
+    
+    ### get the site (4chars) as a list 
+    site4_list = [s.site4char for s in sitelogs]
+    
+    return site4_list
+
 def _site_search_from_list(fraw_inp,site4_list_inp):
     """
     from a raw file with an approximate site name and a list of correct 
@@ -248,6 +253,9 @@ def _site_search_from_list(fraw_inp,site4_list_inp):
     if not site_out: # last chance, get the 4 1st chars of the raw file
         site_out = fraw_inp.name[:4]
     return site_out
+
+
+
 
 def _select_conv_odd_file(fraw_inp,
                           ext_excluded=[".TG!$",
