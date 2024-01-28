@@ -14,7 +14,7 @@ import os
 import re
 import copy
  
-from geodezyx import utils
+from geodezyx import utils, conv
 
 #import autorino.epochrange as aroepo
 import autorino.general as arogen
@@ -24,7 +24,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 class StepGnss():
-    
     def __init__(self,
                  out_dir,tmp_dir,log_dir,
                  epoch_range,
@@ -164,7 +163,7 @@ class StepGnss():
     def _init_site_id(self,site_id):
         """
         if a site id is not explicitely given, take the one from the site dict 
-        A dummy site dict  will be created in the worst case, ensuring that 
+        A dummy site dict will be created in the worst case, ensuring that 
         site_id will be always initialized
         """
         if not site_id:
@@ -212,6 +211,33 @@ class StepGnss():
         return copy.deepcopy(self)
     
     
+    def update_epoch_table_cols_from_fname(self,use_rnx_filename=False):
+        from rinexmod import rinexfile
+
+        is_rnx = self.table['fname'].apply(conv.rinex_regex_search_tester).apply(bool)
+        
+        if is_rnx.sum() == 0:
+            logger.warn("epoch update impossible, no file matches a RINEX pattern in %s",self)
+            return 
+            
+        for irow,row in self.table.iterrows(): 
+            
+            if not use_rnx_filename:
+                rnx = rinexfile.RinexFile(row['fpath_inp'])
+                epo_srt = rnx.start_date
+                epo_end = rnx.end_date
+            else:
+                epo_srt, epo_end, _ = rinexfile.dates_from_rinex_filename(row['fpath_inp'])
+            
+            self.table.loc[irow,'epoch_srt'] = epo_srt 
+            self.table.loc[irow,'epoch_end'] = epo_end 
+            
+        self.table['epoch_srt'] = pd.to_datetime(self.table['epoch_srt'])
+        self.table['epoch_end'] = pd.to_datetime(self.table['epoch_end'])
+            
+        return
+            
+    
     def update_epoch_range_from_table(self,
                                       column='epoch_srt'):
         """
@@ -234,6 +260,7 @@ class StepGnss():
         self.epoch_range.period = period_new
         
         logger.info("new %s",self.epoch_range)
+        
         
     def translate_path(self,path_inp,epoch_inp=None):
         return arogen.translator(path_inp,self.translate_dict,epoch_inp)
@@ -370,6 +397,7 @@ class StepGnss():
                                  input_files,
                                  inp_regex=".*",
                                  reset_table=True):
+                                 #update_epoch_range=True):
         if reset_table:
             self._init_table(init_epoch=False)
         
@@ -377,7 +405,12 @@ class StepGnss():
                                   inp_regex)
                 
         self.table['fpath_inp'] = flist
+        self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
         self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
+
+        
+        #if update_epoch_range:
+        #    self.update_epoch_range_from_table()
         
         return flist
         
@@ -634,13 +667,13 @@ class StepGnss():
             out = self.table[self.table[col]]
         return out
     
-    
-    def group_epochs(self,
-                     period = '1d',
-                     rolling_period=False,
-                     rolling_ref=-1,
-                     round_method = 'floor'):
-        
+    def divide_step_by_epochs(self,
+                              period = '1d',
+                              rolling_period=False,
+                              rolling_ref=-1,
+                              round_method = 'floor',
+                              drop_epoch_rnd=False):
+                
         epoch_rnd = arogen.round_epochs(self.table['epoch_srt'],
                                         period=period,
                                         rolling_period=rolling_period,
@@ -651,17 +684,22 @@ class StepGnss():
         
         grps = self.table.groupby('epoch_rnd')
         
-        wrkflw_lis_out = []
+        stp_obj_lis_out = []
         
         for tgrp, tabgrp in grps:
-            wrkflw = self.copy()
-            tabgrp_bis = tabgrp.drop('epoch_rnd',axis=1)
-            wrkflw.table = tabgrp_bis
-            wrkflw_lis_out.append(wrkflw)
+            stp_obj = self.copy()
+            
+            if drop_epoch_rnd:
+                tabgrp_bis = tabgrp.drop('epoch_rnd',axis=1)
+            else:
+                tabgrp_bis = pd.DataFrame(tabgrp)
+            stp_obj.table = tabgrp_bis
+            stp_obj_lis_out.append(stp_obj)
     
-        return wrkflw_lis_out          
-        
-
+        return stp_obj_lis_out
+    
+    
+    
 #  __  __ _               __                  _   _                  
 # |  \/  (_)             / _|                | | (_)                 
 # | \  / |_ ___  ___    | |_ _   _ _ __   ___| |_ _  ___  _ __  ___  
@@ -674,7 +712,7 @@ def create_dummy_site_dic():
     d = dict()   
     
     d['name'] = 'RVAG'
-    d['id'] = 'RVAG00REU'
+    d['site_id'] = 'RVAG00REU'
     d['domes'] = '00000X000'
     d['sitelog_path'] = '/null'
     d['position_xyz'] = (1,2,3)

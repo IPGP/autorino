@@ -185,7 +185,7 @@ def round_epochs(epochs_inp,
                  rolling_ref=-1,
                  round_method = 'floor'):
     """
-    High-levelfunction to round several epochs to a common one.
+    High-level function to round several epochs to a common one.
     Useful to group and then splice RINEX
     
     Use it with pandas .groupby in a further step

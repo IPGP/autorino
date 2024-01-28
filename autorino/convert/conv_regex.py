@@ -124,6 +124,40 @@ def conv_regex_teqc(f):
     conv_regex_annex  = conv_regex_main
     return conv_regex_main , conv_regex_annex
 
+def conv_regex_gfzrnx(f):
+    """
+    Generate the regular expressions of the main and annex converted files 
+    outputed by GFZRNX (polyvalent)
+    
+    It has the same behavior as all the `conv_regex` functions
+    See note below
+
+    Parameters
+    ----------
+    f : str or Path
+        the input Raw filename or path 
+        (the filename will be extracted in the function).
+
+    Returns
+    -------
+    conv_regex_main & conv_regex_annex : Complied Regex Objects
+        The regular expressions.
+        
+    Note
+    ----
+    general behavior of the `conv_regex` functions:
+    main = the regex for the main file i.e. the Observation RINEX
+    annex = the regex for the ALL outputed files (Observation RINEX included)
+    the main with be processed before the annex, 
+    thus annex regex will finally not include the main one
+    """
+    f = Path(Path(f).name) ### keep the filename only
+    #conv_regex_main = re.compile(f.with_suffix(".rnx_teqc").name)
+    conv_regex_main = re.compile(f.name + ".rnx_gfzrnx")   
+    conv_regex_annex  = conv_regex_main
+    return conv_regex_main , conv_regex_annex
+
+
 def conv_regex_trm2rinex(f):
     """
     Generate the regular expressions of the mainand annex converted files 
