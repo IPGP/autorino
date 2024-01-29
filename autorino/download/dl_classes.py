@@ -40,9 +40,11 @@ class DownloadGnss(arogen.StepGnss):
         Guess the paths and name of the remote files based on the 
         Session and EpochRange attributes of the DownloadGnss
         
-        see also method guess_local_files(), a general method for all 
-        StepGnss objects
+        see also method ``guess_local_raw_files()``
         """
+        ### wrong but legacy docstring
+        #see also method guess_local_raw_files(), a general method for all 
+        #StepGnss objects
         
         if not self.remote_fname:
             logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
@@ -80,6 +82,52 @@ class DownloadGnss(arogen.StepGnss):
         logger.info("nbr remote files guessed: %s",len(rmot_paths_list))
 
         return rmot_paths_list
+    
+    def guess_local_raw_files(self):
+        """
+        Guess the paths and name of the local raw files based on the
+        EpochRange and `remote_fname` attributes of the DownloadGnss object
+        
+        see also method ``guess_remote_raw_files()``,
+        """
+        ### wrong but legacy docstring
+        # If the object is not a DownloadGnss one, 
+        # You must provide as ``remote_fname_inp``, which is usually 
+        # a ``DownloadGnss.remote_fname`` attribute
+        
+        # see also method ``guess_remote_raw_files()``,
+        # a specific method for DownloadGnss objects
+
+        rmot_paths_list = []
+        local_paths_list = []
+        
+        for epoch in self.epoch_range.epoch_range_list():
+
+            # guess the potential local files
+            local_dir_use = str(self.out_dir)
+            local_fname_use = str(self.remote_fname)
+            local_path_use = os.path.join(local_dir_use,
+                                          local_fname_use)
+
+
+            local_path_use = self.translate_path(local_path_use,
+                                                 epoch)
+
+            local_fname_use = os.path.basename(local_path_use)
+
+            local_paths_list.append(local_path_use)
+
+            iepoch = self.table[self.table['epoch_srt'] == epoch].index
+
+            self.table.loc[iepoch, 'fname'] = local_fname_use
+            self.table.loc[iepoch, 'fpath_out'] = local_path_use
+            logger.debug("local file guessed: %s", local_path_use)
+
+        rmot_paths_list = sorted(list(set(rmot_paths_list)))
+
+        logger.info("nbr local raw files guessed: %s", len(local_paths_list))
+
+        return local_paths_list
     
         
     def _guess_remote_directories(self):
