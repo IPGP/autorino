@@ -18,7 +18,7 @@ from geodezyx import utils, conv
 
 #import autorino.epochrange as aroepo
 import autorino.general as arogen
-from autorino import logconfig
+import autorino.config as arocfg
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
@@ -206,34 +206,66 @@ class StepGnss():
     
     def copy(self):
         """
-        return a duplicate (deep copy) of the current object
+        return a duplicate (deep copy) of the current StepGnss object
         """
         return copy.deepcopy(self)
     
     
-    def update_epoch_table_cols_from_fname(self,use_rnx_filename=False):
+    def update_epoch_table_from_rnx_fname(self,
+                                          use_rnx_filename_only=False,
+                                          update_epoch_range=True):
+        """
+        If the StepGnss object **contains RINEX files**,
+        Update the StepGnss table's columns ``epoch_srt`` and ``epoch_end`` 
+        based on the RINEX files.
+
+        Parameters
+        ----------
+        use_rnx_filename_only : bool, optional
+            determine the start epochm the end epoch and the period of the
+            RINEX file based on its name only. (The RINEX is not readed). 
+            This function is much faster but less reliable. 
+            The default is False.
+        update_epoch_range : bool, optional
+            at the end of the table update, update also
+            the EpochRange object associated to the StepGnss object 
+            (recommended). 
+            The default is True.
+
+        Returns
+        -------
+        None.
+
+        """
+        
         from rinexmod import rinexfile
 
-        is_rnx = self.table['fname'].apply(conv.rinex_regex_search_tester).apply(bool)
+        is_rnx = \
+            self.table['fname'].apply(conv.rinex_regex_search_tester).apply(bool)
         
         if is_rnx.sum() == 0:
-            logger.warn("epoch update impossible, no file matches a RINEX pattern in %s",self)
+            logger.warn("epoch update impossible, \
+                        no file matches a RINEX pattern in %s",self)
             return 
             
         for irow,row in self.table.iterrows(): 
             
-            if not use_rnx_filename:
+            if not use_rnx_filename_only:
                 rnx = rinexfile.RinexFile(row['fpath_inp'])
                 epo_srt = rnx.start_date
                 epo_end = rnx.end_date
             else:
-                epo_srt, epo_end, _ = rinexfile.dates_from_rinex_filename(row['fpath_inp'])
+                epo_srt, epo_end, _ = \
+                    rinexfile.dates_from_rinex_filename(row['fpath_inp'])
             
             self.table.loc[irow,'epoch_srt'] = epo_srt 
             self.table.loc[irow,'epoch_end'] = epo_end 
             
         self.table['epoch_srt'] = pd.to_datetime(self.table['epoch_srt'])
         self.table['epoch_end'] = pd.to_datetime(self.table['epoch_end'])
+        
+        if update_epoch_range:
+            self.update_epoch_range_from_table()
             
         return
             
@@ -253,7 +285,7 @@ class StepGnss():
         tdelta_arr = self.table[column].diff().dropna().unique()
         
         if len(tdelta_arr) > 1:
-            logger.warn("the period spacing of %s is not uniform".self)
+            logger.warn("the period spacing of %s is not uniform",self)
             ##### be sure to keep the 1st one!!!
         
         period_new = arogen.timedelta2freqency_alias(tdelta_arr[0])
@@ -264,11 +296,6 @@ class StepGnss():
         
     def translate_path(self,path_inp,epoch_inp=None):
         return arogen.translator(path_inp,self.translate_dict,epoch_inp)
-        
-        
-        
-
-
 
  #  _                       _             
  # | |                     (_)            
@@ -301,7 +328,7 @@ class StepGnss():
         log_name = "_".join((ts , ".log"))
         log_path = os.path.join(log_dir_use,log_name)
 
-        log_cfg_dic = logconfig.logconfig.log_config_dict
+        log_cfg_dic = arocfg.logcfg.log_config_dict
         fmt_dic = log_cfg_dic['formatters']['fmtgzyx_nocolor']
 
         logfile_handler = logging.FileHandler(log_path)
@@ -431,13 +458,12 @@ class StepGnss():
         
         return None
     
-    def guess_local_files(self,
-                          guess_local=True):
+    def guess_local_raw_files(self):
         """
-        Guess the paths and name of the local files based on the 
+        Guess the paths and name of the local raw files based on the 
         Session and EpochRange attributes of the DownloadGnss
         
-        see also method guess_remote_files(), 
+        see also method guess_remote_raw_files(), 
         a specific method for DownloadGnss objects 
         """
         
@@ -467,9 +493,39 @@ class StepGnss():
   
         rmot_paths_list = sorted(list(set(rmot_paths_list)))
             
-        logger.info("nbr local files guessed: %s",len(local_paths_list))
+        logger.info("nbr local raw files guessed: %s",len(local_paths_list))
 
         return local_paths_list
+    
+    def guess_local_rnx_files(self):
+        return None
+    
+    
+    def decompress_table(self,table_col='fpath_inp'):
+        """
+        decompress the potential compressed files in the ``table_col`` column
+        (usually ``fpath_inp``)
+        
+        It will uncompress the file if it is a 
+        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file (gzip) 
+        
+        It will create a new column ``fpath_ori`` (for original)
+        to keep the trace of the original file
+        """
+        bool_comp = self.table[table_col].apply(arogen.is_compressed)
+        idx_comp = self.table.loc[bool_comp].index        
+        self.table.loc[idx_comp,'fpath_ori'] = self.table.loc[idx_comp,
+                                                              table_col]
+        files_out = \
+            self.table.loc[idx_comp,table_col].apply(arogen.decompress,
+                                                     args=(self.tmp_dir,))
+        self.table.loc[idx_comp,table_col] = files_out
+        self.table.loc[idx_comp,'ok_inp'] = \
+            self.table.loc[idx_comp,table_col].apply(os.path.isfile)
+        self.table.loc[idx_comp,'fname'] = \
+            self.table.loc[idx_comp,table_col].apply(os.path.basename)
+            
+        return None        
 
 #  ______ _ _ _              _        _     _      
 # |  ____(_) | |            | |      | |   | |     
@@ -741,12 +797,10 @@ def input_list_reader(inp_fil,inp_regex=".*"):
     Handles mutiples types of input lists (in a general sense)  
     and returns a python list of the input
     
-    inp_fil can be:
+    inp_fil can be:  
         * a python list (then nothing is done)
-        * a text file path containing a list of files 
-        (readed as a python list)
-        * a tuple containing several text files path 
-        (recursive version of the previous point)
+        * a text file path containing a list of files (readed as a python list)
+        * a tuple containing several text files path  (recursive version of the previous point)
         * a directory path (all the files matching inp_regex are readed)
     """
 

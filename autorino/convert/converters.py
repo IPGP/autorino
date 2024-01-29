@@ -95,6 +95,38 @@ def _ashtech_name_2_date(inp_raw_fpath):
 
 
 def _converter_select(converter_inp,inp_raw_fpath=None):
+    """
+    internal function for ``converter_run``.
+    Find the correct RAW > RINEX converter and gives its corresponding attributes 
+    
+    Returns directly those attributes based on `converter_inp` keyword,
+    or can do a basic research based on the RAW file extension
+
+    Parameters
+    ----------
+    converter_inp : str
+        name of the converter used.
+        see ``converter_run`` help for more details
+    inp_raw_fpath : str, optional
+        RAW file path. used for converter research based on the RAW
+        file extension. The default is None.
+
+    Returns
+    -------
+    converter_name : str
+        converter's name.
+    brand : str
+        converter's name/manufacturer.
+    cmd_build_fct : function
+        interface function with the converter to perform the conversion.
+        see ``converter_run``'s help for more details
+    conv_regex_fct : function
+        interface function to find the converted file with a regular expression.
+    bin_options : list
+        options for the conversion program. The default is [].
+    bin_kwoptions : dict
+        keyword options for the conversion program. The default is dict().
+    """
 
     if converter_inp == "auto" and not inp_raw_fpath:
         logger.error("not converter nor input file given, \
@@ -202,7 +234,7 @@ def _converter_select(converter_inp,inp_raw_fpath=None):
         bin_options = [] 
         bin_kwoptions = dict() 
         
-    ##### GFZRNX
+    ##### CONVERTO
     elif converter_inp == 'converto':
         converter_name = "converto"
         brand = "RINEX Handeling (IGN)"
@@ -248,16 +280,17 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
     converter : str, optional
         name of the converter used.
         Supports : 
-            'auto' (automatic choice based on the extension),
-            'trm2rnx' (Trimble),
-            'runpkr00' (Trimble legacy),
-            'teqc' (legacy conversion & RINEX Handeling),
-            'mdb2rinex' (Leica),
-            'sbf2rin' (Septentrio),
-            'convbin' (BINEX),
-            'tps2rin' (Topcon),       
-            'gfzrnx' (RINEX Handeling)
-        see `_converter_select` function and `cmd_build` module 
+            * 'auto' (automatic choice based on the extension),
+            * 'trm2rnx' (Trimble),
+            * 'runpkr00' (Trimble legacy),
+            * 'teqc' (legacy conversion & RINEX Handeling),
+            * 'mdb2rinex' (Leica),
+            * 'sbf2rin' (Septentrio),
+            * 'convbin' (BINEX),
+            * 'tps2rin' (Topcon),   
+            * 'converto' (RINEX Handeling)
+            * 'gfzrnx' (RINEX Handeling)
+        see ``_converter_select`` function and ``cmd_build`` module 
         for more details.
         The default is 'auto'.
     timeout : int, optional
