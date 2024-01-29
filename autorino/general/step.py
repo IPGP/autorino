@@ -482,6 +482,7 @@ class StepGnss():
             local_path_use = os.path.join(local_dir_use,
                                           local_fname_use)
 
+            print("AAAAAAAAAAAAAA",self.translate_dict)
             local_path_use = self.translate_path(local_path_use,
                                                  epoch)
 
