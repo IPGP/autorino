@@ -55,7 +55,7 @@ flist = "/home/sakic/090_TEMP/Raw_dome_GL_mk01a.list"
 
 
 prev_table_logs = utils.find_recursive(pout,'*table.log')    
-if prev_table_logs:
+if prev_table_logs and False:
     DF_prev_tbl = pd.concat([pd.read_csv(f) for f in prev_table_logs])
     DF_prev_tbl.reset_index(inplace=True,drop=True)
 
