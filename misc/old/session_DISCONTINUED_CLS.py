@@ -18,8 +18,8 @@ class SessionGnss:
         self.sta_user = sta_user
         self.sta_pass = sta_pass  
         self.site = site ## setter bellow
-        self.site4 = site  ## setter bellow       
-        self.site9 = site   ## setter bellow         
+        self.site4 = site ## setter bellow       
+        self.site9 = site ## setter bellow         
         self.session_period = session_period
         self.translate_dict = self._init_translate_dict()
         
