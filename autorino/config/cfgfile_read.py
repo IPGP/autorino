@@ -33,12 +33,13 @@ def read_configfile(configfile_path):
     y_sessions_list = y_station["sessions_list"]
     
     for yses in y_sessions_list:
+
         
-        _check_parent_dir_existence(yses['tmp_dir_parent'])
+        _check_parent_dir_existence(yses['session']['tmp_dir_parent'])
         tmp_dir = os.path.join(yses['session']['tmp_dir_parent'],
                                yses['session']['tmp_dir_structure'])
 
-        _check_parent_dir_existence(yses['log_dir_parent'])
+        _check_parent_dir_existence(yses['session']['log_dir_parent'])
         log_dir = os.path.join(yses['session']['log_dir_parent'],
                                yses['session']['log_dir_structure'])
         
@@ -95,7 +96,7 @@ def _check_parent_dir_existence(parent_dir_inp):
     parent_dir_out = arogen.translator(parent_dir_inp)
     
     if  not os.path.isdir(parent_dir_out):
-        logger.error("%s do not exists, create it first")
+        logger.error("%s do not exists, create it first",parent_dir_out)
         raise Exception
     else:
         return None

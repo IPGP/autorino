@@ -5,7 +5,7 @@ import os
 from autorino import download as arodl
 from autorino import convert as arocnv
 from autorino import general as arogen
-from autorino import configread as arocfg
+from autorino import config as arocfg
 
 import yaml
 
@@ -21,8 +21,8 @@ dwl = workflow_lis[0]
 cnv = workflow_lis[1]
 
 #L = REQ.ask_remote_files()
-L = dwl.guess_local_files()
-L = dwl.guess_remote_files()
+L = dwl.guess_local_raw_files()
+L = dwl.guess_remote_raw_files()
 L = dwl.check_local_files()
 L = dwl.invalidate_small_local_files()
 
