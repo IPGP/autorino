@@ -42,6 +42,7 @@ def is_compressed(file_inp):
         
     
 def _decompress_gzip(gzip_file_inp, out_dir_inp = None):
+    gzip_file_inp = str(gzip_file_inp)
     gzip_file2 = Path(gzip_file_inp)
 
     if not out_dir_inp:
@@ -62,6 +63,7 @@ def _decompress_gzip(gzip_file_inp, out_dir_inp = None):
 
 def _decompress_hatanaka(crx_file_inp,out_dir_inp = None):
     
+    crx_file_inp = str(crx_file_inp)
     crx_file_inp2 = Path(crx_file_inp)
     
     if out_dir_inp:
@@ -80,7 +82,8 @@ def _decompress_hatanaka(crx_file_inp,out_dir_inp = None):
 
 def decompress(file_inp,
                out_dir_inp = None):
-        
+
+    file_inp = str(file_inp) 
     file_inp2 = Path(file_inp)
     ext = file_inp2.suffix.lower()
     
