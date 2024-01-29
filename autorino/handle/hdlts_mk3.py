@@ -13,7 +13,7 @@ tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
 out_dir = '/home/psakicki/autorino_workflow_tests/handle'
 log_dir = tmp_dir
 
-epo = arogen.epochrange.create_dummy_epochrange()
+epo = arogen.epoch_range.create_dummy_epochrange()
 hdl = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo, site_id='CFNG')
 
 from geodezyx import utils

@@ -8,17 +8,11 @@ Created on Mon Mar 27 09:16:34 2023
 
 import ftplib
 import os
-import datetime as dt 
-import hashlib
 import urllib
 from urllib.parse import urlparse
-import pandas
-from pathlib import Path
 import urllib.request                 
 from tqdm import tqdm
-from ftplib import FTP
 import requests
-from tqdm.contrib.logging import logging_redirect_tqdm
 import io
 # Create a logger object.
 import logging
@@ -142,8 +136,7 @@ def list_remote_files_http(host_name,remote_dir):
 def size_remote_file_http(url):
     req = urllib.request.Request(url, method='HEAD')
     f = urllib.request.urlopen(req)
-    size_url.append(f.headers['Content-Length'])
-    return size_url
+    return f.headers['Content-Length']
 
 ############# download remote file
 
