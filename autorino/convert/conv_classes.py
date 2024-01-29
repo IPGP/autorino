@@ -6,20 +6,17 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-from geodezyx import utils,operational,conv
+from geodezyx import utils,operational
 import autorino.convert as arocnv
 from rinexmod import rinexmod_api
 from pathlib import Path
-import gzip
 import os
 import re 
 import numpy as np
 import datetime as dt
 import dateutil
 import docker
-import pandas as pd
 import shutil
-import hatanaka
 import autorino.general as arogen
 
 
@@ -134,7 +131,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
             ### manage compressed files
             if ext in ('.gz',):
                 logger.debug("%s is compressed",fraw)
-                fraw = Path(decompress(fraw, tmp_dir_unzipped_use))
+                fraw = Path(arogen.decompress(fraw, tmp_dir_unzipped_use))
  
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
@@ -252,8 +249,6 @@ def _site_search_from_list(fraw_inp,site4_list_inp):
     return site_out
 
 
-
-
 def _select_conv_odd_file(fraw_inp,
                           ext_excluded=[".TG!$",
                                         ".DAT",
@@ -314,126 +309,8 @@ def stop_long_running_containers(max_running_time=120):
             container.stop()
             logger.warning(f'Stopped container {container.name} after {elapsed_time} seconds.')
             
-    return None
-
-def _decompress_gzip(gzip_file_inp, out_dir_inp = None):
-    gzip_file2 = Path(gzip_file_inp)
-
-    if not out_dir_inp:
-        out_dir = gzip_file2.parent
-    else:
-        out_dir = Path(out_dir_inp)
-
-    file_out = out_dir.joinpath(gzip_file2.stem)
-
-    with gzip.open(gzip_file_inp, 'rb') as f_in:
-        with open(file_out, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
-            
-    logger.debug("decompress (gzip): %s > %s", gzip_file2.name, file_out)
-
-    return str(file_out)
-
-
-def _decompress_hatanaka(crx_file_inp,out_dir_inp = None):
-    
-    crx_file_inp2 = Path(crx_file_inp)
-    
-    if out_dir_inp:
-        crx_file = shutil.copy2(crx_file_inp, out_dir_inp)
-        dell = True
-    else:
-        crx_file = crx_file_inp
-        dell = False
-    
-    rnx_file_out = hatanaka.decompress_on_disk(crx_file,delete=dell)
-    logger.debug("decompress (hatanaka): %s > %s", crx_file_inp2.name,
-                 rnx_file_out)
-    
-    return str(rnx_file_out)
-    
-
-def decompress(file_inp,
-               out_dir_inp = None):
-    
-    file_inp2 = Path(file_inp)
-    
-    ### RINEX Case
-    if conv.rinex_regex_search_tester(file_inp,compressed=True):
-        file_out = _decompress_hatanaka(file_inp,out_dir_inp)
-    ### Generic gzipped case (e.g. RAW file)
-    elif file_inp2.ext == ".gz":
-        file_out = _decompress_gzip(file_inp,out_dir_inp)
-    else:
-        logger.info("no valid compression for %s, nothing is done", 
-                    file_inp2.name)
-        file_out = file_inp
-        
-    return file_out
-    
+    return None   
 
 
 #################################################
 ############ FUNCTION GRAVEYARD
-
-
-    # def filter_year_min_max_non_pythonic(self,
-    #                                      year_min=1980,
-    #                                      year_max=2099,
-    #                                      year_in_inp_path=None):
-    #     """
-    #     Filter a list of raw files if they are not in a year range
-    #     it is the year in the file path which is tested
-        
-    #     year_in_inp_path is the position of the year in the absolute path
-    #     e.g.
-    #     if the absolute path is:
-    #     /home/user/input_data/raw/2011/176/PSA1201106250000a.T00
-    #     year_in_inp_path is 4
-        
-    #     if no year_in_inp_path provided, a regex search is performed
-    #     (more versatile, but less robust)
-        
-        
-    #     year min and year max are included in the range
-        
-    #     modify the boolean "ok_inp" of the object's table
-    #     returns the filtered raw files in a list
-    #     """
-    #     flist_out = []
-    #     nfil = 0 
-        
-    #     ok_inp_bool_stk = []
-        
-    #     for irow,row in self.table.iterrows():
-    #         f = row.fraw
-    #         try:
-    #             if year_in_inp_path:
-    #                 year_folder = int(f.split("/")[year_in_inp_path])
-    #             else:
-    #                 rgx = re.search("\/(19|20)[0-9]{2}\/",f)
-    #                 year_folder = int(rgx.group()[1:-1])       
-    #         except:
-    #             logger.warning("unable to get the year in path: %s",f)
-    #             continue
-            
-    #         if year_folder < year_min or year_folder > year_max:
-    #             logger.debug("file filtered, not in year range (%s): %s",
-    #                          year_folder,f)
-    #             nfil += 1
-    #             ok_inp_bool_stk.append(False)
-
-    #         else:
-    #             if not row.ok_inp: ### ok_inp is already false
-    #                 ok_inp_bool_stk.append(False)
-    #             else:
-    #                 ok_inp_bool_stk.append(True)
-    #                 flist_out.append(f)
-
-    #     ### final replace of ok init
-    #     self.table.ok_inp = ok_inp_bool_stk
-
-    #     logger.info("%6i files filtered, not in the year min/max range (%4i/%4i)",
-    #                 nfil,year_min,year_max)
-    #     return flist_out 
-    

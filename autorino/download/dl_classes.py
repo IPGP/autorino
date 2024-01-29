@@ -35,7 +35,7 @@ class DownloadGnss(arogen.StepGnss):
         self.remote_dir = remote_dir
         self.remote_fname = remote_fname
                 
-    def guess_remote_files(self):
+    def guess_remote_raw_files(self):
         """
         Guess the paths and name of the remote files based on the 
         Session and EpochRange attributes of the DownloadGnss
