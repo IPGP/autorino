@@ -1,3 +1,5 @@
+## Installation
+
 ### create docker group
 ```
 sudo addgroup --system docker
@@ -15,6 +17,15 @@ cd trm2rinex-docker
 docker build -t trm2rinex:cli-light .
 ```
 running it in *sudo* mode might be better
+
+## Usage
+
+### Run the test file conversion
+```
+cd <...>/trm2rinex-docker
+docker run --rm -v "$(pwd):/data" trm2rinex:cli-light data/MAGC320b.2021.rt27 data/out
+```
+## Issues
 
 ### Issue about removing folders
 #### Error
