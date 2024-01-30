@@ -18,6 +18,16 @@ docker build -t trm2rinex:cli-light .
 ```
 running it in *sudo* mode might be better
 
+### clean useless Docker images
+at the end of the installation
+```
+docker image ls
+```
+and remove intermediate images
+```
+docker image rm 925d947bf045
+```
+
 ## Usage
 
 ### Run the test file conversion
