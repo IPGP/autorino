@@ -60,22 +60,18 @@ class StepGnss():
 
     # getter and setter
     # site_id
-    @property
-    def site_id(self):
-        return self._site_id
+
 
     @site_id.setter
     def site_id(self, value):
         self._site_id = value
 
     @property
+    def site_id(self):
+        return self._site_id
+    @property
     def site_id4(self):
         return self._site_id[:4]
-
-    # @site_id4.setter
-    # def site_id4(self,value):
-    #     self._site_id4 = value[:4]
-
     @property
     def site_id9(self):
         if len(self._site_id) == 9:
