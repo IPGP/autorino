@@ -158,7 +158,7 @@ def cmd_build_trm2rinex(inp_raw_fpath,
     ----
     Usage of `trm2rinex`
     
-    docker run --rm -v ${f_dir}:/inp -v ${DIR_out}:/out trm2rinex:cli-light inp/${f_base} -p out/${subdir_out_010} -n -d -s -v 3.04
+    docker run --rm -v ${DIR_INP}:/inp -v ${DIR_OUT}:/out trm2rinex:cli-light inp/${FNAME_RAW} -p out/${SUBDIR_OUT} -n -d -s -v 3.04
     
     data/MAGC320b.2021.rt27 defines the input file (relative to container filesystem root)
     -p data/out defines the path for the conversion output (relative to container filesystem root)

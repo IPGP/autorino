@@ -98,7 +98,6 @@ class DownloadGnss(arogen.StepGnss):
         # see also method ``guess_remote_raw_files()``,
         # a specific method for DownloadGnss objects
 
-        rmot_paths_list = []
         local_paths_list = []
         
         for epoch in self.epoch_range.epoch_range_list():
@@ -123,7 +122,6 @@ class DownloadGnss(arogen.StepGnss):
             self.table.loc[iepoch, 'fpath_out'] = local_path_use
             logger.debug("local file guessed: %s", local_path_use)
 
-        rmot_paths_list = sorted(list(set(rmot_paths_list)))
 
         logger.info("nbr local raw files guessed: %s", len(local_paths_list))
 
