@@ -5,7 +5,7 @@ station:
         name: CFNG 
         site_id: CFNG00REU 
         domes: 
-        sitelog_path: <$HOME>/sitelogs ###  can be a specific file or a directory path containing the sitelogs
+        sitelog_path: <$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
         position_xyz: (1,2,3)
     device:
         attributes_from_sitelog: True
