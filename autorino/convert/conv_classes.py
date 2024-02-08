@@ -204,8 +204,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
             ###### FINAL MOVE                             
             ### def output folders        
             outdir_use = self.translate_path(self.out_dir,
-                                             self.table.loc[irow,
-                                                            'epoch_srt'])
+                                             epoch_inp=self.table.loc[irow,
+                                                                      'epoch_srt'])
             try:
                 ### do the move 
                 utils.create_dir(outdir_use)
