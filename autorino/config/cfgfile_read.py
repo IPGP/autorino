@@ -34,21 +34,18 @@ def read_configfile(configfile_path):
     
     for yses in y_sessions_list:
 
-        
+        ##### TMP DIRECTORY
         _check_parent_dir_existence(yses['session']['tmp_dir_parent'])
         tmp_dir = os.path.join(yses['session']['tmp_dir_parent'],
                                yses['session']['tmp_dir_structure'])
 
+        ##### LOG DIRECTORY
         _check_parent_dir_existence(yses['session']['log_dir_parent'])
         log_dir = os.path.join(yses['session']['log_dir_parent'],
                                yses['session']['log_dir_structure'])
-        
     
-        epo_obj_gen = arogen.EpochRange(yses['epoch_range']['epoch1'], 
-                                        yses['epoch_range']['epoch2'],
-                                        yses['epoch_range']['period'],
-                                        yses['epoch_range']['round_method'],
-                                        yses['epoch_range']['tz'])
+        ##### EPOCH RANGE AT THE SESSION LEVEL
+        epo_obj_gen = _epoch_range_from_cfg_bloc(yses['epoch_range'])
         
         workflow_lis = []
         #### manage workflow
@@ -59,28 +56,35 @@ def read_configfile(configfile_path):
             out_dir = os.path.join(ywkf['out_dir_parent'],
                                    ywkf['out_dir_structure'])
             
-            if k_step == 'download':
+            if k_step == 'download' and ywkf['active'] == True:
                 Dwl =  arodwl.DownloadGnss
                 dwl_obj = Dwl(out_dir=out_dir,
                               tmp_dir=tmp_dir,
                               log_dir=log_dir,
                               epoch_range=epo_obj_gen,
                               access=y_access,
-                              remote_dir=ywkf['remote_dir'],
-                              remote_fname=ywkf['remote_fname'],
+                              remote_dir=ywkf['inp_dir_parent'],
+                              remote_fname=ywkf['inp_fname_structure'],
                               site=y_site,
                               session=yses['session'])
                 
                 workflow_lis.append(dwl_obj)
                 
-            if k_step == 'conversion':
+            if k_step == 'conversion_rinex_header_mod':
                 Cnv = arocnv.ConvertRinexModGnss
+                
+                if y_site['sitelog_path'] and ywkf['active'] == True:
+                    sitelogs=y_site['sitelog_path']
+                else:
+                    sitelogs=None
+                
                 cnv_obj = Cnv(out_dir=out_dir,
                               tmp_dir=tmp_dir,
                               log_dir=log_dir,
                               epoch_range=epo_obj_gen,
                               site=y_site,
-                              session=yses['session'])
+                              session=yses['session'],
+                              sitelogs=sitelogs)
                 
                 workflow_lis.append(cnv_obj)
                 
@@ -100,3 +104,12 @@ def _check_parent_dir_existence(parent_dir_inp):
         raise Exception
     else:
         return None
+
+
+def _epoch_range_from_cfg_bloc(epoch_range_dic):
+    return arogen.EpochRange(epoch_range_dic['epoch1'], 
+                             epoch_range_dic['epoch2'],
+                             epoch_range_dic['period'],
+                             epoch_range_dic['round_method'],
+                             epoch_range_dic['tz'])
+    

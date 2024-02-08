@@ -28,10 +28,9 @@ logger.setLevel("DEBUG")
 class StepGnss():
     def __init__(self,
                  out_dir, tmp_dir, log_dir,
-                 epoch_range,
+                 epoch_range=None,
                  site=None,
-                 session=None,
-                 site_id=None):
+                 session=None):
 
         self.out_dir = out_dir
         self.tmp_dir = tmp_dir
@@ -40,7 +39,7 @@ class StepGnss():
 
         self._init_site(site)
         self._init_session(session)
-        self._init_site_id(site_id)
+        self._init_site_id()
         self._init_table()
 
         self.translate_dict = self._set_translate_dict()
@@ -61,14 +60,14 @@ class StepGnss():
     # getter and setter
     # site_id
 
-
+    @property
+    def site_id(self):
+        return self._site_id
+    
     @site_id.setter
     def site_id(self, value):
         self._site_id = value
 
-    @property
-    def site_id(self):
-        return self._site_id
     @property
     def site_id4(self):
         return self._site_id[:4]
@@ -163,16 +162,27 @@ class StepGnss():
         else:
             self.session = session
 
-    def _init_site_id(self, site_id):
+    def _init_site_id(self):
         """
         if a site id is not explicitely given, take the one from the site dict
         A dummy site dict will be created in the worst case, ensuring that
         site_id will be always initialized
         """
-        if not site_id:
+        if 'site_id' in self.site.keys():
             self.site_id = self.site['site_id']
         else:
-            self.site_id = site_id
+            self.site_id = 'XXXX'
+            
+    def _init_epoch_range(self,epoch_range):
+        """
+        initialize the epoch range if given, and create a dummy one between 
+        NaT (not a time) if nothing is given
+        """
+        if epoch_range:
+            self.epoch_range = epoch_range
+        else:
+            self.epoch_range = arogen.EpochRange()
+
 
     def _set_translate_dict(self):
         """

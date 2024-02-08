@@ -17,14 +17,12 @@ class HandleGnss(arogen.StepGnss):
     def __init__(self,out_dir,tmp_dir,log_dir,
                  epoch_range,
                  site=None,
-                 session=None,
-                 site_id=None):
+                 session=None):
     
         super().__init__(out_dir,tmp_dir,log_dir,
                          epoch_range,
                          site=site,
-                         session=session,
-                         site_id=site_id)
+                         session=session)
 
     def splice(self):
         

@@ -97,6 +97,7 @@ class EpochRange:
 
         return list(epochrange)
 
+
 def dateparser_frontend(date_in,tz="UTC"):
     """
     Frontend function to parse a string/datetime 
@@ -112,8 +113,12 @@ def dateparser_frontend(date_in,tz="UTC"):
         date_out = pd.Timestamp(dateparser.parse(date_in))
     else:
         date_out = pd.Timestamp(date_in)
-    
-    if not date_out.tz:
+
+
+    if type(date_out) is pd._libs.tslibs.nattype.NaTType:
+        ### NaT case. can not support tz
+        pass
+    elif not date_out.tz:
         date_out = pd.Timestamp(date_out, tz=tz)
     
     return date_out
@@ -148,7 +153,10 @@ def _round_date(date_in,period,round_method="floor"):
     # we separate the Series case of the simple datetime-like 
     # both for ease and performance reason
     
-    if type(date_in) is pd.Series:
+    if type(date_in) is pd._libs.tslibs.nattype.NaTType: ### NaT case
+        date_out = date_in
+    
+    elif type(date_in) is pd.Series:
         
         date_use = date_in
         
@@ -161,7 +169,7 @@ def _round_date(date_in,period,round_method="floor"):
         else:
             raise Exception
         
-    else:
+    else:        
         date_typ = type(date_in)
         date_use = pd.Timestamp(date_in)
     
@@ -282,4 +290,6 @@ def create_dummy_epochrange():
                      epoch2="30 min ago",
                      period='15min')
     return epo
+
+EpochRange(pd.NaT, pd.NaT)
 
