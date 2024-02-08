@@ -70,12 +70,13 @@ def read_configfile(configfile_path):
                 
                 workflow_lis.append(dwl_obj)
                 
-            if k_step == 'conversion_rinex_header_mod':
+            if k_step == 'conversion_rinex_header_mod' and ywkf['active'] == True:
                 Cnv = arocnv.ConvertRinexModGnss
                 
-                if y_site['sitelog_path'] and ywkf['active'] == True:
+                if y_site['sitelog_path']:
                     sitelogs=y_site['sitelog_path']
                 else:
+                    print("AAAAAAAAAAA",y_site['sitelog_path'])
                     sitelogs=None
                 
                 cnv_obj = Cnv(out_dir=out_dir,
