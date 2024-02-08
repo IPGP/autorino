@@ -31,14 +31,12 @@ class ConvertRinexModGnss(arogen.StepGnss):
                  epoch_range,
                  site=None,
                  session=None,
-                 site_id=None,
                  sitelogs=None):
     
         super().__init__(out_dir,tmp_dir,log_dir,
                          epoch_range,
                          site=site,
-                         session=session,
-                         site_id=site_id)
+                         session=session)
 
         ### temp dirs init
         self._init_conv_tmp_dirs_paths() 
@@ -176,7 +174,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
             #############################################################
             ###### RINEXMOD            
             try:
-                frnxfin = rinexmod_api.rinexmod(frnxtmp,
+                frnxmod = rinexmod_api.rinexmod(frnxtmp,
                                                 tmp_dir_rinexmoded_use,
                                                 marker=site,
                                                 compression="gz",
@@ -188,8 +186,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
                                                 full_history=True)
                 ### update table if things go well
                 self.table.loc[irow,'ok_out'] = True
-                self.table.loc[irow,'fpath_out'] = frnxfin
-                self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
+                self.table.loc[irow,'fpath_out'] = frnxmod
+                self.table.loc[irow,'size_out'] = os.path.getsize(frnxmod)
                                            
                 self.write_in_table_log(self.table.loc[irow])
                 
@@ -204,12 +202,21 @@ class ConvertRinexModGnss(arogen.StepGnss):
             #############################################################
             ###### FINAL MOVE                             
             ### def output folders        
-            #### !!!!! ADD THE EXCEPTION AND TABLE UPDATE !!!!
             outdir_use = self.translate_path(self.out_dir,
-                                             self.table.loc[irow,'epoch_srt'])
-            ### do the move 
-            utils.create_dir(outdir_use)
-            shutil.copy(frnxfin,outdir_use)
+                                             self.table.loc[irow,
+                                                            'epoch_srt'])
+            try:
+                ### do the move 
+                utils.create_dir(outdir_use)
+                frnxfin = shutil.copy2(frnxmod,outdir_use)
+                self.table.loc[irow,'ok_out'] = True
+                self.table.loc[irow,'fpath_out'] = frnxfin
+                self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
+            except Exception as e:
+                logger.error(e)
+                self.table.loc[irow,'ok_out'] = False
+                self.write_in_table_log(self.table.loc[irow])
+                continue               
                 
         return None
 
