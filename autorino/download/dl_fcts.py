@@ -6,6 +6,7 @@ Created on Mon Mar 27 09:16:34 2023
 @author: psakicki
 """
 
+from bs4 import BeautifulSoup
 import ftplib
 import os
 import urllib
@@ -140,14 +141,15 @@ def size_remote_file_http(url):
 
 ############# download remote file
 
-def download_file_ftp(url, output_dir,username, password):
+def download_file_ftp(url, output_dir,username, password,
+                      timeout=100):
     urlp = urlparse(url)
     
     url_host = urlp.netloc
     url_dir = os.path.dirname(urlp.path)[1:]
     url_fname = os.path.basename(urlp.path)
     
-    ftp = ftplib.FTP(url_host)
+    ftp = ftplib.FTP(url_host,timeout=timeout)
     ftp.login(username, password)
     ftp.cwd(url_dir)
     filename = url_fname 
@@ -167,7 +169,9 @@ def download_file_ftp(url, output_dir,username, password):
                desc=filename) as pbar:
                     
         _ftp_callback.bytes_transferred = 0
-        ftp.retrbinary('RETR ' + filename, lambda data: (f.write(data), pbar.update(len(data))), 1024)
+        ftp.retrbinary('RETR ' + filename,
+                       lambda data: (f.write(data),pbar.update(len(data))),
+                       1024)
         ftp.quit()
         
     f.close()
