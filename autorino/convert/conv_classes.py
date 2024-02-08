@@ -43,6 +43,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
         ### sitelog init
         if sitelogs:
+            print(sitelogs,"AAAAAAAAAAAAAAAAAAA")
             sitelogs_set = self.translate_path(sitelogs)
             self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_set,
                                                               force=False)
