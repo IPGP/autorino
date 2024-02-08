@@ -12,7 +12,7 @@ import yaml
 
 ###########################################################################################
 ## dummy comment2
-pcfg = '/home/sysop/pymods_ovs/autorino/configfiles/proto_config_06b_CFNG.yml'
+pcfg = '/home/sysop/pymods_ovs/autorino/configfiles/proto_config_06d_CFNG.yml'
 
 tupout = arocfg.read_configfile(pcfg)
 
