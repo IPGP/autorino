@@ -76,7 +76,6 @@ def read_configfile(configfile_path):
                 if y_site['sitelog_path']:
                     sitelogs=y_site['sitelog_path']
                 else:
-                    print("AAAAAAAAAAA",y_site['sitelog_path'])
                     sitelogs=None
                 
                 cnv_obj = Cnv(out_dir=out_dir,
