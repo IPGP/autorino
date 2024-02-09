@@ -96,6 +96,13 @@ class EpochRange:
             
 
         return list(epochrange)
+    
+
+    def is_valid(self):
+        if np.isnat(self.epoch_start) or np.isnat(self.epoch_end):
+            return False
+        else:
+            return True
 
 
 def dateparser_frontend(date_in,tz="UTC"):
