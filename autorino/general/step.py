@@ -74,14 +74,14 @@ class StepGnss():
         return self.translate_path(self._tmp_dir)
     @tmp_dir.setter
     def tmp_dir(self,value):
-        return self._tmp_dir = value
+        self._tmp_dir = value
     
     @property
     def log_dir(self):
         return self.translate_path(self._log_dir)
     @log_dir.setter
     def log_dir(self,value):
-        return self._log_dir = value
+        self._log_dir = value
         
 
     @property
