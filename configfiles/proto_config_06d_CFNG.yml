@@ -23,7 +23,7 @@ station:
     sessions_list:
       - session: ####Keep session in dictionnary / Object not necessary
             name: NA 
-            data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+            data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
             tmp_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
             tmp_dir_structure: '<SITE_ID>' # /%Y/%j  
             log_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
