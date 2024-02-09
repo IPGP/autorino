@@ -409,7 +409,6 @@ class StepGnss():
 #                                                        __/ |
 #                                                       |___/
 
-
     def print_table(self,
                     no_print=False,
                     no_return=True,
@@ -701,6 +700,11 @@ class StepGnss():
         filter the table according to a "ok" column
         i.e. remove all the values with a False values
         """
+        
+        if len(self.table):
+            logger.warning("the table is empty, unable to purge it")
+            return None
+        
         if inplace:
             self.table = self.table[self.table[col]]
             out = list(self.table['fraw'])

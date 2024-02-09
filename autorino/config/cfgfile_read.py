@@ -46,7 +46,7 @@ def read_configfile(configfile_path):
         _check_parent_dir_existence(yses['session']['tmp_dir_parent'])
         tmp_dir = os.path.join(yses['session']['tmp_dir_parent'],
                                yses['session']['tmp_dir_structure'])
-
+        
         ##### LOG DIRECTORY
         _check_parent_dir_existence(yses['session']['log_dir_parent'])
         log_dir = os.path.join(yses['session']['log_dir_parent'],
