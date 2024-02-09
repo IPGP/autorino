@@ -32,11 +32,6 @@ class StepGnss():
                  site=None,
                  session=None):
 
-        self.translate_dict = self._set_translate_dict()
-
-        self.out_dir = out_dir
-        self.tmp_dir = tmp_dir
-        self.log_dir = log_dir
         self.epoch_range = epoch_range  # setter bellow
 
         self._init_site(site)
@@ -44,6 +39,10 @@ class StepGnss():
         self._init_site_id()
         self._init_table()
 
+        self.translate_dict = self._set_translate_dict()
+        self.out_dir = out_dir
+        self.tmp_dir = tmp_dir
+        self.log_dir = log_dir
 
         # generic log
         self.set_logfile()
