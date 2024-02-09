@@ -27,7 +27,7 @@ L = dwl.check_local_files()
 L = dwl.invalidate_small_local_files()
 
 dwl.print_table()
-dwl.download_remote_files()
+dwl.fetch_remote_files()
 dwl.print_table()
 
 cnv.load_table_from_prev_step_table(dwl.table)

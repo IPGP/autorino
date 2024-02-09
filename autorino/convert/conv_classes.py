@@ -106,7 +106,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
     
     ###############################################
 
-    def convert_rnxmod(self,print_table=False):
+    def convert_rnxmod(self,print_table=False,force=False):
         if self.sitelogs:
             site4_list = site_list_from_sitelogs(self.sitelogs)
         else:
@@ -117,16 +117,29 @@ class ConvertRinexModGnss(arogen.StepGnss):
         ### initialize the table as log
         self.set_table_log(out_dir=tmp_dir_logs_use)
 
+        self.guess_local_rnx_files()
+        self.check_local_files()
+
+        self.table['ok_out'].apply(np.logical_not)
+
+        if not force:
+            ### exclude also the conversion when a final RINEX exists
+            table_init_ok = self.filter_purge('ok_out')
+            n_ok_out = (self.table['ok_out']).sum()
+            n_not_ok_out = np.logical_not(self.table['ok_out']).sum()
+        else:
+            n_not_ok_out = 0
+
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table['ok_inp']).sum()
         n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
-        
+
         logger.info("******** RINEX conversion / Header mod ('rinexmod') for %6i files",
                     n_ok_inp)        
         
         logger.info("%6i files are excluded",
-                    n_not_ok_inp)
+                    n_not_ok_inp + n_not_ok_out )
         
         if print_table:
             self.print_table()
@@ -141,10 +154,10 @@ class ConvertRinexModGnss(arogen.StepGnss):
             _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_conv_tmp_dirs_paths()
 
             ### manage compressed files
-            # not here anymore
-            #if ext in ('.gz',):
-            #    logger.debug("%s is compressed",fraw)
-            #    fraw = Path(arogen.decompress(fraw, tmp_dir_unzipped_use))
+            # not here anymore actually it is still here 
+            if ext in ('.gz',):
+                logger.debug("%s is compressed",fraw)
+                fraw = Path(arogen.decompress(fraw, tmp_dir_unzipped_use))
  
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
