@@ -22,10 +22,15 @@ logger = logging.getLogger(__name__)
 
 
 def run_workflow(workflow_lis,print_table=True):
-    for wkf in workflow_lis:
+    wkf_prev = None
+    for iwkf,wkf in enumerate(workflow_lis):
+        if iwkf > 0:
+            wkf_prev = workflow_lis[iwkf-1]
+
         if type(wkf).__name__ == "DownloadGnss":
             wkf.download(print_table)
         elif type(wkf).__name__ == "ConvertRinexModGnss":
+            wkf.load_table_from_prev_step_table(wkf_prev.table)
             wkf.convert_rnxmod(print_table)
 
 def read_configfile(configfile_path):

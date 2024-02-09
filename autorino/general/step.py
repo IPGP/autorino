@@ -471,6 +471,8 @@ class StepGnss():
         if reset_table:
             self._init_table(init_epoch=False)
 
+
+
         self.table['fpath_inp'] = input_table['fpath_out'].values
         self.table['size_inp'] = input_table['size_out'].values
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
@@ -491,15 +493,17 @@ class StepGnss():
             local_dir_use = str(self.out_dir)
             #local_fname_use = str(self.remote_fname)
             
-            period_ = self.table[iepoch,'epoch_srt'] - epoch
+            epo_dt_srt = epoch.to_pydatetime()
+            epo_dt_end = self.table.loc[iepoch,'epoch_end'].to_pydatetime()
+            prd_str=rinexmod.rinexfile.file_period_from_timedelta(epo_dt_srt, epo_dt_end)[0]
             
             local_fname_use = conv.statname_dt2rinexname_long(
                                             self.site_id9,
                                             epoch,
                                             country="XXX",
                                             data_source="R", ### always will be with autorino
-                                            file_period=period_,
-                                            data_freq="00U", 
+                                            file_period=prd_str, 
+                                            data_freq=self.session['data_frequency'],
                                             data_type="MO", 
                                             format_compression='crx.gz',
                                             preset_type=None)
@@ -527,6 +531,45 @@ class StepGnss():
         return local_paths_list
         
         return None
+
+    def check_local_files(self):
+        """
+        check the existence of the local files, and set the corresponding
+        booleans in the ok_out column
+        """
+        
+        local_files_list = []
+        
+        for irow,row in self.table.iterrows():
+            local_file = row['fpath_out']
+            if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
+                self.table.loc[irow,'ok_out'] = True
+                self.table.loc[irow,'size_out'] = os.path.getsize(local_file)
+                local_files_list.append(local_file)
+            else:
+                self.table.loc[irow,'ok_out'] = False
+                
+        return local_files_list
+        
+    def invalidate_small_local_files(self,threshold=.80):
+        """
+        if the local file is smaller than threshold * median 
+        of the considered local files in the request table
+        the ok_out boolean is set at False, and the local file 
+        is redownloaded
+        
+        check_local_files must be launched 1st
+        """
+        
+        med = self.table['size_out'].median(skipna=True)
+        valid_bool = threshold * med < self.table['size_out']
+        self.table.loc[:,'ok_out'] = valid_bool
+        invalid_local_files_list = list(self.table.loc[valid_bool,'fpath_out'])
+
+        return invalid_local_files_list
+
+
+
 
     def decompress_table(self, table_col='fpath_inp'):
         """
@@ -745,11 +788,10 @@ class StepGnss():
         i.e. remove all the values with a False values
         """
         
-        if len(self.table):
+        if len(self.table) == 0:
             logger.warning("the table is empty, unable to purge it")
-            return None
-        
-        if inplace:
+            out = []
+        elif inplace:
             self.table = self.table[self.table[col]]
             out = list(self.table['fraw'])
         else:
