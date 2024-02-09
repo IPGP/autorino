@@ -29,6 +29,7 @@ def run_workflow(workflow_lis,print_table=True):
             wkf.convert_rnxmod(print_table)
 
 def read_configfile(configfile_path):
+    logger.info('start to read configfile: %s',configfile_path)
     y = yaml.safe_load(open(configfile_path))
     
     y_station = y["station"]
