@@ -203,13 +203,17 @@ class DownloadGnss(arogen.StepGnss):
         return invalid_local_files_list
 
 
-    def download_remote_files(self,force_download=False):
+    def fetch_remote_files(self,force_download=False):
         """
         will download locally the files which have been identified by 
         the guess_remote_files method
         
         exploits the fname_remote column of the DownloadGnss.table
         attribute
+        
+        This `fetch_remote_files` method is for the download stricly speaking. 
+        Ìn operation, use the `download` method which does a broader
+        preliminary actions.
         """
         download_files_list = []
                 
@@ -279,3 +283,24 @@ class DownloadGnss(arogen.StepGnss):
                 self.table.loc[irow,"ok_out"] = False
                 
         return download_files_list
+    
+    
+    def download(self,print_table=False):
+        """
+        frontend method to download files from a GNSS recevier
+        """
+        self.guess_local_raw_files()
+        self.guess_remote_raw_files()
+        self.check_local_files()
+        self.invalidate_small_local_files()
+
+        if print_table:
+            self.print_table()
+        #### DOWNLOAD a.k.a FETCH
+        self.fetch_remote_files()
+        if print_table:
+            self.print_table()    
+            
+        return None
+        
+        
