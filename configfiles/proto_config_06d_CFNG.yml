@@ -29,8 +29,10 @@ station:
             log_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
             log_dir_structure: '' #<SITE_ID>/%Y/%j  
         epoch_range:
-            epoch1: '2 days ago at 14:00'
-            epoch2: '2 days ago at 16:00'
+          #epoch1: '2 days ago at 14:00'
+          #epoch2: '2 days ago at 16:00'
+            epoch1: '2 hours ago'
+            epoch2: 'now'
             period: "15min" # RINEX convention (01D, 01H etc...)
             round_method: "ceil"
             tz : 'UTC'
@@ -41,12 +43,6 @@ station:
                 inp_fname_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
                 out_dir_parent: '<$HOME>/autorino_workflow_tests/download_tests/'
                 out_dir_structure: <SITE_ID>/%Y/%j
-                epoch_range:
-                    epoch1: '2 days ago at 14:00'
-                    epoch1: '2 days ago at 16:00'
-                    period: "1h" # RINEX convention (01D, 01H etc...)
-                    round_method: "ceil"
-                    tz : 'UTC'
             conversion_rinex_header_mod:
                 active: True
                 converter : auto
