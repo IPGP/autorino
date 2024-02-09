@@ -482,6 +482,50 @@ class StepGnss():
         return None
 
     def guess_local_rnx_files(self):
+        
+        local_paths_list = []
+        
+        for iepoch,epoch in self.table['epoch_srt'].items():
+
+            # guess the potential local files
+            local_dir_use = str(self.out_dir)
+            #local_fname_use = str(self.remote_fname)
+            
+            period_ = self.table[iepoch,'epoch_srt'] - epoch
+            
+            local_fname_use = conv.statname_dt2rinexname_long(
+                                            self.site_id9,
+                                            epoch,
+                                            country="XXX",
+                                            data_source="R", ### always will be with autorino
+                                            file_period=period_,
+                                            data_freq="00U", 
+                                            data_type="MO", 
+                                            format_compression='crx.gz',
+                                            preset_type=None)
+            
+            
+            local_path_use = os.path.join(local_dir_use,
+                                          local_fname_use)
+
+            local_path_use = self.translate_path(local_path_use,
+                                                 epoch)
+
+            local_fname_use = os.path.basename(local_path_use)
+
+            local_paths_list.append(local_path_use)
+
+            #iepoch = self.table[self.table['epoch_srt'] == epoch].index
+
+            #self.table.loc[iepoch, 'fname'] = local_fname_use
+            self.table.loc[iepoch, 'fpath_out'] = local_path_use
+            logger.debug("local RINEX file guessed: %s", local_path_use)
+
+
+        logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))
+
+        return local_paths_list
+        
         return None
 
     def decompress_table(self, table_col='fpath_inp'):
