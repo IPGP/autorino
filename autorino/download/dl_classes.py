@@ -166,43 +166,6 @@ class DownloadGnss(arogen.StepGnss):
         logger.info("nbr remote files found on rec: %s",len(rmot_files_list))
         return rmot_files_list
         
-    def check_local_files(self):
-        """
-        check the existence of the local files, and set the corresponding
-        booleans in the ok_out column
-        """
-        
-        local_files_list = []
-        
-        for irow,row in self.table.iterrows():
-            local_file = row['fpath_out']
-            if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
-                self.table.loc[irow,'ok_out'] = True
-                self.table.loc[irow,'size_out'] = os.path.getsize(local_file)
-                local_files_list.append(local_file)
-            else:
-                self.table.loc[irow,'ok_out'] = False
-                
-        return local_files_list
-        
-    def invalidate_small_local_files(self,threshold=.80):
-        """
-        if the local file is smaller than threshold * median 
-        of the considered local files in the request table
-        the ok_out boolean is set at False, and the local file 
-        is redownloaded
-        
-        check_local_files must be launched 1st
-        """
-        
-        med = self.table['size_out'].median(skipna=True)
-        valid_bool = threshold * med < self.table['size_out']
-        self.table.loc[:,'ok_out'] = valid_bool
-        invalid_local_files_list = list(self.table.loc[valid_bool,'fpath_out'])
-
-        return invalid_local_files_list
-
-
     def fetch_remote_files(self,force_download=False):
         """
         will download locally the files which have been identified by 

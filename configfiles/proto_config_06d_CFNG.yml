@@ -23,7 +23,7 @@ station:
     sessions_list:
       - session: ####Keep session in dictionnary / Object not necessary
             name: NA 
-            data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+            data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
             tmp_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
             tmp_dir_structure: '<SITE_ID>' # /%Y/%j  
             log_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
@@ -33,7 +33,7 @@ station:
           #epoch2: '2 days ago at 16:00'
             epoch1: '2 hours ago'
             epoch2: 'now'
-            period: "15min" # RINEX convention (01D, 01H etc...)
+            period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
             round_method: "ceil"
             tz : 'UTC'
         workflow:
