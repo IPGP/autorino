@@ -21,6 +21,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def run_workflow(workflow_lis,print_table=True):
+    for wkf in workflow_lis:
+        if type(wkf).__name__ == "DownloadGnss":
+            wkf.download(print_table)
+        elif type(wkf).__name__ == "ConvertRinexModGnss":
+            wkf.convert_rnxmod(print_table)
+
 def read_configfile(configfile_path):
     y = yaml.safe_load(open(configfile_path))
     
