@@ -101,7 +101,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
         utils.create_dir(tmp_dir_converted_set)
         utils.create_dir(tmp_dir_rinexmoded_set)
         
-        return tmp_dir_logs_set, tmp_dir_unzipped_set, tmp_dir_converted_set, tmp_dir_rinexmoded_set
+        return tmp_dir_logs_set, tmp_dir_unzipped_set,\
+            tmp_dir_converted_set, tmp_dir_rinexmoded_set
     
     ###############################################
 
