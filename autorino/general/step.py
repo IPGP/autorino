@@ -32,6 +32,8 @@ class StepGnss():
                  site=None,
                  session=None):
 
+        self.translate_dict = self._set_translate_dict()
+
         self.out_dir = out_dir
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
@@ -42,7 +44,6 @@ class StepGnss():
         self._init_site_id()
         self._init_table()
 
-        self.translate_dict = self._set_translate_dict()
 
         # generic log
         self.set_logfile()
@@ -59,6 +60,29 @@ class StepGnss():
 
     # getter and setter
     # site_id
+    
+    
+    @property
+    def out_dir(self):
+        return self.translate_path(self._out_dir)
+    @out_dir.setter
+    def out_dir(self,value):
+        self._out_dir = value
+
+    @property
+    def tmp_dir(self):
+        return self.translate_path(self._tmp_dir)
+    @tmp_dir.setter
+    def tmp_dir(self,value):
+        return self._tmp_dir = value
+    
+    @property
+    def log_dir(self):
+        return self.translate_path(self._log_dir)
+    @log_dir.setter
+    def log_dir(self,value):
+        return self._log_dir = value
+        
 
     @property
     def site_id(self):
@@ -378,7 +402,7 @@ class StepGnss():
 
 
 # _______    _     _                                                                    _
-# |__   __|  | |   | |                                                                  | |
+#|__   __|  | |   | |                                                                  | |
 #   | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_
 #   | |/ _` | '_ \| |/ _ \ | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|
 #   | | (_| | |_) | |  __/ | | | | | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_
