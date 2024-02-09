@@ -43,7 +43,6 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
         ### sitelog init
         if sitelogs:
-            print(sitelogs,"AAAAAAAAAAAAAAAAAAA")
             sitelogs_set = self.translate_path(sitelogs)
             self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_set,
                                                               force=False)
@@ -78,9 +77,9 @@ class ConvertRinexModGnss(arogen.StepGnss):
         
         ### translation
         self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
-        self.tmp_dir_unzipped = self.translate_path(self.tmp_dir_unzipped)
-        self.tmp_dir_converted = self.translate_path(self.tmp_dir_converted)
-        self.tmp_dir_rinexmoded = self.translate_path(self.tmp_dir_rinexmoded)
+        self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
+        self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
+        self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
 
         return self.tmp_dir_logs, self.tmp_dir_unzipped, \
             self.tmp_dir_converted, self.tmp_dir_rinexmoded 
