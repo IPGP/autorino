@@ -743,6 +743,42 @@ class StepGnss():
         self.table['ok_inp'] = ok_inp_bool_stk
 
         return flist_out
+    
+    def filter_ok_out(self):
+        """
+        Filter a list of raw files if they have a positive ok_out boolean
+        (i.e. the converted file exists already) 
+        
+        modify the boolean "ok_inp" of the object's table
+        returns the filtered raw files in a list
+        """
+        
+        def _not_impl(ok_inp,ok_out):
+            """
+            The truth table we want is one
+            ok_inp ok_out result
+            0      0      0
+            1      0      1
+            0      1      0
+            1      1      0
+            
+            it is NOT(ok_inp => ok_out) i.e. ok_inp AND NOT(ok_out)
+            """
+            
+            res = np.logical_and(ok_inp,np.logical_not(ok_out))
+            return res
+        
+        
+        ok_inp_new = _not_impl(self.table['ok_inp'].values, 
+                               self.table['ok_out'].values)
+        
+        flist_out = list(self.table[ok_inp_new,'fpath'])
+        
+        
+        self.table['ok_inp'] = ok_inp_new
+        
+        return flist_out
+            
 
     def filter_previous_tables(self,
                                DF_prev_tab):
