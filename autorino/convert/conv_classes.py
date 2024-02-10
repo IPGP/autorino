@@ -119,16 +119,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
         self.guess_local_rnx_files()
         self.check_local_files()
-
-        self.table['ok_out'].apply(np.logical_not)
-
-        if not force:
-            ### exclude also the conversion when a final RINEX exists
-            table_init_ok = self.filter_purge('ok_out')
-            n_ok_out = (self.table['ok_out']).sum()
-            n_not_ok_out = np.logical_not(self.table['ok_out']).sum()
-        else:
-            n_not_ok_out = 0
+        self.filter_ok_out()
 
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
@@ -139,7 +130,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
                     n_ok_inp)        
         
         logger.info("%6i files are excluded",
-                    n_not_ok_inp + n_not_ok_out )
+                    n_not_ok_inp)
         
         if print_table:
             self.print_table()
