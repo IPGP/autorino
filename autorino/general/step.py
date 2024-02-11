@@ -826,7 +826,7 @@ class StepGnss():
             out = []
         elif inplace:
             self.table = self.table[self.table[col]]
-            out = list(self.table['fraw'])
+            out = list(self.table[col])
         else:
             out = self.table[self.table[col]]
         return out
