@@ -116,6 +116,9 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
         ### initialize the table as log
         self.set_table_log(out_dir=tmp_dir_logs_use)
+        ### initialize list for tmp rinexs to be removed
+        frnxtmp_files = []
+        
 
         self.guess_local_rnx_files()
         self.check_local_files()
@@ -123,7 +126,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
         if not force:
             self.filter_ok_out()
         
-        self.decompress_table()
+        decompressed_files = self.decompress_table()
 
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
@@ -190,6 +193,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
                 self.table.loc[irow,'epoch_srt'] = epo_srt_ok
                 self.table.loc[irow,'epoch_end'] = epo_end_ok 
                 self.table.loc[irow,'ok_out'] = True
+                frnxtmp_files.append(frnxtmp) ### list for final remove
             else:
                 ### update table if things go wrong
                 self.table.loc[irow,'ok_out'] = False
@@ -240,7 +244,16 @@ class ConvertRinexModGnss(arogen.StepGnss):
                 self.table.loc[irow,'ok_out'] = False
                 self.write_in_table_log(self.table.loc[irow])
                 continue               
-                
+        
+        #### remove temporary files
+        if decompressed_files:
+            for f in decompressed_files:
+                logger.debug("remove temp RINEX file: %s",f)
+                os.remove(f)
+        if frnxtmp_files:
+            for f in frnxtmp_files:
+                logger.debug("remove temp RINEX file: %s",f)
+                os.remove(f)            
         return None
 
 
