@@ -21,6 +21,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+
+def autorino_run(cfg_in):
+    workflow_lis, y_site, y_device, y_access = read_configfile(cfg_in)
+    run_workflow(workflow_lis)
+    return None
+
 def run_workflow(workflow_lis,print_table=True):
     wkf_prev = None
     for iwkf,wkf in enumerate(workflow_lis):
