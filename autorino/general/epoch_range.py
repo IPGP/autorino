@@ -298,5 +298,6 @@ def create_dummy_epochrange():
                      period='15min')
     return epo
 
-EpochRange(pd.NaT, pd.NaT)
+e = EpochRange("now", "2 hours ago","15min")
+e.epoch_range_list(True)
 
