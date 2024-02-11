@@ -772,7 +772,7 @@ class StepGnss():
         ok_inp_new = _not_impl(self.table['ok_inp'].values, 
                                self.table['ok_out'].values)
         
-        flist_out = list(self.table[ok_inp_new,'fpath'])
+        flist_out = list(self.table['fpath_inp'][ok_inp_new])
         
         
         self.table['ok_inp'] = ok_inp_new
