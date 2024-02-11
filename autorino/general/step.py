@@ -568,9 +568,6 @@ class StepGnss():
 
         return invalid_local_files_list
 
-
-
-
     def decompress_table(self, table_col='fpath_inp'):
         """
         decompress the potential compressed files in the ``table_col`` column
