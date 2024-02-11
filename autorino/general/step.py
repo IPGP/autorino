@@ -587,9 +587,13 @@ class StepGnss():
         idx_comp = self.table.loc[bool_wrk].index
         self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp,
                                                                table_col]
+        if hasattr(self, 'tmp_dir_unzipped'): 
+            tmp_dir = self.tmp_dir_unzipped 
+        else:
+            tmp_dir = self.tmp_dir
         files_out = \
             self.table.loc[idx_comp, table_col].apply(arogen.decompress,
-                                                      args=(self.tmp_dir,))
+                                                      args=(tmp_dir,))
         self.table.loc[idx_comp, table_col] = files_out
         self.table.loc[idx_comp, 'ok_inp'] = \
             self.table.loc[idx_comp, table_col].apply(os.path.isfile)
