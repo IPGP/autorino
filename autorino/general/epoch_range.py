@@ -19,7 +19,7 @@ class EpochRange:
                  epoch1,
                  epoch2,
                  period="1d",
-                 round_method="floor",
+                 round_method="round",
                  tz="UTC"):
         """
         period : str, optional
@@ -60,8 +60,8 @@ class EpochRange:
     def epoch_start(self,value):
         self._epoch_start = dateparser_frontend(value,tz=self.tz)
         self._epoch_start = _round_date(self._epoch_start,
-                                               self.period,
-                                               self.round_method) 
+                                        self.period,
+                                        self.round_method) 
     @property
     def epoch_end(self):
         return self._epoch_end
@@ -69,8 +69,8 @@ class EpochRange:
     def epoch_end(self,value):
         self._epoch_end = dateparser_frontend(value) #,tz=self.tz) 
         self._epoch_end = _round_date(self._epoch_end,
-                                             self.period,
-                                             self.round_method)
+                                      self.period,
+                                      self.round_method)
     @property
     def period_values(self):
         numbers = re.findall(r'[0-9]+', self.period)
@@ -130,7 +130,7 @@ def dateparser_frontend(date_in,tz="UTC"):
     
     return date_out
     
-def _round_date(date_in,period,round_method="floor"):
+def _round_date(date_in,period,round_method="round"):
     """
     low-level function to round a Pandas Serie or a datetime-like object 
     according to the "ceil", "floor" or "round" approach
