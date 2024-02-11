@@ -119,7 +119,10 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
         self.guess_local_rnx_files()
         self.check_local_files()
-        self.filter_ok_out()
+        if False:
+            self.filter_ok_out()
+        
+        self.decompress_table()
 
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
@@ -146,9 +149,9 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
             ### manage compressed files
             # not here anymore actually it is still here 
-            if ext in ('.gz',):
-                logger.debug("%s is compressed",fraw)
-                fraw = Path(arogen.decompress(fraw, tmp_dir_unzipped_use))
+            #if ext in ('.gz',):
+            #    logger.debug("%s is compressed",fraw)
+            #    fraw = Path(arogen.decompress(fraw, tmp_dir_unzipped_use))
  
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
