@@ -214,9 +214,9 @@ class DownloadGnss(arogen.StepGnss):
                 raise Exception
             elif self.access['protocol'] == "http":
                 try:
-                    file_dl = arodl.download_file_http(rmot_file,
-                                                       tmpdir_use)
-                    shutil.copy(file_dl,outdir_use)
+                    file_dl_tmp = arodl.download_file_http(rmot_file,
+                                                           tmpdir_use)
+                    file_dl_out = shutil.copy(file_dl_tmp,outdir_use)
                     dl_ok = True
                 except Exception as e:
                     logger.error("HTTP download error: %s",str(e))
@@ -224,11 +224,11 @@ class DownloadGnss(arogen.StepGnss):
                     
             elif self.access['protocol'] == "ftp":
                 try:
-                    file_dl = arodl.download_file_ftp(rmot_file,
-                                                      tmpdir_use,
-                                                      self.access['login'],
-                                                      self.access['password'])
-                    shutil.copy(file_dl,outdir_use)
+                    file_dl_tmp = arodl.download_file_ftp(rmot_file,
+                                                          tmpdir_use,
+                                                          self.access['login'],
+                                                          self.access['password'])
+                    file_dl_out = shutil.copy(file_dl_tmp,outdir_use)
                     dl_ok = True
                 except ftplib.error_perm as e:
                     logger.error("FTP download error: %s",str(e))
@@ -239,9 +239,10 @@ class DownloadGnss(arogen.StepGnss):
 
             ###### store the results in the table
             if dl_ok:
-                download_files_list.append(file_dl)
+                download_files_list.append(file_dl_out)
                 self.table.loc[irow,"ok_out"] = True
-                self.table.loc[irow,"fpath_out"] = file_dl
+                self.table.loc[irow,"fpath_out"] = file_dl_out
+                os.remove(file_dl_tmp)
             else:
                 self.table.loc[irow,"ok_out"] = False
                 
@@ -259,7 +260,7 @@ class DownloadGnss(arogen.StepGnss):
 
         if print_table:
             self.print_table()
-        #### DOWNLOAD a.k.a FETCH
+        #### DOWNLOAD CORE a.k.a FETCH
         self.fetch_remote_files()
         if print_table:
             self.print_table()    
