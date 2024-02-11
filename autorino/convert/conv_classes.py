@@ -119,7 +119,8 @@ class ConvertRinexModGnss(arogen.StepGnss):
 
         self.guess_local_rnx_files()
         self.check_local_files()
-        if False:
+        force=False
+        if not force:
             self.filter_ok_out()
         
         self.decompress_table()

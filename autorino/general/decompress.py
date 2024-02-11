@@ -11,6 +11,7 @@ from pathlib import Path
 import gzip
 import shutil
 import hatanaka
+import os
 
 #### Import the logger
 import logging
@@ -86,6 +87,11 @@ def decompress(file_inp,
     file_inp = str(file_inp) 
     file_inp2 = Path(file_inp)
     ext = file_inp2.suffix.lower()
+
+    if not os.path.isfile(file_inp):
+        logger.warning("unable to decompress, file not exists: %s",file_inp2.name)
+        return file_inp 
+
     
     ### RINEX Case
     if conv.rinex_regex_search_tester(file_inp,compressed=True):
