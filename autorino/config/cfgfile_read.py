@@ -15,17 +15,26 @@ import autorino.convert as arocnv
 #import autorino.epochrange as aroepo
 
 import yaml
+import glob
 
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
 
 def autorino_run(cfg_in):
-    if not (os.path.isdir(cfg_in) or os.path.isfile(cfg_in)):
-        logger.error("%s does not exists, check input config file/dir")
+
+    if os.path.isdir(cfg_in):
+        cfg_use_lis = glob.glob(cfg_in + '/*yml')
+    elif  os.path.isfile(cfg_in):
+        cfg_use_lis = [cfg_in]
+    else:
+        logger.error("%s does not exist, check input config file/dir",cfg_in)
         raise Exception
-    workflow_lis, y_site, y_device, y_access = read_configfile(cfg_in)
-    run_workflow(workflow_lis)
+    
+    for cfg_use in cfg_use_lis:
+        workflow_lis, y_site, y_device, y_access = read_configfile(cfg_use)
+        run_workflow(workflow_lis)
+        
     return None
 
 def run_workflow(workflow_lis,print_table=True):
@@ -40,7 +49,36 @@ def run_workflow(workflow_lis,print_table=True):
             wkf.load_table_from_prev_step_table(wkf_prev.table)
             wkf.convert_rnxmod(print_table)
 
-def read_configfile(configfile_path):
+def read_configfile(configfile_path,
+                    epoch_range_inp=None):
+    """
+    Load a config file (YAML format) and 
+    return a "Workflow list" i.e. a list of StepGnss object 
+    to be launched sequencially
+    
+    epoch_range_inp is a EpochRange object which will override the epoch ranges
+    given in the config file
+
+    Parameters
+    ----------
+    configfile_path : TYPE
+        DESCRIPTION.
+    epoch_range_inp : TYPE, optional
+        DESCRIPTION. The default is None.
+
+    Returns
+    -------
+    workflow_lis : list
+        "Workflow list" i.e. a list of StepGnss object 
+        to be launched sequencially.
+    y_site : dict
+        site dictionnary.
+    y_device : dict
+        device dictionnary.
+    y_access : dict
+        station access dictionnary.
+
+    """
     logger.info('start to read configfile: %s',configfile_path)
     y = yaml.safe_load(open(configfile_path))
     
@@ -65,7 +103,11 @@ def read_configfile(configfile_path):
                                yses['session']['log_dir_structure'])
     
         ##### EPOCH RANGE AT THE SESSION LEVEL
-        epo_obj_gen = _epoch_range_from_cfg_bloc(yses['epoch_range'])
+        if not epoch_range_inp:
+            epo_obj_gen = _epoch_range_from_cfg_bloc(yses['epoch_range'])
+        else:
+            epo_obj_gen = epoch_range_inp
+        
         
         workflow_lis = []
         #### manage workflow
@@ -114,7 +156,11 @@ def read_configfile(configfile_path):
     
 def _check_parent_dir_existence(parent_dir_inp):
     """
+    Check if a parent dictionnary exists
+    
     will translate it with the environnement variable first
+    
+    internal function for read_configfile
     """
     parent_dir_out = arogen.translator(parent_dir_inp)
     
@@ -126,6 +172,11 @@ def _check_parent_dir_existence(parent_dir_inp):
 
 
 def _epoch_range_from_cfg_bloc(epoch_range_dic):
+    """
+    get an EpochRange object from epoch_range dictionnary bloc
+    internal function for read_configfile
+
+    """
     return arogen.EpochRange(epoch_range_dic['epoch1'], 
                              epoch_range_dic['epoch2'],
                              epoch_range_dic['period'],
