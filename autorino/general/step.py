@@ -568,10 +568,11 @@ class StepGnss():
 
         return invalid_local_files_list
 
-    def decompress_table(self, table_col='fpath_inp'):
+    def decompress_table(self, table_col='fpath_inp',table_ok_col='ok_inp'):
         """
         decompress the potential compressed files in the ``table_col`` column
-        (usually ``fpath_inp``)
+        and its corresponding ``table_ok_col`` boolean column
+        (usually ``fpath_inp`` and ``ok_inp``)
 
         It will uncompress the file if it is a
         (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file (gzip)
@@ -580,7 +581,10 @@ class StepGnss():
         to keep the trace of the original file
         """
         bool_comp = self.table[table_col].apply(arogen.is_compressed)
-        idx_comp = self.table.loc[bool_comp].index
+        ### we also ensure the fact that the boolean ok column is True
+        bool_ok = self.table[table_ok_col]
+        bool_wrk = np.logical_and(bool_comp,bool_ok) 
+        idx_comp = self.table.loc[bool_wrk].index
         self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp,
                                                                table_col]
         files_out = \
@@ -823,7 +827,7 @@ class StepGnss():
         
         if len(self.table) == 0:
             logger.warning("the table is empty, unable to purge it")
-            out = []
+            out = pd.DataFrame([])
         elif inplace:
             self.table = self.table[self.table[col]]
             out = list(self.table[col])
