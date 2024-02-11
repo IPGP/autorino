@@ -596,7 +596,7 @@ class StepGnss():
         self.table.loc[idx_comp, 'fname'] = \
             self.table.loc[idx_comp, table_col].apply(os.path.basename)
 
-        return None
+        return files_out
 
 #  ______ _ _ _              _        _     _
 # |  ____(_) | |            | |      | |   | |
