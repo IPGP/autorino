@@ -20,9 +20,10 @@ import yaml
 import logging
 logger = logging.getLogger(__name__)
 
-
-
 def autorino_run(cfg_in):
+    if not (os.path.isdir(cfg_in) or os.path.isfile(cfg_in)):
+        logger.error("%s does not exists, check input config file/dir")
+        raise Exception
     workflow_lis, y_site, y_device, y_access = read_configfile(cfg_in)
     run_workflow(workflow_lis)
     return None
@@ -114,7 +115,6 @@ def read_configfile(configfile_path):
 def _check_parent_dir_existence(parent_dir_inp):
     """
     will translate it with the environnement variable first
-
     """
     parent_dir_out = arogen.translator(parent_dir_inp)
     
