@@ -47,7 +47,7 @@ class StepGnss():
         # generic log
         self.set_logfile()
         # table log is on request only (for the moment9)
-        # thus this table_log_path attribute must be initialized
+        # thus this table_log_path attribute must be initialized as none
         self.table_log_path = None
 
     def __repr__(self):
