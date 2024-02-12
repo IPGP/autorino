@@ -7,7 +7,7 @@ Created on Thu Dec  1 15:47:05 2022
 """
 
 import os
-import autorino.general as arogen
+import autorino.common as arocmn
 import autorino.download as arodwl
 import autorino.convert as arocnv
 
@@ -162,7 +162,7 @@ def _check_parent_dir_existence(parent_dir_inp):
     
     internal function for read_configfile
     """
-    parent_dir_out = arogen.translator(parent_dir_inp)
+    parent_dir_out = arocmn.translator(parent_dir_inp)
     
     if  not os.path.isdir(parent_dir_out):
         logger.error("%s do not exists, create it first",parent_dir_out)
@@ -177,7 +177,7 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
     internal function for read_configfile
 
     """
-    return arogen.EpochRange(epoch_range_dic['epoch1'], 
+    return arocmn.EpochRange(epoch_range_dic['epoch1'], 
                              epoch_range_dic['epoch2'],
                              epoch_range_dic['period'],
                              epoch_range_dic['round_method'],

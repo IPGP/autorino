@@ -6,7 +6,7 @@ import pandas as pd
 import os
 import shutil
 import autorino.download as arodl
-import autorino.general as arogen
+import autorino.common as arocmn
 
 pd.options.mode.chained_assignment = 'warn'
 
@@ -14,7 +14,7 @@ pd.options.mode.chained_assignment = 'warn'
 import logging
 logger = logging.getLogger(__name__)
 
-class DownloadGnss(arogen.StepGnss):
+class DownloadGnss(arocmn.StepGnss):
     
     def __init__(self,out_dir,tmp_dir,log_dir,
                  epoch_range,
