@@ -249,20 +249,30 @@ class DownloadGnss(arocmn.StepGnss):
         return download_files_list
     
     
-    def download(self,print_table=False):
+    def download(self,verbose=False):
         """
         frontend method to download files from a GNSS recevier
         """
+        
+        logger.info("******** GNSS RAW files download")
+
         self.guess_local_raw_files()
         self.guess_remote_raw_files()
         self.check_local_files()
         self.invalidate_small_local_files()
-
-        if print_table:
+        
+        n_ok_inp = (self.table['ok_inp']).sum()
+        n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
+        
+        logger.info("%6i files will be downloaded, %6i files are excluded",
+                    n_ok_inp,n_not_ok_inp)
+                    
+        if verbose:
             self.print_table()
         #### DOWNLOAD CORE a.k.a FETCH
         self.fetch_remote_files()
-        if print_table:
+        ###############################
+        if verbose:
             self.print_table()    
             
         return None
