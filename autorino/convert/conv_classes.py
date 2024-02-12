@@ -108,7 +108,7 @@ class ConvertRinexModGnss(arocmn.StepGnss):
     ###############################################
 
     def convert_rnxmod(self,print_table=False,force=False):
-        logger.info("******** RINEX conversion / Header mod ('rinexmod')")
+        logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
 
         if self.sitelogs:
             site4_list = site_list_from_sitelogs(self.sitelogs)
