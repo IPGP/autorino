@@ -18,7 +18,7 @@ import rinexmod
 from geodezyx import utils, conv
 
 # import autorino.epochrange as aroepo
-import autorino.general as arogen
+import autorino.common as arocmn
 import autorino.config as arocfg
 # import autorino.download as arodwl
 logger = logging.getLogger(__name__)
@@ -204,7 +204,7 @@ class StepGnss():
         if epoch_range:
             self.epoch_range = epoch_range
         else:
-            self.epoch_range = arogen.EpochRange()
+            self.epoch_range = arocmn.EpochRange()
 
 
     def _set_translate_dict(self):
@@ -318,13 +318,13 @@ class StepGnss():
             logger.warning("the period spacing of %s is not uniform", self)
             # be sure to keep the 1st one!!!
 
-        period_new = arogen.timedelta2freqency_alias(tdelta_arr[0])
+        period_new = arocmn.timedelta2freqency_alias(tdelta_arr[0])
         self.epoch_range.period = period_new
 
         logger.info("new %s", self.epoch_range)
 
     def translate_path(self, path_inp, epoch_inp=None):
-        return arogen.translator(path_inp, self.translate_dict, epoch_inp)
+        return arocmn.translator(path_inp, self.translate_dict, epoch_inp)
 
  #  _                       _
  # | |                     (_)
@@ -580,7 +580,7 @@ class StepGnss():
         It will create a new column ``fpath_ori`` (for original)
         to keep the trace of the original file
         """
-        bool_comp = self.table[table_col].apply(arogen.is_compressed)
+        bool_comp = self.table[table_col].apply(arocmn.is_compressed)
         ### we also ensure the fact that the boolean ok column is True
         bool_ok = self.table[table_ok_col]
         bool_wrk = np.logical_and(bool_comp,bool_ok) 
@@ -592,7 +592,7 @@ class StepGnss():
         else:
             tmp_dir = self.tmp_dir
         files_out = \
-            self.table.loc[idx_comp, table_col].apply(arogen.decompress,
+            self.table.loc[idx_comp, table_col].apply(arocmn.decompress,
                                                       args=(tmp_dir,))
         self.table.loc[idx_comp, table_col] = files_out
         self.table.loc[idx_comp, 'ok_inp'] = \
@@ -846,7 +846,7 @@ class StepGnss():
                               round_method='floor',
                               drop_epoch_rnd=False):
 
-        epoch_rnd = arogen.round_epochs(self.table['epoch_srt'],
+        epoch_rnd = arocmn.round_epochs(self.table['epoch_srt'],
                                         period=period,
                                         rolling_period=rolling_period,
                                         rolling_ref=rolling_ref,

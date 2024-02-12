@@ -6,10 +6,6 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-from geodezyx import utils,operational
-import autorino.convert as arocnv
-from rinexmod import rinexmod_api
-from pathlib import Path
 import os
 import re 
 import numpy as np
@@ -17,16 +13,21 @@ import datetime as dt
 import dateutil
 import docker
 import shutil
-import autorino.general as arogen
+from pathlib import Path
 
+from geodezyx import utils,operational
 
+import autorino.convert as arocnv
+import autorino.general as arocmn
+
+from rinexmod import rinexmod_api
 
 #### Import the logger
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
-class ConvertRinexModGnss(arogen.StepGnss):
+class ConvertRinexModGnss(arocmn.StepGnss):
     def __init__(self,out_dir,tmp_dir,log_dir,
                  epoch_range,
                  site=None,
@@ -156,7 +157,7 @@ class ConvertRinexModGnss(arogen.StepGnss):
             # not here anymore actually it is still here 
             #if ext in ('.gz',):
             #    logger.debug("%s is compressed",fraw)
-            #    fraw = Path(arogen.decompress(fraw, tmp_dir_unzipped_use))
+            #    fraw = Path(arocmn.decompress(fraw, tmp_dir_unzipped_use))
  
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
