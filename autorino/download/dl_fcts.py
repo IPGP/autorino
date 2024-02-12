@@ -15,7 +15,8 @@ import urllib.request
 from tqdm import tqdm
 import requests
 import io
-import socketfrom ftplib import FTP, error_temp
+import socket
+from ftplib import FTP, error_temp
 from time import sleep
 
 # Create a logger object.
@@ -177,13 +178,14 @@ def download_file_ftp(url, output_dir,username, password,
                 ftp.retrbinary('RETR ' + filename,
                                lambda data: (f.write(data),pbar.update(len(data))),
                                1024)
-            except (error_temp, BrokenPipeError, socket.timeout) as e: 
-                try_count += 1
-                if try_count > max_try:
-                    raise e
-                else:
-                    print(e)
-                    sleep(try_count * 2)
+                break
+        except (error_temp, BrokenPipeError, socket.timeout) as e: 
+            try_count += 1
+            if try_count > max_try:
+                raise e
+            else:
+                print(e)
+                sleep(try_count * 2)
             
     ftp.quit()
     f.close()
