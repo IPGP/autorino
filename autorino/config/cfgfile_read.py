@@ -166,7 +166,7 @@ def _check_parent_dir_existence(parent_dir_inp):
     
     if  not os.path.isdir(parent_dir_out):
         logger.error("%s do not exists, create it first",parent_dir_out)
-        raise FileNotFoundError("%s do not exists, create it first",parent_dir_out)
+        raise FileNotFoundError(parent_dir_out,"do not exists, create it first")
     else:
         return None
 
