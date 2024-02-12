@@ -15,6 +15,9 @@ import urllib.request
 from tqdm import tqdm
 import requests
 import io
+import socketfrom ftplib import FTP, error_temp
+from time import sleep
+
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
@@ -142,7 +145,7 @@ def size_remote_file_http(url):
 ############# download remote file
 
 def download_file_ftp(url, output_dir,username, password,
-                      timeout=100):
+                      timeout=15,max_try=3):
     urlp = urlparse(url)
     
     url_host = urlp.netloc
@@ -160,20 +163,29 @@ def download_file_ftp(url, output_dir,username, password,
     file_size = ftp.size(filename)
 
     output_path = os.path.join(output_dir, filename)
-    f = open(output_path, 'wb')
-
+    #f = open(output_path, 'wb')
     #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
-    with tqdm(total=file_size,
-               unit='B', 
-               unit_scale=True,
-               desc=filename) as pbar:
-                    
-        _ftp_callback.bytes_transferred = 0
-        ftp.retrbinary('RETR ' + filename,
-                       lambda data: (f.write(data),pbar.update(len(data))),
-                       1024)
-        ftp.quit()
-        
+    try_count = 0
+    while True:  
+        try: 
+            with tqdm(total=file_size,
+                       unit='B', 
+                       unit_scale=True,
+                       desc=filename) as pbar, open(output_path, 'wb') as f:
+                            
+                _ftp_callback.bytes_transferred = 0
+                ftp.retrbinary('RETR ' + filename,
+                               lambda data: (f.write(data),pbar.update(len(data))),
+                               1024)
+            except (error_temp, BrokenPipeError, socket.timeout) as e: 
+                try_count += 1
+                if try_count > max_try:
+                    raise e
+                else:
+                    print(e)
+                    sleep(try_count * 2)
+            
+    ftp.quit()
     f.close()
     return output_path
 
