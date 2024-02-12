@@ -108,6 +108,8 @@ class ConvertRinexModGnss(arocmn.StepGnss):
     ###############################################
 
     def convert_rnxmod(self,print_table=False,force=False):
+        logger.info("******** RINEX conversion / Header mod ('rinexmod')")
+
         if self.sitelogs:
             site4_list = site_list_from_sitelogs(self.sitelogs)
         else:
@@ -134,12 +136,9 @@ class ConvertRinexModGnss(arocmn.StepGnss):
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table['ok_inp']).sum()
         n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
-
-        logger.info("******** RINEX conversion / Header mod ('rinexmod') for %6i files",
-                    n_ok_inp)        
         
-        logger.info("%6i files are excluded",
-                    n_not_ok_inp)
+        logger.info("%6i files will be converted, %6i files are excluded",
+                    n_ok_inp,n_not_ok_inp)
         
         if print_table:
             self.print_table()
