@@ -77,7 +77,30 @@ def join_url(protocol_inp,hostname_inp,dir_inp,fname_inp):
 
 ############# list remote files
 
-def list_remote_files_ftp(host_name, remote_dir, username, password):
+def FTP_create_object(url_host_inp,
+                      timeout=15,max_try=3,sleep_time=5):
+    """
+    create an FTP object, and retry in case of a timeout
+    """
+    
+    try_count = 0
+    while True:  
+        try: 
+            ftp = ftplib.FTP(url_host_inp,timeout=timeout)
+            return ftp
+        except TimeoutError as e: 
+            try_count += 1
+            if try_count > max_try:
+                raise e
+            else:
+                print(e)
+                sleep(sleep_time)
+        
+
+    
+
+def list_remote_files_ftp(host_name, remote_dir, username, password,
+                          timeout=15,max_try=3):
     # clean hostname & remote_dir
     # MUST BE IMPROVED !!!
     remote_dir = remote_dir.replace(host_name,"")
@@ -88,7 +111,7 @@ def list_remote_files_ftp(host_name, remote_dir, username, password):
     join_url()
     
     # connect to FTP server
-    ftp = ftplib.FTP(host_name)
+    ftp = ftplib.FTP(host_name,timeout=timeout)
     ftp.login(username, password)
     
     # change to remote directory
@@ -146,14 +169,18 @@ def size_remote_file_http(url):
 ############# download remote file
 
 def download_file_ftp(url, output_dir,username, password,
-                      timeout=15,max_try=3):
+                      timeout=15,max_try=3,sleep_time=5):
     urlp = urlparse(url)
     
     url_host = urlp.netloc
     url_dir = os.path.dirname(urlp.path)[1:]
     url_fname = os.path.basename(urlp.path)
     
-    ftp = ftplib.FTP(url_host,timeout=timeout)
+    ftp = FTP_create_object(url_host,
+                            timeout=timeout,
+                            max_try=max_try,
+                            sleep_time=sleep_time)
+    
     ftp.login(username, password)
     ftp.cwd(url_dir)
     filename = url_fname 
@@ -176,7 +203,8 @@ def download_file_ftp(url, output_dir,username, password,
                             
                 _ftp_callback.bytes_transferred = 0
                 ftp.retrbinary('RETR ' + filename,
-                               lambda data: (f.write(data),pbar.update(len(data))),
+                               lambda data: (f.write(data),
+                                             pbar.update(len(data))),
                                1024)
                 break
         except (error_temp, BrokenPipeError, socket.timeout) as e: 
@@ -185,7 +213,7 @@ def download_file_ftp(url, output_dir,username, password,
                 raise e
             else:
                 print(e)
-                sleep(try_count * 2)
+                sleep(sleep_time)
             
     ftp.quit()
     f.close()
