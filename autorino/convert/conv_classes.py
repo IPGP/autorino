@@ -18,7 +18,7 @@ from pathlib import Path
 from geodezyx import utils,operational
 
 import autorino.convert as arocnv
-import autorino.general as arocmn
+import autorino.common as arocmn
 
 from rinexmod import rinexmod_api
 
