@@ -120,9 +120,10 @@ class ConvertRinexModGnss(arogen.StepGnss):
         frnxtmp_files = []
         
 
+        ### guess and desactivate existing local RINEX files
         self.guess_local_rnx_files()
         self.check_local_files()
-        force=False
+
         if not force:
             self.filter_ok_out()
         
@@ -246,14 +247,12 @@ class ConvertRinexModGnss(arogen.StepGnss):
                 continue               
         
         #### remove temporary files
-        if decompressed_files:
-            for f in decompressed_files:
-                logger.debug("remove temp RINEX file: %s",f)
-                os.remove(f)
-        if frnxtmp_files:
-            for f in frnxtmp_files:
-                logger.debug("remove temp RINEX file: %s",f)
-                os.remove(f)            
+        for f in decompressed_files:
+            logger.debug("remove tmp decompres RINEX file: %s",f)
+            os.remove(f)
+        for f in frnxtmp_files:
+            logger.debug("remove tmp converted RINEX file: %s",f)
+            os.remove(f)            
         return None
 
 
