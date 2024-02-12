@@ -259,6 +259,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.guess_local_raw_files()
         self.guess_remote_raw_files()
         self.check_local_files()
+        self.filter_ok_out()
         self.invalidate_small_local_files()
         
         n_ok_inp = (self.table['ok_inp']).sum()
