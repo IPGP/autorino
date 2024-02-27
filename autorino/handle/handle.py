@@ -25,7 +25,7 @@ class HandleGnss(arogen.StepGnss):
                          session=session)
 
     def splice(self):
-        
+        ### divide_step_by_epochs will create several HandleGnss objects
         hdl_obj_out = self.divide_step_by_epochs()
         
         for hdl in hdl_obj_out:
@@ -37,16 +37,20 @@ class HandleGnss(arogen.StepGnss):
         
         tmp_dir_use = self.translate_path(self.tmp_dir)
         
-        if True:
+        
+        handle_software = 'converto'
+        if handle_software == 'converto':
             frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
                                               tmp_dir_use,
                                               'converto',
                                               bin_options=['-cat'])
-        else:
+        elif handle_software == 'gfzrnx':
             frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
                                               tmp_dir_use,
                                               'gfzrnx',
                                               bin_options=['-f'])
+    
             
+    
 
         
