@@ -77,7 +77,7 @@ def join_url(protocol_inp,hostname_inp,dir_inp,fname_inp):
 
 ############# list remote files
 
-def FTP_create_object(url_host_inp,
+def ftp_create_object(url_host_inp,
                       timeout=15,max_try=3,sleep_time=5):
     """
     create an FTP object, and retry in case of a timeout
@@ -176,7 +176,7 @@ def download_file_ftp(url, output_dir,username, password,
     url_dir = os.path.dirname(urlp.path)[1:]
     url_fname = os.path.basename(urlp.path)
     
-    ftp = FTP_create_object(url_host,
+    ftp = ftp_create_object(url_host,
                             timeout=timeout,
                             max_try=max_try,
                             sleep_time=sleep_time)
