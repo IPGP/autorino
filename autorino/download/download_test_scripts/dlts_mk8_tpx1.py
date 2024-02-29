@@ -41,7 +41,7 @@ dwl.print_table()
 # out = "/home/sysop/workflow_tests/convert_tests"
 # sitelog_dir = '/home/sysop/sitelogs/OVPF'
 
-# conv = arocnv.ConvertRinexModGnss(ses,dwl.epoch_range,out,sitelog_dir)
+# conv = arocnv.ConvertGnss(ses,dwl.epoch_range,out,sitelog_dir)
 
 # conv.load_table_from_prev_step_table(dwl.table)
 # conv.print_table()

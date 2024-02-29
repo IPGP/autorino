@@ -16,6 +16,8 @@ import pandas as pd
 import numpy as np
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
+rnxmod_dir = '/home/psakicki/autorino_workflow_tests/rinexmoded'
+
 out_dir = '/home/psakicki/autorino_workflow_tests/handle'
 log_dir = tmp_dir
 
@@ -40,32 +42,25 @@ handle_software = 'converto'
 
 hdl_split.decompress_table()
 
-hdl_split.split()
+#hdl_split.split()
 
 #def split(self):
 for irow,row in hdl_split.table.iterrows():
 
-    frnx_inp = row['fpath_inp']
+    rinexmod_kwargs = {#'marker': 'TOTO',
+                       'compression': "gz",
+                       'longname': True,
+                       #'sitelog': sitelogs,
+                       'force_rnx_load': True,
+                       'verbose': False,
+                       'tolerant_file_period': True,
+                       'full_history': True}
 
-    tmp_dir_use = hdl_split.translate_path(self.tmp_dir)
-    out_dir_use = hdl_split.translate_path(self.out_dir)
+    hdl_split.split_row(irow, tmp_dir)
 
-    if handle_software == 'converto':
-        converto_kwoptions={'-st':row['epoch_srt'].strftime('%Y%m%d%H%M%S'),
-                            '-e': row['epoch_end'].strftime('%Y%m%d%H%M%S')}
+    hdl_split.rinexmod_row(irow,rnxmod_dir,rinexmod_kwargs)
 
-        frnxtmp, _ = arocnv.converter_run(frnx_inp,
-                                          tmp_dir_use,
-                                          'converto',
-                                          bin_kwoptions=converto_kwoptions)
-    elif handle_software == 'gfzrnx':
-        gfzrnx_kwoptions = {'-epo_beg': row['epoch_srt'].strftime('%Y%m%d_%H%M%S'),
-                            '-d': int((row['epoch_end'] - row['epoch_srt']).total_seconds())}
-
-        frnxtmp, _ = arocnv.converter_run(frnx_inp,
-                                          tmp_dir_use,
-                                          'gfzrnx',
-                                          bin_kwoptions=gfzrnx_kwoptions)
+    hdl_split.move_final_row(irow)
 
 
 
