@@ -125,7 +125,7 @@ class StepGnss():
     @epoch_range.setter
     def epoch_range(self, value):
         self._epoch_range = value
-        # this test becones useless after session class suppression (240126)
+        # this test becomes useless after session class suppression (240126)
         # if self._epoch_range.period != self.session.session_period:
         #     logger.warning("Session period (%s) ≠ Epoch Range period (%s)",
         #     self.session.session_period,self._epoch_range.period)
@@ -141,8 +141,22 @@ class StepGnss():
         # designed for future safety tests
 
     def _init_table(self,
-                    table_cols=None,
-                    init_epoch=True):
+                    table_cols: list = None,
+                    init_epoch: bool = True) -> pd.DataFrame:
+        """
+        initialize the table of a Step object
+
+        Parameters
+        ----------
+        table_cols
+        init_epoch: bool
+
+        Returns
+        -------
+        df :
+            the Step object's table
+
+        """
 
         if table_cols is None:
             table_cols = ['fname',
@@ -156,7 +170,6 @@ class StepGnss():
                           'size_inp',
                           'size_out',
                           'note']
-
 
         df = pd.DataFrame([], columns=table_cols)
 
@@ -307,25 +320,34 @@ class StepGnss():
         return
 
     def update_epoch_range_from_table(self,
-                                      column='epoch_srt'):
+                                      column_srt='epoch_srt',
+                                      column_end = 'epoch_end'):
         """
         update the EpochRange of the StepGnss object with
         the min/max of the epochs in the object's table
         """
-        epomin = self.table[column].min()
-        epomax = self.table[column].max()
+        epomin = self.table[column_srt].min()
+        epomax = self.table[column_srt].max()
 
-        self.epoch_range.epoch1 = epomin
-        self.epoch_range.epoch1 = epomax
+        epoch1 = epomin
+        epoch2 = epomax
 
-        tdelta_arr = self.table[column].diff().dropna().unique()
+        tdelta = self.table[column_end] - self.table[column_srt]
 
-        if len(tdelta_arr) > 1:
-            logger.warning("the period spacing of %s is not uniform", self)
+        n_tdelta = tdelta.value_counts().to_frame()
+        v_tdelta = tdelta.mode()[0]
+
+        if len(n_tdelta) > 1:
+            logger.warning("the period spacing of %s is not uniform, keep the most common", self)
+            logger.warning("%s", n_tdelta)
             # be sure to keep the 1st one!!!
 
-        period_new = arocmn.timedelta2freqency_alias(tdelta_arr[0])
-        self.epoch_range.period = period_new
+        period_new = arocmn.timedelta2freqency_alias(v_tdelta)
+        logger.debug("new period, %s, %s",v_tdelta, period_new)
+
+        self.epoch_range = arocmn.EpochRange(epoch1,epoch2,period_new,
+                                             round_method=self.epoch_range.round_method,
+                                             tz=self.epoch_range.tz)
 
         logger.info("new %s", self.epoch_range)
 
@@ -454,7 +476,7 @@ class StepGnss():
                                  input_files,
                                  inp_regex=".*",
                                  reset_table=True):
-        # update_epoch_range=True):
+                                 #update_epoch_range=False):
         if reset_table:
             self._init_table(init_epoch=False)
 
@@ -465,7 +487,7 @@ class StepGnss():
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
         self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
 
-        # if update_epoch_range:
+        #if update_epoch_range:
         #    self.update_epoch_range_from_table()
 
         return flist
@@ -834,37 +856,6 @@ class StepGnss():
             out = self.table[self.table[col]]
         return out
 
-    def divide_step_by_epochs(self,
-                              period='1d',
-                              rolling_period=False,
-                              rolling_ref=-1,
-                              round_method='floor',
-                              drop_epoch_rnd=False):
-
-        epoch_rnd = arocmn.round_epochs(self.table['epoch_srt'],
-                                        period=period,
-                                        rolling_period=rolling_period,
-                                        rolling_ref=rolling_ref,
-                                        round_method=round_method)
-
-        self.table['epoch_rnd'] = epoch_rnd
-
-        grps = self.table.groupby('epoch_rnd')
-
-        stp_obj_lis_out = []
-
-        for tgrp, tabgrp in grps:
-            stp_obj = self.copy()
-
-            if drop_epoch_rnd:
-                tabgrp_bis = tabgrp.drop('epoch_rnd', axis=1)
-            else:
-                tabgrp_bis = pd.DataFrame(tabgrp)
-            stp_obj.table = tabgrp_bis
-            stp_obj_lis_out.append(stp_obj)
-
-        return stp_obj_lis_out
-
     #               _   _
     #     /\       | | (_)
     #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
@@ -873,7 +864,7 @@ class StepGnss():
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def convert_row(self, irow, tmp_dir_inp,converter_inp):
+    def convert_row(self, irow, tmp_dir_inp, converter_inp):
         self.table.loc[irow, 'ok_inp'] = True
 
         frnxtmp, _ = arocnv.converter_run(fraw,

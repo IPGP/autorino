@@ -21,13 +21,14 @@ p="/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"
 L = utils.find_recursive(p,"*gz")
 
 hdl.load_table_from_filelist(L)
-hdl.update_epoch_table_from_rnx_fname()
+hdl.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-# bool_comp = hdl.table['fpath_inp'].apply(arocmn.is_compressed)
-# idx_comp = hdl.table.loc[bool_comp].index        
-# hdl.table.loc[idx_comp,'fpath_ori'] = hdl.table[idx_comp,'fpath_inp']
-# files_out = self.table.loc[idx_comp,table_col].apply(arocmn.decompress)
-# self.table.loc[idx_comp,table_col] = files_out
+a = hdl.divide_by_epochs()
+
+
+
+
+
 
 hdl.decompress_table()
 
