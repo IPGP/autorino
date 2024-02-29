@@ -20,6 +20,7 @@ import rinexmod
 from geodezyx import utils, conv
 
 import autorino.common as arocmn
+#import autorino.convert as arocnv
 import autorino.config as arocfg
 
 logger = logging.getLogger(__name__)
@@ -780,14 +781,15 @@ class StepGnss():
 
         def _not_impl(ok_inp, ok_out):
             """
-            The truth table we want is one
+            The truth table we want is this one
             ok_inp ok_out result
             0      0      0
             1      0      1
             0      1      0
             1      1      0
             
-            it is NOT(ok_inp => ok_out) i.e. ok_inp AND NOT(ok_out)
+            it is the negation of an implication
+            i.e. NOT(ok_inp => ok_out) i.e. ok_inp AND NOT(ok_out)
             """
 
             res = np.logical_and(ok_inp, np.logical_not(ok_out))
@@ -803,7 +805,7 @@ class StepGnss():
         return flist_out
 
     def filter_previous_tables(self,
-                               DF_prev_tab):
+                               df_prev_tab):
         """
         Filter a list of raw files if they are present in previous
         conversion tables stored as log
@@ -815,10 +817,10 @@ class StepGnss():
         col_ok_names = ["ok_inp", "ok_conv", "ok_rnxmod"]
 
         # previous files when everthing was ok
-        prev_bool_ok = DF_prev_tab[col_ok_names].apply(np.logical_and.reduce,
+        prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce,
                                                        axis=1)
 
-        prev_files_ok = DF_prev_tab[prev_bool_ok].fraw
+        prev_files_ok = df_prev_tab[prev_bool_ok].fraw
 
         # current files which have been already OK and which have already
         # ok_inp == False
@@ -864,11 +866,11 @@ class StepGnss():
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def convert_row(self, irow, tmp_dir_inp, converter_inp):
+    def convert_row(self, irow, out_dir_inp, converter_inp):
         self.table.loc[irow, 'ok_inp'] = True
 
         frnxtmp, _ = arocnv.converter_run(fraw,
-                                          tmp_dir_inp,
+                                          out_dir_inp,
                                           converter=converter_inp)
         if frnxtmp:
             ### update table if things go well
@@ -882,32 +884,35 @@ class StepGnss():
             self.table.loc[irow, 'ok_out'] = False
         return frnxtmp
 
-    def rinexmod_row(self, irow, tmp_dir_inp, rinexmod_kwargs):
+    def rinexmod_row(self, irow, out_dir_inp, rinexmod_kwargs):
 
         frnx = self.table.loc[irow, 'fpath_out']
 
         try:
             frnxmod = rinexmod.rinexmod_api.rinexmod(frnx,
-                                                     tmp_dir_inp,
+                                                     out_dir_inp,
                                                      **rinexmod_kwargs)
             ### update table if things go well
             self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, 'fpath_out'] = frnxmod
             self.table.loc[irow, 'size_out'] = os.path.getsize(frnxmod)
-
             self.write_in_table_log(self.table.loc[irow])
+
         except Exception as e:
             ### update table if things go wrong
             logger.error(e)
             self.table.loc[irow, 'ok_out'] = False
             self.write_in_table_log(self.table.loc[irow])
+            frnxmod = None
+            raise e
+
         return frnxmod
 
     def move_final_row(self, irow):
         ### def output folders
         outdir_use = self.translate_path(self.out_dir,
-                                         epoch_inp=self.table.loc[irow,
-                                         'epoch_srt'])
+                                         epoch_inp=self.table.loc[irow,'epoch_srt'])
+
         frnxmod = self.table.loc[irow, 'fpath_out']
 
         try:
@@ -921,8 +926,12 @@ class StepGnss():
             logger.error(e)
             self.table.loc[irow, 'ok_out'] = False
             self.write_in_table_log(self.table.loc[irow])
+            frnxfin = None
+            raise e
 
         return frnxfin
+
+
 
 
 #  __  __ _               __                  _   _
