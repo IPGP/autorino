@@ -34,56 +34,38 @@ epo = arocmn.EpochRange(dt.datetime(2024,2,28,1),
 
 hdl_split = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo)
 
-#find_rnxs_for_split()
-
-
-
-
-for irow,row in hdl_split.table.iterrows():
-    epo_srt = np.datetime64(hdl_split.table.loc[irow, 'epoch_srt'])
-    epo_end = np.datetime64(hdl_split.table.loc[irow, 'epoch_end'])
-
-    epoch_srt_bool = hdl_store.table['epoch_srt'] <= epo_srt
-    epoch_end_bool = hdl_store.table['epoch_end'] >= epo_end
-
-    epoch_bool = epoch_srt_bool & epoch_end_bool
-
-    if epoch_bool.sum() == 0:
-        print("no")
-        hdl_split.table.loc[irow, 'ok_inp'] = False
-        continue
-    elif epoch_bool.sum() > 1:
-        print("> 1, keep first")
-        rnxinp_row = hdl_store.table.loc[epoch_bool].iloc[0]
-    else:
-        rnxinp_row = hdl_store.table.loc[epoch_bool].squeeze()
-
-    hdl_split.table.loc[irow,'fpath_inp'] = rnxinp_row['fpath_inp']
-    hdl_split.table.loc[irow, 'ok_inp'] = True
+hdl_split.find_rnxs_for_split(hdl_store)
 
 handle_software = 'converto'
 
 hdl_split.decompress_table()
 
+hdl_split.split()
+
+#def split(self):
 for irow,row in hdl_split.table.iterrows():
 
     frnx_inp = row['fpath_inp']
 
-    tmp_dir_use = hdl_split.translate_path(hdl_split.tmp_dir)
-    out_dir_use = hdl_split.translate_path(hdl_split.out_dir)
+    tmp_dir_use = hdl_split.translate_path(self.tmp_dir)
+    out_dir_use = hdl_split.translate_path(self.out_dir)
 
     if handle_software == 'converto':
+        converto_kwoptions={'-st':row['epoch_srt'].strftime('%Y%m%d%H%M%S'),
+                            '-e': row['epoch_end'].strftime('%Y%m%d%H%M%S')}
+
         frnxtmp, _ = arocnv.converter_run(frnx_inp,
                                           tmp_dir_use,
                                           'converto',
-                                          bin_kwoptions={'-st':row['epoch_srt'].strftime('%Y%m%d%H%M%S'),
-                                                         '-e': row['epoch_end'].strftime('%Y%m%d%H%M%S')})
+                                          bin_kwoptions=converto_kwoptions)
     elif handle_software == 'gfzrnx':
+        gfzrnx_kwoptions = {'-epo_beg': row['epoch_srt'].strftime('%Y%m%d_%H%M%S'),
+                            '-d': int((row['epoch_end'] - row['epoch_srt']).total_seconds())}
+
         frnxtmp, _ = arocnv.converter_run(frnx_inp,
                                           tmp_dir_use,
                                           'gfzrnx',
-                                          bin_kwoptions={'-epo_beg': row['epoch_srt'].strftime('%Y%m%d_%H%M%S'),
-                                                         '-d': int((row['epoch_end'] - row['epoch_srt']).total_seconds())})
+                                          bin_kwoptions=gfzrnx_kwoptions)
 
 
 
