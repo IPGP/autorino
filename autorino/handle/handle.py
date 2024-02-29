@@ -101,3 +101,26 @@ class HandleGnss(arocmn.StepGnss):
                                               'gfzrnx',
                                               bin_options=['-f'])
 
+
+    def find_rnxs_for_split(self, hdl_store):
+        for irow, row in self.table.iterrows():
+            epo_srt = np.datetime64(self.table.loc[irow, 'epoch_srt'])
+            epo_end = np.datetime64(self.table.loc[irow, 'epoch_end'])
+
+            epoch_srt_bool = hdl_store.table['epoch_srt'] <= epo_srt
+            epoch_end_bool = hdl_store.table['epoch_end'] >= epo_end
+
+            epoch_bool = epoch_srt_bool & epoch_end_bool
+
+            if epoch_bool.sum() == 0:
+                print("no")
+                self.table.loc[irow, 'ok_inp'] = False
+                continue
+            elif epoch_bool.sum() > 1:
+                print("> 1, keep first")
+                rnxinp_row = hdl_store.table.loc[epoch_bool].iloc[0]
+            else:
+                rnxinp_row = hdl_store.table.loc[epoch_bool].squeeze()
+
+            self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
+            self.table.loc[irow, 'ok_inp'] = True
