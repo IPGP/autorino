@@ -45,7 +45,7 @@ def run_workflow(workflow_lis,print_table=True):
 
         if type(wkf).__name__ == "DownloadGnss":
             wkf.download(print_table)
-        elif type(wkf).__name__ == "ConvertRinexModGnss":
+        elif type(wkf).__name__ == "ConvertGnss":
             wkf.load_table_from_prev_step_table(wkf_prev.table)
             wkf.convert_rnxmod(print_table)
 
@@ -133,7 +133,7 @@ def read_configfile(configfile_path,
                 workflow_lis.append(dwl_obj)
                 
             if k_step == 'conversion_rinex_header_mod' and ywkf['active'] == True:
-                Cnv = arocnv.ConvertRinexModGnss
+                Cnv = arocnv.ConvertGnss
                 
                 if y_site['sitelog_path']:
                     sitelogs=y_site['sitelog_path']

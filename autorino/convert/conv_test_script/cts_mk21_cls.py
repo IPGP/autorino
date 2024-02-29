@@ -42,10 +42,10 @@ EPOC = arogen.create_dummy_epochrange()
 
 SES.tmp_dir =  pout + "/tmp_conv"
 
-CONV = arcv.ConvertRinexModGnss(SES,
-                                EPOC,
-                                pout,
-                                psitelogs)
+CONV = arcv.ConvertGnss(SES,
+                        EPOC,
+                        pout,
+                        psitelogs)
 
 
 flist = "/home/sakic/090_TEMP/Raw_all_MQ_mk01a.list"

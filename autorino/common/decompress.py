@@ -42,7 +42,7 @@ def is_compressed(file_inp):
     return bool_compress
         
     
-def _decomp_gzip(gzip_file_inp, out_dir_inp = None):
+def _decomp_gzip(gzip_file_inp, out_dir_inp = None, force=False):
     gzip_file_inp = str(gzip_file_inp)
     gzip_file2 = Path(gzip_file_inp)
 
@@ -53,11 +53,14 @@ def _decomp_gzip(gzip_file_inp, out_dir_inp = None):
 
     file_out = out_dir.joinpath(gzip_file2.stem)
 
-    with gzip.open(gzip_file_inp, 'rb') as f_in:
-        with open(file_out, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
-            
-    logger.debug("decompress (gzip): %s > %s", gzip_file2.name, file_out)
+    if file_out.exists() and not force:
+        logger.debug("%s already exists, no decompression", file_out)
+    else:
+        with gzip.open(gzip_file_inp, 'rb') as f_in:
+            with open(file_out, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+        logger.debug("decompress (gzip): %s > %s", gzip_file2.name, file_out)
 
     return str(file_out)
 
