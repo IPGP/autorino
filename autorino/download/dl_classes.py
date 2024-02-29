@@ -46,7 +46,8 @@ class DownloadGnss(arocmn.StepGnss):
         #StepGnss objects
         
         if not self.remote_fname:
-            logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
+            logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",
+                           self.session)
         
         hostname_use = self.access['hostname']
         

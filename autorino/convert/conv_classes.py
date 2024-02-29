@@ -121,9 +121,8 @@ class ConvertRinexModGnss(arocmn.StepGnss):
         self.set_table_log(out_dir=tmp_dir_logs_use)
         ### initialize list for tmp rinexs to be removed
         frnxtmp_files = []
-        
 
-        ### guess and desactivate existing local RINEX files
+        ### guess and deactivate existing local RINEX files
         self.guess_local_rnx_files()
         self.check_local_files()
 
@@ -176,79 +175,41 @@ class ConvertRinexModGnss(arocmn.StepGnss):
                 self.write_in_table_log(self.table.loc[irow])
                 continue
             
-            ### a fonction to stop the docker conteners running for too long
+            ### a function to stop the docker containers running for too long
             # (for trimble conversion)
             stop_long_running_containers()
             
             #############################################################
             ###### CONVERSION
-            self.table.loc[irow,'ok_inp'] = True
-    
-            frnxtmp, _ = arocnv.converter_run(fraw,
-                                              tmp_dir_converted_use, 
-                                              converter = conve)
-            if frnxtmp:
-                ### update table if things go well
-                self.table.loc[irow,'fpath_out'] = frnxtmp
-                epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
-                self.table.loc[irow,'epoch_srt'] = epo_srt_ok
-                self.table.loc[irow,'epoch_end'] = epo_end_ok 
-                self.table.loc[irow,'ok_out'] = True
-                frnxtmp_files.append(frnxtmp) ### list for final remove
-            else:
-                ### update table if things go wrong
-                self.table.loc[irow,'ok_out'] = False
+            frnxtmp = self.convert_row(irow,tmp_dir_converted_use,
+                                       converter_inp=conve)
+            frnxtmp_files.append(frnxtmp)  ### list for final remove
+
+            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
+
     
             #############################################################
-            ###### RINEXMOD            
-            try:
-                frnxmod = rinexmod_api.rinexmod(frnxtmp,
-                                                tmp_dir_rinexmoded_use,
-                                                marker=site,
-                                                compression="gz",
-                                                longname=True,
-                                                sitelog=self.sitelogs,
-                                                force_rnx_load=True,
-                                                verbose=False,
-                                                tolerant_file_period=True,
-                                                full_history=True)
-                ### update table if things go well
-                self.table.loc[irow,'ok_out'] = True
-                self.table.loc[irow,'fpath_out'] = frnxmod
-                self.table.loc[irow,'size_out'] = os.path.getsize(frnxmod)
-                                           
-                self.write_in_table_log(self.table.loc[irow])
-                
-            except Exception as e:
-                ### update table if things go wrong
-                logger.error(e)
-                self.table.loc[irow,'ok_out'] = False
-                self.write_in_table_log(self.table.loc[irow])
+            ###### RINEXMOD
+            rinexmod_kwargs = {'marker' = site,
+                               'compression' = "gz",
+                               'longname' = True,
+                               'sitelog' = self.sitelogs,
+                               'force_rnx_load' = True,
+                               'verbose' = False,
+                               'tolerant_file_period' = True,
+                               'full_history' = True}
 
-                continue
+            self.rinexmod_row(irow,tmp_dir_rinexmoded_use,rinexmod_kwargs)
+            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
             ###### FINAL MOVE                             
-            ### def output folders        
-            outdir_use = self.translate_path(self.out_dir,
-                                             epoch_inp=self.table.loc[irow,
-                                                                      'epoch_srt'])
-            try:
-                ### do the move 
-                utils.create_dir(outdir_use)
-                frnxfin = shutil.copy2(frnxmod,outdir_use)
-                self.table.loc[irow,'ok_out'] = True
-                self.table.loc[irow,'fpath_out'] = frnxfin
-                self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
-            except Exception as e:
-                logger.error(e)
-                self.table.loc[irow,'ok_out'] = False
-                self.write_in_table_log(self.table.loc[irow])
-                continue               
-        
+            self.move_final_row(irow)
+            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
+
         #### remove temporary files
         for f in decompressed_files:
-            logger.debug("remove tmp decompres RINEX file: %s",f)
+            logger.debug("remove tmp decompress RINEX file: %s",f)
             os.remove(f)
         for f in frnxtmp_files:
             logger.debug("remove tmp converted RINEX file: %s",f)
