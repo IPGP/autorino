@@ -3,7 +3,7 @@
 """
 Created on Sun Feb 11 18:44:52 2024
 
-@author: psakicki
+@author: psakic
 """
 
 import argparse
