@@ -43,7 +43,8 @@ def _kw_options_dict2str(kw_options):
     '-a valueA -b 42'
     """
     cmd_list = []
-    
+
+
     if utils.is_iterable(kw_options):
         pass
     else:
