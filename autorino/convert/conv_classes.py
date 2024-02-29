@@ -190,14 +190,14 @@ class ConvertRinexModGnss(arocmn.StepGnss):
     
             #############################################################
             ###### RINEXMOD
-            rinexmod_kwargs = {'marker' = site,
-                               'compression' = "gz",
-                               'longname' = True,
-                               'sitelog' = self.sitelogs,
-                               'force_rnx_load' = True,
-                               'verbose' = False,
-                               'tolerant_file_period' = True,
-                               'full_history' = True}
+            rinexmod_kwargs = {'marker' : site,
+                               'compression' : "gz",
+                               'longname' : True,
+                               'sitelog' : self.sitelogs,
+                               'force_rnx_load' : True,
+                               'verbose' : False,
+                               'tolerant_file_period' : True,
+                               'full_history' : True}
 
             self.rinexmod_row(irow,tmp_dir_rinexmoded_use,rinexmod_kwargs)
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
