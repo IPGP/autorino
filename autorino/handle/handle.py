@@ -50,8 +50,6 @@ class HandleGnss(arocmn.StepGnss):
                                               bin_options=['-f'])
 
 
-        self.
-        
 
 
     # def find_rnx_
