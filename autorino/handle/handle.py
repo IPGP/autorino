@@ -6,14 +6,14 @@ Created on Wed Jan 10 15:00:40 2024
 @author: psakic
 """
 
-import autorino.general as arogen
+import autorino.common as arocmn
 import autorino.convert as arocnv
 
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
 
-class HandleGnss(arogen.StepGnss):       
+class HandleGnss(arocmn.StepGnss):
     def __init__(self,out_dir,tmp_dir,log_dir,
                  epoch_range,
                  site=None,
@@ -26,9 +26,9 @@ class HandleGnss(arogen.StepGnss):
 
     def splice(self):
         ### divide_step_by_epochs will create several HandleGnss objects
-        hdl_obj_out = self.divide_step_by_epochs()
+        hdl_objs_lis = self.divide_step_by_epochs()
         
-        for hdl in hdl_obj_out:
+        for hdl in hdl_objs_lis:
             hdl._splice_mono()
         
     def _splice_mono(self):
@@ -36,8 +36,7 @@ class HandleGnss(arogen.StepGnss):
         fpath_inp_lst = list(self.table['fpath_inp'])
         
         tmp_dir_use = self.translate_path(self.tmp_dir)
-        
-        
+
         handle_software = 'converto'
         if handle_software == 'converto':
             frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
@@ -49,6 +48,16 @@ class HandleGnss(arogen.StepGnss):
                                               tmp_dir_use,
                                               'gfzrnx',
                                               bin_options=['-f'])
+
+
+        self.
+        
+
+
+    # def find_rnx_
+
+    # def split(self):
+
     
             
     
