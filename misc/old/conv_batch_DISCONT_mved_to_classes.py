@@ -13,7 +13,7 @@ WILL  BE DISCONTINUED WHEN CLASSES WILL BE OPE
 
 from geodezyx import utils,  operational
 import autorino.convert as arcv
-import rinexmod_api
+from rinexmod import rinexmod_api
 from pathlib import Path
 import os
 import re 
