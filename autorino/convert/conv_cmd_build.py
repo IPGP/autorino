@@ -1093,7 +1093,7 @@ def cmd_build_gfzrnx(inp_raw_fpath,
                      out_dir,
                      bin_options_custom=[],
                      bin_kwoptions_custom=dict(),
-                     bin_path="/home/psakicki/SOFTWARE/GFZRNX/GFZRNX"):
+                     bin_path="gfzrnx"):
     """
     Build a command to launch gfzrnx, for RINEX Handeling
     
