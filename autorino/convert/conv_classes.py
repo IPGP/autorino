@@ -8,7 +8,7 @@ Created on Fri Apr  7 12:07:18 2023
 
 from geodezyx import utils,  operational
 import autorino.convert as arcv
-import rinexmod_api
+from rinexmod import rinexmod_api
 from pathlib import Path
 import os
 import re 
