@@ -106,6 +106,10 @@ maxyear = 2100
 flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_231_forFB_mk01a.list" 
 flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_246_forFB_mk02a.list" 
 flist = "/home/sakic/090_TEMP/Raw_GL_2023_100_346_forFB_mk03a.list" 
+flist = "/scratch/temp_stuffs/Raw_GL_2023_100_365_forFB_mk04b.list"
+flist = "/scratch/temp_stuffs/Raw_GL_2023_100_365_forFB_mk05a.list"
+
+outdir = "/scratch/convgnss/056_big_conv_GL_2023_100-231_BIS"
 outdir = "/scratch/convgnss/056_big_conv_GL_2023_100-231"
 regex = ".*"
 nyear = 6
