@@ -13,6 +13,10 @@ from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 import autorino.convert as arcv
 from autorino import configread as arcfg
+#from autorino import epochrange as aroepo
+#from autorino import  session as aroses
+import autorino.general as arogen
+
 import yaml
 
 import timeit
@@ -24,30 +28,34 @@ pconfig = "/home/sakic/010_CODES/autorino/configfiles/proto_config_HOUE_03a.yml"
 
 Y1 = yaml.safe_load(open(pconfig))
 
-SESlist, REQlist = arcfg.session_request_from_configfile(pconfig)
+#SESlist, REQlist = arcfg.session_download_from_configfile(pconfig)
 #REQ = REQlist[1]
-SES = SESlist
-REQ = REQlist
-EPOC = REQ.epoch_range
+#SES = SESlist
+#REQ = REQlist
+#EPOC = REQ.epoch_range
 
-pout = "/home/sakic/020_TEMP/convcls_test"
+pout = "/home/sakic/090_TEMP/convcls_test"
 psitelogs = "/work/sitelogs/SITELOGS"
+
+SES = arogen.create_dummy_session()
+EPOC = arogen.create_dummy_epochrange()
+
+SES.tmp_dir =  pout + "/tmp_conv"
 
 CONV = arcv.ConvertGnss(SES,
                         EPOC,
                         pout,
-                        pout,
                         psitelogs)
 
 
-flist = "/home/sakic/020_TEMP/Raw_all_MQ_mk01a.list"
-flist = "/home/sakic/020_TEMP/Raw_dome_GL_mk01a.list"
+flist = "/home/sakic/090_TEMP/Raw_all_MQ_mk01a.list"
+flist = "/home/sakic/090_TEMP/Raw_dome_GL_mk01a.list"
 
 ### find and read previous table log files
 
 
 prev_table_logs = utils.find_recursive(pout,'*table.log')    
-if prev_table_logs:
+if prev_table_logs and False:
     DF_prev_tbl = pd.concat([pd.read_csv(f) for f in prev_table_logs])
     DF_prev_tbl.reset_index(inplace=True,drop=True)
 
@@ -55,11 +63,15 @@ if prev_table_logs:
 
 
 CONV.load_table_from_filelist(flist)
+CONV.print_table()
 #CONV.filter_bad_keywords(['Problem','Rinex','ZIP'])
-CONV.filter_year_min_max(2019,2020)
+#CONV.filter_year_min_max(2019,2020)
 
 # if prev_table_logs:
 #     CONV.filter_previous_tables(DF_prev_tbl)
 
-CONV.conv_rnxmod_files()
+CONV.convert_rnxmod()
+
+
+
 
