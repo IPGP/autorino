@@ -70,7 +70,7 @@ CONV.print_table()
 # if prev_table_logs:
 #     CONV.filter_previous_tables(DF_prev_tbl)
 
-CONV.convert_rnxmod()
+CONV.convert_table()
 
 
 

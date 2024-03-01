@@ -866,7 +866,7 @@ class StepGnss():
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def convert_row(self, irow, out_dir_inp, converter_inp):
+    def on_row_convert(self, irow, out_dir_inp, converter_inp):
         self.table.loc[irow, 'ok_inp'] = True
 
         frnxtmp, _ = arocnv.converter_run(fraw,
@@ -884,7 +884,7 @@ class StepGnss():
             self.table.loc[irow, 'ok_out'] = False
         return frnxtmp
 
-    def rinexmod_row(self, irow, out_dir_inp, rinexmod_kwargs):
+    def on_row_rinexmod(self, irow, out_dir_inp, rinexmod_kwargs):
 
         frnx = self.table.loc[irow, 'fpath_out']
 
@@ -908,7 +908,7 @@ class StepGnss():
 
         return frnxmod
 
-    def move_final_row(self, irow):
+    def on_row_move_final(self, irow):
         ### def output folders
         outdir_use = self.translate_path(self.out_dir,
                                          epoch_inp=self.table.loc[irow,'epoch_srt'])
