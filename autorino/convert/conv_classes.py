@@ -6,9 +6,9 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-from geodezyx import utils,  operational
+from geodezyx import utils,operational
 import autorino.convert as arocnv
-import rinexmod_api
+from rinexmod import rinexmod_api
 from pathlib import Path
 import os
 import re 
@@ -19,13 +19,13 @@ import docker
 import pandas as pd
 import shutil
 
-from autorino import general as arogen
+#from autorino import general as arogen
+import autorino.workflow as arowkf
 
 #### Import the logger
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
-
 
 
 def site_list_from_sitelogs(sitelogs_inp):
@@ -43,46 +43,7 @@ def site_list_from_sitelogs(sitelogs_inp):
     return site4_list
 
 
-
-def input_list_reader(inp_fil,inp_regex=".*"):
-    """
-    Handles mutiples types of input lists (in a general sense)  
-    and returns a python list of the input
-    
-    inp_fil can be:
-        * a python list (then nothing is done)
-        * a text file path containing a list of files 
-        (readed as a python list)
-        * a tuple containing several text files path 
-        (recursive version of the previous point)
-        * a directory path (all the files matching inp_regex are readed)
-    """
-
-    if not inp_fil:
-        flist  = []
-    elif type(inp_fil) is tuple and os.path.isfile(inp_fil[0]):
-        flist = list(np.hstack([open(f,"r+").readlines() for f in inp_fil]))
-        flist = [f.strip() for f in flist]
-    elif type(inp_fil) is list:
-        flist = inp_fil
-    elif os.path.isfile(inp_fil):
-        flist = open(inp_fil,"r+").readlines()
-        flist = [f.strip() for f in flist]
-    elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil,
-                                     inp_regex,
-                                     case_sensitive=False)
-    else:
-        flist = []
-        logger.warning("the filelist is empty") 
-        
-    if inp_regex != ".*":
-        flist = [f for f in flist if re.match(inp_regex, f)]
-        
-    return flist
-
-
-class ConvertRinexModGnss(arogen.WorkflowGnss):
+class ConvertRinexModGnss(arowkf.WorkflowGnss):
     def __init__(self,session,epoch_range,out_dir,sitelogs=None):
         super().__init__(session,epoch_range,out_dir)
         
@@ -122,7 +83,6 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
                     n_not_ok_inp)
         
         for irow,row in table_init_ok.iterrows(): 
-             
             fraw = Path(row['fpath_inp'])
             ext = fraw.suffix.upper()
             logger.info("***** input raw file for conversion: %s",
@@ -139,7 +99,7 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             utils.create_dir(tmpdir_rinexmoded_use)
             
             ### find the right converter
-            conve = select_converter_batch(fraw)
+            conve = _select_conv_odd_file(fraw)
             
             logger.info("extension/converter: %s/%s",ext,conve)
         
@@ -155,23 +115,27 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
             stop_long_running_containers()
             
             #############################################################
-            #### CONVERSION
+            ###### CONVERSION
             self.table.loc[irow,'ok_inp'] = True
     
             frnxtmp, _ = arocnv.converter_run(fraw,
-                                            tmpdir_converted,
-                                            converter = conve)
+                                              tmpdir_converted,
+                                              converter = conve)
             if frnxtmp:
+                ### update table if things go well
                 self.table.loc[irow,'fpath_out'] = frnxtmp
-                self.table.loc[irow,'epoch_srt'],self.table.loc[irow,'epoch_end'] = operational.rinex_start_end(frnxtmp)
+                epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
+                self.table.loc[irow,'epoch_srt'],\
+                    self.table.loc[irow,'epoch_end'] = epo_srt_ok, epo_end_ok 
                 self.table.loc[irow,'ok_out'] = True
             else:
+                ### update table if things go wrong
                 self.table.loc[irow,'ok_out'] = False
     
             #############################################################
-            #### RINEXMOD            
+            ###### RINEXMOD            
             try:
-                frinfin = rinexmod_api.rinexmod(frnxtmp,
+                frnxfin = rinexmod_api.rinexmod(frnxtmp,
                                                 tmpdir_rinexmoded_use,
                                                 marker=site,
                                                 compression="gz",
@@ -180,27 +144,33 @@ class ConvertRinexModGnss(arogen.WorkflowGnss):
                                                 force_rnx_load=True,
                                                 verbose=False,
                                                 full_history=True)
+                ### update table if things go well
                 self.table.loc[irow,'ok_out'] = True
-                self.table.loc[irow,'fpath_out'] = frinfin
-                self.table.loc[irow,'size_out'] = os.path.getsize(frinfin)
+                self.table.loc[irow,'fpath_out'] = frnxfin
+                self.table.loc[irow,'size_out'] = os.path.getsize(frnxfin)
                 
-                pd.DataFrame(row).T.to_csv(log_table,mode="a",
+                pd.DataFrame(row).T.to_csv(log_table,mode='a',
                                            index=False,header=False) 
-                                           
-                ### def output folders        
-                outdir_use = arogen.translator(self.out_dir,
-                                               row.epoch,
-                                               self.session.translate_dict)
-                utils.create_dir(outdir_use)
-                shutil.copy(frinfin,outdir_use)
-                
             except Exception as e:
-                logger.warn(e)
+                ### update table if things go wrong
+                logger.error(e)
                 self.table.loc[irow,'ok_out'] = False
                 pd.DataFrame(row).T.to_csv(log_table,mode="a",
-                                           index=False,header=False) 
+                                            index=False,header=False) 
                 continue
-        
+
+            #############################################################
+            ###### FINAL MOVE                             
+            ### def output folders        
+            #### !!!!! ADDD THE EXCEPTION AND TABLE UPDATE !!!!
+            outdir_use = arowkf.translator(self.out_dir,
+                                           self.table.loc[irow,'epoch_srt'], 
+                                           self.session.translate_dict)
+            ### do the move 
+            utils.create_dir(outdir_use)
+            shutil.copy(frnxfin,outdir_use)
+                
+       
         return None
 
 
@@ -220,15 +190,15 @@ def _site_search_from_list(fraw_inp,site4_list_inp):
         site_out = fraw_inp.name[:4]
     return site_out
 
-def select_converter_batch(fraw_inp,
-                           ext_excluded=[".TG!$",
-                                         ".DAT",
-                                         ".Z",
-                                         ".BCK",
-                                         "^.[0-9]{3}$",
-                                         ".A$",
-                                         "Trimble",
-                                         ".ORIG"]):
+def _select_conv_odd_file(fraw_inp,
+                          ext_excluded=[".TG!$",
+                                        ".DAT",
+                                        ".Z",
+                                        ".BCK",
+                                        "^.[0-9]{3}$",
+                                        ".A$",
+                                        "Trimble",
+                                        ".ORIG"]):
     """
     do a high level case matching to identify the right converter 
     for raw file with an unconventional extension, or exclude the file
@@ -243,12 +213,17 @@ def select_converter_batch(fraw_inp,
     elif re.match(".M[0-9][0-9]", ext):
         conve = "mdb2rinex"
     ### here we skip all the weird files    
-    elif np.any([bool(re.match(exclu,ext)) for exclu in ext_excluded]):
-        conve = None
     else:
-        ### per default
+    ### per default
         conve = "auto"
-        
+        for ext_exl in ext_excluded:
+            if re.match(ext_exl,ext):
+                conve = None    
+                logger.warn("%s will be skipped, excluded extention %s",
+                            fraw.name,
+                            ext_exl)
+                break
+            
     return conve
 
 def stop_long_running_containers(max_running_time=120):
