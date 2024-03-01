@@ -8,12 +8,10 @@ Created on Thu Feb 29 17:25:11 2024
 
 import autorino.common as arocmn
 import autorino.handle as arohdl
-import autorino.convert as arocnv
 
 from geodezyx import utils
 import datetime as dt
-import pandas as pd
-import numpy as np
+
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
 rnxmod_dir = '/home/psakicki/autorino_workflow_tests/rinexmoded'
