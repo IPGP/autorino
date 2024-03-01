@@ -3,7 +3,26 @@
 """
 Created on Tue Mar 14 12:05:28 2023
 
-@author: psakicki
+@author: psakic
+
+This module contains the functions to build the generic commands 
+needed to run a GNSS conversion
+
+one function per converter, one  converter per manufacturer
+
+all the functions here have the same returns:
+
+Returns
+-------
+cmd_use : list of string
+    the command as a mono-string in list (singleton).
+    Ready to be used by subprocess.run
+cmd_list : list of strings
+    the command as a list of strings, splited for each element.
+cmd_str : string
+    the command as a concatenated string.
+
+
 """
 
 #### Import star style
@@ -24,7 +43,8 @@ def _kw_options_dict2str(kw_options):
     '-a valueA -b 42'
     """
     cmd_list = []
-    
+
+
     if utils.is_iterable(kw_options):
         pass
     else:
@@ -139,7 +159,7 @@ def cmd_build_trm2rinex(inp_raw_fpath,
     ----
     Usage of `trm2rinex`
     
-    docker run --rm -v ${f_dir}:/inp -v ${DIR_out}:/out trm2rinex:cli-light inp/${f_base} -p out/${subdir_out_010} -n -d -s -v 3.04
+    docker run --rm -v ${DIR_INP}:/inp -v ${DIR_OUT}:/out trm2rinex:cli-light inp/${FNAME_RAW} -p out/${SUBDIR_OUT} -n -d -s -v 3.04
     
     data/MAGC320b.2021.rt27 defines the input file (relative to container filesystem root)
     -p data/out defines the path for the conversion output (relative to container filesystem root)
@@ -483,37 +503,12 @@ def cmd_build_runpkr00(inp_raw_fpath,
     cmd_use = [cmd_str]
     
     return cmd_use, cmd_list, cmd_str
-
-
-def cmd_build_teqc(inp_raw_fpath,
-                   out_dir,
-                   bin_options_custom=[],
-                   bin_kwoptions_custom=dict(),
-                   bin_path="teqc"):
-    
-    
-    #### Convert the paths as Path objects
-    inp_raw_fpath = Path(inp_raw_fpath)
-    out_dir = Path(out_dir)
-
-    #out_fpath = out_dir.joinpath(inp_raw_fpath.with_suffix(".rnx_teqc").name)   
-    out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_teqc")   
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-    
-    cmd_list = [bin_path,'+out',out_fpath] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
-    cmd_list = [str(e) for e in cmd_list]
-    cmd_str = " ".join(cmd_list)
-    cmd_use = [cmd_str]
-    
-    return cmd_use, cmd_list, cmd_str
     
 def cmd_build_convbin(inp_raw_fpath,
-                   out_dir,
-                   bin_options_custom=[],
-                   bin_kwoptions_custom=dict(),
-                   bin_path="convbin"):    
+                      out_dir,
+                      bin_options_custom=[],
+                      bin_kwoptions_custom=dict(),
+                      bin_path="convbin"):    
     """
     Build a command to launch convbin, the RTKLIB converter, for BINEX
     
@@ -673,7 +668,7 @@ def cmd_build_tps2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="/opt/softs_gnss/bin/tps2rin.exe"):
+                      bin_path="tps2rin.exe"):
     """
     Build a command to launch tps2rin, for Topcon
     
@@ -706,7 +701,7 @@ def cmd_build_tps2rin(inp_raw_fpath,
     Note
     ----
     Usage of `tps2rin`
-    
+    ```
     TPS2RIN 1.0.28.3459 Win64 build Jun 01, 2022 (c) Topcon Positioning Systems
     Conversion of TPS file to RINEX.
     Usage :  TPS2RIN  [<sw> [ <sw>]]  <input file name> [<sw> [ <sw>]]
@@ -825,6 +820,7 @@ def cmd_build_tps2rin(inp_raw_fpath,
       --preview          Scan the file and print a short summary.
       --print            Print all TPS messages to the log file.
       --utf8             Log file has UTF-8 charset.
+    ```
     """
     
     #### Convert the paths as Path objects
@@ -842,6 +838,551 @@ def cmd_build_tps2rin(inp_raw_fpath,
     return cmd_use, cmd_list, cmd_str
     
 
+def cmd_build_teqc(inp_raw_fpath,
+                   out_dir,
+                   bin_options_custom=[],
+                   bin_kwoptions_custom=dict(),
+                   bin_path="teqc"):
+    """
+    Build a command to launch teqc, for legacy conversion and RINEX Handeling
+    
+    It has the same behavior as all the `cmd_build` functions
+
+    Parameters
+    ----------
+    inp_raw_fpath : str or Path
+        the path of the input Raw GNSS file.
+        for RINEX Handeling (e.g. splice) a list of path is allowed.
+    out_dir : str or Path
+        the path of the output directory.
+    bin_options_custom : list, optional
+        a list for custom option arguments. The default is [].
+    bin_kwoptions_custom : dict, optional
+        a dictionary for custom keywords arguments. The default is dict().
+    bin_path : str, optional
+        the path the executed binary.
+        The default is "teqc".
+
+    Returns
+    -------
+    cmd_use : list of string
+        the command as a mono-string in list (singleton).
+        Ready to be used by subprocess.run
+    cmd_list : list of strings
+        the command as a list of strings, splited for each element.
+    cmd_str : string
+        the command as a concatenated string.
+    """
+        
+    
+    #### Convert the paths as Path objects    
+    out_dir = Path(out_dir)
+    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    if utils.is_iterable(inp_raw_fpath):
+        raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
+        raw_fpath_mono = raw_fpath_multi[0]
+    else: # a single  file, most common case
+        raw_fpath_multi = [Path(inp_raw_fpath)]
+        raw_fpath_mono = Path(inp_raw_fpath)
+           
+    raw_fpath_str_lst = [str(e) for e in raw_fpath_multi]
+    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_teqc")   
+    
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
+    
+    cmd_list = [bin_path,'+out',out_fpath] + cmd_opt_list + cmd_kwopt_list + raw_fpath_str_lst
+    cmd_list = [str(e) for e in cmd_list]
+    cmd_str = " ".join(cmd_list)
+    cmd_use = [cmd_str]
+    
+    return cmd_use, cmd_list, cmd_str
+    
+
+def cmd_build_converto(inp_raw_fpath,
+                       out_dir,
+                       bin_options_custom=[],
+                       bin_kwoptions_custom=dict(),
+                       bin_path="/home/psakicki/SOFTWARE_INSTALL/Converto/ConvertoCpp-master_1_6_0_5/bin/Release/ConvertoCPP"):
+    """
+    Build a command to launch teqc, for legacy conversion and RINEX Handeling
+    
+    It has the same behavior as all the `cmd_build` functions
+
+    Parameters
+    ----------
+    inp_raw_fpath : str or Path
+        the path of the input Raw GNSS file.
+        for RINEX Handeling (e.g. splice) a list of path is allowed.
+    out_dir : str or Path
+        the path of the output directory.
+    bin_options_custom : list, optional
+        a list for custom option arguments. The default is [].
+    bin_kwoptions_custom : dict, optional
+        a dictionary for custom keywords arguments. The default is dict().
+    bin_path : str, optional
+        the path the executed binary.
+        The default is "converto".
+
+    Returns
+    -------
+    cmd_use : list of string
+        the command as a mono-string in list (singleton).
+        Ready to be used by subprocess.run
+    cmd_list : list of strings
+        the command as a list of strings, splited for each element.
+    cmd_str : string
+        the command as a concatenated string.
+        
+    Note
+    ----
+    
+    Usage of `converto`
+    
+    ##############################################################
+   "Converto" v1.0.5.2 permet d'effectuer plusieurs types de traitements sur des fichiers RINEX, dont :
+   edition, extraction d'informations, conversion et controle qualite.
+
+    ## Parametre obligatoire :
+       -i[n] fichier            Nom(s) de fichier(s) en entree (separes par une virgule si plusieurs)
+                                Les caract�res regex impliquent des guillements ex : rinex.17o,"*.18o")
+    
+    ## Autres parametres : 
+       -o[ut] fichier           Nom(s) de fichier(s) en sortie (separes par une virgule si plusieurs)
+       -config fichier          Nom(s) de fichier(s) de configuration (separes par une virgule si plusieurs)
+       -h[elp]                  Affiche ces lignes d'aide
+       -ver                     Affiche le numero de version de Converto
+       -a[lerte]                Active l'affichage des alertes concernant le traitement dans la console
+       -v[erbose]               Active l'affichage des etapes du traitement en plus des alertes dans la console
+       -rep[ort]                Ecrit un fichier de rapport (mode -cat, -conv et -ech seulement)
+       -phc                     Supprime les commentaires situes apres la fin du header
+    
+                                Mode edition par defaut
+       -cat                     Mode concatenation de fichiers
+       -mix                     Mode mixage de 2 fichiers RINEX OBS
+       -conv                    Mode conversion V3 vers V2
+       -info                    Mode extraction d'informations
+       -qc                      Mode controle qualite de fichiers RINEX OBS
+    
+       -G|gps                   Exclut le systeme GPS du traitement (inclus par defaut)
+       -R|glo                   Exclut le systeme GLONASS du traitement (inclus par defaut)
+       -E|gal                   Exclut le systeme Galileo du traitement (inclus par defaut)
+       -S|sba                   Exclut le systeme SBAS du traitement (inclus par defaut)
+       -C|bds                   Exclut le systeme BDS/Compass du traitement (inclus par defaut, sauf mode -conv : voir -v212)
+       -J|qzs                   Exclut le systeme QZSS du traitement (inclus par defaut, sauf mode -conv : voir -v212)
+       -I|irnss                 Exclut le systeme IRNSS du traitement (inclus par defaut, sauf mode -conv : voir -v212)
+    
+    # Options d'edition de RINEX OBS ou MET :
+       -st[art_window] str      set windowing start time to str == [[[[[[YY]YY]MM]DD]hh]mm]ss[.sssss]
+       -e[nd_window] str        set windowing end time to str == [[[[[[YY]YY]MM]DD]hh]mm]ss[.sssss]
+       -dX #                    delta X time of # from windowing start time; X == Y, M, d, h, m, s for year,...,second
+                                     if negative, from windowing end time.
+       -hole fichier            read file 'name' to establish list of window holes
+       -tbin # str              time binned output with # time-delta (# = <N>[d|h|m|s]) and filename prefix 'str'
+       -ast str                 set aligned time binned start time to str == [[[[[[YY]YY]MM]DD]hh]mm]ss[.sssss]
+                                     or str = _ to start alignment with the first observation epoch
+    
+    # Options d'edition de RINEX OBS :
+       -O.s[ystem] #            set RINEX OBS header satellite system to # (= G, R, E, S, C, J or M)
+       -O.r[un_by] 'str'        set RINEX OBS header run by to 'str'
+       -O.c[omment] 'str'       append RINEX OBS header comment 'str'
+       -O.mo[nument] 'str'      set RINEX OBS header monument name to 'str'
+       -O.mn 'str'              set RINEX OBS header monument number to 'str'
+       -O.o[perator] 'str'      set RINEX OBS header operator name to 'str'
+       -O.ag[ency] 'str'        set RINEX OBS header operating agency to 'str'
+       -O.rn 'str'              set RINEX OBS header receiver number to 'str'
+       -O.rt 'str'              set RINEX OBS header receiver type to 'str'
+       -O.rv 'str'              set RINEX OBS header receiver firmware version to 'str'
+       -O.an 'str'              set RINEX OBS header antenna number to 'str'
+       -O.at 'str'              set RINEX OBS header antenna type (and radome type) to 'str'
+       -O.px[WGS84xyz,m] x y z  set RINEX OBS header antenna WGS 84 position to x y z (meters)
+       -O.mov[ing] 1            force RINEX OBS antenna position to be in kinematic (roving) state initially
+       -O.def_wf i j            set RINEX OBS header default wavelength factors to i and j
+       -O.leap #                set RINEX OBS header leap seconds to #
+       -ech|O.dec[imate] #      modulo decimation of OBS epochs to # time units
+                                     # = 15s results in epochs at 00, 15, 30, and 45 seconds
+       -nbobs                   write or update  PRN / # OF OBS fields in the header
+    
+    # Options d'edition de RINEX OBS V2 :
+       -O.obs[_types] 'str'     change RINEX OBS header observables to 'str'
+                                     'str' = L1+L2+C1+P2 (or L1L2C1P2) sets 4 observables to be L1 L2 C1 P2, and in that order
+       -O._obs[_types] 'str'    exclude those RINEX OBS observables listed in 'str'
+    
+    # Options d'edition de RINEX OBS V3 :
+       -O.obs_G 'str'           change GPS RINEX OBS header observables to 'str'
+                                     'str' = L1C+L2W+C1C+C2W sets 4 observables to be L1C L2W C1C C2W, and in that order
+       -O.obs_R 'str'           change GLONASS RINEX OBS header observables to 'str'
+       -O.obs_E 'str'           change Galileo RINEX OBS header observables to 'str'
+       -O.obs_S 'str'           change SBAS RINEX OBS header observables to 'str'
+       -O.obs_C 'str'           change BDS/Compass RINEX OBS header observables to 'str'
+       -O.obs_J 'str'           change QZSS RINEX OBS header observables to 'str'
+       -O.obs_I 'str'           change IRNSS RINEX OBS header observables to 'str'
+       -O._obs_G 'str'          exclude those GPS RINEX OBS observables listed in 'str'
+       -O._obs_R 'str'          exclude those GLONASS RINEX OBS observables listed in 'str'
+       -O._obs_E 'str'          exclude those Galileo RINEX OBS observables listed in 'str'
+       -O._obs_S 'str'          exclude those SBAS RINEX OBS observables listed in 'str'
+       -O._obs_C 'str'          exclude those BDS/Compass RINEX OBS observables listed in 'str'
+       -O._obs_J 'str'          exclude those QZSS RINEX OBS observables listed in 'str'
+       -O._obs_I 'str'          exclude those IRNSS RINEX OBS observables listed in 'str'
+    
+    # Options d'edition de RINEX MET :
+       -M.r[un_by] 'str'        set RINEX MET header run by to 'str'
+       -M.c[omment] 'str'       append RINEX MET header comment 'str'
+       -M.mo[nument] 'str'      set RINEX MET header monument name to 'str'
+       -M.mn 'str'              set RINEX MET header monument number to 'str'
+       -M.obs[_types] 'str'     change RINEX MET header observables to 'str'
+                                     'str' = TD+HR+PR sets 3 observables to be TD HR PR, and in that order
+       -M._obs[_types] 'str'    exclude those RINEX MET observables listed in 'str'
+       -M.mod[el/type/acc] 'obs' 'model' 'type' accuracy  set 'obs' RINEX MET header sensor mod/type/acc to 'model' 'type' accuracy
+       -M.pos[ition] 'obs' x y z h  set 'obs' RINEX MET header sensor XYZ/H to x y z h
+       -M.dec[imate] #          modulo decimation of MET epochs to # time units
+                                     # = 15m results in epochs at 00, 15, 30, and 45 minutes
+    
+    # Options d'edition de RINEX NAV :
+       -N.s[ystem] #            set RINEX NAV header satellite system to # (= G, R, E, S, C, J or M)
+       -N.r[un_by] 'str'        set RINEX NAV header run by to 'str'
+       -N.c[omment] 'str'       append RINEX NAV header comment 'str'
+       -N.leap #                set RINEX NAV header leap seconds to #
+    
+    # Options en mode -conv, pour RINEX OBS V3 seulement :
+       -l1_p1                   Privilegie la phase issue du code P1 (si presente) en GPS a celle issue du code C/A sur L1
+       -l2_l2c                  Inclut et privilegie la phase issue d'un code Civilian sur L2 (L2C) en GPS (RINEX v2.11)
+       -c2_l2c                  Inclut la pseudo-distance issue d'un code Civilian sur L2 (L2C) en GPS (RINEX v2.11)
+       -l2c                     Joue le role de -l2_l2c et -c2_l2c (RINEX v2.11)
+       -l5                      Inclut les observables issus de la bande L5 en GPS (RINEX v2.11)
+       -std                     Joue le role de -l2c et -l5 (RINEX v2.11)
+       -l1c                     Inclut les observables Civilian sur L1 (L1C) en GPS (RINEX v2.12)
+       -v212                    Joue le role de -l1c, -std et inclut les observables BDS/Compass, QZSS et IRNSS (RINEX v2.12)
+       -rep[ort]                Ecrit un fichier de rapport de la conversion
+    
+    # Options en mode -qc :
+       -set_mask|masks #        Positionner le masque a # degres (defaut : 10.00 ; separer par une virgule si plusieurs valeurs)
+       -sym[bol_codes]          dump symbol codes and hierarchy for short report qc ASCII timeplot
+       -w[idth] #               set time width of qc ASCII timeplot to # (default = 72)
+       -lli                     Desactiver l'affichage des indicateurs de Loss Of Lock (symbole L)
+    ##############################################################
+
+    """
+        
+    
+    #### Convert the paths as Path objects    
+    out_dir = Path(out_dir)
+    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    if utils.is_iterable(inp_raw_fpath):
+        raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
+        raw_fpath_mono = raw_fpath_multi[0]
+    else: # a single  file, most common case
+        raw_fpath_multi = [Path(inp_raw_fpath)]
+        raw_fpath_mono = Path(inp_raw_fpath)
+           
+    raw_fpath_str_lst = [str(e) for e in raw_fpath_multi]
+    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_converto")   
+    
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
+    
+    cmd_list = [bin_path,'-i'] + raw_fpath_str_lst  + ['-o', out_fpath] + cmd_opt_list + cmd_kwopt_list
+
+    cmd_list = [str(e) for e in cmd_list]
+    cmd_str = " ".join(cmd_list)
+    cmd_use = [cmd_str]
+    
+    return cmd_use, cmd_list, cmd_str
+    
+def cmd_build_gfzrnx(inp_raw_fpath,
+                     out_dir,
+                     bin_options_custom=[],
+                     bin_kwoptions_custom=dict(),
+                     bin_path="/home/psakicki/SOFTWARE/GFZRNX/GFZRNX"):
+    """
+    Build a command to launch gfzrnx, for RINEX Handeling
+    
+    It has the same behavior as all the `cmd_build` functions
+    
+    Parameters
+    ----------        
+    inp_raw_fpath : str or Path
+        the path of the input Raw GNSS file.
+        for RINEX Handeling (e.g. splice) a list of path is allowed.
+    out_dir : str or Path
+        the path of the output directory.
+    bin_options_custom : list, optional
+        a list for custom option arguments. The default is [].
+    bin_kwoptions_custom : dict, optional
+        a dictionary for custom keywords arguments. The default is dict().
+    bin_path : str, optional
+        the path the executed binary.
+        The default is "gfzrnx".
+
+    Returns
+    -------
+    cmd_use : list of string
+        the command as a mono-string in list (singleton).
+        Ready to be used by subprocess.run
+    cmd_list : list of strings
+        the command as a list of strings, splited for each element.
+    cmd_str : string
+        the command as a concatenated string.
+        
+    Warning
+    -------
+    `gfzrnx` requires a commercial license when used in a **routine environment**
+    
+    Note
+    ----
+    Usage of `gfzrnx`
+    
+     file only or common options
+     -----------------------------------------------------------------------------------------
+     [-h]                      - show this usage message
+     [-help]
+
+     [-finp <file list>]       - input  rinex file(s) (std. STDIN).
+                                 STDIN is only valid for a single file input.
+
+                                 the following file name types are supported to derive the
+                                 nominal epoch/duration information.
+
+                                 RINEX-2 file naming
+
+                                 ssssDDD0.YYx       - daily      file
+                                 ssssDDD[a-x].YYx   - hourly     file
+                                 ssssDDD[a-x]mm.YYx - sub-hourly file
+
+                                 RINEX-3/4 file naming
+
+                                 SSSSMRCCC_S_YYYYDDDHHMM_NNN_FRQ_TT.FMT
+                                 SSSSMRCCC_S_YYYYDDDHHMM_NNN_TT.FMT
+
+                                 see Documentation for details
+
+                                 splice mode:
+                                 ------------
+                                 * list of input files
+
+     [-fout <file>]            - output rinex or statistics file (std. STDOUT)
+                                 automatic output file name if filename given is "::RX2::", "::RX3::" or "::RX4::"
+
+     [-4to9 <file>]            - renaming information for rinex-3 type (re)naming
+                                 ( NNNN -> NNNNMRCCC / POTS -> POTS00DEU )
+
+     [-f]                      - force overwrite of output file if it already exists
+                                 (std. no overwrite)
+
+     [-sifl]                   - perform an operation on a single file if a file list is
+     [-single_file]              provided via "-finp"
+
+     [-ant_rename]             - rename historical antenna names to be IGS conform
+
+  [-nomren23 <[s,][mr,][iso]>] - fast nominal output file name for RINEX-2 to RINEX-3 file renaming.
+                                 RINEX-3 output file name is written to STDOUT.
+
+                                    s   - data source (S|R)        (default R)
+                                    mr  - marker receiver number   (default 00)
+                                    iso - 3 char. iso country code (default XXX)
+
+                                 the input parameters can be given in any order.
+                                 supported input file names nnnnddde.yyt[.cmp] or nnnndddedd.yyt[.cmp]
+
+                                 if providing a compressed file all information which is usually taken
+                                 from file header (sat. system(s), data frequency) has to be given via the
+                                 command line parameter (see documion for details).
+
+     [-vo <2|3|4>]             - output RINEX version (std. latest)
+     [--version_out <2|3|4>]
+     [-vosc <2|3|4>]           - output RINEX version (fully standard conform)
+
+     [-vnum m.nn]              - change header VERSION number and set output RINEX version
+                                 (only the version number is changed / output RINEX version is the highest supported one)
+
+     [-pr3rx2 <list>]          - komma separated list of list of signal priorities used for rinex 3 -> 2 conversion
+                                 to overwrite the standard settings, see documentation for details.
+
+                                 S:n[n...]:STRING
+
+                                 S      - satellite System [CEGJRSI]
+                                 n      - frequency number(s)
+                                 STRING - prority STRING
+
+                                 G:12:PWCSLXYN,G:5:QXI,R:12:CP
+
+     [-errlog <file>]          - store (append) error logs to a file (std. print to STDERR)
+
+     [-smp <num>]              - sampling rate in sec. (std. no sampling / resolution 1 ms)
+
+     [-smp_nom <num>]          - sampling rate (num) in sec to be used for automatic file naming
+
+     [-smp_lli_shift]          - perform LLI shifts via data sampling to sampling epoch
+
+     [-nav_mixed]              - create a mixed nav. filename
+
+     [-no_nav_stk]             - no nav. splice header statistic tables
+
+     [-stk_obs]                - output data statistics information (std. STDOUT)
+     [-stk_only]
+
+     [-crux <file>]            - rinex header manipulations definitions for input files
+
+     [-cx_updins <string(s)>]  - rinex header manipulation(s) definition for input files
+                                 given via command line
+
+     [-cx_addinthd]            - if using using a crux-file (-crux) internal/data headers are created
+                                 at crux-settings starting epochs.
+
+     [-show_crux]              - show crux structure adopted and used by the program
+
+     [-hded]                   - perform the header edit ONLY mode (with -crux)
+
+     [-stk_epo <n[:list]>]     - ASCII timeplot of data availability (std. STDOUT)
+                                 n    - time resolution in seconds
+                                 list - comma separated list (prn,otp) (std. prn)
+
+     [-ot <list>]              - obs. types list to be used (pattern matching). the list can be given
+     [--obs_types <list>]        globaly or sat. system dependent. the sat. system dependent record
+                                 replaces fully a global one.
+
+                                 list can be: [S:]OT1,OT2,...[+S:OT3,OT4,...][+...]
+
+                                 S  - satellite system [CEGJRSI]
+                                 OT - observation type identifier
+
+                                 L1,L2,C1,C2,P1,P2
+                                 L1,L2,C1,C2,P1,P2+C:L1,L7,C1,C7+G:L1C,L2W,C1,C2
+
+     [-ots <string>[:<attr>]]  - obs. types output sorting
+[--obs_types_sort <string>[:<attr>]]
+                                 the "string" consists of the 1st obs. type id. characters ( e.g. CPLDS ),
+                                 the "attr" can be [frqasc|frqdsc|frqi,j,...] (frequ. numbers (i,j,...) = 1,...,n),
+                                 which means a preferred sorting by frequency (ascending,descending or
+                                 a list of distinct frequency numbers)
+
+     [-prn <prn-list>]         - komma separated list of PRNs to be used
+                                 range notations are possible G1-32,C01-5,R01-10,E14,E18
+
+     [-no_prn <prn-list>]      - komma separated list of PRNs to be skipped
+                                 range notations are possible G1-32,C01-5,R01-10,E14,E18
+
+     [-kaot]                   - keep all obs. types (including fully empty ones)
+
+     [-rsot <n>]               - remove sparse obs. types.
+[--remove_sparse_obs_types <n>]  n - defines the % limit of the median number of observations
+                                     per observation type used to delete an observation type fully.
+
+     [-satsys <letters>]       - satellite system(s) to be used (CEGIJRS) (std. CEGIJRS)
+                                 C - Beidou
+                                 E - Galileo
+                                 G - GPS
+                                 I - IRNSS
+                                 J - QZSS
+                                 R - Glonass
+                                 S - SBAS
+
+     [-ns        <type>]       - output order of navigation records.   type = [time|prn] (std. prn)
+     [--nav_sort <type>]         time - sort by time,prn
+                                 prn  - sort by prn,time
+
+     [-nt       <type-list>]   - '+' separated list of nav. selection records (version >= 4).
+     [-nav_type <type-list>]     record = [<sat.system(s)>::]<nav.type(s)>:[<message.type(s)]
+                                 type(s) are separated via '.'
+
+     [-split n]                - split input file in <n seconds> pieces
+                                 - valid only with -fout ::RX2:: or ::RX3::
+                                 - valid if n is a multiple of 60 seconds.
+                                 - only supported for single input file
+
+     [-chk]                    - extended formal checks on input file (slower)
+
+     [-meta <type[:format]>]   - extract file meta data. the type can be (basic|full).
+                                 supported formats are json|xml|txt|dump
+
+     [-fdiff]                  - compare two rinex files of the same format (major version id.)
+                                 the two input files have to be given via -finp
+
+     [-met_nwm]                - edit a rinex meteo file(1) by the means of a reference NWM file(2).
+                                 the two input files have to be given via -finp.
+                                 the second file contains reference NWM data and check limits
+                                 (can be used in conjunction with -obs_types, -ot)
+
+     [-site <sitename>]        - use the 4- or 9-char sitename for output filename via automatic file naming
+                                 or for header editing settings extractions (crux)
+                                 or for "MARKER NAME" in case it is missing.
+
+     [-kv]                     - keep major output version number same as in input
+
+     [-q]                      - quiet mode
+
+     [-d <sec>]                - file duration (seconds) (std. ignored on input
+     [--duration <sec>]                                   std. 86400   on output )
+
+     [-epo_beg <EPOCH>]        - first output epoch (<EPOCH> see below)
+
+     [-sei <in|out>]
+[--strict_epoch_interval <in|out>] - output epoch interval according to in/output file name
+                                     (only valid in case of RINEX conform file names)
+
+     [-enb <n>]                - extend the nav. epoch interval by +- n seconds
+                                 (when using strict epoch interval)
+
+     [-nav_epo_filter]         - only standard epochs are passed to the output
+     [-nav_epo_strict]         - only nominal  epochs are passed to the output
+     [-nav_latest]             - only latest nav. record per PRN are passed to the output
+
+     [splice_direct]           - use no RAM to store observations via splice operations
+                                 (no header data statistics)
+
+     [try_append <sec>]        - try append mode to fasten the splice process with
+                                 smallest nominal file duration (seconds) of part files
+
+     [-use_obs_map <file>]     - use modified obs. types mapping
+     [-out_obs_map]            - output std.  obs. types mapping
+
+     [-tab]                    - create a tabular data representation output
+
+     [-tab_date]               - use other date (pattern) for tabular observation output
+                                 (yyyy-mm-dd|yy-mm-dd|yyyy-ddd|wwww-d|yyyymmdd|yymmdd|yyyyddd|wwwwd|mjd|ddd)
+
+     [-tab_time]               - use other time pattern for tabular observation output
+                                 (hh:mm:ss|hhmmss|sod|fod)
+
+     [-tab_sep <string>]       - column separator string (default: BLANK)
+
+     epoch <EPOCH> parameter
+     -----------------------------------------------------------------------------------------
+     mjd             56753   or        56753_123000
+     wwwwd           17870   or        17870_12:30:00
+     yyyyddd       2014096   or      2014096_123000
+     yyyymmdd     20140406   or     20140406_12:30:00
+     yyyy-mm-dd 2014-04-06   or   2014-04-06_123000
+
+     all these date types can be combined via '_' with a time string of type:
+     hhmmss
+     hh:mm:ss
+    """
+
+    #### Convert the paths as Path objects    
+    out_dir = Path(out_dir)
+    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    if utils.is_iterable(inp_raw_fpath):
+        raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
+        raw_fpath_mono = raw_fpath_multi[0]
+    else: # a single  file, most common case
+        raw_fpath_multi = [Path(inp_raw_fpath)]
+        raw_fpath_mono = Path(inp_raw_fpath)
+           
+    raw_fpath_str_lst = [str(e) for e in raw_fpath_multi]
+    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_gfzrnx")   
+    
+    cmd_opt_list , _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
+    
+    cmd_list = [bin_path,'-finp'] + raw_fpath_str_lst  + ['-fout', out_fpath] + cmd_opt_list + cmd_kwopt_list
+    cmd_list = [str(e) for e in cmd_list]
+    cmd_str = " ".join(cmd_list)
+    cmd_use = [cmd_str]
+    
+    return cmd_use, cmd_list, cmd_str
+
+                    
 
 
 

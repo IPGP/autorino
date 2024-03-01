@@ -70,7 +70,7 @@ for (site,day),df in DFgrp:
     pout_site = pout + "/" + site[:4]
 
     utils.create_dir(pout_site)
-    cmd_gfzrnx = "gfzrnx -finp " + rnxs_str + " -fout  " + pout_site + "/::RX3::" 
+    cmd_gfzrnx = "gfzrnx -finp " + rnxs_str + " -fout " + pout_site + "/::RX3::" 
 
     print(cmd_gfzrnx)
 
