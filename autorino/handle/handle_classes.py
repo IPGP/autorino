@@ -142,7 +142,8 @@ class HandleGnss(arocmn.StepGnss):
 
             self.split_row(irow, self.tmp_dir, handle_software=handle_software)
             self.rinexmod_row(irow, rnxmod_dir, rinexmod_kwargs)
-            self.move_final_row(irow)
+            if rnxmod_dir != self.out_dir:
+                self.move_final_row(irow)
 
     def split_row(self, irow, out_dir_inp, handle_software='converto'):
         frnx_inp = self.table.loc[irow, 'fpath_inp']
