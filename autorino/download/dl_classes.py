@@ -2,14 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import ftplib
-import datetime as dt
 import pandas as pd
-import numpy as np
 import os
-import dateparser
 import shutil
-from autorino import download as arodl
-from autorino import general as arogen
+import autorino.download as arodl
+import autorino.configread as arocfg
+import autorino.workflow as arowkf
 
 pd.options.mode.chained_assignment = 'warn'
 
@@ -17,80 +15,57 @@ pd.options.mode.chained_assignment = 'warn'
 import logging
 logger = logging.getLogger(__name__)
 
-class DownloadGnss(arogen.WorkflowGnss):
+class DownloadGnss(arowkf.WorkflowGnss):
     
     def __init__(self,session,epoch_range,out_dir):
         super().__init__(session,epoch_range,out_dir)
-    
-    ########### DownloadGnss specific methods        
-    def guess_remote_local_files(self,
-                                 guess_remote=True,
-                                 guess_local=True):
+                
+    def guess_remote_files(self):
         """
         Guess the paths and name of the remote files based on the 
         Session and EpochRange attributes of the DownloadGnss
+        
+        see also method guess_local_files(), a general method for all 
+        WorkflowGnss objects
         """
         
         if not self.session.remote_fname:
             logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
-
+        
         hostname_use = self.session.hostname
         
         rmot_paths_list = []
-        local_paths_list = []
         
         for epoch in self.epoch_range.epoch_range_list():
             ### guess the potential remote files
-            if guess_remote:
-                rmot_dir_use = str(self.session.remote_dir)
-                rmot_fname_use = str(self.session.remote_fname)
-                
-                rmot_path_use = arodl.join_url(self.session.protocol,
-                                              hostname_use,
-                                              rmot_dir_use,
-                                              rmot_fname_use)
+            rmot_dir_use = str(self.session.remote_dir)
+            rmot_fname_use = str(self.session.remote_fname)
+            
+            rmot_path_use = arodl.join_url(self.session.protocol,
+                                          hostname_use,
+                                          rmot_dir_use,
+                                          rmot_fname_use)
 
-                rmot_path_use = arogen.translator(rmot_path_use,
-                                                  epoch,
-                                                  self.session.translate_dict)
-                                           
-                rmot_fname_use = os.path.basename(rmot_path_use)
-                                           
-                rmot_paths_list.append(rmot_path_use)
-                
-                iepoch = self.table[self.table['epoch_srt'] == epoch].index[0]
-                                                
-                self.table.loc[iepoch,'fname']     = rmot_fname_use
-                self.table.loc[iepoch,'fpath_inp'] = rmot_path_use
-                logger.debug("remote file guessed: %s",rmot_path_use)
-
-            ### guess the potential local files
-            if guess_local:
-                local_dir_use = str(self.out_dir)
-                local_fname_use = str(self.session.remote_fname)
-                local_path_use = os.path.join(local_dir_use,
-                                              local_fname_use)
-
-                local_path_use = arogen.translator(local_path_use,
-                                                   epoch,
-                                                   self.session.translate_dict)
+            rmot_path_use = arowkf.translator(rmot_path_use,
+                                              epoch,
+                                              self.session.translate_dict)
+                                       
+            rmot_fname_use = os.path.basename(rmot_path_use)
+                                       
+            rmot_paths_list.append(rmot_path_use)
+            
+            iepoch = self.table[self.table['epoch_srt'] == epoch].index[0]
                                             
-                local_fname_use = os.path.basename(local_path_use)
-                                           
-                local_paths_list.append(local_path_use)
-
-                iepoch = self.table[self.table['epoch_srt'] == epoch].index
-
-                self.table.loc[iepoch,'fname']       = local_fname_use
-                self.table.loc[iepoch,'fpath_out'] = local_path_use
-                logger.debug("local file guessed: %s",local_path_use)
+            self.table.loc[iepoch,'fname']     = rmot_fname_use
+            self.table.loc[iepoch,'fpath_inp'] = rmot_path_use
+            logger.debug("remote file guessed: %s",rmot_path_use)
       
         rmot_paths_list = sorted(list(set(rmot_paths_list)))
             
         logger.info("nbr remote files guessed: %s",len(rmot_paths_list))
-        logger.info("nbr local files guessed: %s",len(local_paths_list))
 
-        return rmot_paths_list, local_paths_list
+        return rmot_paths_list
+    
         
     def _guess_remote_directories(self):
         """
@@ -102,7 +77,7 @@ class DownloadGnss(arogen.WorkflowGnss):
         rmot_dir_list = []
         for epoch in self.epoch_range.epoch_range_list():
             rmot_dir_use = str(self.session.remote_dir)
-            rmot_dir_use = arogen.translator(rmot_dir_use,epoch,
+            rmot_dir_use = arowkf.translator(rmot_dir_use,epoch,
                                              self.session.translate_dict)
             rmot_dir_list.append(rmot_dir_use)
             
@@ -194,7 +169,7 @@ class DownloadGnss(arogen.WorkflowGnss):
             ###### use the guessed local file as destination or the generic directory                
             if not local_file: #### the local file has not been guessed
                 outdir_use = str(self.out_dir)
-                outdir_use = arogen.translator(outdir_use,
+                outdir_use = arowkf.translator(outdir_use,
                                                epoch,
                                                self.session.translate_dict)
             else: #### the local file has been guessed before
@@ -246,3 +221,78 @@ class DownloadGnss(arogen.WorkflowGnss):
                 self.table.loc[irow,"ok_out"] = False
                 
         return download_files_list
+    
+    
+##### function graveyard 
+
+# ########### DownloadGnss specific methods        
+# def guess_remote_local_files(self,
+#                              guess_remote=True,
+#                              guess_local=True):
+#     """
+#     Guess the paths and name of the remote files based on the 
+#     Session and EpochRange attributes of the DownloadGnss
+#     """
+    
+#     if not self.session.remote_fname:
+#         logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
+
+#     hostname_use = self.session.hostname
+    
+#     rmot_paths_list = []
+#     local_paths_list = []
+    
+#     for epoch in self.epoch_range.epoch_range_list():
+#         ### guess the potential remote files
+#         if guess_remote:
+#             rmot_dir_use = str(self.session.remote_dir)
+#             rmot_fname_use = str(self.session.remote_fname)
+            
+#             rmot_path_use = arodl.join_url(self.session.protocol,
+#                                           hostname_use,
+#                                           rmot_dir_use,
+#                                           rmot_fname_use)
+
+#             rmot_path_use = arocfg.translator(rmot_path_use,
+#                                               epoch,
+#                                               self.session.translate_dict)
+                                       
+#             rmot_fname_use = os.path.basename(rmot_path_use)
+                                       
+#             rmot_paths_list.append(rmot_path_use)
+            
+#             iepoch = self.table[self.table['epoch_srt'] == epoch].index[0]
+                                            
+#             self.table.loc[iepoch,'fname']     = rmot_fname_use
+#             self.table.loc[iepoch,'fpath_inp'] = rmot_path_use
+#             logger.debug("remote file guessed: %s",rmot_path_use)
+
+#         ### guess the potential local files
+#         if guess_local:
+#             local_dir_use = str(self.out_dir)
+#             local_fname_use = str(self.session.remote_fname)
+#             local_path_use = os.path.join(local_dir_use,
+#                                           local_fname_use)
+
+#             local_path_use = arocfg.translator(local_path_use,
+#                                                epoch,
+#                                                self.session.translate_dict)
+                                        
+#             local_fname_use = os.path.basename(local_path_use)
+                                       
+#             local_paths_list.append(local_path_use)
+
+#             iepoch = self.table[self.table['epoch_srt'] == epoch].index
+
+#             self.table.loc[iepoch,'fname']       = local_fname_use
+#             self.table.loc[iepoch,'fpath_out'] = local_path_use
+#             logger.debug("local file guessed: %s",local_path_use)
+  
+#     rmot_paths_list = sorted(list(set(rmot_paths_list)))
+        
+#     logger.info("nbr remote files guessed: %s",len(rmot_paths_list))
+#     logger.info("nbr local files guessed: %s",len(local_paths_list))
+
+#     return rmot_paths_list, local_paths_list
+
+
