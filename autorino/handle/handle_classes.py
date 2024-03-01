@@ -154,10 +154,13 @@ class HandleGnss(arocmn.StepGnss):
         if handle_software == 'converto':
             conv_kwoptions = {'-st': self.table.loc[irow, 'epoch_srt'].strftime('%Y%m%d%H%M%S'),
                               '-e': self.table.loc[irow, 'epoch_end'].strftime('%Y%m%d%H%M%S')}
+            conv_options = []
         elif handle_software == 'gfzrnx':
             duration = int((self.table.loc[irow, 'epoch_end'] - self.table.loc[irow, "epoch_srt"]).total_seconds())
             conv_kwoptions = {'-epo_beg': self.table.loc[irow, 'epoch_srt'].strftime('%Y%m%d_%H%M%S'),
                               '-d': duration}
+            conv_options = ['-f']
+
         else:
             logger.error('wrong handle_software value: %s', handle_software)
             raise ValueError
@@ -166,6 +169,7 @@ class HandleGnss(arocmn.StepGnss):
             frnxtmp, _ = arocnv.converter_run(frnx_inp,
                                               out_dir_inp,
                                               converter=handle_software,
+                                              bin_options=conv_options,
                                               bin_kwoptions=conv_kwoptions)
 
             self.table.loc[irow, 'fpath_out'] = frnxtmp
