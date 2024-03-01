@@ -101,30 +101,48 @@ class HandleGnss(arocmn.StepGnss):
                                               'gfzrnx',
                                               bin_options=['-f'])
 
-
     def find_rnxs_for_split(self, hdl_store):
         for irow, row in self.table.iterrows():
             epo_srt = np.datetime64(self.table.loc[irow, 'epoch_srt'])
             epo_end = np.datetime64(self.table.loc[irow, 'epoch_end'])
 
-            epoch_srt_bool = hdl_store.table['epoch_srt'] <= epo_srt
-            epoch_end_bool = hdl_store.table['epoch_end'] >= epo_end
+            epoch_srt_bool_col = hdl_store.table['epoch_srt'] <= epo_srt
+            epoch_end_bool_col = hdl_store.table['epoch_end'] >= epo_end
 
-            epoch_bool = epoch_srt_bool & epoch_end_bool
+            epoch_bool_col = epoch_srt_bool_col & epoch_end_bool_col
 
-            if epoch_bool.sum() == 0:
+            if epoch_bool_col.sum() == 0:
                 print("no")
                 self.table.loc[irow, 'ok_inp'] = False
                 continue
-            elif epoch_bool.sum() > 1:
+            elif epoch_bool_col.sum() > 1:
                 print("> 1, keep first")
-                rnxinp_row = hdl_store.table.loc[epoch_bool].iloc[0]
+                rnxinp_row = hdl_store.table.loc[epoch_bool_col].iloc[0]
             else:
-                rnxinp_row = hdl_store.table.loc[epoch_bool].squeeze()
+                rnxinp_row = hdl_store.table.loc[epoch_bool_col].squeeze()
 
             self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
             self.table.loc[irow, 'ok_inp'] = True
 
+    def split(self, rnxmod_dir_inp=None):
+        if rnxmod_dir_inp:
+            rnxmod_dir = rnxmod_dir_inp
+        else:
+            rnxmod_dir = self.out_dir
+
+        for irow, row in self.table.iterrows():
+            rinexmod_kwargs = {  # 'marker': 'TOTO',
+                'compression': "gz",
+                'longname': True,
+                # 'sitelog': sitelogs,
+                'force_rnx_load': True,
+                'verbose': False,
+                'tolerant_file_period': True,
+                'full_history': True}
+
+            self.split_row(irow, self.tmp_dir)
+            self.rinexmod_row(irow, rnxmod_dir, rinexmod_kwargs)
+            self.move_final_row(irow)
 
     def split_row(self, irow, out_dir_inp, handle_software='converto'):
         frnx_inp = self.table.loc[irow, 'fpath_inp']
@@ -133,11 +151,11 @@ class HandleGnss(arocmn.StepGnss):
         out_dir_use = self.translate_path(self.out_dir)
 
         if handle_software == 'converto':
-            conv_kwoptions={'-st':self.table.loc[irow,'epoch_srt'].strftime('%Y%m%d%H%M%S'),
-                            '-e': self.table.loc[irow,'epoch_end'].strftime('%Y%m%d%H%M%S')}
+            conv_kwoptions = {'-st': self.table.loc[irow, 'epoch_srt'].strftime('%Y%m%d%H%M%S'),
+                              '-e': self.table.loc[irow, 'epoch_end'].strftime('%Y%m%d%H%M%S')}
         elif handle_software == 'gfzrnx':
-            duration = int((self.table.loc[irow,'epoch_end'] - self.table.loc[irow, "epoch_srt"]).total_seconds())
-            conv_kwoptions = {'-epo_beg': self.table.loc[irow,'epoch_srt'].strftime('%Y%m%d_%H%M%S'),
+            duration = int((self.table.loc[irow, 'epoch_end'] - self.table.loc[irow, "epoch_srt"]).total_seconds())
+            conv_kwoptions = {'-epo_beg': self.table.loc[irow, 'epoch_srt'].strftime('%Y%m%d_%H%M%S'),
                               '-d': duration}
         else:
             logger.error('wrong handle_software value: %s', handle_software)
