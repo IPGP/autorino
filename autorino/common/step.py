@@ -935,8 +935,8 @@ class StepGnss():
         file_uncomp_out = arocmn.decompress_file(self.table.loc[irow, table_col], tmp_dir)
 
         self.table.loc[irow, table_col] = file_uncomp_out
-        self.table.loc[irow, 'ok_inp'] = self.table.loc[irow, table_col].apply(os.path.isfile)
-        self.table.loc[irow, 'fname'] = self.table.loc[irow, table_col].apply(os.path.basename)
+        self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
+        self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
 
         return file_uncomp_out
 
