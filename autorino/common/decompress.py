@@ -55,7 +55,8 @@ def _decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
     file_out = out_dir.joinpath(gzip_file2.stem)
 
     if file_out.exists() and not force:
-        logger.debug("%s already exists, no decompression", file_out)
+        pass
+        #logger.debug("%s already exists, no decompression", file_out)
     else:
         with gzip.open(gzip_file_inp, 'rb') as f_in:
             with open(file_out, 'wb') as f_out:
@@ -83,7 +84,7 @@ def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
     rnx_file_potential = os.path.join(out_dir, rnx_name_potential)
 
     if os.path.isfile(rnx_file_potential) and not force:
-        logger.debug("%s already exists, no decompression", rnx_file_potential)
+        #logger.debug("%s already exists, no decompression", rnx_file_potential)
         rnx_file_out = rnx_file_potential
     else:
         rnx_file_out = hatanaka.decompress_on_disk(crx_file, delete=dell)
