@@ -72,7 +72,7 @@ def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
 
     if out_dir_inp:
         out_dir_use = out_dir_inp
-        crx_file = shutil.copy2(out_dir_use, out_dir_inp)
+        crx_file = shutil.copy2(crx_file_inp, out_dir_use)
         dell = True
     else:
         out_dir_use = os.path.dirname(crx_file_inp)
