@@ -13,52 +13,36 @@ from geodezyx import utils
 import datetime as dt
 
 
-tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
-rnxmod_dir = '/home/psakicki/autorino_workflow_tests/rinexmoded'
+tmp_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/temp'
+rnxmod_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/rinexmoded'
 
-out_dir = '/home/psakicki/autorino_workflow_tests/handle'
+out_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/handle'
 log_dir = tmp_dir
 
 epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
 hdl_store = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo_dummy) #, site_id='CFNG')
 
-p="/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"
-L = utils.find_recursive(p,"*gz")
+p="/home/ovsgnss/090_TEMP_STUFFS/2402_tests_PF_pride" 
+L = utils.find_recursive(p,"*BORG*crx*gz")
 
 hdl_store.load_table_from_filelist(L)
 hdl_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-epo = arocmn.EpochRange(dt.datetime(2024,2,28,1),
-                        dt.datetime(2024,2,28,3),
-                        '5min')
+epo = arocmn.EpochRange(dt.datetime(2023,6,4),
+                        dt.datetime(2023,7,31),
+                       # dt.datetime(2023,6,4,0,30),
+                        '15min')
 
 hdl_split = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo)
 
 hdl_split.find_rnxs_for_split(hdl_store)
 
-handle_software = 'converto'
+handle_software = 'gfzrnx'
 
 hdl_split.decompress()
 
-#hdl_split.split()
+hdl_split.split(handle_software='gfzrnx')
 
-#def split(self):
-for irow,row in hdl_split.table.iterrows():
-
-    rinexmod_kwargs = {#'marker': 'TOTO',
-                       'compression': "gz",
-                       'longname': True,
-                       #'sitelog': sitelogs,
-                       'force_rnx_load': True,
-                       'verbose': False,
-                       'tolerant_file_period': True,
-                       'full_history': True}
-
-    hdl_split.on_row_split(irow, tmp_dir)
-
-    hdl_split.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
-
-    hdl_split.on_row_move_final(irow)
 
 
 
