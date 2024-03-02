@@ -124,7 +124,7 @@ class HandleGnss(arocmn.StepGnss):
             self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
             self.table.loc[irow, 'ok_inp'] = True
 
-    def split(self, rnxmod_dir_inp=None, handle_software='converto'):
+    def split_table(self, rnxmod_dir_inp=None, handle_software='converto'):
         if rnxmod_dir_inp:
             rnxmod_dir = rnxmod_dir_inp
         else:
@@ -140,12 +140,12 @@ class HandleGnss(arocmn.StepGnss):
                 'tolerant_file_period': True,
                 'full_history': True}
 
-            self.split_row(irow, self.tmp_dir, handle_software=handle_software)
-            self.rinexmod_row(irow, rnxmod_dir, rinexmod_kwargs)
+            self.on_row_split(irow, self.tmp_dir, handle_software=handle_software)
+            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
             if rnxmod_dir != self.out_dir:
-                self.move_final_row(irow)
+                self.on_row_move_final(irow)
 
-    def split_row(self, irow, out_dir_inp, handle_software='converto'):
+    def on_row_split(self, irow, out_dir_inp, handle_software='converto'):
         frnx_inp = self.table.loc[irow, 'fpath_inp']
 
         tmp_dir_use = self.translate_path(self.tmp_dir)
