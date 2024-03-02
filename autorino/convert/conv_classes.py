@@ -130,7 +130,7 @@ class ConvertGnss(arocmn.StepGnss):
         if not force:
             self.filter_ok_out()
 
-        decompressed_files = self.decompress_table()
+        decompressed_files = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
@@ -156,7 +156,7 @@ class ConvertGnss(arocmn.StepGnss):
             # not here anymore actually it is still here 
             #if ext in ('.gz',):
             #    logger.debug("%s is compressed",fraw)
-            #    fraw = Path(arocmn.decompress(fraw, tmp_dir_unzipped_use))
+            #    fraw = Path(arocmn.decompress_file(fraw, tmp_dir_unzipped_use))
 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
@@ -206,7 +206,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         #### remove temporary files
         for f in decompressed_files:
-            logger.debug("remove tmp decompress RINEX file: %s", f)
+            logger.debug("remove tmp decompress_file RINEX file: %s", f)
             os.remove(f)
         for f in frnxtmp_files:
             logger.debug("remove tmp converted RINEX file: %s", f)

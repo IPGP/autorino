@@ -27,10 +27,10 @@ hdl.update_epoch_table_from_rnx_fname()
 # bool_comp = hdl.table['fpath_inp'].apply(arocmn.is_compressed)
 # idx_comp = hdl.table.loc[bool_comp].index        
 # hdl.table.loc[idx_comp,'fpath_ori'] = hdl.table[idx_comp,'fpath_inp']
-# files_out = self.table.loc[idx_comp,table_col].apply(arocmn.decompress)
+# files_out = self.table.loc[idx_comp,table_col].apply(arocmn.decompress_file)
 # self.table.loc[idx_comp,table_col] = files_out
 
-hdl.decompress_table()
+hdl.decompress()
 
 hdl.print_table()
 hdl.splice()

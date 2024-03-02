@@ -38,7 +38,7 @@ hdl_split.find_rnxs_for_split(hdl_store)
 
 handle_software = 'converto'
 
-hdl_split.decompress_table()
+hdl_split.decompress()
 
 #hdl_split.split()
 
