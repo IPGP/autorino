@@ -38,7 +38,7 @@ hdl_split.find_rnxs_for_split(hdl_store)
 
 handle_software = 'converto'
 
-hdl_split.decompress_table()
+hdl_split.decompress()
 
 #hdl_split.split()
 
@@ -54,11 +54,11 @@ for irow,row in hdl_split.table.iterrows():
                        'tolerant_file_period': True,
                        'full_history': True}
 
-    hdl_split.split_row(irow, tmp_dir)
+    hdl_split.on_row_split(irow, tmp_dir)
 
-    hdl_split.rinexmod_row(irow,rnxmod_dir,rinexmod_kwargs)
+    hdl_split.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
 
-    hdl_split.move_final_row(irow)
+    hdl_split.on_row_move_final(irow)
 
 
 
