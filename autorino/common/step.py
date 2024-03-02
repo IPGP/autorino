@@ -919,8 +919,7 @@ class StepGnss():
 
     def on_row_decompress(self,irow,table_col='fpath_inp', table_ok_col='ok_inp'):
         bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
-        print("AAAAAAAAAAA",self.table.loc[irow, table_col])
-        bool_ok = self.table[irow,table_ok_col]
+        bool_ok = self.table.loc[irow,table_ok_col]
         bool_wrk = np.logical_and(bool_comp, bool_ok)
 
         if bool_wrk:
