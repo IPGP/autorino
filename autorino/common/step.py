@@ -918,7 +918,7 @@ class StepGnss():
         return frnxfin
 
     def on_row_decompress(self,irow,table_col='fpath_inp', table_ok_col='ok_inp'):
-        bool_comp = self.table.loc[irow, table_col].apply(arocmn.is_compressed)
+        bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
         bool_ok = self.table[irow,table_ok_col]
         bool_wrk = np.logical_and(bool_comp, bool_ok)
 
@@ -931,7 +931,8 @@ class StepGnss():
             tmp_dir = self.tmp_dir_unzipped
         else:
             tmp_dir = self.tmp_dir
-        file_uncomp_out = self.table.loc[irow, table_col].apply(arocmn.decompress_file, args=(tmp_dir,))
+        file_uncomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
+                                                 tmp_dir=tmp_dir)
 
         self.table.loc[irow, table_col] = file_uncomp_out
         self.table.loc[irow, 'ok_inp'] = self.table.loc[irow, table_col].apply(os.path.isfile)
