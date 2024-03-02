@@ -124,7 +124,7 @@ class HandleGnss(arocmn.StepGnss):
             self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
             self.table.loc[irow, 'ok_inp'] = True
 
-    def split_table(self, rnxmod_dir_inp=None, handle_software='converto'):
+    def split(self, rnxmod_dir_inp=None, handle_software='converto'):
         if rnxmod_dir_inp:
             rnxmod_dir = rnxmod_dir_inp
         else:
