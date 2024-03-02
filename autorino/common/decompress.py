@@ -71,16 +71,16 @@ def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
     crx_file_inp2 = Path(crx_file_inp)
 
     if out_dir_inp:
-        out_dir_use = out_dir_inp
-        crx_file = shutil.copy2(crx_file_inp, out_dir_use)
+        out_dir = out_dir_inp
+        crx_file = shutil.copy2(crx_file_inp, out_dir)
         dell = True
     else:
-        out_dir_use = os.path.dirname(crx_file_inp)
+        out_dir = os.path.dirname(crx_file_inp)
         crx_file = crx_file_inp
         dell = False
 
-    rnx_name_potential = os.path.basename(p).split('.')[0] + '.rnx'
-    rnx_file_potential = os.path.join(out_dir_use, rnx_name_potential)
+    rnx_name_potential = os.path.basename(crx_file).split('.')[0] + '.rnx'
+    rnx_file_potential = os.path.join(out_dir, rnx_name_potential)
 
     if os.path.isfile(rnx_file_potential) and not force:
         logger.debug("%s already exists, no decompression", rnx_file_potential)
