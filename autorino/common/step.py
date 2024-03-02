@@ -931,8 +931,8 @@ class StepGnss():
             tmp_dir = self.tmp_dir_unzipped
         else:
             tmp_dir = self.tmp_dir
-        file_uncomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
-                                                 tmp_dir)
+
+        file_uncomp_out = arocmn.decompress_file(self.table.loc[irow, table_col], tmp_dir)
 
         self.table.loc[irow, table_col] = file_uncomp_out
         self.table.loc[irow, 'ok_inp'] = self.table.loc[irow, table_col].apply(os.path.isfile)
