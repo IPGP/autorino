@@ -15,34 +15,35 @@ import os
 
 #### Import the logger
 import logging
+
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 
- #  _____                                               _             
- # |  __ \                                             (_)            
- # | |  | | ___  ___ ___  _ __ ___  _ __  _ __ ___  ___ _  ___  _ __  
- # | |  | |/ _ \/ __/ _ \| '_ ` _ \| '_ \| '__/ _ \/ __| |/ _ \| '_ \ 
- # | |__| |  __/ (_| (_) | | | | | | |_) | | |  __/\__ \ | (_) | | | |
- # |_____/ \___|\___\___/|_| |_| |_| .__/|_|  \___||___/_|\___/|_| |_|
- #                                 | |                                
- #                                 |_|    
+#  _____                                               _
+# |  __ \                                             (_)
+# | |  | | ___  ___ ___  _ __ ___  _ __  _ __ ___  ___ _  ___  _ __
+# | |  | |/ _ \/ __/ _ \| '_ ` _ \| '_ \| '__/ _ \/ __| |/ _ \| '_ \
+# | |__| |  __/ (_| (_) | | | | | | |_) | | |  __/\__ \ | (_) | | | |
+# |_____/ \___|\___\___/|_| |_| |_| .__/|_|  \___||___/_|\___/|_| |_|
+#                                 | |
+#                                 |_|
 
 
 def is_compressed(file_inp):
     file_inp2 = Path(file_inp)
-    
+
     ext = file_inp2.suffix.lower()
-    
+
     if ext in ('.gz',):
         bool_compress = True
     else:
         bool_compress = False
-        
+
     return bool_compress
-        
-    
-def _decomp_gzip(gzip_file_inp, out_dir_inp = None, force=False):
+
+
+def _decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
     gzip_file_inp = str(gzip_file_inp)
     gzip_file2 = Path(gzip_file_inp)
 
@@ -65,46 +66,53 @@ def _decomp_gzip(gzip_file_inp, out_dir_inp = None, force=False):
     return str(file_out)
 
 
-def _decomp_hatanaka(crx_file_inp,out_dir_inp = None):
-    
+def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
     crx_file_inp = str(crx_file_inp)
     crx_file_inp2 = Path(crx_file_inp)
-    
+
     if out_dir_inp:
-        crx_file = shutil.copy2(crx_file_inp, out_dir_inp)
+        out_dir_use = out_dir_inp
+        crx_file = shutil.copy2(out_dir_use, out_dir_inp)
         dell = True
     else:
+        out_dir_use = os.path.dirname(crx_file_inp)
         crx_file = crx_file_inp
         dell = False
-    
-    rnx_file_out = hatanaka.decompress_on_disk(crx_file,delete=dell)
-    logger.debug("decompress (hatanaka): %s > %s", crx_file_inp2.name,
-                 rnx_file_out)
-    
+
+    rnx_name_potential = os.path.basename(p).split('.')[0] + '.rnx'
+    rnx_file_potential = os.path.join(out_dir_use, rnx_name_potential)
+
+    if os.path.isfile(rnx_file_potential) and not force:
+        logger.debug("%s already exists, no decompression", rnx_file_potential)
+        rnx_file_out = rnx_file_potential
+    else:
+        rnx_file_out = hatanaka.decompress_on_disk(crx_file, delete=dell)
+        logger.debug("decompress (hatanaka): %s > %s", crx_file_inp2.name,
+                     rnx_file_out)
+
     return str(rnx_file_out)
-    
 
-def decompress(file_inp,
-               out_dir_inp = None):
 
-    file_inp = str(file_inp) 
+def decompress_file(file_inp,
+                    out_dir_inp=None,
+                    force=False):
+    file_inp = str(file_inp)
     file_inp2 = Path(file_inp)
     ext = file_inp2.suffix.lower()
 
     if not os.path.isfile(file_inp):
-        logger.warning("unable to decompress, file not exists: %s",file_inp2.name)
-        return file_inp 
+        logger.warning("unable to decompress, file not exists: %s", file_inp2.name)
+        return file_inp
 
-    
     ### RINEX Case
-    if conv.rinex_regex_search_tester(file_inp,compressed=True):
-        file_out = _decomp_hatanaka(file_inp,out_dir_inp)
+    if conv.rinex_regex_search_tester(file_inp, compressed=True):
+        file_out = _decomp_hatanaka(file_inp, out_dir_inp, force=force)
     ### Generic gzipped case (e.g. RAW file)
     elif ext == ".gz":
-        file_out = _decomp_gzip(file_inp,out_dir_inp)
+        file_out = _decomp_gzip(file_inp, out_dir_inp, force=force)
     else:
-        logger.info("no valid compression for %s, nothing is done", 
+        logger.info("no valid compression for %s, nothing is done",
                     file_inp2.name)
         file_out = file_inp
-        
+
     return file_out

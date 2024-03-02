@@ -108,7 +108,7 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert_rnxmod(self, print_table=False, force=False):
+    def convert_table(self, print_table=False, force=False):
         logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
 
         if self.sitelogs:
@@ -130,7 +130,7 @@ class ConvertGnss(arocmn.StepGnss):
         if not force:
             self.filter_ok_out()
 
-        decompressed_files = self.decompress_table()
+        decompressed_files = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
         table_init_ok = self.filter_purge()
@@ -156,7 +156,7 @@ class ConvertGnss(arocmn.StepGnss):
             # not here anymore actually it is still here 
             #if ext in ('.gz',):
             #    logger.debug("%s is compressed",fraw)
-            #    fraw = Path(arocmn.decompress(fraw, tmp_dir_unzipped_use))
+            #    fraw = Path(arocmn.decompress_file(fraw, tmp_dir_unzipped_use))
 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
@@ -181,7 +181,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             ###### CONVERSION
-            frnxtmp = self.convert_row(irow, tmp_dir_converted_use, converter_inp=conve)
+            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use, converter_inp=conve)
             frnxtmp_files.append(frnxtmp)  ### list for final remove
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
@@ -196,17 +196,17 @@ class ConvertGnss(arocmn.StepGnss):
                                'tolerant_file_period': True,
                                'full_history': True}
 
-            self.rinexmod_row(irow, tmp_dir_rinexmoded_use, rinexmod_kwargs)
+            self.on_row_rinexmod(irow, tmp_dir_rinexmoded_use, rinexmod_kwargs)
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
             ###### FINAL MOVE
-            self.move_final_row(irow)
+            self.on_row_move_final(irow)
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
         #### remove temporary files
         for f in decompressed_files:
-            logger.debug("remove tmp decompress RINEX file: %s", f)
+            logger.debug("remove tmp decompress_file RINEX file: %s", f)
             os.remove(f)
         for f in frnxtmp_files:
             logger.debug("remove tmp converted RINEX file: %s", f)
@@ -251,19 +251,22 @@ def _site_search_from_list(fraw_inp, site4_list_inp):
 
 
 def _select_conv_odd_file(fraw_inp,
-                          ext_excluded=[".TG!$",
-                                        ".DAT",
-                                        ".Z",
-                                        ".BCK",
-                                        "^.[0-9]{3}$",
-                                        ".A$",
-                                        "Trimble",
-                                        ".ORIG"]):
+                          ext_excluded=None):
     """
     do a high level case matching to identify the right converter 
     for raw file with an unconventional extension, or exclude the file
     if its extension matches an excluded one
     """
+
+    if ext_excluded is None:
+        ext_excluded = [".TG!$",
+                        ".DAT",
+                        ".Z",
+                        ".BCK",
+                        "^.[0-9]{3}$",
+                        ".A$",
+                        "Trimble",
+                        ".ORIG"]
 
     fraw = Path(fraw_inp)
     ext = fraw.suffix.upper()

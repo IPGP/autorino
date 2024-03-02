@@ -428,14 +428,14 @@ class StepGnss():
                                       header=False)
         return None
 
-    # _______    _     _                                                                    _
-    #|__   __|  | |   | |                                                                  | |
-    #   | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_
-    #   | |/ _` | '_ \| |/ _ \ | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|
-    #   | | (_| | |_) | |  __/ | | | | | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_
-    #   |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
-    #                                                        __/ |
-    #                                                       |___/
+    #  _______    _     _                                                                    _
+    # |__   __|  | |   | |                                                                  | |
+    #    | | __ _| |__ | | ___   _ __ ___   __ _ _ __   __ _  __ _  ___ _ __ ___   ___ _ __ | |_
+    #    | |/ _` | '_ \| |/ _ \ | '_ ` _ \ / _` | '_ \ / _` |/ _` |/ _ \ '_ ` _ \ / _ \ '_ \| __|
+    #    | | (_| | |_) | |  __/ | | | | | | (_| | | | | (_| | (_| |  __/ | | | | |  __/ | | | |_
+    #    |_|\__,_|_.__/|_|\___| |_| |_| |_|\__,_|_| |_|\__,_|\__, |\___|_| |_| |_|\___|_| |_|\__|
+    #                                                         __/ |
+    #                                                        |___/
 
     def print_table(self,
                     no_print=False,
@@ -589,39 +589,25 @@ class StepGnss():
 
         return invalid_local_files_list
 
-    def decompress_table(self, table_col='fpath_inp', table_ok_col='ok_inp'):
+    def decompress(self, table_col='fpath_inp', table_ok_col='ok_inp'):
         """
         decompress the potential compressed files in the ``table_col`` column
         and its corresponding ``table_ok_col`` boolean column
         (usually ``fpath_inp`` and ``ok_inp``)
 
         It will uncompress the file if it is a
-        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file (gzip)
+        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file
+        (gzip only for the moment)
 
         It will create a new column ``fpath_ori`` (for original)
         to keep the trace of the original file
         """
-        bool_comp = self.table[table_col].apply(arocmn.is_compressed)
-        ### we also ensure the fact that the boolean ok column is True
-        bool_ok = self.table[table_ok_col]
-        bool_wrk = np.logical_and(bool_comp, bool_ok)
-        idx_comp = self.table.loc[bool_wrk].index
-        self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp,
-        table_col]
-        if hasattr(self, 'tmp_dir_unzipped'):
-            tmp_dir = self.tmp_dir_unzipped
-        else:
-            tmp_dir = self.tmp_dir
-        files_out = \
-            self.table.loc[idx_comp, table_col].apply(arocmn.decompress,
-                                                      args=(tmp_dir,))
-        self.table.loc[idx_comp, table_col] = files_out
-        self.table.loc[idx_comp, 'ok_inp'] = \
-            self.table.loc[idx_comp, table_col].apply(os.path.isfile)
-        self.table.loc[idx_comp, 'fname'] = \
-            self.table.loc[idx_comp, table_col].apply(os.path.basename)
+        files_uncmp_list = []
+        for irow, row in self.table.iterrows():
+            file_uncmp = self.on_row_decompress(irow,table_col=table_col,table_ok_col=table_ok_col)
+            files_uncmp_list.append(file_uncmp)
 
-        return files_out
+        return files_uncmp_list
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |
@@ -866,7 +852,7 @@ class StepGnss():
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def convert_row(self, irow, out_dir_inp, converter_inp):
+    def on_row_convert(self, irow, out_dir_inp, converter_inp):
         self.table.loc[irow, 'ok_inp'] = True
 
         frnxtmp, _ = arocnv.converter_run(fraw,
@@ -884,7 +870,7 @@ class StepGnss():
             self.table.loc[irow, 'ok_out'] = False
         return frnxtmp
 
-    def rinexmod_row(self, irow, out_dir_inp, rinexmod_kwargs):
+    def on_row_rinexmod(self, irow, out_dir_inp, rinexmod_kwargs):
 
         frnx = self.table.loc[irow, 'fpath_out']
 
@@ -908,7 +894,7 @@ class StepGnss():
 
         return frnxmod
 
-    def move_final_row(self, irow):
+    def on_row_move_final(self, irow):
         ### def output folders
         outdir_use = self.translate_path(self.out_dir,
                                          epoch_inp=self.table.loc[irow,'epoch_srt'])
@@ -931,7 +917,27 @@ class StepGnss():
 
         return frnxfin
 
+    def on_row_decompress(self,irow,table_col='fpath_inp', table_ok_col='ok_inp'):
+        bool_comp = self.table.loc[irow, table_col].apply(arocmn.is_compressed)
+        bool_ok = self.table[irow,table_ok_col]
+        bool_wrk = np.logical_and(bool_comp, bool_ok)
 
+        if bool_wrk:
+            if 'fpath_ori' not in self.table.columns:
+                self.table['fpath_ori'] = [np.nan] * len(self.table)
+            self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow,table_col]
+
+        if hasattr(self, 'tmp_dir_unzipped'):
+            tmp_dir = self.tmp_dir_unzipped
+        else:
+            tmp_dir = self.tmp_dir
+        file_uncomp_out = self.table.loc[irow, table_col].apply(arocmn.decompress_file, args=(tmp_dir,))
+
+        self.table.loc[irow, table_col] = file_uncomp_out
+        self.table.loc[irow, 'ok_inp'] = self.table.loc[irow, table_col].apply(os.path.isfile)
+        self.table.loc[irow, 'fname'] = self.table.loc[irow, table_col].apply(os.path.basename)
+
+        return file_uncomp_out
 
 
 #  __  __ _               __                  _   _

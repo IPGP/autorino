@@ -24,8 +24,8 @@ def split_frontend(epo_in,rnxs_inp,tmp_dir,out_dir,
     #### define hdl_split: the Handle object which will perform the split operation
     hdl_split = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo)
     hdl_split.find_rnxs_for_split(hdl_store)
-    hdl_split.decompress_table()
-    hdl_split.split()
+    hdl_split.decompress()
+    hdl_split.split_table()
 
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
