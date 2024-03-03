@@ -33,11 +33,11 @@ EPOC = REQ.epoch_range
 pout = "/home/sakic/020_TEMP/convcls_test"
 psitelogs = "/work/sitelogs/SITELOGS"
 
-CONV = arcv.ConvertRinexModGnss(SES,
-                                EPOC,
-                                pout,
-                                pout,
-                                psitelogs)
+CONV = arcv.ConvertGnss(SES,
+                        EPOC,
+                        pout,
+                        pout,
+                        psitelogs)
 
 
 flist = "/home/sakic/020_TEMP/Raw_all_MQ_mk01a.list"
