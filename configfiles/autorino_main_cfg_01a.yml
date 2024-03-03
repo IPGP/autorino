@@ -1,0 +1,27 @@
+sessions_list:
+  - session: ####Keep session in dictionnary / Object not necessary
+        name: NA 
+        tmp_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
+        tmp_dir_structure: '<SITE_ID>' # /%Y/%j  
+        log_dir_parent: '<$HOME>/autorino_workflow_tests/log'
+        log_dir_structure: '' #<SITE_ID>/%Y/%j  
+    epoch_range:
+      #epoch1: '2 days ago at 14:00'
+      #epoch2: '2 days ago at 16:00'
+        epoch1: '2 hours ago'
+        epoch2: 'now'
+        period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+        round_method: "floor"
+        tz : 'UTC'
+    workflow:
+        download:
+            inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+            inp_fname_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
+            out_dir_parent: '<$HOME>/autorino_workflow_tests/download_tests/'
+            out_dir_structure: <SITE_ID>/%Y/%j
+            #options:
+        conversion_rinex_header_mod:
+            inp_dir_parent: '<$HOME>/autorino_workflow_tests/download_tests/'
+            inp_dir_structure: <SITE_ID>/%Y/%j
+            out_dir_parent: '<$HOME>/autorino_workflow_tests/conv_tests/'
+            out_dir_structure: <SITE_ID>/%Y/%j
