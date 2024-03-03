@@ -1,0 +1,60 @@
+### other structure for the session(s) 
+
+station:
+    site:
+        name: CFNG 
+        site_id: CFNG00REU 
+        domes: 
+        sitelog_path:
+        position_xyz: (1,2,3)
+    device:
+        attributes_from_sitelog: True
+        ant_manufacturer: NA
+        ant_model: NA
+        ant_sn: NA
+        rec_manufacturer: AUTO_FROM_SITELOG # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        rec_model: AUTO_FROM_SITELOG
+        rec_sn: NA 
+    access:
+        protocol: "ftp"
+        hostname: "192.168.12.20" 
+        login: "admin"
+        password: "W1F10VPF"
+    sessions_list:
+      - session: ####Keep session in dictionnary / Object not necessary
+            name: NA 
+            data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+            tmp_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
+            tmp_dir_structure: '<SITE_ID>' # /%Y/%j  
+            log_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
+            log_dir_structure: '' #<SITE_ID>/%Y/%j  
+        epoch_range:
+          #epoch1: '2 days ago at 14:00'
+          #epoch2: '2 days ago at 16:00'
+            epoch1: 'one hour ago' 
+            epoch2: '15 minutes ago'
+            period: "15min" # RINEX convention (01D, 01H etc...)
+            round_method: "ceil"
+            tz : 'UTC'
+        workflow:
+            download:
+                active: True
+                remote_dir: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+                remote_fname:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
+                out_dir_parent: '<$HOME>/autorino_workflow_tests/download_tests/'
+                out_dir_structure: <SITE_ID>/%Y/%j
+                epoch_range:
+                    epoch1: '2 days ago at 14:00'
+                    epoch2: '2 days ago at 16:00'
+                    period: "1h" # RINEX convention (01D, 01H etc...)
+                    round_method: "ceil"
+                    tz : 'UTC'
+            conversion:
+                active: True
+                converter : auto
+                out_dir_parent: '<$HOME>/autorino_workflow_tests/conv_tests/'
+                out_dir_structure: <SITE_ID>/%Y/%j  
+            rinex_header_mod:
+                active: True
+                out_dir_parent: '<$HOME>/autorino_workflow_tests/conv_tests/' 
+                out_dir_structure: <SITE_ID>/%Y/%j

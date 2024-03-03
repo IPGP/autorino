@@ -15,6 +15,7 @@ import yaml
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05b_BOMG.yml'
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05c_BOMG.yml'
 pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05c_RVAG.yml'
+pconfig='/home/sysop/pymods_ovs/autorino/configfiles/proto_config_05d_CNFG.yml'
 
 Y1 = yaml.safe_load(open(pconfig))
 
@@ -24,7 +25,8 @@ ses = ses_lst[0]
 #req = req_lst
 
 #L = REQ.ask_remote_files()
-L = dwl.guess_remote_local_files(guess_local=1)
+L = dwl.guess_local_files()
+L = dwl.guess_remote_files()
 L = dwl.check_local_files()
 L = dwl.invalidate_small_local_files()
 
@@ -35,9 +37,9 @@ dwl.print_table()
 out = "/home/sysop/workflow_tests/convert_tests"
 sitelog_dir = '/home/sysop/sitelogs/OVPF'
 
-conv = arocnv.ConvertRinexModGnss(ses,dwl.epoch_range,out,sitelog_dir)
+conv = arocnv.ConvertGnss(ses, dwl.epoch_range, out, sitelog_dir)
 
 conv.load_table_from_prev_step_table(dwl.table)
 conv.print_table()
-conv.conv_rnxmod_files()
+conv.convert_table()
 conv.print_table()

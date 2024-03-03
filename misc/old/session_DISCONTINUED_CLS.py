@@ -18,10 +18,10 @@ class SessionGnss:
         self.sta_user = sta_user
         self.sta_pass = sta_pass  
         self.site = site ## setter bellow
-        self.site4 = site  ## setter bellow       
-        self.site9 = site   ## setter bellow         
+        self.site4 = site ## setter bellow       
+        self.site9 = site ## setter bellow         
         self.session_period = session_period
-        self.translate_dict = self._translate_dict_init()
+        self.translate_dict = self._init_translate_dict()
         
     def __repr__(self):
         return "session {} on {}".format(self.session_period,self.site4)
@@ -60,7 +60,7 @@ class SessionGnss:
             raise Exception("given site code != 9 or 4 chars.: " + value)
             
     ############ methods
-    def _translate_dict_init(self):
+    def _init_translate_dict(self):
         """
         generate the translation dict based on all the SessionGnss 
         object attributes
@@ -78,28 +78,28 @@ class SessionGnss:
         return trsltdict
 
 
-def create_dummy_session():
-    """
-    Create a fake/dummy SessionGnss object
-    for test/developpement purpose
+# def create_dummy_session():
+#     """
+#     Create a fake/dummy SessionGnss object
+#     for test/developpement purpose
 
-    Returns
-    -------
-    ses :  SessionGnss object
-        dummy SessionGnss object.
+#     Returns
+#     -------
+#     ses :  SessionGnss object
+#         dummy SessionGnss object.
 
-    """
+#     """
     
-    ses = SessionGnss(name='XXXX',
-                      protocol='ftp',
-                      hostname='remote.address.net',
-                      remote_dir='SES1',
-                      tmp_dir='/tmp/',
-                      remote_fname='<SITE4>%Y%m%d%H%MA.T02',
-                      sta_user='admin',
-                      sta_pass='admin',
-                      site='SITE00FRA',
-                      session_period='15min')
+#     ses = SessionGnss(name='XXXX',
+#                       protocol='ftp',
+#                       hostname='remote.address.net',
+#                       remote_dir='SES1',
+#                       tmp_dir='/tmp/',
+#                       remote_fname='<SITE4>%Y%m%d%H%MA.T02',
+#                       sta_user='admin',
+#                       sta_pass='admin',
+#                       site='SITE00FRA',
+#                       session_period='15min')
     
-    return ses
+#     return ses
 
