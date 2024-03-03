@@ -6,20 +6,19 @@ Created on Mon Mar 27 09:16:34 2023
 @author: psakicki
 """
 
+from bs4 import BeautifulSoup
 import ftplib
 import os
-import datetime as dt 
-import hashlib
 import urllib
 from urllib.parse import urlparse
-import pandas
-from pathlib import Path
 import urllib.request                 
 from tqdm import tqdm
-from ftplib import FTP
 import requests
-from tqdm.contrib.logging import logging_redirect_tqdm
 import io
+import socket
+from ftplib import FTP, error_temp
+from time import sleep
+
 # Create a logger object.
 import logging
 logger = logging.getLogger(__name__)
@@ -78,7 +77,30 @@ def join_url(protocol_inp,hostname_inp,dir_inp,fname_inp):
 
 ############# list remote files
 
-def list_remote_files_ftp(host_name, remote_dir, username, password):
+def ftp_create_object(url_host_inp,
+                      timeout=15,max_try=3,sleep_time=5):
+    """
+    create an FTP object, and retry in case of a timeout
+    """
+    
+    try_count = 0
+    while True:  
+        try: 
+            ftp = ftplib.FTP(url_host_inp,timeout=timeout)
+            return ftp
+        except TimeoutError as e: 
+            try_count += 1
+            if try_count > max_try:
+                raise e
+            else:
+                print(e)
+                sleep(sleep_time)
+        
+
+    
+
+def list_remote_files_ftp(host_name, remote_dir, username, password,
+                          timeout=15,max_try=3):
     # clean hostname & remote_dir
     # MUST BE IMPROVED !!!
     remote_dir = remote_dir.replace(host_name,"")
@@ -89,7 +111,7 @@ def list_remote_files_ftp(host_name, remote_dir, username, password):
     join_url()
     
     # connect to FTP server
-    ftp = ftplib.FTP(host_name)
+    ftp = ftplib.FTP(host_name,timeout=timeout)
     ftp.login(username, password)
     
     # change to remote directory
@@ -142,19 +164,23 @@ def list_remote_files_http(host_name,remote_dir):
 def size_remote_file_http(url):
     req = urllib.request.Request(url, method='HEAD')
     f = urllib.request.urlopen(req)
-    size_url.append(f.headers['Content-Length'])
-    return size_url
+    return f.headers['Content-Length']
 
 ############# download remote file
 
-def download_file_ftp(url, output_dir,username, password):
+def download_file_ftp(url, output_dir,username, password,
+                      timeout=15,max_try=3,sleep_time=5):
     urlp = urlparse(url)
     
     url_host = urlp.netloc
     url_dir = os.path.dirname(urlp.path)[1:]
     url_fname = os.path.basename(urlp.path)
     
-    ftp = ftplib.FTP(url_host)
+    ftp = ftp_create_object(url_host,
+                            timeout=timeout,
+                            max_try=max_try,
+                            sleep_time=sleep_time)
+    
     ftp.login(username, password)
     ftp.cwd(url_dir)
     filename = url_fname 
@@ -165,18 +191,31 @@ def download_file_ftp(url, output_dir,username, password):
     file_size = ftp.size(filename)
 
     output_path = os.path.join(output_dir, filename)
-    f = open(output_path, 'wb')
-
+    #f = open(output_path, 'wb')
     #tqdm_out = TqdmToLogger(logger,level=logging.INFO)
-    with tqdm(total=file_size,
-               unit='B', 
-               unit_scale=True,
-               desc=filename) as pbar:
-                    
-        _ftp_callback.bytes_transferred = 0
-        ftp.retrbinary('RETR ' + filename, lambda data: (f.write(data), pbar.update(len(data))), 1024)
-        ftp.quit()
-        
+    try_count = 0
+    while True:  
+        try: 
+            with tqdm(total=file_size,
+                       unit='B', 
+                       unit_scale=True,
+                       desc=filename) as pbar, open(output_path, 'wb') as f:
+                            
+                _ftp_callback.bytes_transferred = 0
+                ftp.retrbinary('RETR ' + filename,
+                               lambda data: (f.write(data),
+                                             pbar.update(len(data))),
+                               1024)
+                break
+        except (error_temp, BrokenPipeError, socket.timeout) as e: 
+            try_count += 1
+            if try_count > max_try:
+                raise e
+            else:
+                print(e)
+                sleep(sleep_time)
+            
+    ftp.quit()
     f.close()
     return output_path
 
