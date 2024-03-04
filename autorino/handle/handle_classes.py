@@ -106,20 +106,20 @@ class HandleGnss(arocmn.StepGnss):
             epo_srt = np.datetime64(self.table.loc[irow, 'epoch_srt'])
             epo_end = np.datetime64(self.table.loc[irow, 'epoch_end'])
 
-            epoch_srt_bool_col = hdl_store.table['epoch_srt'] <= epo_srt
-            epoch_end_bool_col = hdl_store.table['epoch_end'] >= epo_end
+            epoch_srt_bol = hdl_store.table['epoch_srt'] <= epo_srt
+            epoch_end_bol = hdl_store.table['epoch_end'] >= epo_end
 
-            epoch_bool_col = epoch_srt_bool_col & epoch_end_bool_col
+            epoch_bol = epoch_srt_bol & epoch_end_bol
 
-            if epoch_bool_col.sum() == 0:
+            if epoch_bol_col.sum() == 0:
                 print("no")
                 self.table.loc[irow, 'ok_inp'] = False
                 continue
-            elif epoch_bool_col.sum() > 1:
+            elif epoch_bol_col.sum() > 1:
                 print("> 1, keep first")
-                rnxinp_row = hdl_store.table.loc[epoch_bool_col].iloc[0]
+                rnxinp_row = hdl_store.table.loc[epoch_bol].iloc[0]
             else:
-                rnxinp_row = hdl_store.table.loc[epoch_bool_col].squeeze()
+                rnxinp_row = hdl_store.table.loc[epoch_bol].squeeze()
 
             self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
             self.table.loc[irow, 'ok_inp'] = True
@@ -139,7 +139,7 @@ class HandleGnss(arocmn.StepGnss):
                 'verbose': False,
                 'tolerant_file_period': True,
                 'full_history': True}
-
+            self.on_row_decompress(irow)
             self.on_row_split(irow, self.tmp_dir, handle_software=handle_software)
             self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
             if rnxmod_dir != self.out_dir:
