@@ -243,7 +243,7 @@ def round_epochs(epochs_inp,
     Returns
     -------
     epochs_rnd : 
-        Pandas Serie of Timestamp or Timedelta 
+        Pandas Series of Timestamp or Timedelta
     
     Note
     ----
@@ -271,7 +271,7 @@ def round_epochs(epochs_inp,
     return epochs_rnd
 
 
-def timedelta2freqency_alias(timedelta_in):
+def timedelta2freq_alias(timedelta_in):
     """
     Time representation conversion
     
@@ -291,8 +291,8 @@ def timedelta2freqency_alias(timedelta_in):
     ----
     Pandas' frequency aliases memo
     https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
-    
     """
+
     offset = to_offset(pd.Timedelta(timedelta_in))
     return offset.freqstr
 
@@ -300,7 +300,7 @@ def timedelta2freqency_alias(timedelta_in):
 def create_dummy_epochrange():
     """
     Create a fake/dummy EpochRange object
-    for test/developpement purpose
+    for test/development purpose
 
     Returns
     -------

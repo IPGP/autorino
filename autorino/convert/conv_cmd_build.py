@@ -52,7 +52,7 @@ def _kw_options_dict2str(kw_options):
     
     for kwo in kw_options:
         for key,val in kwo.items():
-            cmd_list = cmd_list + [str(key),str(val)]
+            cmd_list = cmd_list + [str(key), str(val)]
         
     cmd_str = " ".join(cmd_list)
     
