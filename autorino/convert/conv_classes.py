@@ -3,7 +3,7 @@
 """
 Created on Fri Apr  7 12:07:18 2023
 
-@author: psakicki
+@author: psakic
 """
 
 import os
@@ -12,12 +12,10 @@ import numpy as np
 import datetime as dt
 import dateutil
 import docker
-import shutil
 from pathlib import Path
 
 from geodezyx import utils, operational
 
-import autorino.convert as arocnv
 import autorino.common as arocmn
 
 from rinexmod import rinexmod_api
@@ -42,7 +40,7 @@ class ConvertGnss(arocmn.StepGnss):
                          session=session)
 
         ### temp dirs init
-        self._init_conv_tmp_dirs_paths()
+        self._init_tmp_dirs_paths()
 
         ### sitelog init
         if sitelogs:
@@ -51,60 +49,6 @@ class ConvertGnss(arocmn.StepGnss):
                                                               force=False)
         else:
             self.sitelogs = None
-
-    ########### ConvertGnss specific methods
-
-    def _init_conv_tmp_dirs_paths(self,
-                                  tmp_subdir_logs='logs',
-                                  tmp_subdir_unzip='unzipped',
-                                  tmp_subdir_conv='converted',
-                                  tmp_subdir_rnxmod='rinexmoded'):
-
-        """
-        initialize temp dirs, but keeps their generic form, with <...> and %X,
-        and without creating them 
-        
-        sees set_conv_tmp_dirs_paths() for the effective translation and 
-        creation of these temp dirs
-        """
-
-        ### internal (_) versions have not been translated
-        self._tmp_dir_logs = os.path.join(self.tmp_dir,
-                                          tmp_subdir_logs)
-        self._tmp_dir_unzipped = os.path.join(self.tmp_dir,
-                                              tmp_subdir_unzip)
-        self._tmp_dir_converted = os.path.join(self.tmp_dir,
-                                               tmp_subdir_conv)
-        self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir,
-                                                tmp_subdir_rnxmod)
-
-        ### translation
-        self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
-        self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
-        self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
-        self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
-
-        return self.tmp_dir_logs, self.tmp_dir_unzipped, \
-            self.tmp_dir_converted, self.tmp_dir_rinexmoded
-
-    def set_conv_tmp_dirs_paths(self):
-        """
-        effective translation and creation of temp dirs
-        """
-
-        #### this translation is now  useless, is also done in _init_conv_tmp_dirs_paths
-        tmp_dir_logs_set = self.translate_path(self.tmp_dir_logs)
-        tmp_dir_unzipped_set = self.translate_path(self.tmp_dir_unzipped)
-        tmp_dir_converted_set = self.translate_path(self.tmp_dir_converted)
-        tmp_dir_rinexmoded_set = self.translate_path(self.tmp_dir_rinexmoded)
-
-        utils.create_dir(tmp_dir_logs_set)
-        utils.create_dir(tmp_dir_unzipped_set)
-        utils.create_dir(tmp_dir_converted_set)
-        utils.create_dir(tmp_dir_rinexmoded_set)
-
-        return tmp_dir_logs_set, tmp_dir_unzipped_set, \
-            tmp_dir_converted_set, tmp_dir_rinexmoded_set
 
     ###############################################
 
@@ -116,7 +60,7 @@ class ConvertGnss(arocmn.StepGnss):
         else:
             site4_list = []
 
-        tmp_dir_logs_use, _, _, _ = self.set_conv_tmp_dirs_paths()
+        tmp_dir_logs_use, _, _, _ = self.set_tmp_dirs_paths()
 
         ### initialize the table as log
         self.set_table_log(out_dir=tmp_dir_logs_use)
@@ -150,7 +94,7 @@ class ConvertGnss(arocmn.StepGnss):
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
-            _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_conv_tmp_dirs_paths()
+            _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_tmp_dirs_paths()
 
             ### manage compressed files
             # not here anymore actually it is still here 
@@ -298,7 +242,7 @@ def stop_long_running_containers(max_running_time=120):
     try:
         client = docker.from_env()
     except docker.errors.DockerException:
-        logger.warn('Permission denied for Docker')
+        logger.warning('Permission denied for Docker')
         return None
     containers = client.containers.list()
 
