@@ -2,9 +2,9 @@ sessions_list:
   - session: ####Keep session in dictionnary / Object not necessary
         name: NA 
         tmp_dir_parent: '<$HOME>/autorino_workflow_tests/tmp'
-        tmp_dir_structure: '<SITE_ID>' # /%Y/%j  
+        tmp_structure: '<SITE_ID>' # /%Y/%j  
         log_dir_parent: '<$HOME>/autorino_workflow_tests/log'
-        log_dir_structure: '' #<SITE_ID>/%Y/%j  
+        log_structure: '' #<SITE_ID>/%Y/%j  
     epoch_range:
       #epoch1: '2 days ago at 14:00'
       #epoch2: '2 days ago at 16:00'
@@ -16,12 +16,12 @@ sessions_list:
     workflow:
         download:
             inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
-            inp_fname_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
+            inp_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
             out_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
-            out_dir_structure: <SITE_ID>/%Y/%j
+            out_structure: <SITE_ID>/%Y/%j
             #options:
-        conversion_rinex_header_mod:
+        conversion:
             inp_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
-            inp_dir_structure: <SITE_ID>/%Y/%j
+            inp_structure: <SITE_ID>/%Y/%j
             out_dir_parent: '<$HOME>/autorino_workflow_tests/rnx/'
-            out_dir_structure: <SITE_ID>/%Y/%j
+            out_structure: <SITE_ID>/%Y/%j
