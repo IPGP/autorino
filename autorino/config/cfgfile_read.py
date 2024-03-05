@@ -45,15 +45,16 @@ def run_workflow(workflow_lis, print_table=True):
         if iwkf > 0:
             wkf_prev = workflow_lis[iwkf - 1]
 
-        if type(wkf).__name__ == "DownloadGnss":
+        if wkf.get_step_type() == "DownloadGnss":
             wkf.download(print_table)
-        elif type(wkf).__name__ == "ConvertGnss":
+        elif wkf.get_step_type() == "ConvertGnss":
             wkf.load_table_from_prev_step_table(wkf_prev.table)
             wkf.convert_table(print_table)
 
 
 def read_configfile(configfile_path,
-                    epoch_range_inp=None):
+                    epoch_range_inp=None,
+                    main_cfg_dic={}):
     """
     Load a config file (YAML format) and 
     return a "Workflow list" i.e. a list of StepGnss object 
@@ -94,7 +95,8 @@ def read_configfile(configfile_path,
 
     workflow_lis = read_configfile_sessions_list(y_sessions_list,
                                                  y_site=y_site,
-                                                 y_access=y_access)
+                                                 y_access=y_access,
+                                                 main_cfg_dic=main_cfg_dic)
 
     return workflow_lis, y_site, y_device, y_access
 
@@ -102,25 +104,22 @@ def read_configfile(configfile_path,
 def read_configfile_sessions_list(y_sessions_list_inp,
                                   epoch_range_inp=None,
                                   y_site_inp=None,
-                                  y_access_inp=None):
-
+                                  y_access_inp=None,
+                                  main_cfg_dic={}):
     logger.info('start to read configfile: %s', y_sessions_list_inp)
     if type(y_sessions_list_inp) is dict:
         y_sessions_list = y_sessions_list_inp
-    else: ### it is a path, a main config file
+    else:  ### it is a path, a main config file
         y_main = yaml.safe_load(open(y_sessions_list_inp))
         y_sessions_list = y_main["sessions_list"]
 
     for yses in y_sessions_list:
         ##### TMP DIRECTORY
-        _check_parent_dir_existence(yses['session']['tmp_dir_parent'])
-        tmp_dir = os.path.join(yses['session']['tmp_dir_parent'],
-                               yses['session']['tmp_dir_structure'])
+        tmp_dir, _, _ = _get_dir_path('session', yses,'tmp', main_cfg_dic)
 
         ##### LOG DIRECTORY
-        _check_parent_dir_existence(yses['session']['log_dir_parent'])
-        log_dir = os.path.join(yses['session']['log_dir_parent'],
-                               yses['session']['log_dir_structure'])
+        log_dir, _, _ = _get_dir_path('session',yses,'tmp', main_cfg_dic)
+
 
         ##### EPOCH RANGE AT THE SESSION LEVEL
         if not epoch_range_inp:
@@ -129,55 +128,64 @@ def read_configfile_sessions_list(y_sessions_list_inp,
             epo_obj_use = epoch_range_inp
 
         workflow_lis = []
+        workflow_dic = {}
+
         #### manage workflow
         y_workflow = yses['workflow']
-        for k_step, ywkf in y_workflow.items():
+        main_cfg_dic_workflow = main_cfg_dic['workflow']
 
-            _check_parent_dir_existence(ywkf['out_dir_parent'])
-            out_dir = os.path.join(ywkf['out_dir_parent'],
-                                   ywkf['out_dir_structure'])
+        for k_step, y_step in y_workflow.items():
 
+            out_dir, _, _ = _get_dir_path(k_step, y_step, 'out',
+                                          main_cfg_dic['workflow'])
+
+            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(k_step, y_step, 'inp',
+                                                                   main_cfg_dic['workflow'])
             if k_step == 'download':
-
-                if not _is_cfg_bloc_active(ywkf):
+                if not _is_cfg_bloc_active(y_step):
                     continue
 
-                Dwl = arodwl.DownloadGnss
-                dwl_obj = Dwl(out_dir=out_dir,
-                              tmp_dir=tmp_dir,
-                              log_dir=log_dir,
-                              epoch_range=epo_obj_use,
-                              access=y_access_inp,
-                              remote_dir=ywkf['inp_dir_parent'],
-                              remote_fname=ywkf['inp_fname_structure'],
-                              site=y_site_inp,
-                              session=yses['session'])
+                dwl = arodwl.DownloadGnss
+                step_obj = dwl(out_dir=out_dir,
+                               tmp_dir=tmp_dir,
+                               log_dir=log_dir,
+                               epoch_range=epo_obj_use,
+                               access=y_access_inp,
+                               remote_dir=inp_dir_parent,
+                               remote_fname=inp_structure,
+                               site=y_site_inp,
+                               session=yses['session'])
 
-                workflow_lis.append(dwl_obj)
+            # appended in lis and dic at the end of the tests
 
-            if k_step == 'conversion_rinex_header_mod':
-
-                if not _is_cfg_bloc_active(ywkf):
+            elif k_step == 'conversion':
+                if not _is_cfg_bloc_active(y_step):
                     continue
-
-                Cnv = arocnv.ConvertGnss
 
                 if y_site_inp and y_site_inp['sitelog_path']:
                     sitelogs = y_site_inp['sitelog_path']
                 else:
                     sitelogs = None
 
-                cnv_obj = Cnv(out_dir=out_dir,
-                              tmp_dir=tmp_dir,
-                              log_dir=log_dir,
-                              epoch_range=epo_obj_use,
-                              site=y_site_inp,
-                              session=yses['session'],
-                              sitelogs=sitelogs)
+                cnv = arocnv.ConvertGnss
+                step_obj = cnv(out_dir=out_dir,
+                               tmp_dir=tmp_dir,
+                               log_dir=log_dir,
+                               epoch_range=epo_obj_use,
+                               site=y_site_inp,
+                               session=yses['session'],
+                               sitelogs=sitelogs)
 
-                workflow_lis.append(cnv_obj)
+                # appended in lis and dic at the end of the tests
 
-    return workflow_lis
+            else:
+                logger.warning("unknown step %s in config file, skipped...")
+                continue
+
+            workflow_lis.append(step_obj)
+            workflow_dic[k_step] = step_obj
+
+    return workflow_lis, workflow_dic
 
 
 def _check_parent_dir_existence(parent_dir_inp):
@@ -196,14 +204,16 @@ def _check_parent_dir_existence(parent_dir_inp):
     else:
         return None
 
+
 def _is_cfg_bloc_active(ywkf_inp):
     if 'active' in ywkf_inp.keys():
-        if ywkf_inp['active'] == True:
+        if ywkf_inp['active']:
             return True
         else:
             return False
-    else: ### if no 'active' key, we assume the bloc active
+    else:  ### if no 'active' key, we assume the bloc active
         return True
+
 
 def _epoch_range_from_cfg_bloc(epoch_range_dic):
     """
@@ -216,3 +226,21 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
                              epoch_range_dic['period'],
                              epoch_range_dic['round_method'],
                              epoch_range_dic['tz'])
+
+
+def _get_dir_path(k_step,
+                  y_step,
+                  dir_type='out',
+                  main_default_step_dic={}):
+
+    if k_step in main_default_step_dic.keys():
+        dir_parent = main_default_step_dic[k_step][dir_type + '_dir_parent']
+        structure = main_default_step_dic[k_step][dir_type + '_structure']
+    else:
+        dir_parent = y_step[dir_type + '_dir_parent']
+        structure = y_step[dir_type + '_structure']
+
+    _check_parent_dir_existence(dir_parent)
+    dir_path = os.path.join(dir_parent, structure)
+
+    return dir_path, dir_parent, structure
