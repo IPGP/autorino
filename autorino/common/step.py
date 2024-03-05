@@ -327,6 +327,9 @@ class StepGnss():
         """
         return copy.deepcopy(self)
 
+    def get_step_type(self):
+        return type(wkf).__name__
+
     def update_epoch_table_from_rnx_fname(self,
                                           use_rnx_filename_only=False,
                                           update_epoch_range=True):
