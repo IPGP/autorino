@@ -8,6 +8,7 @@ Created on Mon Jan  8 15:47:58 2024
 
 #### Import star style
 import dateparser
+import datetime as dt
 import pandas as pd
 import numpy as np
 import re
@@ -78,6 +79,10 @@ class EpochRange:
 
     @property
     def period_values(self):
+        """
+        for a period, e.g. 15min, 1H...
+        Returns the value (e.g. 15, 1) and the unit (e.g. min, H)
+        """
         numbers = re.findall(r'[0-9]+', self.period)
         alphabets = re.findall(r'[a-zA-Z]+', self.period)
         val = int("".join(*numbers))
@@ -86,28 +91,45 @@ class EpochRange:
 
     ########### methods
     def epoch_range_list(self, end_bound=False):
-        if not end_bound:  ### start bound
-            epochrange_srt = pd.date_range(self.epoch_start,
-                                           self.epoch_end,
-                                           freq=self.period)
-            epochrange = epochrange_srt
+        """
+        Compute the list of epochs corresponding to the EpochRange
+        if end_bound = True, give the end bound of the range
+        (start bound is generated per default)
+
+        Parameters
+        ----------
+        end_bound
+
+        Returns
+        -------
+        list of epochs
+
+        """
+        if not self.is_valid(): ### NaT case
+            eporng = [pd.NaT]
+        elif not end_bound:  ### start bound
+            eprrng_srt = pd.date_range(self.epoch_start,
+                                       self.epoch_end,
+                                       freq=self.period)
+            eporng = eprrng_srt
         else:  ### end bound
             plus_one = pd.Timedelta(self.period)
-            epochrange_end = pd.date_range(self.epoch_start,
-                                           self.epoch_end + plus_one,
-                                           freq=self.period)
-            epochrange = epochrange_end[1:] - np.timedelta64(1, 's')
+            eprrng_end = pd.date_range(self.epoch_start,
+                                       self.epoch_end + plus_one,
+                                       freq=self.period)
+            # subtract one second for security reason
+            eporng = eprrng_end[1:] - np.timedelta64(1, 's')
 
-        return list(epochrange)
+        return list(eporng)
 
     def is_valid(self):
-        if np.isnat(self.epoch_start) or np.isnat(self.epoch_end):
+        if pd.isna(self.epoch_start) or pd.isna(self.epoch_end):
             return False
         else:
             return True
 
 
-def dateparser_frontend(date_in, tz="UTC"):
+def dateparser_frontend(date_inp, tz="UTC"):
     """
     Frontend function to parse a string/datetime 
     to a Pandas Timestamp 
@@ -118,10 +140,10 @@ def dateparser_frontend(date_in, tz="UTC"):
     rounding is not a parsing operation
     """
 
-    if type(date_in) is str:
-        date_out = pd.Timestamp(dateparser.parse(date_in))
+    if type(date_inp) is str:
+        date_out = pd.Timestamp(dateparser.parse(date_inp))
     else:
-        date_out = pd.Timestamp(date_in)
+        date_out = pd.Timestamp(date_inp)
 
     if type(date_out) is pd._libs.tslibs.nattype.NaTType:
         ### NaT case. can not support tz
@@ -131,7 +153,8 @@ def dateparser_frontend(date_in, tz="UTC"):
 
     return date_out
 
-def dates_list2epoch_range(dates_list_inp, period=None,
+def dates_list2epoch_range(dates_list_inp,
+                           period=None,
                            round_method='floor'):
     epoch1 = np.min(dates_list_inp)
     epoch2 = np.max(dates_list_inp)
@@ -153,7 +176,7 @@ def _round_date(date_in, period, round_method="round"):
 
     Parameters
     ----------
-    date_in : Pandas Serie or a datetime-like object 
+    date_inp : Pandas Serie or a datetime-like object
         Input date .
     period : str, optional
         the rounding period. 
@@ -313,7 +336,3 @@ def create_dummy_epochrange():
                      epoch2="30 min ago",
                      period='15min')
     return epo
-
-
-e = EpochRange("now", "2 hours ago", "15min")
-e.epoch_range_list(True)
