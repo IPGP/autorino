@@ -18,6 +18,5 @@ psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/autorino_site_cfg_07d_CF
 
 out = arocfg.read_configfile_sessions_list(pmain)
 
-
-arocmn.EpochRange()
-
+a = arocmn.EpochRange(pd.NaT,pd.NaT)
+a.epoch_range_list()

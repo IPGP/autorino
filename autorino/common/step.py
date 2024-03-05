@@ -235,8 +235,6 @@ class StepGnss():
         """
         initialize the epoch range if given, and create a dummy one between 
         NaT (not a time) if nothing is given
-
-        # !!!!!!! NOT FULLY IMPLEMENTED
         """
         if epoch_range:
             self.epoch_range = epoch_range
