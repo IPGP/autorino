@@ -1,6 +1,6 @@
 sessions_list:
-  - session: ####Keep session in dictionnary / Object not necessary
-        name: NA 
+  - hourly: ####Keep session in dictionnary / Object not necessary
+        name: hourly 
         tmp_dir_parent: '<$HOME>/autorino_workflow_tests/tmp'
         tmp_structure: '<SITE_ID>' # /%Y/%j  
         log_dir_parent: '<$HOME>/autorino_workflow_tests/log'

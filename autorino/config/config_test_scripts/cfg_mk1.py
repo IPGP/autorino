@@ -13,10 +13,12 @@ import autorino.common as arocmn
 
 import pandas as pd
 
+
 pmain = '/home/psakicki/CODES/IPGP/autorino/configfiles/autorino_main_cfg_01a.yml'
 psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/autorino_site_cfg_07d_CFNG.yml'
 
-out = arocfg.read_configfile_sessions_list(pmain)
+#out = arocfg.read_configfile_sessions_list(psite)
+arocfg.read_configfile(psite)
 
 a = arocmn.EpochRange(pd.NaT,pd.NaT)
 a.epoch_range_list()
