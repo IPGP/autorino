@@ -1,23 +1,6 @@
 station:
     site:
-        name: CFNG 
-        site_id: CFNG00REU 
-        domes: 
-        sitelog_path: #<$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
-        position_xyz: (1,2,3)
-    #device:
-        #attributes_from_sitelog: True
-        #ant_manufacturer: NA
-        #ant_model: NA
-        #ant_sn: NA
-        #rec_manufacturer: NA # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
-        #rec_model: NA
-        #rec_sn: NA 
-    #access:
-        #protocol: "ftp"
-        #hostname: "192.168.12.20" 
-        #login: "admin"
-        #password: "W1F10VPF"
+        sitelog_path: <$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
     sessions:
         session_hourly: ####Keep session in dictionnary / Object not necessary
             general:
