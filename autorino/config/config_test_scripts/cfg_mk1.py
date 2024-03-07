@@ -16,7 +16,7 @@ pmain = '/home/psakicki/CODES/IPGP/autorino/configfiles/autorino_main_cfg_01a.ym
 psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/autorino_site_cfg_08a_CFNG.yml'
 
 #out = arocfg.read_configfile_sessions_list(psite)
-out = arocfg.read_configfile(psite, main_cfg_path=pmain)
+out = arocfg.read_cfg(psite, main_cfg_path=pmain)
 
 out
 
