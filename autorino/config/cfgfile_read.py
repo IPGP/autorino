@@ -55,7 +55,7 @@ def run_workflow(workflow_lis, print_table=True):
 
 def read_configfile(configfile_path,
                     epoch_range_inp=None,
-                    main_cfg_dic={}):
+                    main_cfg_path=None):
     """
     Load a config file (YAML format) and 
     return a "Workflow list" i.e. a list of StepGnss object 
@@ -86,51 +86,50 @@ def read_configfile(configfile_path,
     logger.info('start to read configfile: %s', configfile_path)
     y = yaml.safe_load(open(configfile_path))
 
-    y_station = y["station"]
+    if main_cfg_path:
+        ymain = yaml.safe_load(open(main_cfg_path))
+        ymain_sessions = ymain['sessions']
+    else:
+        ymain_sessions = None
 
+    y_station = y["station"]
     y_site = y_station["site"]
     y_device = y_station["device"]
     y_access = y_station["access"]
+    y_sessions = y_station["sessions"]
 
-    y_sessions_list = y_station["sessions_list"]
+    workflow_lis, workflow_dic = read_configfile_sessions_dict(y_sessions,
+                                                               y_site=y_site,
+                                                               y_access=y_access,
+                                                               epoch_range_inp=None,
+                                                               y_main_sessions_dic=ymain_sessions)
 
-    workflow_lis = read_configfile_sessions_list(y_sessions_list,
-                                                 y_site=y_site,
-                                                 y_access=y_access,
-                                                 epoch_range_inp=None,
-                                                 main_cfg_dic=main_cfg_dic)
+    return workflow_lis, workflow_dic, y_site, y_device, y_access
 
-    return workflow_lis, y_site, y_device, y_access
 
-def read_configfile_sessions_list(y_sessions_list_inp,
+def read_configfile_sessions_dict(y_sessions_dict,
                                   epoch_range=None,
                                   y_site=None,
                                   y_access=None,
                                   epoch_range_inp=None,
-                                  main_cfg_dic=None):
+                                  y_main_sessions_dic=None):
 
-    logger.info('start to read configfile: %s', y_sessions_list_inp)
-    if type(y_sessions_list_inp) is list:
-        y_sessions_list = y_sessions_list_inp
-    else:  ### it is a path, it is a main config file
-        y_main = yaml.safe_load(open(y_sessions_list_inp))
-        y_sessions_list = y_main["sessions_list"]
+    for kses, yses in y_sessions_dict.items():
 
-    for yses in y_sessions_list:
+        yses_main = y_main_sessions_dic[kses]
+
         ygen = yses['general']
         session_name = ygen['name']
 
-        ##### replace with main default values if any
-        if main_cfg_dic:
-            yses_main = _find_session_by_name_in_list(session_name,
-                                                      main_cfg_dic['sessions_list'])
-            yses = mergedeep.mergedeep({},yses,yses_main)
+        ygen_main = yses_main['general']
+
+        ygen = update_dic_deep(ygen,ygen_main)
 
         ##### TMP DIRECTORY
-        tmp_dir, _, _ = _get_dir_path(ygen,'tmp')
+        tmp_dir, _, _ = _get_dir_path(ygen, 'tmp')
 
         ##### LOG DIRECTORY
-        log_dir, _, _ = _get_dir_path(ygen,'log')
+        log_dir, _, _ = _get_dir_path(ygen, 'log')
 
         ##### EPOCH RANGE AT THE SESSION LEVEL
         if not epoch_range_inp:
@@ -143,8 +142,13 @@ def read_configfile_sessions_list(y_sessions_list_inp,
 
         #### manage workflow
         y_workflow = yses['workflow']
+        y_workflow_main = yses_main['workflow']
+
 
         for k_step, y_step in y_workflow.items():
+
+            y_step_main = y_workflow_main[k_step]
+            y_step = update_dic_deep(y_step, y_step_main)
 
             out_dir, _, _ = _get_dir_path(y_step, 'out')
             inp_dir, inp_dir_parent, inp_structure = _get_dir_path(y_step, 'inp',
@@ -248,19 +252,16 @@ def _get_dir_path(y_step,
 
     return dir_path, dir_parent, structure
 
-
-def _find_session_by_name_in_list(ses_name,ses_list):
-    for ses in ses_list:
-        if ses['name'] == ses_name:
-            return ses
-    return None
-
 import collections.abc
 
-def update_dic_deep(d, u):
+def update_dic_deep(d, u, specific_key='FROM_MAIN'):
+    dout = d.copy()
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
-            d[k] = update_dic_deep(d.get(k, {}), v)
+            dout[k] = update_dic_deep(dout.get(k, {}), v)
         else:
-            d[k] = v
-    return d
+            if not (specific_key and k == specific_key):
+                continue
+            else:
+                dout[k] = v
+    return dout

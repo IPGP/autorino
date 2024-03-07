@@ -20,7 +20,7 @@ station:
         hostname: "***REMOVED***" 
         login: "***REMOVED***"
         password: "***REMOVED***"
-    sessions_list:
+    sessions:
         session_hourly:
             general:
                 name: hourly 
