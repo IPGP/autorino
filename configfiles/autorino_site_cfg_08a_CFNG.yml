@@ -5,7 +5,7 @@ station:
         name: CFNG 
         site_id: CFNG00REU 
         domes: 
-        sitelog_path: #<$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
+        sitelog_path: FROM_MAIN #<$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
         position_xyz: (1,2,3)
     device:
         attributes_from_sitelog: True
@@ -26,12 +26,10 @@ station:
                 name: hourly 
                 data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
                 tmp_dir_parent: FROM_MAIN
-                tmp_structure: '<SITE_ID>' # /%Y/%j  
+                tmp_structure: FROM_MAIN 
                 log_dir_parent: FROM_MAIN
-                log_structure: '' #<SITE_ID>/%Y/%j  
+                log_structure: FROM_MAIN 
             epoch_range:
-              #epoch1: '2 days ago at 14:00'
-              #epoch2: '2 days ago at 16:00'
                 epoch1: '2 hours ago'
                 epoch2: 'now'
                 period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
@@ -42,8 +40,8 @@ station:
                     active: True
                     inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
                     inp_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
-                    out_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
-                    out_structure: <SITE_ID>/%Y/%j
+                    out_dir_parent: FROM_MAIN
+                    out_structure: FROM_MAIN
                     #options:
                 conversion:
                     active: True
