@@ -25,9 +25,9 @@ station:
             general:
                 name: hourly 
                 data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
-                tmp_dir_parent: '<$HOME>/autorino_workflow_tests/tmp'
+                tmp_dir_parent: FROM_MAIN
                 tmp_structure: '<SITE_ID>' # /%Y/%j  
-                log_dir_parent: '<$HOME>/autorino_workflow_tests/log'
+                log_dir_parent: FROM_MAIN
                 log_structure: '' #<SITE_ID>/%Y/%j  
             epoch_range:
               #epoch1: '2 days ago at 14:00'
@@ -48,8 +48,8 @@ station:
                 conversion:
                     active: True
                     converter : auto
-                    inp_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
-                    inp_structure: <SITE_ID>/%Y/%j
-                    out_dir_parent: '<$HOME>/autorino_workflow_tests/rnx/'
-                    out_structure: <SITE_ID>/%Y/%j
+                    inp_dir_parent: FROM_MAIN
+                    inp_structure: FROM_MAIN
+                    out_dir_parent: FROM_MAIN
+                    out_structure: FROM_MAIN
                     #options:

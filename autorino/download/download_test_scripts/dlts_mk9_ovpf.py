@@ -14,7 +14,7 @@ import yaml
 ## dummy comment2
 pcfg = '/home/sysop/pymods_ovs/autorino/configfiles/proto_config_06d_CFNG.yml'
 
-tupout = arocfg.read_configfile(pcfg)
+tupout = arocfg.read_cfg(pcfg)
 
 workflow_lis, y_site, y_device, y_access = tupout
 dwl = workflow_lis[0]
