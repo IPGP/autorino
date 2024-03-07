@@ -16,6 +16,7 @@ import autorino.convert as arocnv
 
 import yaml
 import glob
+import mergedeep
 
 # Create a logger object.
 import logging
@@ -96,30 +97,40 @@ def read_configfile(configfile_path,
     workflow_lis = read_configfile_sessions_list(y_sessions_list,
                                                  y_site=y_site,
                                                  y_access=y_access,
+                                                 epoch_range_inp=None,
                                                  main_cfg_dic=main_cfg_dic)
 
     return workflow_lis, y_site, y_device, y_access
 
-
 def read_configfile_sessions_list(y_sessions_list_inp,
+                                  epoch_range=None,
+                                  y_site=None,
+                                  y_access=None,
                                   epoch_range_inp=None,
-                                  y_site_inp=None,
-                                  y_access_inp=None,
-                                  main_cfg_dic={}):
+                                  main_cfg_dic=None):
+
     logger.info('start to read configfile: %s', y_sessions_list_inp)
-    if type(y_sessions_list_inp) is dict:
+    if type(y_sessions_list_inp) is list:
         y_sessions_list = y_sessions_list_inp
-    else:  ### it is a path, a main config file
+    else:  ### it is a path, it is a main config file
         y_main = yaml.safe_load(open(y_sessions_list_inp))
         y_sessions_list = y_main["sessions_list"]
 
     for yses in y_sessions_list:
+        ygen = yses['general']
+        session_name = ygen['name']
+
+        ##### replace with main default values if any
+        if main_cfg_dic:
+            yses_main = _find_session_by_name_in_list(session_name,
+                                                      main_cfg_dic['sessions_list'])
+            yses = mergedeep.mergedeep({},yses,yses_main)
+
         ##### TMP DIRECTORY
-        tmp_dir, _, _ = _get_dir_path('session', yses,'tmp', main_cfg_dic)
+        tmp_dir, _, _ = _get_dir_path(ygen,'tmp')
 
         ##### LOG DIRECTORY
-        log_dir, _, _ = _get_dir_path('session',yses,'tmp', main_cfg_dic)
-
+        log_dir, _, _ = _get_dir_path(ygen,'log')
 
         ##### EPOCH RANGE AT THE SESSION LEVEL
         if not epoch_range_inp:
@@ -132,15 +143,13 @@ def read_configfile_sessions_list(y_sessions_list_inp,
 
         #### manage workflow
         y_workflow = yses['workflow']
-        main_cfg_dic_workflow = main_cfg_dic['workflow']
 
         for k_step, y_step in y_workflow.items():
 
-            out_dir, _, _ = _get_dir_path(k_step, y_step, 'out',
-                                          main_cfg_dic['workflow'])
+            out_dir, _, _ = _get_dir_path(y_step, 'out')
+            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(y_step, 'inp',
+                                                                   check_parent_dir_existence=False)
 
-            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(k_step, y_step, 'inp',
-                                                                   main_cfg_dic['workflow'])
             if k_step == 'download':
                 if not _is_cfg_bloc_active(y_step):
                     continue
@@ -150,11 +159,11 @@ def read_configfile_sessions_list(y_sessions_list_inp,
                                tmp_dir=tmp_dir,
                                log_dir=log_dir,
                                epoch_range=epo_obj_use,
-                               access=y_access_inp,
+                               access=y_access,
                                remote_dir=inp_dir_parent,
                                remote_fname=inp_structure,
-                               site=y_site_inp,
-                               session=yses['session'])
+                               site=y_site,
+                               session=yses['general'])
 
             # appended in lis and dic at the end of the tests
 
@@ -162,8 +171,8 @@ def read_configfile_sessions_list(y_sessions_list_inp,
                 if not _is_cfg_bloc_active(y_step):
                     continue
 
-                if y_site_inp and y_site_inp['sitelog_path']:
-                    sitelogs = y_site_inp['sitelog_path']
+                if y_site and y_site['sitelog_path']:
+                    sitelogs = y_site['sitelog_path']
                 else:
                     sitelogs = None
 
@@ -172,8 +181,8 @@ def read_configfile_sessions_list(y_sessions_list_inp,
                                tmp_dir=tmp_dir,
                                log_dir=log_dir,
                                epoch_range=epo_obj_use,
-                               site=y_site_inp,
-                               session=yses['session'],
+                               site=y_site,
+                               session=yses['general'],
                                sitelogs=sitelogs)
 
                 # appended in lis and dic at the end of the tests
@@ -228,19 +237,30 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
                              epoch_range_dic['tz'])
 
 
-def _get_dir_path(k_step,
-                  y_step,
+def _get_dir_path(y_step,
                   dir_type='out',
-                  main_default_step_dic={}):
-
-    if k_step in main_default_step_dic.keys():
-        dir_parent = main_default_step_dic[k_step][dir_type + '_dir_parent']
-        structure = main_default_step_dic[k_step][dir_type + '_structure']
-    else:
-        dir_parent = y_step[dir_type + '_dir_parent']
-        structure = y_step[dir_type + '_structure']
-
-    _check_parent_dir_existence(dir_parent)
+                  check_parent_dir_existence=True):
+    dir_parent = y_step[dir_type + '_dir_parent']
+    structure = y_step[dir_type + '_structure']
+    if check_parent_dir_existence:
+        _check_parent_dir_existence(dir_parent)
     dir_path = os.path.join(dir_parent, structure)
 
     return dir_path, dir_parent, structure
+
+
+def _find_session_by_name_in_list(ses_name,ses_list):
+    for ses in ses_list:
+        if ses['name'] == ses_name:
+            return ses
+    return None
+
+import collections.abc
+
+def update_dic_deep(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = update_dic_deep(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
