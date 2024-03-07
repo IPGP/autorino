@@ -89,12 +89,13 @@ def read_cfg(configfile_path,
 
     if main_cfg_path:
         y_main = yaml.safe_load(open(main_cfg_path))
-        y_main_sessions = y_main['sessions']
+        y_main_sessions = y_main['station']['sessions']
     else:
         y_main_sessions = None
 
     y_station = y["station"]
 
+    y = update_dic_deep(y,y_main)
     workflow_lis, workflow_dic = read_cfg_sessions(y_station["sessions"],
                                                    y_station=y_station,
                                                    epoch_range=epoch_range,
@@ -113,8 +114,8 @@ def read_cfg_sessions(y_sessions_dict,
         y_ses_main = y_main_sessions_dic[k_ses]
 
         y_gen = y_ses['general']
-        y_gen_main = y_ses_main['general']
-        y_gen = update_dic_deep(y_gen, y_gen_main)
+        #y_gen_main = y_ses_main['general']
+        #y_gen = update_dic_deep(y_gen, y_gen_main)
 
         ##### TMP DIRECTORY
         tmp_dir, _, _ = _get_dir_path(y_gen, 'tmp')
@@ -133,15 +134,16 @@ def read_cfg_sessions(y_sessions_dict,
 
         #### manage workflow
         y_workflow = y_ses['workflow']
-        y_workflow_main = y_ses_main['workflow']
+        #y_workflow_main = y_ses_main['workflow']
 
         for k_step, y_step in y_workflow.items():
 
-            y_step_main = y_workflow_main[k_step]
-            y_step = update_dic_deep(y_step, y_step_main)
+            #y_step_main = y_workflow_main[k_step]
+            #y_step = update_dic_deep(y_step, y_step_main)
 
             out_dir, _, _ = _get_dir_path(y_step, 'out')
-            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(y_step, 'inp',
+            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(y_step,
+                                                                   'inp',
                                                                    check_parent_dir_existence=False)
             if k_step == 'download':
                 if not _is_cfg_bloc_active(y_step):
