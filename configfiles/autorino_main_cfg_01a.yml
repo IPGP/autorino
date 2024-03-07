@@ -22,7 +22,7 @@ sessions:
                 out_structure: <SITE_ID>/%Y/%j
                 #options:
             conversion:
-                inp_dir_parent: FROM_MAIN
+                inp_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
                 inp_structure: <SITE_ID>/%Y/%j
-                out_dir_parent: FROM_MAIN
+                out_dir_parent: '<$HOME>/autorino_workflow_tests/rnx/'
                 out_structure: <SITE_ID>/%Y/%j
