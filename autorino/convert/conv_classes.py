@@ -104,6 +104,9 @@ class ConvertGnss(arocmn.StepGnss):
         if print_table:
             self.print_table()
 
+        print("AAAAAAAAAAABBBBBBBBBB", force)
+        self.print_table()
+
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
             fraw = Path(row['fpath_inp'])
