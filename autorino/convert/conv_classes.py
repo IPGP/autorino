@@ -30,14 +30,14 @@ logger.setLevel("INFO")
 
 class ConvertGnss(arocmn.StepGnss):
     def __init__(self, out_dir, tmp_dir, log_dir,
-                 epoch_range,
+                 epoch_range=None,
                  site=None,
                  session=None,
                  sitelogs=None,
                  options=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
-                         epoch_range,
+                         epoch_range=epoch_range,
                          site=site,
                          session=session,
                          options=options)
@@ -55,8 +55,8 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert_table(self, print_table=False, force=False,
-                      rinexmod_options=None):
+    def convert(self, print_table=False, force=False,
+                rinexmod_options=None):
         logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
 
         if not rinexmod_options:
