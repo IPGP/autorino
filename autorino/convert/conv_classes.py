@@ -17,6 +17,7 @@ from pathlib import Path
 from geodezyx import utils, operational
 
 import autorino.common as arocmn
+import autorino.convert as arocvn
 
 from rinexmod import rinexmod_api
 
@@ -174,9 +175,9 @@ class ConvertGnss(arocmn.StepGnss):
     def on_row_convert(self, irow, out_dir_inp, converter_inp):
         self.table.loc[irow, 'ok_inp'] = True
 
-        frnxtmp, _ = converter_run(self.table.loc[irow, 'fpath_inp'],
-                                   out_dir_inp,
-                                   converter=converter_inp)
+        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, 'fpath_inp'],
+                                          out_dir_inp,
+                                          converter=converter_inp)
         if frnxtmp:
             ### update table if things go well
             self.table.loc[irow, 'fpath_out'] = frnxtmp
