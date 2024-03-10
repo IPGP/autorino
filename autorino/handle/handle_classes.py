@@ -20,14 +20,28 @@ logger = logging.getLogger(__name__)
 
 class HandleGnss(arocmn.StepGnss):
     def __init__(self, out_dir, tmp_dir, log_dir,
-                 epoch_range,
+                 epoch_range=None,
                  site=None,
-                 session=None):
+                 session=None,
+                 options=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
-                         epoch_range,
+                         epoch_range=epoch_range,
                          site=site,
-                         session=session)
+                         session=session,
+                         options=options)
+
+class SpliceGnss(HandleGnss):
+    def __init__(self, out_dir, tmp_dir, log_dir,
+                 epoch_range=None,
+                 site=None,
+                 session=None,
+                 options=None):
+        super().__init__(out_dir, tmp_dir, log_dir,
+                         epoch_range=epoch_range,
+                         site=site,
+                         session=session,
+                         options=options)
 
     def divide_by_epochs(self,
                          period='1d',
@@ -101,6 +115,27 @@ class HandleGnss(arocmn.StepGnss):
                                               'gfzrnx',
                                               bin_options=['-f'])
 
+    #  _____       _ _ _
+    # / ____|     | (_) |
+    # | (___  _ __ | |_| |_
+    # \___ \| '_ \| | | __|
+    # ____) | |_) | | | |_
+    # |_____/| .__/|_|_|\__|
+    #        | |
+    #        |_|
+
+class SplitGnss(HandleGnss):
+    def __init__(self, out_dir, tmp_dir, log_dir,
+                 epoch_range=None,
+                 site=None,
+                 session=None,
+                 options=None):
+        super().__init__(out_dir, tmp_dir, log_dir,
+                         epoch_range=epoch_range,
+                         site=site,
+                         session=session,
+                         options=options)
+
     def find_rnxs_for_split(self, hdl_store):
         for irow, row in self.table.iterrows():
             epo_srt = np.datetime64(self.table.loc[irow, 'epoch_srt'])
@@ -112,11 +147,9 @@ class HandleGnss(arocmn.StepGnss):
             epoch_bol = epoch_srt_bol & epoch_end_bol
 
             if epoch_bol_col.sum() == 0:
-                print("no")
                 self.table.loc[irow, 'ok_inp'] = False
                 continue
             elif epoch_bol_col.sum() > 1:
-                print("> 1, keep first")
                 rnxinp_row = hdl_store.table.loc[epoch_bol].iloc[0]
             else:
                 rnxinp_row = hdl_store.table.loc[epoch_bol].squeeze()
@@ -144,6 +177,7 @@ class HandleGnss(arocmn.StepGnss):
             self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
             if rnxmod_dir != self.out_dir:
                 self.on_row_move_final(irow)
+
 
     def on_row_split(self, irow, out_dir_inp, handle_software='converto'):
         frnx_inp = self.table.loc[irow, 'fpath_inp']
