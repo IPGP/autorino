@@ -163,6 +163,33 @@ class ConvertGnss(arocmn.StepGnss):
             os.remove(f)
         return None
 
+    #               _   _
+    #     /\       | | (_)
+    #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
+    #   / /\ \ / __| __| |/ _ \| '_ \/ __|  / _ \| '_ \  | '__/ _ \ \ /\ / / __|
+    #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
+    # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
+    #
+
+    def on_row_convert(self, irow, out_dir_inp, converter_inp):
+        self.table.loc[irow, 'ok_inp'] = True
+
+        frnxtmp, _ = converter_run(self.table.loc[irow, 'fpath_inp'],
+                                   out_dir_inp,
+                                   converter=converter_inp)
+        if frnxtmp:
+            ### update table if things go well
+            self.table.loc[irow, 'fpath_out'] = frnxtmp
+            epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
+            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
+            self.table.loc[irow, 'epoch_end'] = epo_end_ok
+            self.table.loc[irow, 'ok_out'] = True
+        else:
+            ### update table if things go wrong
+            self.table.loc[irow, 'ok_out'] = False
+        return frnxtmp
+
+ 
 
 #########################################################################
 #### Misc functions 
