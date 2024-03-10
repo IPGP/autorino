@@ -328,7 +328,10 @@ class StepGnss():
         return copy.deepcopy(self)
 
     def get_step_type(self):
-        return type(wkf).__name__
+        """
+        return the ytpw of the step as a string
+        """
+        return type(self).__name__
 
     def update_epoch_table_from_rnx_fname(self,
                                           use_rnx_filename_only=False,
@@ -956,24 +959,6 @@ class StepGnss():
     #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
-
-    def on_row_convert(self, irow, out_dir_inp, converter_inp):
-        self.table.loc[irow, 'ok_inp'] = True
-
-        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, 'fpath_inp'],
-                                          out_dir_inp,
-                                          converter=converter_inp)
-        if frnxtmp:
-            ### update table if things go well
-            self.table.loc[irow, 'fpath_out'] = frnxtmp
-            epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
-            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
-            self.table.loc[irow, 'epoch_end'] = epo_end_ok
-            self.table.loc[irow, 'ok_out'] = True
-        else:
-            ### update table if things go wrong
-            self.table.loc[irow, 'ok_out'] = False
-        return frnxtmp
 
     def on_row_rinexmod(self, irow, out_dir_inp, rinexmod_kwargs):
 
