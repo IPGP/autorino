@@ -30,11 +30,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config = args.config
-    main = args.main
+    main_config = args.main_config
     start = args.start
     end = args.end
     list_sites = args.list_sites
 
-    arocfg.autorino_run(config)
-    
+    arocfg.autorino_run(cfg_in=config,main_cfg_in=main_config)
+
     
