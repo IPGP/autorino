@@ -25,7 +25,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def autorino_run(cfg_in):
+def autorino_run(cfg_in,main_cfg_in):
     if os.path.isdir(cfg_in):
         cfg_use_lis = glob.glob(cfg_in + '/*yml')
     elif os.path.isfile(cfg_in):
@@ -35,7 +35,8 @@ def autorino_run(cfg_in):
         raise Exception
 
     for cfg_use in cfg_use_lis:
-        steps_lis, y_site, y_device, y_access = read_cfg(cfg_use)
+        steps_lis, steps_dic, y_station = read_cfg(configfile_path=cfg_use,
+                                                   main_cfg_path=main_cfg_in)
         run_steps(steps_lis)
 
     return None
@@ -98,11 +99,11 @@ def read_cfg(configfile_path,
     y_station = y["station"]
 
     y = update_w_main_dic(y, y_main)
-    steps_lis, steps_lis = read_cfg_sessions(y_station["sessions"],
+    steps_lis, steps_dic = read_cfg_sessions(y_station["sessions"],
                                                    y_station=y_station,
                                                    epoch_range=epoch_range)
 
-    return steps_lis, steps_lis, y_station
+    return steps_lis, steps_dic, y_station
 
 
 def read_cfg_sessions(y_sessions_dict,
