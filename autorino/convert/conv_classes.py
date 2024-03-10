@@ -32,12 +32,14 @@ class ConvertGnss(arocmn.StepGnss):
                  epoch_range,
                  site=None,
                  session=None,
-                 sitelogs=None):
+                 sitelogs=None,
+                 options=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range,
                          site=site,
-                         session=session)
+                         session=session,
+                         options=options)
 
         ### temp dirs init
         self._init_tmp_dirs_paths()
@@ -52,8 +54,17 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert_table(self, print_table=False, force=False):
+    def convert_table(self, print_table=False, force=False,
+                      rinexmod_options=None):
         logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
+
+        if not rinexmod_options:
+            rinexmod_options = {'compression': "gz",
+                                'longname': True,
+                                'force_rnx_load': True,
+                                'verbose': False,
+                                'tolerant_file_period': True,
+                                'full_history': True}
 
         if self.sitelogs:
             site4_list = site_list_from_sitelogs(self.sitelogs)
@@ -131,14 +142,9 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             ###### RINEXMOD
-            rinexmod_kwargs = {'marker': site,
-                               'compression': "gz",
-                               'longname': True,
-                               'sitelog': self.sitelogs,
-                               'force_rnx_load': True,
-                               'verbose': False,
-                               'tolerant_file_period': True,
-                               'full_history': True}
+            rinexmod_kwargs = rinexmod_options.copy()
+            rinexmod_kwargs.update({'marker':site,
+                                    'sitelog':self.sitelogs})
 
             self.on_row_rinexmod(irow, tmp_dir_rinexmoded_use, rinexmod_kwargs)
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
