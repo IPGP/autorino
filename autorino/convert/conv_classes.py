@@ -83,13 +83,14 @@ class ConvertGnss(arocmn.StepGnss):
         self.guess_local_rnx_files()
         self.check_local_files()
 
+        print("AAAAAAAAAAA".force)
         if not force:
             self.filter_ok_out()
 
         decompressed_files = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
-        # table_init_ok must be used only for the folling statistics!
+        # table_init_ok must be used only for the following statistics!
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table['ok_inp']).sum()
         n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
@@ -102,20 +103,12 @@ class ConvertGnss(arocmn.StepGnss):
 
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
-
-
             fraw = Path(row['fpath_inp'])
             ext = fraw.suffix.lower()
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
             _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_tmp_dirs_paths()
-
-            ### manage compressed files
-            # not here anymore actually it is still here 
-            #if ext in ('.gz',):
-            #    logger.debug("%s is compressed",fraw)
-            #    fraw = Path(arocmn.decompress_file(fraw, tmp_dir_unzipped_use))
 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
@@ -132,7 +125,6 @@ class ConvertGnss(arocmn.StepGnss):
                 self.table.loc[irow, 'note'] = "no converter found"
                 self.table.loc[irow, 'ok_inp'] = False
                 self.write_in_table_log(self.table.loc[irow])
-                continue
 
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
@@ -140,12 +132,12 @@ class ConvertGnss(arocmn.StepGnss):
 
             if not self.table.loc[irow, 'ok_inp']:
                 warning.info("conversion skipped: %s", fraw)
-
-
+                continue
 
             #############################################################
             ###### CONVERSION
-            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use, converter_inp=conve)
+            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use,
+                                          converter_inp=conve)
             frnxtmp_files.append(frnxtmp)  ### list for final remove
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
