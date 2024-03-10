@@ -962,6 +962,11 @@ class StepGnss():
 
     def on_row_rinexmod(self, irow, out_dir_inp, rinexmod_kwargs):
 
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
+
         frnx = self.table.loc[irow, 'fpath_out']
 
         try:
@@ -985,6 +990,11 @@ class StepGnss():
         return frnxmod
 
     def on_row_move_final(self, irow, out_dir_inp=None):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
 
         if out_dir_inp:
             out_dir = out_dir_inp
@@ -1015,6 +1025,11 @@ class StepGnss():
 
     def on_row_decompress(self,irow,tmp_dir_unzipped_inp=None,
                           table_col='fpath_inp', table_ok_col='ok_inp'):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
 
         if tmp_dir_unzipped_inp:
             tmp_dir_unzipped = tmp_dir_unzipped_inp
