@@ -83,7 +83,7 @@ class ConvertGnss(arocmn.StepGnss):
         self.guess_local_rnx_files()
         self.check_local_files()
 
-        print("AAAAAAAAAAA".force)
+        print("AAAAAAAAAAA",force)
         if not force:
             self.filter_ok_out()
 
