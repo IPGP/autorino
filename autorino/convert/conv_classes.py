@@ -17,7 +17,7 @@ from pathlib import Path
 from geodezyx import utils, operational
 
 import autorino.common as arocmn
-import autorino.convert as arocvn
+import autorino.convert as arocnv
 
 from rinexmod import rinexmod_api
 
@@ -30,14 +30,14 @@ logger.setLevel("INFO")
 
 class ConvertGnss(arocmn.StepGnss):
     def __init__(self, out_dir, tmp_dir, log_dir,
-                 epoch_range,
+                 epoch_range=None,
                  site=None,
                  session=None,
                  sitelogs=None,
                  options=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
-                         epoch_range,
+                         epoch_range=epoch_range,
                          site=site,
                          session=session,
                          options=options)
@@ -55,8 +55,8 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert_table(self, print_table=False, force=False,
-                      rinexmod_options=None):
+    def convert(self, print_table=False, force=False,
+                rinexmod_options=None):
         logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
 
         if not rinexmod_options:
@@ -82,14 +82,14 @@ class ConvertGnss(arocmn.StepGnss):
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx_files()
         self.check_local_files()
-
         if not force:
             self.filter_ok_out()
 
         decompressed_files = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
-        # table_init_ok must be used only for the folling statistics!
+        # table_init_ok must be used only for the following statistics!
+
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table['ok_inp']).sum()
         n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
@@ -102,7 +102,13 @@ class ConvertGnss(arocmn.StepGnss):
 
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
-
+            
+            if not self.table.loc[irow, 'ok_inp'] and self.table.loc[irow, 'ok_out']:
+                logger.info("conversion skipped (output already exists): %s", fraw)
+                continue
+            if not self.table.loc[irow, 'ok_inp']:
+                logger.warning("conversion skipped (something went wrong): %s", fraw)
+                continue
 
             fraw = Path(row['fpath_inp'])
             ext = fraw.suffix.lower()
@@ -110,12 +116,6 @@ class ConvertGnss(arocmn.StepGnss):
                         fraw.name)
 
             _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_tmp_dirs_paths()
-
-            ### manage compressed files
-            # not here anymore actually it is still here 
-            #if ext in ('.gz',):
-            #    logger.debug("%s is compressed",fraw)
-            #    fraw = Path(arocmn.decompress_file(fraw, tmp_dir_unzipped_use))
 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
@@ -132,7 +132,6 @@ class ConvertGnss(arocmn.StepGnss):
                 self.table.loc[irow, 'note'] = "no converter found"
                 self.table.loc[irow, 'ok_inp'] = False
                 self.write_in_table_log(self.table.loc[irow])
-                continue
 
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
@@ -145,7 +144,8 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             ###### CONVERSION
-            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use, converter_inp=conve)
+            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use,
+                                          converter_inp=conve)
             frnxtmp_files.append(frnxtmp)  ### list for final remove
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
@@ -165,11 +165,13 @@ class ConvertGnss(arocmn.StepGnss):
 
         #### remove temporary files
         for f in decompressed_files:
-            logger.debug("remove tmp decompress_file RINEX file: %s", f)
-            os.remove(f)
+            if f:
+                logger.debug("remove tmp decompress_file RINEX file: %s", f)
+                os.remove(f)
         for f in frnxtmp_files:
-            logger.debug("remove tmp converted RINEX file: %s", f)
-            os.remove(f)
+            if f:
+                logger.debug("remove tmp converted RINEX file: %s", f)
+                os.remove(f)
         return None
 
     #               _   _
@@ -181,6 +183,14 @@ class ConvertGnss(arocmn.StepGnss):
     #
 
     def on_row_convert(self, irow, out_dir_inp, converter_inp):
+<<<<<<< HEAD
+=======
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
+>>>>>>> dev-hudson_01a
 
         frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, 'fpath_inp'],
                                           out_dir_inp,
