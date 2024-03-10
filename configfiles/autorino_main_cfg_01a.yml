@@ -1,6 +1,6 @@
 station:
     site:
-        sitelog_path: /home/psakicki/garner.ucsd.edu/pub/docs/station_logs/1nsu_20220908.log  ###  can be a specific file or a directory path containing the sitelogs
+        sitelog_path: <$HOME>/sitelogs/OVPF/  ###  can be a specific file or a directory path containing the sitelogs
     sessions:
         session_15m01s: ####Keep session in dictionnary / Object not necessary
             general:
@@ -30,7 +30,7 @@ station:
                         round_method: "floor"
                         tz : 'UTC'
                     options:
-                        force: True
+                        force: False
                 conversion:
                     inp_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
                     inp_structure: <SITE_ID>/%Y/%j
