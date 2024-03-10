@@ -101,6 +101,9 @@ class ConvertGnss(arocmn.StepGnss):
 
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
+            fraw = Path(row['fpath_inp'])
+            ext = fraw.suffix.lower()
+
             if not self.table.loc[irow, 'ok_inp'] and self.table.loc[irow, 'ok_out']:
                 logger.info("conversion skipped (output file already exists): %s", fraw)
                 continue
@@ -108,8 +111,6 @@ class ConvertGnss(arocmn.StepGnss):
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
 
-            fraw = Path(row['fpath_inp'])
-            ext = fraw.suffix.lower()
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
