@@ -178,7 +178,7 @@ class ConvertGnss(arocmn.StepGnss):
     def on_row_convert(self, irow, out_dir_inp, converter_inp):
 
         if not self.table.loc[irow, 'ok_inp']:
-            logger.warning("action on row skipped (ok_inp = False): %s",
+            logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
             return None
 
