@@ -101,6 +101,13 @@ class ConvertGnss(arocmn.StepGnss):
 
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
+            if not self.table.loc[irow, 'ok_inp'] and self.table.loc[irow, 'ok_out']:
+                logger.info("conversion skipped (output file already exists): %s", fraw)
+                continue
+            if not self.table.loc[irow, 'ok_inp']:
+                logger.warning("conversion skipped (something went wrong): %s", fraw)
+                continue
+
             fraw = Path(row['fpath_inp'])
             ext = fraw.suffix.lower()
             logger.info("***** input raw file for conversion: %s",
@@ -127,10 +134,6 @@ class ConvertGnss(arocmn.StepGnss):
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
             stop_long_running_containers()
-
-            if not self.table.loc[irow, 'ok_inp']:
-                logger.warning("conversion skipped: %s", fraw)
-                continue
 
             #############################################################
             ###### CONVERSION
