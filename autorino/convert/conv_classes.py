@@ -105,7 +105,7 @@ class ConvertGnss(arocmn.StepGnss):
             ext = fraw.suffix.lower()
 
             if not self.table.loc[irow, 'ok_inp'] and self.table.loc[irow, 'ok_out']:
-                logger.info("conversion skipped (output file already exists): %s", fraw)
+                logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
             if not self.table.loc[irow, 'ok_inp']:
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
