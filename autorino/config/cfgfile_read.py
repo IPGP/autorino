@@ -16,12 +16,14 @@ import autorino.convert as arocnv
 
 import yaml
 import glob
-import mergedeep
+import collections.abc
+
 
 # Create a logger object.
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def autorino_run(cfg_in):
     if os.path.isdir(cfg_in):
@@ -33,23 +35,23 @@ def autorino_run(cfg_in):
         raise Exception
 
     for cfg_use in cfg_use_lis:
-        workflow_lis, y_site, y_device, y_access = read_cfg(cfg_use)
-        run_workflow(workflow_lis)
+        steps_lis, y_site, y_device, y_access = read_cfg(cfg_use)
+        run_steps(steps_lis)
 
     return None
 
 
-def run_workflow(workflow_lis, print_table=True):
+def run_steps(steps_lis, print_table=True):
     wkf_prev = None
-    for iwkf, wkf in enumerate(workflow_lis):
-        if iwkf > 0:
-            wkf_prev = workflow_lis[iwkf - 1]
+    for istp, stp in enumerate(steps_lis):
+        if istp > 0:
+            wkf_prev = steps_lis[istp - 1]
 
-        if wkf.get_step_type() == "DownloadGnss":
-            wkf.download(print_table)
-        elif wkf.get_step_type() == "ConvertGnss":
-            wkf.load_table_from_prev_step_table(wkf_prev.table)
-            wkf.convert_table(print_table)
+        if stp.get_step_type() == "DownloadGnss":
+            stp.download(print_table)
+        elif stp.get_step_type() == "ConvertGnss":
+            stp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.convert_table(print_table)
 
 
 def read_cfg(configfile_path,
@@ -57,7 +59,7 @@ def read_cfg(configfile_path,
              main_cfg_path=None):
     """
     Load a config file (YAML format) and 
-    return a "Workflow list" i.e. a list of StepGnss object 
+    return a "Steps list" i.e. a list of StepGnss object 
     to be launched sequentially
     
     epoch_range_inp is a EpochRange object which will override the epoch ranges
@@ -72,8 +74,8 @@ def read_cfg(configfile_path,
 
     Returns
     -------
-    workflow_lis : list
-        "Workflow list" i.e. a list of StepGnss object 
+    steps_lis : list
+        "Steps list" i.e. a list of StepGnss object 
         to be launched sequentially.
     y_site : dict
         site dictionary.
@@ -95,27 +97,22 @@ def read_cfg(configfile_path,
 
     y_station = y["station"]
 
-    y = update_dic_deep(y,y_main)
-    workflow_lis, workflow_dic = read_cfg_sessions(y_station["sessions"],
+    y = update_w_main_dic(y, y_main)
+    steps_lis, steps_lis = read_cfg_sessions(y_station["sessions"],
                                                    y_station=y_station,
-                                                   epoch_range=epoch_range,
-                                                   y_main_sessions_dic=y_main_sessions)
+                                                   epoch_range=epoch_range)
 
-    return workflow_lis, workflow_dic, y_station
+    return steps_lis, steps_lis, y_station
 
 
 def read_cfg_sessions(y_sessions_dict,
                       epoch_range=None,
-                      y_station=None,
-                      y_main_sessions_dic=None):
-
+                      y_station=None):
     for k_ses, y_ses in y_sessions_dict.items():
-
-        y_ses_main = y_main_sessions_dic[k_ses]
 
         y_gen = y_ses['general']
         #y_gen_main = y_ses_main['general']
-        #y_gen = update_dic_deep(y_gen, y_gen_main)
+        #y_gen = update_w_main_dic(y_gen, y_gen_main)
 
         ##### TMP DIRECTORY
         tmp_dir, _, _ = _get_dir_path(y_gen, 'tmp')
@@ -125,45 +122,54 @@ def read_cfg_sessions(y_sessions_dict,
 
         ##### EPOCH RANGE AT THE SESSION LEVEL
         if not epoch_range:
-            epo_obj_use = _epoch_range_from_cfg_bloc(y_ses['epoch_range'])
+            epo_obj_ses = _epoch_range_from_cfg_bloc(y_ses['epoch_range'])
         else:
-            epo_obj_use = epoch_range
+            epo_obj_ses = epoch_range
 
-        workflow_lis = []
-        workflow_dic = {}
+        steps_lis = []
+        steps_dic = {}
 
-        #### manage workflow
-        y_workflow = y_ses['workflow']
+        #### manage steps
+        y_steps = y_ses['steps']
         #y_workflow_main = y_ses_main['workflow']
 
-        for k_step, y_step in y_workflow.items():
+        for k_stp, y_stp in y_steps.items():
 
-            #y_step_main = y_workflow_main[k_step]
-            #y_step = update_dic_deep(y_step, y_step_main)
+            #y_step_main = y_workflow_main[k_stp]
+            #y_step = update_w_main_dic(y_step, y_step_main)
 
-            out_dir, _, _ = _get_dir_path(y_step, 'out')
-            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(y_step,
+            ##### EPOCH RANGE AT THE STEP LEVEL
+            if y_stp['epoch_range'] == 'FROM_SESSION':
+                epo_obj_stp = epo_obj_ses
+                y_stp['epoch_range'] = y_ses['epoch_range']
+            else:
+                epo_obj_stp = _epoch_range_from_cfg_bloc(y_stp['epoch_range'])
+
+            out_dir, _, _ = _get_dir_path(y_stp, 'out')
+            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(y_stp,
                                                                    'inp',
                                                                    check_parent_dir_existence=False)
-            if k_step == 'download':
-                if not _is_cfg_bloc_active(y_step):
+
+            if k_stp == 'download':
+                if not _is_cfg_bloc_active(y_stp):
                     continue
 
                 dwl = arodwl.DownloadGnss
                 step_obj = dwl(out_dir=out_dir,
                                tmp_dir=tmp_dir,
                                log_dir=log_dir,
-                               epoch_range=epo_obj_use,
+                               epoch_range=epo_obj_stp,
                                access=y_station['access'],
                                remote_dir=inp_dir_parent,
                                remote_fname=inp_structure,
                                site=y_station['site'],
-                               session=y_ses['general'])
+                               session=y_ses['general'],
+                               options=y_stp['options'])
 
             # appended in lis and dic at the end of the tests
 
-            elif k_step == 'conversion':
-                if not _is_cfg_bloc_active(y_step):
+            elif k_stp == 'conversion':
+                if not _is_cfg_bloc_active(y_stp):
                     continue
 
                 if y_station['site']['sitelog_path']:
@@ -175,24 +181,25 @@ def read_cfg_sessions(y_sessions_dict,
                 step_obj = cnv(out_dir=out_dir,
                                tmp_dir=tmp_dir,
                                log_dir=log_dir,
-                               epoch_range=epo_obj_use,
+                               epoch_range=epo_obj_stp,
                                site=y_station['site'],
                                session=y_ses['general'],
-                               sitelogs=sitelogs)
+                               sitelogs=sitelogs,
+                               options=y_stp['options'])
 
-                # appended in lis and dic at the end of the tests
+                # appended in lis and dic at the end of the k_stp tests
 
             else:
-                logger.warning("unknown step %s in config file, skipped...",k_step)
+                logger.warning("unknown step %s in config file, skipped...", k_stp)
                 continue
 
-            workflow_lis.append(step_obj)
-            workflow_dic[k_step] = step_obj
+            steps_lis.append(step_obj)
+            steps_dic[k_stp] = step_obj
 
-    return workflow_lis, workflow_dic
+    return steps_lis, steps_dic
 
 
-def _check_parent_dir_existence(parent_dir_inp):
+def _check_parent_dir_existence(parent_dir):
     """
     Check if a parent dictionary exists
     
@@ -200,7 +207,7 @@ def _check_parent_dir_existence(parent_dir_inp):
     
     internal function for read_cfg
     """
-    parent_dir_out = arocmn.translator(parent_dir_inp)
+    parent_dir_out = arocmn.translator(parent_dir)
 
     if not os.path.isdir(parent_dir_out):
         logger.error("%s do not exists, create it first", parent_dir_out)
@@ -209,9 +216,9 @@ def _check_parent_dir_existence(parent_dir_inp):
         return None
 
 
-def _is_cfg_bloc_active(ywkf_inp):
-    if 'active' in ywkf_inp.keys():
-        if ywkf_inp['active']:
+def _is_cfg_bloc_active(ywkf):
+    if 'active' in ywkf.keys():
+        if ywkf['active']:
             return True
         else:
             return False
@@ -243,13 +250,19 @@ def _get_dir_path(y_step,
 
     return dir_path, dir_parent, structure
 
-import collections.abc
 
-def update_dic_deep(d, u, specific_value='FROM_MAIN'):
+def update_w_main_dic(d, u, specific_value='FROM_MAIN'):
+    if u is None:
+        return d
     for k, v in u.items():
-        if isinstance(v, collections.abc.Mapping):
-            d[k] = update_dic_deep(d.get(k, {}), v)
+        if d[k] == specific_value:
+            d[k] = v
+        elif isinstance(v, collections.abc.Mapping):
+            d[k] = update_w_main_dic(d.get(k, {}), v)
         else:
             if d[k] == specific_value:
                 d[k] = v
     return d
+
+
+#def device_cfg_bloc2metadata():

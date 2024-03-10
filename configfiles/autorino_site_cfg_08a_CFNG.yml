@@ -21,9 +21,9 @@ station:
         login: "***REMOVED***"
         password: "***REMOVED***"
     sessions:
-        session_hourly:
+        session_15m01s:
             general:
-                name: hourly 
+                name: 15m01s 
                 data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
                 tmp_dir_parent: FROM_MAIN
                 tmp_structure: FROM_MAIN 
@@ -35,19 +35,18 @@ station:
                 period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
                 round_method: "floor"
                 tz : 'UTC'
-            workflow:
+            steps:
                 download:
                     active: True
                     inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
                     inp_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
                     out_dir_parent: FROM_MAIN
                     out_structure: FROM_MAIN
-                    #options:
+                    epoch_range:
+                        FROM_MAIN
+                    options:
+                        FROM_MAIN
                 conversion:
-                    active: True
-                    converter : auto
-                    inp_dir_parent: FROM_MAIN
-                    inp_structure: FROM_MAIN
-                    out_dir_parent: FROM_MAIN
-                    out_structure: FROM_MAIN
-                    #options:
+                    FROM_MAIN
+
+                    
