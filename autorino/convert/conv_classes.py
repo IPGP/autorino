@@ -82,10 +82,13 @@ class ConvertGnss(arocmn.StepGnss):
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx_files()
         self.check_local_files()
-
         print("AAAAAAAAAAA",force)
         if not force:
+            self.print_table()
+            print("AAAAAAAAAAA", force)
             self.filter_ok_out()
+            print("AAAAAAAAAAA", force)
+            self.print_table()
 
         decompressed_files = self.decompress()
 
@@ -131,7 +134,7 @@ class ConvertGnss(arocmn.StepGnss):
             stop_long_running_containers()
 
             if not self.table.loc[irow, 'ok_inp']:
-                warning.info("conversion skipped: %s", fraw)
+                logger.warning("conversion skipped: %s", fraw)
                 continue
 
             #############################################################
