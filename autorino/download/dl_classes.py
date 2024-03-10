@@ -25,12 +25,14 @@ class DownloadGnss(arocmn.StepGnss):
                  remote_dir,
                  remote_fname,
                  site=None,
-                 session=None):
+                 session=None,
+                 options=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range,
                          site=site,
-                         session=session)
+                         session=session,
+                         options=options)
 
         self.access = access
         self.remote_dir = remote_dir
@@ -250,7 +252,7 @@ class DownloadGnss(arocmn.StepGnss):
 
     def download(self, verbose=False):
         """
-        frontend method to download files from a GNSS recevier
+        frontend method to download files from a GNSS receiver
         """
 
         logger.info("******** RAW files download")
@@ -270,7 +272,7 @@ class DownloadGnss(arocmn.StepGnss):
         if verbose:
             self.print_table()
         #### DOWNLOAD CORE a.k.a FETCH
-        self.fetch_remote_files()
+        self.fetch_remote_files(force_download=self.options.get('force'))
         ###############################
         if verbose:
             self.print_table()
