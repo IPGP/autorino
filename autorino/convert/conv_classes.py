@@ -3,7 +3,7 @@
 """
 Created on Fri Apr  7 12:07:18 2023
 
-@author: psakicki
+@author: psakic
 """
 
 import os
@@ -12,13 +12,12 @@ import numpy as np
 import datetime as dt
 import dateutil
 import docker
-import shutil
 from pathlib import Path
 
 from geodezyx import utils, operational
 
-import autorino.convert as arocnv
 import autorino.common as arocmn
+import autorino.convert as arocnv
 
 from rinexmod import rinexmod_api
 
@@ -31,18 +30,20 @@ logger.setLevel("INFO")
 
 class ConvertGnss(arocmn.StepGnss):
     def __init__(self, out_dir, tmp_dir, log_dir,
-                 epoch_range,
+                 epoch_range=None,
                  site=None,
                  session=None,
-                 sitelogs=None):
+                 sitelogs=None,
+                 options=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
-                         epoch_range,
+                         epoch_range=epoch_range,
                          site=site,
-                         session=session)
+                         session=session,
+                         options=options)
 
         ### temp dirs init
-        self._init_conv_tmp_dirs_paths()
+        self._init_tmp_dirs_paths()
 
         ### sitelog init
         if sitelogs:
@@ -52,71 +53,26 @@ class ConvertGnss(arocmn.StepGnss):
         else:
             self.sitelogs = None
 
-    ########### ConvertGnss specific methods
-
-    def _init_conv_tmp_dirs_paths(self,
-                                  tmp_subdir_logs='logs',
-                                  tmp_subdir_unzip='unzipped',
-                                  tmp_subdir_conv='converted',
-                                  tmp_subdir_rnxmod='rinexmoded'):
-
-        """
-        initialize temp dirs, but keeps their generic form, with <...> and %X,
-        and without creating them 
-        
-        sees set_conv_tmp_dirs_paths() for the effective translation and 
-        creation of these temp dirs
-        """
-
-        ### internal (_) versions have not been translated
-        self._tmp_dir_logs = os.path.join(self.tmp_dir,
-                                          tmp_subdir_logs)
-        self._tmp_dir_unzipped = os.path.join(self.tmp_dir,
-                                              tmp_subdir_unzip)
-        self._tmp_dir_converted = os.path.join(self.tmp_dir,
-                                               tmp_subdir_conv)
-        self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir,
-                                                tmp_subdir_rnxmod)
-
-        ### translation
-        self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
-        self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
-        self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
-        self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
-
-        return self.tmp_dir_logs, self.tmp_dir_unzipped, \
-            self.tmp_dir_converted, self.tmp_dir_rinexmoded
-
-    def set_conv_tmp_dirs_paths(self):
-        """
-        effective translation and creation of temp dirs
-        """
-
-        #### this translation is now  useless, is also done in _init_conv_tmp_dirs_paths
-        tmp_dir_logs_set = self.translate_path(self.tmp_dir_logs)
-        tmp_dir_unzipped_set = self.translate_path(self.tmp_dir_unzipped)
-        tmp_dir_converted_set = self.translate_path(self.tmp_dir_converted)
-        tmp_dir_rinexmoded_set = self.translate_path(self.tmp_dir_rinexmoded)
-
-        utils.create_dir(tmp_dir_logs_set)
-        utils.create_dir(tmp_dir_unzipped_set)
-        utils.create_dir(tmp_dir_converted_set)
-        utils.create_dir(tmp_dir_rinexmoded_set)
-
-        return tmp_dir_logs_set, tmp_dir_unzipped_set, \
-            tmp_dir_converted_set, tmp_dir_rinexmoded_set
-
     ###############################################
 
-    def convert_table(self, print_table=False, force=False):
+    def convert(self, print_table=False, force=False,
+                rinexmod_options=None):
         logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
+
+        if not rinexmod_options:
+            rinexmod_options = {'compression': "gz",
+                                'longname': True,
+                                'force_rnx_load': True,
+                                'verbose': False,
+                                'tolerant_file_period': True,
+                                'full_history': True}
 
         if self.sitelogs:
             site4_list = site_list_from_sitelogs(self.sitelogs)
         else:
             site4_list = []
 
-        tmp_dir_logs_use, _, _, _ = self.set_conv_tmp_dirs_paths()
+        tmp_dir_logs_use, _, _, _ = self.set_tmp_dirs_paths()
 
         ### initialize the table as log
         self.set_table_log(out_dir=tmp_dir_logs_use)
@@ -126,13 +82,13 @@ class ConvertGnss(arocmn.StepGnss):
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx_files()
         self.check_local_files()
-
         if not force:
             self.filter_ok_out()
 
         decompressed_files = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
+        # table_init_ok must be used only for the following statistics!
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table['ok_inp']).sum()
         n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
@@ -144,19 +100,20 @@ class ConvertGnss(arocmn.StepGnss):
             self.print_table()
 
         ######################### START THE LOOP ##############################
-        for irow, row in table_init_ok.iterrows():
+        for irow, row in self.table.iterrows():
+            if not self.table.loc[irow, 'ok_inp'] and self.table.loc[irow, 'ok_out']:
+                logger.info("conversion skipped (output already exists): %s", fraw)
+                continue
+            if not self.table.loc[irow, 'ok_inp']:
+                logger.warning("conversion skipped (something went wrong): %s", fraw)
+                continue
+
             fraw = Path(row['fpath_inp'])
             ext = fraw.suffix.lower()
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
-            _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_conv_tmp_dirs_paths()
-
-            ### manage compressed files
-            # not here anymore actually it is still here 
-            #if ext in ('.gz',):
-            #    logger.debug("%s is compressed",fraw)
-            #    fraw = Path(arocmn.decompress_file(fraw, tmp_dir_unzipped_use))
+            _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_tmp_dirs_paths()
 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
@@ -173,7 +130,6 @@ class ConvertGnss(arocmn.StepGnss):
                 self.table.loc[irow, 'note'] = "no converter found"
                 self.table.loc[irow, 'ok_inp'] = False
                 self.write_in_table_log(self.table.loc[irow])
-                continue
 
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
@@ -181,20 +137,16 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             ###### CONVERSION
-            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use, converter_inp=conve)
+            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use,
+                                          converter_inp=conve)
             frnxtmp_files.append(frnxtmp)  ### list for final remove
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
             ###### RINEXMOD
-            rinexmod_kwargs = {'marker': site,
-                               'compression': "gz",
-                               'longname': True,
-                               'sitelog': self.sitelogs,
-                               'force_rnx_load': True,
-                               'verbose': False,
-                               'tolerant_file_period': True,
-                               'full_history': True}
+            rinexmod_kwargs = rinexmod_options.copy()
+            rinexmod_kwargs.update({'marker':site,
+                                    'sitelog':self.sitelogs})
 
             self.on_row_rinexmod(irow, tmp_dir_rinexmoded_use, rinexmod_kwargs)
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
@@ -206,13 +158,46 @@ class ConvertGnss(arocmn.StepGnss):
 
         #### remove temporary files
         for f in decompressed_files:
-            logger.debug("remove tmp decompress_file RINEX file: %s", f)
-            os.remove(f)
+            if f:
+                logger.debug("remove tmp decompress_file RINEX file: %s", f)
+                os.remove(f)
         for f in frnxtmp_files:
-            logger.debug("remove tmp converted RINEX file: %s", f)
-            os.remove(f)
+            if f:
+                logger.debug("remove tmp converted RINEX file: %s", f)
+                os.remove(f)
         return None
 
+    #               _   _
+    #     /\       | | (_)
+    #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
+    #   / /\ \ / __| __| |/ _ \| '_ \/ __|  / _ \| '_ \  | '__/ _ \ \ /\ / / __|
+    #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
+    # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
+    #
+
+    def on_row_convert(self, irow, out_dir_inp, converter_inp):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
+
+        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, 'fpath_inp'],
+                                          out_dir_inp,
+                                          converter=converter_inp)
+        if frnxtmp:
+            ### update table if things go well
+            self.table.loc[irow, 'fpath_out'] = frnxtmp
+            epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
+            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
+            self.table.loc[irow, 'epoch_end'] = epo_end_ok
+            self.table.loc[irow, 'ok_out'] = True
+        else:
+            ### update table if things go wrong
+            self.table.loc[irow, 'ok_out'] = False
+        return frnxtmp
+
+ 
 
 #########################################################################
 #### Misc functions 
@@ -298,7 +283,7 @@ def stop_long_running_containers(max_running_time=120):
     try:
         client = docker.from_env()
     except docker.errors.DockerException:
-        logger.warn('Permission denied for Docker')
+        logger.warning('Permission denied for Docker')
         return None
     containers = client.containers.list()
 

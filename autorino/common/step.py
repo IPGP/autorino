@@ -17,10 +17,9 @@ import re
 import copy
 
 import rinexmod
-from geodezyx import utils, conv
+from geodezyx import utils, conv, operational
 
 import autorino.common as arocmn
-#import autorino.convert as arocnv
 import autorino.config as arocfg
 
 logger = logging.getLogger(__name__)
@@ -32,12 +31,13 @@ class StepGnss():
                  out_dir, tmp_dir, log_dir,
                  epoch_range=None,
                  site=None,
-                 session=None):
+                 session=None,
+                 options=None):
 
-        self.epoch_range = epoch_range  # setter bellow
-
+        self._init_epoch_range(epoch_range)
         self._init_site(site)
         self._init_session(session)
+        self._init_options(options)
         self._init_site_id()
         self._init_table()
 
@@ -143,7 +143,7 @@ class StepGnss():
 
     def _init_table(self,
                     table_cols: list = None,
-                    init_epoch: bool = True) -> pd.DataFrame:
+                    init_epoch: bool = True):
         """
         initialize the table of a Step object
 
@@ -151,11 +151,6 @@ class StepGnss():
         ----------
         table_cols
         init_epoch: bool
-
-        Returns
-        -------
-        df :
-            the Step object's table
 
         """
 
@@ -181,7 +176,7 @@ class StepGnss():
             df['site'] = self.site_id
 
         self.table = df
-        return df
+        return None
 
     def _init_site(self, site):
         """
@@ -193,6 +188,8 @@ class StepGnss():
             self.site = create_dummy_site_dic()
         else:
             self.site = site
+
+        return None
 
     def _init_session(self, session):
         """
@@ -206,9 +203,24 @@ class StepGnss():
         else:
             self.session = session
 
+        return None
+
+
+    def _init_options(self, options):
+        """
+        if a options dict is not given, create an empty one
+        """
+
+        if not options:
+            self.options = {}
+        else:
+            self.options = options
+
+        return None
+
     def _init_site_id(self):
         """
-        if a site id is not explicitely given, take the one from the site dict
+        if a site id is not explicitly given, take the one from the site dict
         A dummy site dict will be created in the worst case, ensuring that
         site_id will be always initialized
         """
@@ -216,6 +228,8 @@ class StepGnss():
             self.site_id = self.site['site_id']
         else:
             self.site_id = 'XXXX'
+
+        return None
 
     def _init_epoch_range(self, epoch_range):
         """
@@ -225,7 +239,9 @@ class StepGnss():
         if epoch_range:
             self.epoch_range = epoch_range
         else:
-            self.epoch_range = arocmn.EpochRange()
+            self.epoch_range = arocmn.EpochRange(pd.NaT,pd.NaT)
+
+        return None
 
     def _set_translate_dict(self):
         """
@@ -249,6 +265,55 @@ class StepGnss():
 
         return trsltdict
 
+    def _init_tmp_dirs_paths(self,
+                             tmp_subdir_logs='logs',
+                             tmp_subdir_unzip='unzipped',
+                             tmp_subdir_conv='converted',
+                             tmp_subdir_rnxmod='rinexmoded'):
+        """
+        initialize temp dirs, but keeps their generic form, with <...> and %X,
+        and without creating them
+
+        see set_tmp_dirs_paths() for the effective translation and
+        creation of these temp dirs
+        """
+
+        ### internal (_) versions have not been translated
+        self._tmp_dir_logs = os.path.join(self.tmp_dir,
+                                          tmp_subdir_logs)
+        self._tmp_dir_unzipped = os.path.join(self.tmp_dir,
+                                              tmp_subdir_unzip)
+        self._tmp_dir_converted = os.path.join(self.tmp_dir,
+                                               tmp_subdir_conv)
+        self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir,
+                                                tmp_subdir_rnxmod)
+
+        ### translation
+        self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
+        self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
+        self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
+        self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
+
+        return None
+
+    def set_tmp_dirs_paths(self):
+        """
+        effective translation and creation of temp dirs
+        """
+        #### this translation is also done in _init_tmp_dirs_paths
+        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs)
+        tmp_dir_unzipped_set = self.translate_path(self._tmp_dir_unzipped)
+        tmp_dir_converted_set = self.translate_path(self._tmp_dir_converted)
+        tmp_dir_rinexmoded_set = self.translate_path(self._tmp_dir_rinexmoded)
+
+        utils.create_dir(tmp_dir_logs_set)
+        utils.create_dir(tmp_dir_unzipped_set)
+        utils.create_dir(tmp_dir_converted_set)
+        utils.create_dir(tmp_dir_rinexmoded_set)
+
+        return tmp_dir_logs_set, tmp_dir_unzipped_set, \
+            tmp_dir_converted_set, tmp_dir_rinexmoded_set
+
     #   _____                           _                  _   _               _
     #  / ____|                         | |                | | | |             | |
     # | |  __  ___ _ __   ___ _ __ __ _| |  _ __ ___   ___| |_| |__   ___   __| |___
@@ -261,6 +326,12 @@ class StepGnss():
         return a duplicate (deep copy) of the current StepGnss object
         """
         return copy.deepcopy(self)
+
+    def get_step_type(self):
+        """
+        return the ytpw of the step as a string
+        """
+        return type(self).__name__
 
     def update_epoch_table_from_rnx_fname(self,
                                           use_rnx_filename_only=False,
@@ -343,7 +414,7 @@ class StepGnss():
             logger.warning("%s", n_tdelta)
             # be sure to keep the 1st one!!!
 
-        period_new = arocmn.timedelta2freqency_alias(v_tdelta)
+        period_new = arocmn.timedelta2freq_alias(v_tdelta)
         logger.debug("new period, %s, %s",v_tdelta, period_new)
 
         self.epoch_range = arocmn.EpochRange(epoch1,epoch2,period_new,
@@ -588,6 +659,43 @@ class StepGnss():
         invalid_local_files_list = list(self.table.loc[valid_bool, 'fpath_out'])
 
         return invalid_local_files_list
+
+    def decompress_table_batch(self, table_col='fpath_inp',table_ok_col='ok_inp'):
+        """
+        decompress the potential compressed files in the ``table_col`` column
+        and its corresponding ``table_ok_col`` boolean column
+        (usually ``fpath_inp`` and ``ok_inp``)
+
+        It will uncompress the file if it is a
+        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file (gzip)
+
+        It will create a new column ``fpath_ori`` (for original)
+        to keep the trace of the original file
+
+        This function process a complete table at once, and is faster than
+        row-iterative ``decompress``
+        """
+        bool_comp = self.table[table_col].apply(arocmn.is_compressed)
+        ### we also ensure the fact that the boolean ok column is True
+        bool_ok = self.table[table_ok_col]
+        bool_wrk = np.logical_and(bool_comp,bool_ok)
+        idx_comp = self.table.loc[bool_wrk].index
+        self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp,
+                                                               table_col]
+        if hasattr(self, 'tmp_dir_unzipped'):
+            tmp_dir = self.tmp_dir_unzipped
+        else:
+            tmp_dir = self.tmp_dir
+        files_out = \
+            self.table.loc[idx_comp, table_col].apply(arocmn.decompress,
+                                                      args=(tmp_dir,))
+        self.table.loc[idx_comp, table_col] = files_out
+        self.table.loc[idx_comp, 'ok_inp'] = \
+            self.table.loc[idx_comp, table_col].apply(os.path.isfile)
+        self.table.loc[idx_comp, 'fname'] = \
+            self.table.loc[idx_comp, table_col].apply(os.path.basename)
+
+        return files_out
 
     def decompress(self, table_col='fpath_inp', table_ok_col='ok_inp'):
         """
@@ -852,25 +960,12 @@ class StepGnss():
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(self, irow, out_dir_inp, converter_inp):
-        self.table.loc[irow, 'ok_inp'] = True
-
-        frnxtmp, _ = arocnv.converter_run(fraw,
-                                          out_dir_inp,
-                                          converter=converter_inp)
-        if frnxtmp:
-            ### update table if things go well
-            self.table.loc[irow, 'fpath_out'] = frnxtmp
-            epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
-            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
-            self.table.loc[irow, 'epoch_end'] = epo_end_ok
-            self.table.loc[irow, 'ok_out'] = True
-        else:
-            ### update table if things go wrong
-            self.table.loc[irow, 'ok_out'] = False
-        return frnxtmp
-
     def on_row_rinexmod(self, irow, out_dir_inp, rinexmod_kwargs):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
 
         frnx = self.table.loc[irow, 'fpath_out']
 
@@ -894,9 +989,20 @@ class StepGnss():
 
         return frnxmod
 
-    def on_row_move_final(self, irow):
+    def on_row_move_final(self, irow, out_dir_inp=None):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
+
+        if out_dir_inp:
+            out_dir = out_dir_inp
+        else:
+            out_dir = self.out_dir
+
         ### def output folders
-        outdir_use = self.translate_path(self.out_dir,
+        outdir_use = self.translate_path(out_dir,
                                          epoch_inp=self.table.loc[irow,'epoch_srt'])
 
         frnxmod = self.table.loc[irow, 'fpath_out']
@@ -917,7 +1023,22 @@ class StepGnss():
 
         return frnxfin
 
-    def on_row_decompress(self,irow,table_col='fpath_inp', table_ok_col='ok_inp'):
+    def on_row_decompress(self,irow,tmp_dir_unzipped_inp=None,
+                          table_col='fpath_inp', table_ok_col='ok_inp'):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
+
+        if tmp_dir_unzipped_inp:
+            tmp_dir_unzipped = tmp_dir_unzipped_inp
+        elif hasattr(self, 'tmp_dir_unzipped'):
+            tmp_dir_unzipped = self.tmp_dir_unzipped
+        else:
+            tmp_dir_unzipped = self.tmp_dir
+
+
         bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
         bool_ok = self.table.loc[irow,table_ok_col]
         bool_wrk = np.logical_and(bool_comp, bool_ok)
@@ -927,12 +1048,8 @@ class StepGnss():
                 self.table['fpath_ori'] = [np.nan] * len(self.table)
             self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow,table_col]
 
-        if hasattr(self, 'tmp_dir_unzipped'):
-            tmp_dir = self.tmp_dir_unzipped
-        else:
-            tmp_dir = self.tmp_dir
-
-        file_uncomp_out = arocmn.decompress_file(self.table.loc[irow, table_col], tmp_dir)
+        file_uncomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
+                                                 tmp_dir_unzipped)
 
         self.table.loc[irow, table_col] = file_uncomp_out
         self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
@@ -952,11 +1069,11 @@ class StepGnss():
 def create_dummy_site_dic():
     d = dict()
 
-    d['name'] = 'RVAG'
-    d['site_id'] = 'RVAG00REU'
+    d['name'] = 'XXXX'
+    d['site_id'] = 'XXXX00XXX'
     d['domes'] = '00000X000'
     d['sitelog_path'] = '/null'
-    d['position_xyz'] = (1, 2, 3)
+    d['position_xyz'] = (6378000, 0, 0)
 
     return d
 
@@ -966,11 +1083,11 @@ def create_dummy_session_dic():
 
     d['name'] = 'NA'
     d['data_frequency'] = "30S"
-    d['tmp_dir_parent'] = '/home/sysop/workflow_tests/temp'
+    d['tmp_dir_parent'] = '<$HOME>/autorino_workflow_tests/tmp'
     d['tmp_dir_structure'] = '<site_id9>/%Y/%j'
-    d['log_parent_dir'] = '/home/sysop/workflow_tests/log'
+    d['log_parent_dir'] = '<$HOME>/autorino_workflow_tests/log'
     d['log_dir_structure'] = '<site_id9>/%Y/%j'
-    d['out_dir_parent'] = '/home/sysop/workflow_tests/conv_tests/'
+    d['out_dir_parent'] = '<$HOME>/autorino_workflow_tests/out'
     d['out_dir_structure'] = '<site_id9>/%Y/%j'
 
     return d
