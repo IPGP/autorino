@@ -13,7 +13,7 @@ station:
               #epoch1: '2 days ago at 14:00'
               #epoch2: '2 days ago at 16:00'
                 epoch1: '2 hours ago'
-                epoch2: 'now'
+                epoch2: '15min ago'
                 period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
                 round_method: "floor"
                 tz : 'UTC'
@@ -24,11 +24,7 @@ station:
                     out_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
                     out_structure: <SITE_ID>/%Y/%j
                     epoch_range:
-                        epoch1: '2 hours ago'
-                        epoch2: 'now'
-                        period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
-                        round_method: "floor"
-                        tz : 'UTC'
+                        FROM_SESSION
                     options:
                         force: False
                 conversion:
