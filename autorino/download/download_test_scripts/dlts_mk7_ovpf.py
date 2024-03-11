@@ -41,5 +41,5 @@ conv = arocnv.ConvertGnss(ses, dwl.epoch_range, out, sitelog_dir)
 
 conv.load_table_from_prev_step_table(dwl.table)
 conv.print_table()
-conv.convert_rnxmod()
+conv.convert()
 conv.print_table()

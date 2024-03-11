@@ -1,0 +1,52 @@
+### other structure for the session(s) 
+
+station:
+    site:
+        name: CFNG 
+        site_id: CFNG00REU 
+        domes: 
+        sitelog_path: FROM_MAIN #<$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
+        position_xyz: (1,2,3)
+    device:
+        attributes_from_sitelog: True
+        ant_manufacturer: NA
+        ant_model: NA
+        ant_sn: NA
+        rec_manufacturer: NA # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        rec_model: NA
+        rec_sn: NA 
+    access:
+        protocol: "ftp"
+        hostname: "***REMOVED***" 
+        login: "***REMOVED***"
+        password: "***REMOVED***"
+    sessions:
+        session_15m01s:
+            general:
+                name: 15m01s 
+                data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+                tmp_dir_parent: FROM_MAIN
+                tmp_structure: FROM_MAIN 
+                log_dir_parent: FROM_MAIN
+                log_structure: FROM_MAIN 
+            epoch_range:
+                epoch1: '2 hours ago'
+                epoch2: 'now'
+                period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+                round_method: "floor"
+                tz : 'UTC'
+            steps:
+                download:
+                    active: True
+                    inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+                    inp_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
+                    out_dir_parent: FROM_MAIN
+                    out_structure: FROM_MAIN
+                    epoch_range:
+                        FROM_MAIN
+                    options:
+                        FROM_MAIN
+                conversion:
+                    FROM_MAIN
+
+                    

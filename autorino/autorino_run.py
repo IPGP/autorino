@@ -17,6 +17,8 @@ if __name__ == '__main__':
     
     parser.add_argument('-c', '--config', type=str,
                         help='config file path or directory path containing the config file', default='')
+    parser.add_argument('-m', '--main_config', type=str,
+                        help='main config file path', default='')
     parser.add_argument('-s', '--start', type=str,
                         help='', default='')
     parser.add_argument('-e', '--end', type=str,
@@ -28,10 +30,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config = args.config
+    main_config = args.main_config
     start = args.start
     end = args.end
     list_sites = args.list_sites
 
-    arocfg.autorino_run(config)
-    
+    arocfg.autorino_run(cfg_in=config,main_cfg_in=main_config)
+
     
