@@ -30,7 +30,7 @@ a = hdl.divide_by_epochs()
 
 
 
-hdl.decompress_table()
+hdl.decompress()
 
 hdl.print_table()
 hdl.splice()
