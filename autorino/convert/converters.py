@@ -410,10 +410,10 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
     elif process_converter.returncode != 0:
         logger.error("Error while converting %s",raw_fpath_mono.name)
         logger.error("Converter's error message:")
-        logger.error(process_converter.stderr)
+        logger.error(process_converter.stderr.strip())
     else:
         logger.debug("Conversion done (%7.4f sec.). Converter's output:", exec_time)
-        logger.debug(process_converter.stdout)
+        logger.debug(process_converter.stdout.strip())
         
     ###### get the converted file
     #### generate the regex matching the theoretical name for the converted file
