@@ -30,11 +30,7 @@ station:
                 log_dir_parent: FROM_MAIN
                 log_structure: FROM_MAIN 
             epoch_range:
-                epoch1: '2 hours ago'
-                epoch2: 'now'
-                period: "15min" # Pandas Offset aliases https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
-                round_method: "floor"
-                tz : 'UTC'
+                FROM_MAIN
             steps:
                 download:
                     active: True
