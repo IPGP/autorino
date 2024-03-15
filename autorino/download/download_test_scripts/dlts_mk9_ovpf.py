@@ -33,5 +33,5 @@ dwl.print_table()
 cnv.load_table_from_prev_step_table(dwl.table)
 
 cnv.print_table()
-cnv.convert_table()
+cnv.convert()
 

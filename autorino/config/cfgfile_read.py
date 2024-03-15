@@ -10,6 +10,7 @@ import os
 import autorino.common as arocmn
 import autorino.download as arodwl
 import autorino.convert as arocnv
+import autorino.handle as arohdl
 
 #import autorino.session as aroses
 #import autorino.epochrange as aroepo
@@ -52,7 +53,7 @@ def run_steps(steps_lis, print_table=True):
             stp.download(print_table)
         elif stp.get_step_type() == "ConvertGnss":
             stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.convert_table(print_table)
+            stp.convert(print_table)
 
 
 def read_cfg(configfile_path,
@@ -180,6 +181,25 @@ def read_cfg_sessions(y_sessions_dict,
 
                 cnv = arocnv.ConvertGnss
                 step_obj = cnv(out_dir=out_dir,
+                               tmp_dir=tmp_dir,
+                               log_dir=log_dir,
+                               epoch_range=epo_obj_stp,
+                               site=y_station['site'],
+                               session=y_ses['general'],
+                               sitelogs=sitelogs,
+                               options=y_stp['options'])
+
+            elif k_stp == 'split':
+                if not _is_cfg_bloc_active(y_stp):
+                    continue
+
+                if y_station['site']['sitelog_path']:
+                    sitelogs = y_station['site']['sitelog_path']
+                else:
+                    sitelogs = None
+
+                spl = arohdl.SplitGnss
+                step_obj = spl(out_dir=out_dir,
                                tmp_dir=tmp_dir,
                                log_dir=log_dir,
                                epoch_range=epo_obj_stp,
