@@ -272,10 +272,12 @@ def _get_dir_path(y_step,
     return dir_path, dir_parent, structure
 
 
-def update_w_main_dic(d, u, specific_value='FROM_MAIN'):
+def update_w_main_dic(d, u=None, specific_value='FROM_MAIN'):
     if u is None:
         return d
     for k, v in u.items():
+        if not k in d.keys():
+            continue
         if d[k] == specific_value:
             d[k] = v
         elif isinstance(v, collections.abc.Mapping):
@@ -285,5 +287,3 @@ def update_w_main_dic(d, u, specific_value='FROM_MAIN'):
                 d[k] = v
     return d
 
-
-#def device_cfg_bloc2metadata():

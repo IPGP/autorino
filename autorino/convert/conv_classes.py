@@ -89,7 +89,6 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### get a table with only the good files (ok_inp == True)
         # table_init_ok must be used only for the following statistics!
-
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table['ok_inp']).sum()
         n_not_ok_inp = np.logical_not(self.table['ok_inp']).sum()
@@ -102,7 +101,9 @@ class ConvertGnss(arocmn.StepGnss):
 
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
-            
+            fraw = Path(row['fpath_inp'])
+            ext = fraw.suffix.lower()
+
             if not self.table.loc[irow, 'ok_inp'] and self.table.loc[irow, 'ok_out']:
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
@@ -110,8 +111,6 @@ class ConvertGnss(arocmn.StepGnss):
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
 
-            fraw = Path(row['fpath_inp'])
-            ext = fraw.suffix.lower()
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
@@ -136,11 +135,6 @@ class ConvertGnss(arocmn.StepGnss):
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
             stop_long_running_containers()
-
-            if not self.table.loc[irow, 'ok_inp']:
-                warning.info("conversion skipped: %s", fraw)
-
-
 
             #############################################################
             ###### CONVERSION
