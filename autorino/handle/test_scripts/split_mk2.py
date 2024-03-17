@@ -19,12 +19,12 @@ rnxmod_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/rinexmoded'
 out_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/handle'
 log_dir = tmp_dir
 
-epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
-hdl_store = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo_dummy) #, site_id='CFNG')
-
-p="/home/ovsgnss/090_TEMP_STUFFS/2402_tests_PF_pride" 
+p="/home/ovsgnss/090_TEMP_STUFFS/2402_tests_PF_pride"
 L = utils.find_recursive(p,"*BORG*crx*gz")
 
+
+epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
+hdl_store = arocmn.StepGnss(out_dir, tmp_dir, log_dir, epoch_range=None) #, site_id='CFNG')
 hdl_store.load_table_from_filelist(L)
 hdl_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
@@ -33,15 +33,13 @@ epo = arocmn.EpochRange(dt.datetime(2023,6,4),
                        # dt.datetime(2023,6,4,0,30),
                         '15min')
 
-hdl_split = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo)
-
-hdl_split.find_rnxs_for_split(hdl_store)
+splt = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo)
+splt.find_rnxs_for_split(hdl_store)
 
 handle_software = 'gfzrnx'
 
-hdl_split.decompress()
-
-hdl_split.split(handle_software='gfzrnx')
+splt.decompress()
+splt.split(handle_software='gfzrnx')
 
 
 

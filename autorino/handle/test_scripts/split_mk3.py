@@ -20,7 +20,7 @@ out_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/handle'
 log_dir = tmp_dir
 
 epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
-hdl_store = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo_dummy)
+hdl_store = arocmn.StepGnss(out_dir, tmp_dir, log_dir, epo_dummy)
 
 p="/home/ovsgnss/090_TEMP_STUFFS/2402_tests_PF_pride" 
 L = utils.find_recursive(p,"*BORG*crx*gz")
