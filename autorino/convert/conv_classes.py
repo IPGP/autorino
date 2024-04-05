@@ -80,9 +80,9 @@ class ConvertGnss(arocmn.StepGnss):
         frnxtmp_files = []
 
         ### guess and deactivate existing local RINEX files
-        self.guess_local_rnx_files()
-        self.check_local_files()
         if not force:
+            self.guess_local_rnx_files()
+            self.check_local_files()
             self.filter_ok_out()
 
         decompressed_files = self.decompress()
@@ -157,13 +157,14 @@ class ConvertGnss(arocmn.StepGnss):
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
         #### remove temporary files
-        for f in decompressed_files:
-            if f:
-                logger.debug("remove tmp decompress_file RINEX file: %s", f)
-                os.remove(f)
         for f in frnxtmp_files:
             if f:
                 logger.debug("remove tmp converted RINEX file: %s", f)
+                os.remove(f)
+
+        for f in decompressed_files:
+            if f and not self.table['fpath_ori'].isin([f]).any(): # we also test if the file is not an original one!
+                logger.debug("remove tmp decompress_file RINEX file: %s", f)
                 os.remove(f)
         return None
 
