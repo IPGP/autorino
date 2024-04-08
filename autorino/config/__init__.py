@@ -1,2 +1,2 @@
-from .logcfg import *
+from .logcfg       import *
 from .cfgfile_read import *
