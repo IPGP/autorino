@@ -17,7 +17,7 @@ from geodezyx import utils
 
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/tmp'
-out_dir = '/home/psakicki/autorino_workflow_tests/splice'
+out_dir = '/home/psakicki/autorino_workflow_tests/handle_tests/splice'
 
 epo = arocmn.EpochRange(dt.datetime(2024, 2, 28, 1),
                         dt.datetime(2024, 2, 28, 3),
