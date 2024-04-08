@@ -58,7 +58,7 @@ class SpliceGnss(arocmn.StepGnss):
         # get individual Handle objects
         grps = self.table.groupby('epoch_rnd')
 
-        stp_obj_lis_out = []
+        spc_obj_lis_out = []
 
         for t_tabgrp, tabgrp in grps:
             spc_obj = self.copy()
@@ -70,47 +70,64 @@ class SpliceGnss(arocmn.StepGnss):
 
             spc_obj.table = tabgrp_bis
             spc_obj.update_epoch_range_from_table()
-            stp_obj_lis_out.append(spc_obj)
+            spc_obj_lis_out.append(spc_obj)
 
         # get the main Handle object which will describe the final spliced RINEXs
-        hdl_main_obj = self.copy()
+        spc_main_obj_epoch_range = arocmn.EpochRange(np.min(epoch_rnd),
+                                                     np.max(epoch_rnd),
+                                                     period=period,
+                                                     round_method=round_method)
 
-        # hdl_main_obj_epoch_range = arocmn.EpochRange(np.min(epoch_rnd),
-        #                                              np.max(epoch_rnd),
-        #                                              period=period,
-        #                                              round_method=round_method)
-        #
-        # hdl_main_obj = HandleGnss(out_dir=self.out_dir,
-        #                           tmp_dir=self.tmp_dir,
-        #                           log_dir=self.log_dir,
-        #                           epoch_range=hdl_main_obj_epoch_range,
-        #                           site=self.site,
-        #                           session=self.session)
-        return stp_obj_lis_out
+        spc_main_obj = SpliceGnss(out_dir=self.out_dir,
+                                  tmp_dir=self.tmp_dir,
+                                  log_dir=self.log_dir,
+                                  epoch_range=spc_main_obj_epoch_range,
+                                  site=self.site,
+                                  session=self.session)
 
-
-def splice(self):
-    ### divide_by_epochs will create several SpliceGnss objects
-    spc_objs_lis = self.divide_by_epochs()
-
-    for spc in spc_objs_lis:
-        spc.splice_mono()
+        return spc_obj_lis_out, spc_main_obj
 
 
-def splice_mono(self, handle_software='converto'):
-    #### add a test here to be sure that only one epoch is inside
-    fpath_inp_lst = list(self.table['fpath_inp'])
+    def splice(self,
+               period='1d',
+               rolling_period=False,
+               rolling_ref=-1,
+               round_method='floor',
+               drop_epoch_rnd=False):
 
-    tmp_dir_use = self.translate_path(self.tmp_dir)
-    out_dir_use = self.translate_path(self.out_dir)
+        ### divide_by_epochs will create several SpliceGnss objects
+        spc_objs_lis, spc_main_obj = self.divide_by_epochs(period=period,
+                                                           rolling_period=rolling_period,
+                                                           rolling_ref=rolling_ref,
+                                                           round_method=round_method,
+                                                           drop_epoch_rnd=drop_epoch_rnd)
 
-    if handle_software == 'converto':
-        frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
-                                          tmp_dir_use,
-                                          'converto',
-                                          bin_options=['-cat'])
-    elif handle_software == 'gfzrnx':
-        frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
-                                          tmp_dir_use,
-                                          'gfzrnx',
-                                          bin_options=['-f'])
+        for ispc, spc in enumerate(spc_objs_lis):
+            spc.decompress()
+            frnx_out = spc.splice_mono()
+            spc_main_obj.table.loc[ispc, 'fpath_out'] = frnx_out
+
+        return spc_main_obj
+
+    def splice_mono(self, handle_software='converto'):
+        #### add a test here to be sure that only one epoch is inside
+        fpath_inp_lst = list(self.table['fpath_inp'])
+
+        tmp_dir_use = self.translate_path(self.tmp_dir)
+        out_dir_use = self.translate_path(self.out_dir)
+
+        if handle_software == 'converto':
+            frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                                              tmp_dir_use,
+                                              converter='converto',
+                                              bin_options=['-cat'])
+        elif handle_software == 'gfzrnx':
+            frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                                              tmp_dir_use,
+                                              converter='gfzrnx',
+                                              bin_options=['-f'])
+        else:
+            logger.error("wrong handle_software name: %s", handle_software)
+            frnxtmp = None
+
+        return frnxtmp

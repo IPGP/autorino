@@ -6,8 +6,7 @@ import autorino.handle as arohdl
 
 import os
 
-def split_rnx(epo_inp,
-              rnxs_inp,tmp_dir,out_dir,
+def split_rnx(rnxs_inp,epo_inp,tmp_dir,out_dir,
               handle_software='converto'):
 
     ### define other dirs
@@ -15,7 +14,6 @@ def split_rnx(epo_inp,
     log_dir = tmp_dir
 
     #### define spt_store: the Split object which will store all the input RINEXs
-    epo_dummy = arocmn.create_dummy_epochrange()
     spt_store = arohdl.SplitGnss(out_dir, tmp_dir, log_dir)
     spt_store.load_table_from_filelist(rnxs_inp)
     spt_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
