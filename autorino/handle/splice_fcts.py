@@ -24,10 +24,13 @@ def splice_rnx(rnxs_inp,
     spc_inp.load_table_from_filelist(rnxs_inp)
     spc_inp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-    spc_out = spc_inp.splice(period=period,
-                             rolling_period=rolling_period,
-                             rolling_ref=rolling_ref,
-                             round_method=round_method,
-                             drop_epoch_rnd=drop_epoch_rnd)
+    ### divide_by_epochs will create several SpliceGnss objects
+    spc_main_obj, spc_objs_lis = spc_inp.divide_by_epochs(period=period,
+                                                          rolling_period=rolling_period,
+                                                          rolling_ref=rolling_ref,
+                                                          round_method=round_method,
+                                                          drop_epoch_rnd=drop_epoch_rnd)
+
+    spc_main_obj.splice()
 
     return spc_out
