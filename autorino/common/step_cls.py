@@ -185,7 +185,7 @@ class StepGnss():
 
         if not site:
             logger.warning('no site dict given, a dummy one will be created')
-            self.site = create_dummy_site_dic()
+            self.site = arocmn.create_dummy_site_dic()
         else:
             self.site = site
 
@@ -199,7 +199,7 @@ class StepGnss():
         if not session:
             logger.warning(
                 'no session dict given, a dummy one will be created')
-            self.session = create_dummy_session_dic()
+            self.session = arocmn.create_dummy_session_dic()
         else:
             self.session = session
 
@@ -552,8 +552,8 @@ class StepGnss():
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = input_list_reader(input_files,
-                                  inp_regex)
+        flist = arocmn.input_list_reader(input_files,
+                                         inp_regex)
 
         self.table['fpath_inp'] = flist
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
@@ -581,6 +581,12 @@ class StepGnss():
         return None
 
     def guess_local_rnx_files(self):
+        """
+        For a given site name and date in a table, guess the potential local RINEX files
+        and write it as 'fpath_out' value in the table
+        """
+
+        #### to do: split it as a in_row fct
 
         local_paths_list = []
 
@@ -1059,74 +1065,3 @@ class StepGnss():
 
         else:
             return None
-
-
-#  __  __ _               __                  _   _
-# |  \/  (_)             / _|                | | (_)
-# | \  / |_ ___  ___    | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
-# | |\/| | / __|/ __|   |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-# | |  | | \__ \ (__ _  | | | |_| | | | | (__| |_| | (_) | | | \__ \
-# |_|  |_|_|___/\___(_) |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-
-
-def create_dummy_site_dic():
-    d = dict()
-
-    d['name'] = 'XXXX'
-    d['site_id'] = 'XXXX00XXX'
-    d['domes'] = '00000X000'
-    d['sitelog_path'] = '/null'
-    d['position_xyz'] = (6378000, 0, 0)
-
-    return d
-
-
-def create_dummy_session_dic():
-    d = dict()
-
-    d['name'] = 'NA'
-    d['data_frequency'] = "30S"
-    d['tmp_dir_parent'] = '<$HOME>/autorino_workflow_tests/tmp'
-    d['tmp_dir_structure'] = '<site_id9>/%Y/%j'
-    d['log_parent_dir'] = '<$HOME>/autorino_workflow_tests/log'
-    d['log_dir_structure'] = '<site_id9>/%Y/%j'
-    d['out_dir_parent'] = '<$HOME>/autorino_workflow_tests/out'
-    d['out_dir_structure'] = '<site_id9>/%Y/%j'
-
-    return d
-
-
-def input_list_reader(inp_fil, inp_regex=".*"):
-    """
-    Handles mutiples types of input lists (in a general sense)
-    and returns a python list of the input
-
-    inp_fil can be:
-        * a python list (then nothing is done)
-        * a text file path containing a list of files (readed as a python list)
-        * a tuple containing several text files path  (recursive version of the previous point)
-        * a directory path (all the files matching inp_regex are readed)
-    """
-
-    if not inp_fil:
-        flist = []
-    elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
-        flist = list(np.hstack([open(f, "r+").readlines() for f in inp_fil]))
-        flist = [f.strip() for f in flist]
-    elif isinstance(inp_fil, list):
-        flist = inp_fil
-    elif os.path.isfile(inp_fil):
-        flist = open(inp_fil, "r+").readlines()
-        flist = [f.strip() for f in flist]
-    elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil,
-                                     inp_regex,
-                                     case_sensitive=False)
-    else:
-        flist = []
-        logger.warning("the filelist is empty")
-
-    if inp_regex != ".*":
-        flist = [f for f in flist if re.match(inp_regex, f)]
-
-    return flist

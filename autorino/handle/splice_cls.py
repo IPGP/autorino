@@ -95,20 +95,20 @@ def splice(self):
         for hdl in hdl_objs_lis:
             hdl._splice_mono()
 
-    def splice_mono(self, handle_software='converto'):
-        #### add a test here to be sure that only one epoch is inside
-        fpath_inp_lst = list(self.table['fpath_inp'])
+def splice_mono(self, handle_software='converto'):
+    #### add a test here to be sure that only one epoch is inside
+    fpath_inp_lst = list(self.table['fpath_inp'])
 
-        tmp_dir_use = self.translate_path(self.tmp_dir)
-        out_dir_use = self.translate_path(self.out_dir)
+    tmp_dir_use = self.translate_path(self.tmp_dir)
+    out_dir_use = self.translate_path(self.out_dir)
 
-        if handle_software == 'converto':
-            frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
-                                              tmp_dir_use,
-                                              'converto',
-                                              bin_options=['-cat'])
-        elif handle_software == 'gfzrnx':
-            frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
-                                              tmp_dir_use,
-                                              'gfzrnx',
-                                              bin_options=['-f'])
+    if handle_software == 'converto':
+        frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                                          tmp_dir_use,
+                                          'converto',
+                                          bin_options=['-cat'])
+    elif handle_software == 'gfzrnx':
+        frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                                          tmp_dir_use,
+                                          'gfzrnx',
+                                          bin_options=['-f'])
