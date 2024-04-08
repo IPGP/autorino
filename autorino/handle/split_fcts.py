@@ -21,6 +21,5 @@ def split_rnx(rnxs_inp,epo_inp,tmp_dir,out_dir,
     #### define spt_split: the Split object which will perform the split operation
     spt_split = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_inp)
     spt_split.find_rnxs_for_split(spt_store)
-    spt_split.decompress()
     spt_split.split(handle_software=handle_software)
 
