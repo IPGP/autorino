@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from .handle_classes      import *
+from .splice_cls import *
+from .split_cls  import *
+
 
