@@ -181,7 +181,7 @@ def round_epochs(epochs_inp,
     epochs_use = pd.Series(epochs_inp)
 
     if not rolling_period:
-        epochs_rnd = _round_date(epochs_use, period, round_method)
+        epochs_rnd = arocmn.round_date(epochs_use, period, round_method)
     else:
         if type(rolling_ref) is int:
             rolling_ref_use = epochs_use.iloc[rolling_ref]
@@ -192,7 +192,7 @@ def round_epochs(epochs_inp,
         rolling_ref_use = rolling_ref_use + np.timedelta64(1, 's')
 
         roll_diff = epochs_use - rolling_ref_use
-        epochs_rnd = _round_date(roll_diff, period, round_method)
+        epochs_rnd = arocmn.round_date(roll_diff, period, round_method)
 
     return epochs_rnd
 
