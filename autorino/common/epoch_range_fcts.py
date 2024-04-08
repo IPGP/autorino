@@ -235,7 +235,7 @@ def create_dummy_epochrange():
 
     """
 
-    epo = arocmn.EpochRange(epoch1="24 hours and 30min ago",
-                            epoch2="30 min ago",
+    epo = arocmn.EpochRange(epoch1=pd.NaT,
+                            epoch2=pd.NaT,
                             period='15min')
     return epo

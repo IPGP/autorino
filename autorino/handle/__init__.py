@@ -3,5 +3,7 @@
 
 from .splice_cls import *
 from .split_cls  import *
+from .split_fcts  import *
+
 
 
