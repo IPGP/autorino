@@ -11,6 +11,7 @@ import autorino.common as arocmn
 import autorino.convert as arocnv
 
 import pandas as pd
+import os
 
 # Create a logger object.
 import logging
@@ -55,22 +56,6 @@ class SpliceGnss(arocmn.StepGnss):
 
         self.table['epoch_rnd'] = epoch_rnd
 
-        # get individual Handle objects
-        grps = self.table.groupby('epoch_rnd')
-
-        spc_obj_lis_out = []
-
-        for t_tabgrp, tabgrp in grps:
-            spc_obj = self.copy()
-
-            if drop_epoch_rnd:
-                tabgrp_bis = tabgrp.drop('epoch_rnd', axis=1)
-            else:
-                tabgrp_bis = pd.DataFrame(tabgrp)
-
-            spc_obj.table = tabgrp_bis
-            spc_obj.update_epoch_range_from_table()
-            spc_obj_lis_out.append(spc_obj)
 
         # get the main Handle object which will describe the final spliced RINEXs
         spc_main_obj_epoch_range = arocmn.EpochRange(np.min(epoch_rnd),
@@ -85,36 +70,71 @@ class SpliceGnss(arocmn.StepGnss):
                                   site=self.site,
                                   session=self.session)
 
-        return spc_obj_lis_out, spc_main_obj
+        # get individual Handle objects
+        grps = self.table.groupby('epoch_rnd')
+
+        spc_obj_lis_out = []
+
+        for i_tabgrp, (t_tabgrp, tabgrp) in enumerate(grps):
+            spc_obj = self.copy()
+
+            if drop_epoch_rnd:
+                tabgrp_bis = tabgrp.drop('epoch_rnd', axis=1)
+            else:
+                tabgrp_bis = pd.DataFrame(tabgrp)
+
+            spc_obj.table = tabgrp_bis
+            spc_obj.update_epoch_range_from_table()
+            spc_obj_lis_out.append(spc_obj)
+
+            # fill the main object with the individuals
+            # then "fpath_inp" is an individual SpliceGnss Object !
+            spc_main_obj.table.loc[i_tabgrp,"fpath_inp"] = spc_obj
+            spc_main_obj.table.loc[i_tabgrp,"fname"] = os.path.basename(spc_obj.table.iloc[0]["fpath_inp"])
+
+        return spc_main_obj , spc_obj_lis_out
 
 
-    def splice(self,
-               period='1d',
-               rolling_period=False,
-               rolling_ref=-1,
-               round_method='floor',
-               drop_epoch_rnd=False):
+    def splice(self,rnxmod_dir_inp=None,handle_software='converto'):
 
-        ### divide_by_epochs will create several SpliceGnss objects
-        spc_objs_lis, spc_main_obj = self.divide_by_epochs(period=period,
-                                                           rolling_period=rolling_period,
-                                                           rolling_ref=rolling_ref,
-                                                           round_method=round_method,
-                                                           drop_epoch_rnd=drop_epoch_rnd)
+        if rnxmod_dir_inp:
+            rnxmod_dir = rnxmod_dir_inp
+        else:
+            rnxmod_dir = self.out_dir
 
-        for ispc, spc in enumerate(spc_objs_lis):
-            spc.decompress()
-            frnx_out = spc.splice_mono()
-            spc_main_obj.table.loc[ispc, 'fpath_out'] = frnx_out
+        rinexmod_kwargs = {  # 'marker': 'TOTO',
+            'compression': "gz",
+            'longname': True,
+            # 'sitelog': sitelogs,
+            'force_rnx_load': True,
+            'verbose': False,
+            'tolerant_file_period': True,
+            'full_history': True}
 
-        return spc_main_obj
+        for irow, row in self.table.iterrows():
+            self.on_row_splice(irow,handle_software=handle_software)
+            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
+            if rnxmod_dir != self.out_dir:
+                self.on_row_move_final(irow)
 
-    def splice_mono(self, handle_software='converto'):
+        return None
+
+    def on_row_splice(self, irow, handle_software='converto'):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
+
+        spc_row = self.table.loc[irow, 'fpath_inp']
+        spc_row.decompress()
+
         #### add a test here to be sure that only one epoch is inside
-        fpath_inp_lst = list(self.table['fpath_inp'])
 
         tmp_dir_use = self.translate_path(self.tmp_dir)
         out_dir_use = self.translate_path(self.out_dir)
+
+        fpath_inp_lst = list(spc_row.table['fpath_inp'])
 
         if handle_software == 'converto':
             frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
@@ -129,5 +149,7 @@ class SpliceGnss(arocmn.StepGnss):
         else:
             logger.error("wrong handle_software name: %s", handle_software)
             frnxtmp = None
+
+        self.table.loc[irow, 'fpath_out'] = frnxtmp
 
         return frnxtmp
