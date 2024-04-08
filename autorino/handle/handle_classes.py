@@ -18,20 +18,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class HandleGnss(arocmn.StepGnss):
-    def __init__(self, out_dir, tmp_dir, log_dir,
-                 epoch_range=None,
-                 site=None,
-                 session=None,
-                 options=None):
+# class HandleGnss(arocmn.StepGnss):
+#     def __init__(self, out_dir, tmp_dir, log_dir,
+#                  epoch_range=None,
+#                  site=None,
+#                  session=None,
+#                  options=None):
+#
+#         super().__init__(out_dir, tmp_dir, log_dir,
+#                          epoch_range=epoch_range,
+#                          site=site,
+#                          session=session,
+#                          options=options)
 
-        super().__init__(out_dir, tmp_dir, log_dir,
-                         epoch_range=epoch_range,
-                         site=site,
-                         session=session,
-                         options=options)
-
-class SpliceGnss(HandleGnss):
+class SpliceGnss(arocmn.StepGnss):
     def __init__(self, out_dir, tmp_dir, log_dir,
                  epoch_range=None,
                  site=None,
@@ -124,7 +124,7 @@ class SpliceGnss(HandleGnss):
     #        | |
     #        |_|
 
-class SplitGnss(HandleGnss):
+class SplitGnss(arocmn.StepGnss):
     def __init__(self, out_dir, tmp_dir, log_dir,
                  epoch_range=None,
                  site=None,
