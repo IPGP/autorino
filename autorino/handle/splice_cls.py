@@ -127,7 +127,7 @@ class SpliceGnss(arocmn.StepGnss):
             return None
 
         spc_row = self.table.loc[irow, 'fpath_inp']
-        spc_row.decompress()
+        spc_row.decompress_table_batch()
 
         #### add a test here to be sure that only one epoch is inside
 
