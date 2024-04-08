@@ -51,10 +51,10 @@ class SplitGnss(arocmn.StepGnss):
 
             epoch_bol = epoch_srt_bol & epoch_end_bol
 
-            if epoch_bol_col.sum() == 0:
+            if epoch_bol.sum() == 0:
                 self.table.loc[irow, 'ok_inp'] = False
                 continue
-            elif epoch_bol_col.sum() > 1:
+            elif epoch_bol.sum() > 1:
                 rnxinp_row = hdl_store.table.loc[epoch_bol].iloc[0]
             else:
                 rnxinp_row = hdl_store.table.loc[epoch_bol].squeeze()
