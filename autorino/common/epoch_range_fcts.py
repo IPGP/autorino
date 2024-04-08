@@ -17,9 +17,23 @@ from pandas.tseries.frequencies import to_offset
 import autorino.common as arocmn
 
 
-def dateparser_frontend(date_inp, tz="UTC"):
+def epoch_range_interpret(epo_inp):
     """
-    Frontend function to parse a string/datetime
+    interpreter function to get an output EpochRange object from a
+    tuple, typically (epo1, epo2, period)
+    or an input EpochRange (then nothing is done)
+    """
+    if type(epo_inp) is arocmn.EpochRange:
+        epo_range_out = epo_inp
+    else:
+        epo_range_out = arocmn.EpochRange(*epo_inp)
+
+    return epo_range_out
+
+
+def dateparser_interpret(date_inp, tz="UTC"):
+    """
+    Interpreter function to parse a string/datetime
     to a Pandas Timestamp
     (standard used for the DownloadGnss object)
     Also apply a timezone (UTC per default)
@@ -40,6 +54,7 @@ def dateparser_frontend(date_inp, tz="UTC"):
         date_out = pd.Timestamp(date_out, tz=tz)
 
     return date_out
+
 
 def dates_list2epoch_range(dates_list_inp,
                            period=None,
