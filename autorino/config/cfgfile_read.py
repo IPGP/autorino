@@ -36,9 +36,9 @@ def autorino_run(cfg_in,main_cfg_in):
         raise Exception
 
     for cfg_use in cfg_use_lis:
-        steps_lis, steps_dic, y_station = read_cfg(configfile_path=cfg_use,
-                                                   main_cfg_path=main_cfg_in)
-        run_steps(steps_lis)
+        steps_lis_lis, steps_dic_dic, y_station = read_cfg(configfile_path=cfg_use, main_cfg_path=main_cfg_in)
+        for steps_lis in steps_lis_lis:
+            run_steps(steps_lis)
 
     return None
 
@@ -86,6 +86,7 @@ def read_cfg(configfile_path,
     y_access : dict
         station access dictionary.
     """
+    global y_main
     logger.info('start to read configfile: %s',
                 configfile_path)
 
@@ -100,16 +101,19 @@ def read_cfg(configfile_path,
     y_station = y["station"]
 
     y = update_w_main_dic(y, y_main)
-    steps_lis, steps_dic = read_cfg_sessions(y_station["sessions"],
-                                                   y_station=y_station,
-                                                   epoch_range=epoch_range)
+    steps_lis_lis, steps_dic_dic = read_cfg_sessions(y_station["sessions"],
+                                                     y_station=y_station,
+                                                     epoch_range=epoch_range)
 
-    return steps_lis, steps_dic, y_station
+    return steps_lis_lis, steps_dic_dic, y_station
 
 
 def read_cfg_sessions(y_sessions_dict,
                       epoch_range=None,
                       y_station=None):
+    steps_lis_lis = []
+    steps_dic_dic = []
+
     for k_ses, y_ses in y_sessions_dict.items():
 
         y_gen = y_ses['general']
@@ -217,7 +221,10 @@ def read_cfg_sessions(y_sessions_dict,
             steps_lis.append(step_obj)
             steps_dic[k_stp] = step_obj
 
-    return steps_lis, steps_dic
+        steps_lis_lis.append(steps_lis)
+        steps_dic_dic[k_ses] = steps_dic
+
+    return steps_lis_lis, steps_dic_lis
 
 
 def _check_parent_dir_existence(parent_dir):

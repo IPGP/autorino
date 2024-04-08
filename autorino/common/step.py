@@ -1044,18 +1044,21 @@ class StepGnss():
         bool_wrk = np.logical_and(bool_comp, bool_ok)
 
         if bool_wrk:
-            if 'fpath_ori' not in self.table.columns:
+            if 'fpath_ori' not in self.table.columns: ## a 'fpath_ori' column must be created first 
                 self.table['fpath_ori'] = [np.nan] * len(self.table)
             self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow,table_col]
 
-        file_uncomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
-                                                 tmp_dir_unzipped)
+            file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
+                                                     tmp_dir_unzipped)
 
-        self.table.loc[irow, table_col] = file_uncomp_out
-        self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
-        self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
+            self.table.loc[irow, table_col] = file_decomp_out
+            self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
+            self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
+        
+            return file_decomp_out
 
-        return file_uncomp_out
+        else:
+            return None
 
 
 #  __  __ _               __                  _   _
