@@ -8,33 +8,21 @@ from geodezyx import utils
 import datetime as dt
 import os
 
-def split_frontend(epo_in,rnxs_inp,tmp_dir,out_dir,
-                   handle_software='converto'):
+def split_rnx(epo_in,rnxs_inp,tmp_dir,out_dir,
+              handle_software='converto'):
 
     ### define other dirs
     rnxmod_dir = os.path.join(tmp_dir,'rinexmoded')
     log_dir = tmp_dir
 
-    #### define hdl_store: the Handle object which will store the input RINEXs
+    #### define spt_store: the Split object which will store the input RINEXs
     epo_dummy = arocmn.create_dummy_epochrange()
-    hdl_store = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_dummy)  # , site_id='CFNG')
-    hdl_store.load_table_from_filelist(rnxs_inp)
-    hdl_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+    spt_store = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_dummy)  # , site_id='CFNG')
+    spt_store.load_table_from_filelist(rnxs_inp)
+    spt_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-    #### define hdl_split: the Handle object which will perform the split operation
-    hdl_split = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo)
-    hdl_split.find_rnxs_for_split(hdl_store)
-    hdl_split.decompress()
-    hdl_split.split(handle_software=handle_software)
-
-tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
-out_dir = '/home/psakicki/autorino_workflow_tests/handle'
-
-epo = arocmn.EpochRange(dt.datetime(2024, 2, 28, 1),
-                        dt.datetime(2024, 2, 28, 3),
-                        '5min')
-
-p = "/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"
-L = utils.find_recursive(p, "*gz")
-
-split_frontend(epo,L,tmp_dir,out_dir)
+    #### define spt_split: the Split object which will perform the split operation
+    spt_split = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo)
+    spt_split.find_rnxs_for_split(spt_store)
+    spt_split.decompress()
+    spt_split.split(handle_software=handle_software)

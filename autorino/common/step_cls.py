@@ -237,7 +237,7 @@ class StepGnss():
         NaT (not a time) if nothing is given
         """
         if epoch_range:
-            self.epoch_range = epoch_range
+            self.epoch_range = arocmn.epoch_range_interpret(epoch_range)
         else:
             self.epoch_range = arocmn.EpochRange(pd.NaT,pd.NaT)
 
@@ -552,8 +552,8 @@ class StepGnss():
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = arocmn.input_list_reader(input_files,
-                                         inp_regex)
+        flist = arocmn.input_list_interpret(input_files,
+                                            inp_regex)
 
         self.table['fpath_inp'] = flist
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
@@ -834,7 +834,7 @@ class StepGnss():
         returns the filtered raw files in a list
         """
 
-        flist_exclu = input_list_reader(filelist_exclu_inp)
+        flist_exclu = arocmn.input_list_interpret(filelist_exclu_inp)
 
         flist_out = []
         ok_inp_bool_stk = []

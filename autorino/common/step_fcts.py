@@ -51,16 +51,16 @@ def create_dummy_session_dic():
     return d
 
 
-def input_list_reader(inp_fil, inp_regex=".*"):
+def input_list_interpret(inp_fil, inp_regex=".*"):
     """
-    Handles mutiples types of input lists (in a general sense)
+    Handles multiple types of input lists (in a general sense)
     and returns a python list of the input
 
     inp_fil can be:
         * a python list (then nothing is done)
-        * a text file path containing a list of files (readed as a python list)
+        * a text file path containing a list of files (read as a python list)
         * a tuple containing several text files path  (recursive version of the previous point)
-        * a directory path (all the files matching inp_regex are readed)
+        * a directory path (all the files matching inp_regex are read)
     """
 
     if not inp_fil:
