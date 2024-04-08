@@ -14,6 +14,9 @@ import numpy as np
 import re
 from pandas.tseries.frequencies import to_offset
 
+import autorino.common as arocmn
+
+
 def dateparser_frontend(date_inp, tz="UTC"):
     """
     Frontend function to parse a string/datetime
@@ -54,7 +57,7 @@ def dates_list2epoch_range(dates_list_inp,
     return epo_out
 
 
-def _round_date(date_in, period, round_method="round"):
+def round_date(date_in, period, round_method="round"):
     """
     low-level function to round a Pandas Serie or a datetime-like object
     according to the "ceil", "floor" or "round" approach
@@ -217,7 +220,7 @@ def create_dummy_epochrange():
 
     """
 
-    epo = EpochRange(epoch1="24 hours and 30min ago",
-                     epoch2="30 min ago",
-                     period='15min')
+    epo = arocmn.EpochRange(epoch1="24 hours and 30min ago",
+                            epoch2="30 min ago",
+                            period='15min')
     return epo

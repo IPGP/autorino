@@ -14,6 +14,9 @@ import numpy as np
 import re
 from pandas.tseries.frequencies import to_offset
 
+import autorino.common as arocmn
+
+
 
 class EpochRange:
     def __init__(self,
@@ -41,8 +44,8 @@ class EpochRange:
         self._epoch1_raw = epoch1
         self._epoch2_raw = epoch2
 
-        _epoch1tmp = dateparser_frontend(self._epoch1_raw)
-        _epoch2tmp = dateparser_frontend(self._epoch2_raw)
+        _epoch1tmp = arocmn.dateparser_frontend(self._epoch1_raw)
+        _epoch2tmp = arocmn.dateparser_frontend(self._epoch2_raw)
         _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
         _epoch_max_tmp = np.max((_epoch1tmp, _epoch2tmp))
 
@@ -61,10 +64,10 @@ class EpochRange:
 
     @epoch_start.setter
     def epoch_start(self, value):
-        self._epoch_start = dateparser_frontend(value, tz=self.tz)
-        self._epoch_start = _round_date(self._epoch_start,
-                                        self.period,
-                                        self.round_method)
+        self._epoch_start = arocmn.dateparser_frontend(value, tz=self.tz)
+        self._epoch_start = arocmn.round_date(self._epoch_start,
+                                              self.period,
+                                              self.round_method)
 
     @property
     def epoch_end(self):
@@ -72,10 +75,10 @@ class EpochRange:
 
     @epoch_end.setter
     def epoch_end(self, value):
-        self._epoch_end = dateparser_frontend(value)  #,tz=self.tz)
-        self._epoch_end = _round_date(self._epoch_end,
-                                      self.period,
-                                      self.round_method)
+        self._epoch_end = arocmn.dateparser_frontend(value)  #,tz=self.tz)
+        self._epoch_end = arocmn.round_date(self._epoch_end,
+                                            self.period,
+                                            self.round_method)
 
     @property
     def period_values(self):
