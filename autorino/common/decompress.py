@@ -108,12 +108,16 @@ def decompress_file(file_inp,
     ### RINEX Case
     if conv.rinex_regex_search_tester(file_inp, compressed=True):
         file_out = _decomp_hatanaka(file_inp, out_dir_inp, force=force)
+        bool_decomp_out = True
     ### Generic gzipped case (e.g. RAW file)
     elif ext == ".gz":
         file_out = _decomp_gzip(file_inp, out_dir_inp, force=force)
+        bool_decomp_out = True
     else:
-        logger.info("no valid compression for %s, nothing is done",
+        logger.debug("no valid compression for %s, nothing is done",
                     file_inp2.name)
         file_out = file_inp
+        bool_decomp_out = False 
 
-    return file_out
+    return file_out, bool_decomp_out
+
