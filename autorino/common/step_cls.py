@@ -666,6 +666,28 @@ class StepGnss():
 
         return invalid_local_files_list
 
+    def decompress(self, table_col='fpath_inp', table_ok_col='ok_inp'):
+        """
+        decompress the potential compressed files in the ``table_col`` column
+        and its corresponding ``table_ok_col`` boolean column
+        (usually ``fpath_inp`` and ``ok_inp``)
+
+        It will uncompress the file if it is a
+        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file
+        (gzip only for the moment)
+
+        It will create a new column ``fpath_ori`` (for original)
+        to keep the trace of the original file
+        """
+        files_uncmp_list = []
+        for irow, row in self.table.iterrows():
+            file_uncmp = self.on_row_decompress(irow,table_col=table_col,table_ok_col=table_ok_col)
+            files_uncmp_list.append(file_uncmp)
+
+        return files_uncmp_list
+
+
+
     def decompress_table_batch(self, table_col='fpath_inp',table_ok_col='ok_inp'):
         """
         decompress the potential compressed files in the ``table_col`` column
@@ -702,26 +724,6 @@ class StepGnss():
             self.table.loc[idx_comp, table_col].apply(os.path.basename)
 
         return files_out
-
-    def decompress(self, table_col='fpath_inp', table_ok_col='ok_inp'):
-        """
-        decompress the potential compressed files in the ``table_col`` column
-        and its corresponding ``table_ok_col`` boolean column
-        (usually ``fpath_inp`` and ``ok_inp``)
-
-        It will uncompress the file if it is a
-        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file
-        (gzip only for the moment)
-
-        It will create a new column ``fpath_ori`` (for original)
-        to keep the trace of the original file
-        """
-        files_uncmp_list = []
-        for irow, row in self.table.iterrows():
-            file_uncmp = self.on_row_decompress(irow,table_col=table_col,table_ok_col=table_ok_col)
-            files_uncmp_list.append(file_uncmp)
-
-        return files_uncmp_list
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |
