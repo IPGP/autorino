@@ -11,7 +11,8 @@ from geodezyx import *                   # Import the GeodeZYX modules
 from geodezyx.externlib import *         # Import the external modules
 from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
-import autorino.convert.conv_batch as cvb
+#import autorino.convert.conv_batch as cvb
+from autorino import convert as arocnv
 
 
 
@@ -85,11 +86,21 @@ outdir = "/scratch/convgnss/046_big_conv_PF_GB1G_2017_18"
 minyear = 2017
 maxyear = 2018
 
+##### 2023
+flist="/scratch/temp_stuffs/Raw_PF_2023_365_topcon_mk1a.list"
+flist="/home/sakic/090_TEMP/Raw_PF_2023_100_265_mk01a.list"
+regex=".*"
+outdir = "/scratch/convgnss/043_big_conv_PF_2023"
+minyear = 2023
+maxyear = 2024
+nyear = 5
+
+
 
 ##################################################################
 raw_excl_list = tuple(utils.find_recursive(outdir,'*_rnx_fail.log'))
 
-cvb.converter_batch(flist, 
+arocnv.converter_run(flist, 
                     outdir,
                     inp_regex=regex,
                     year_in_inp_path=nyear,
