@@ -18,7 +18,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 #   _____       _ _
 #  / ____|     | (_)
 # | (___  _ __ | |_  ___ ___
@@ -61,16 +60,17 @@ class SpliceGnss(arocmn.StepGnss):
 
         stp_obj_lis_out = []
 
-        for tgrp, tabgrp in grps:
-            hdl_obj = self.copy()
+        for t_tabgrp, tabgrp in grps:
+            spc_obj = self.copy()
 
             if drop_epoch_rnd:
                 tabgrp_bis = tabgrp.drop('epoch_rnd', axis=1)
             else:
                 tabgrp_bis = pd.DataFrame(tabgrp)
-            hdl_obj.table = tabgrp_bis
-            hdl_obj.update_epoch_range_from_table()
-            stp_obj_lis_out.append(hdl_obj)
+
+            spc_obj.table = tabgrp_bis
+            spc_obj.update_epoch_range_from_table()
+            stp_obj_lis_out.append(spc_obj)
 
         # get the main Handle object which will describe the final spliced RINEXs
         hdl_main_obj = self.copy()
@@ -88,12 +88,14 @@ class SpliceGnss(arocmn.StepGnss):
         #                           session=self.session)
         return stp_obj_lis_out
 
-def splice(self):
-        ### divide_by_epochs will create several HandleGnss objects
-        hdl_objs_lis = self.divide_by_epochs()
 
-        for hdl in hdl_objs_lis:
-            hdl._splice_mono()
+def splice(self):
+    ### divide_by_epochs will create several SpliceGnss objects
+    spc_objs_lis = self.divide_by_epochs()
+
+    for spc in spc_objs_lis:
+        spc.splice_mono()
+
 
 def splice_mono(self, handle_software='converto'):
     #### add a test here to be sure that only one epoch is inside
