@@ -33,4 +33,4 @@ def splice_rnx(rnxs_inp,
 
     spc_main_obj.splice()
 
-    return spc_out
+    return spc_main_obj

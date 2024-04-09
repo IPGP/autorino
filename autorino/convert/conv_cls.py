@@ -296,6 +296,3 @@ def stop_long_running_containers(max_running_time=120):
             logger.warning(f'Stopped container {container.name} after {elapsed_time} seconds.')
 
     return None
-
-#################################################
-############ FUNCTION GRAVEYARD

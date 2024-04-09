@@ -42,6 +42,9 @@ class SplitGnss(arocmn.StepGnss):
                          options=options)
 
     def find_rnxs_for_split(self, hdl_store):
+
+        self.table['ok_inp'] = False
+
         for irow, row in self.table.iterrows():
             epo_srt = np.datetime64(self.table.loc[irow, 'epoch_srt'])
             epo_end = np.datetime64(self.table.loc[irow, 'epoch_end'])
@@ -85,6 +88,11 @@ class SplitGnss(arocmn.StepGnss):
             self.tmp_decmp_files.append(fdecmptmp)
 
             frnxtmp = self.on_row_split(irow, self.tmp_dir, handle_software=handle_software)
+            if not self.table.loc[irow, 'fpath_out']:
+                logger.error("unable to split %s, skip",
+                             self.table.loc[irow])
+                continue
+
             self.tmp_rnx_files.append(frnxtmp)
 
             self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
@@ -97,6 +105,12 @@ class SplitGnss(arocmn.StepGnss):
 
 
     def on_row_split(self, irow, out_dir_inp, handle_software='converto'):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'epoch_srt'])
+            return None
+
         frnx_inp = self.table.loc[irow, 'fpath_inp']
 
         tmp_dir_use = self.translate_path(self.tmp_dir)
