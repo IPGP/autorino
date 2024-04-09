@@ -716,7 +716,7 @@ class StepGnss():
         else:
             tmp_dir = self.tmp_dir
         files_out = \
-            self.table.loc[idx_comp, table_col].apply(arocmn.decompress,
+            self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file,
                                                       args=(tmp_dir,))
         self.table.loc[idx_comp, table_col] = files_out
         self.table.loc[idx_comp, 'ok_inp'] = \
@@ -726,16 +726,55 @@ class StepGnss():
 
         return files_out
 
+    def on_row_decompress(self, irow, tmp_dir_unzipped_inp=None,
+                          table_col='fpath_inp', table_ok_col='ok_inp'):
+
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
+
+        if tmp_dir_unzipped_inp:
+            tmp_dir_unzipped = tmp_dir_unzipped_inp
+        elif hasattr(self, 'tmp_dir_unzipped'):
+            tmp_dir_unzipped = self.tmp_dir_unzipped
+        else:
+            tmp_dir_unzipped = self.tmp_dir
+
+        bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
+        bool_ok = self.table.loc[irow, table_ok_col]
+        bool_wrk = np.logical_and(bool_comp, bool_ok)
+
+        if bool_wrk:
+            if 'fpath_ori' not in self.table.columns:  ## a 'fpath_ori' column must be created first
+                self.table['fpath_ori'] = [np.nan] * len(self.table)
+            self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow, table_col]
+
+            file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
+                                                                      tmp_dir_unzipped)
+
+            self.table.loc[irow, table_col] = file_decomp_out
+            self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
+            self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
+
+            return file_decomp_out
+
+        else:
+            return None
+
+
     def remove_tmp_files(self):
         for f in self.tmp_rnx_files:
-            if f:
+            if os.path.isfile(f):
                 logger.debug("remove tmp converted RINEX file: %s", f)
                 os.remove(f)
                 self.tmp_rnx_files.remove(f)
 
         for f in self.tmp_decmp_files:
-            if f and not self.table['fpath_ori'].isin([f]).any():  # we also test if the file is not an original one!
-                logger.debug("remove tmp decompress_file RINEX file: %s", f)
+            # we also test if the file is not an original one!
+            is_original = self.table['fpath_ori'].isin([f]).any()
+            if os.path.isfile(f) and not is_original:
+                logger.debug("remove tmp decompress RINEX file: %s", f)
                 os.remove(f)
                 self.tmp_decmp_files.remove(f)
 
@@ -830,7 +869,7 @@ class StepGnss():
         ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
         nfil_total = sum(bool_out_range)
         # logical inhibition a.\overline{b}
-        nfil_spec = sum(np.logical_and(bool_out_range, self.table['ok_inp']))
+        nfil_spec = sum(nppour.logical_and(bool_out_range, self.table['ok_inp']))
 
         # final replace of ok init
         self.table['ok_inp'] = ok_inp_bool_stk
@@ -1044,40 +1083,3 @@ class StepGnss():
             raise e
 
         return frnxfin
-
-    def on_row_decompress(self,irow,tmp_dir_unzipped_inp=None,
-                          table_col='fpath_inp', table_ok_col='ok_inp'):
-
-        if not self.table.loc[irow, 'ok_inp']:
-            logger.warning("action on row skipped (input disabled): %s",
-                           self.table.loc[irow, 'fname'])
-            return None
-
-        if tmp_dir_unzipped_inp:
-            tmp_dir_unzipped = tmp_dir_unzipped_inp
-        elif hasattr(self, 'tmp_dir_unzipped'):
-            tmp_dir_unzipped = self.tmp_dir_unzipped
-        else:
-            tmp_dir_unzipped = self.tmp_dir
-
-
-        bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
-        bool_ok = self.table.loc[irow,table_ok_col]
-        bool_wrk = np.logical_and(bool_comp, bool_ok)
-
-        if bool_wrk:
-            if 'fpath_ori' not in self.table.columns: ## a 'fpath_ori' column must be created first 
-                self.table['fpath_ori'] = [np.nan] * len(self.table)
-            self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow,table_col]
-
-            file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
-                                                     tmp_dir_unzipped)
-
-            self.table.loc[irow, table_col] = file_decomp_out
-            self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
-            self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
-        
-            return file_decomp_out
-
-        else:
-            return None
