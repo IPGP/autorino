@@ -85,7 +85,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.check_local_files()
             self.filter_ok_out()
 
-        decompressed_files = self.decompress()
+        self.tmp_decmp_files = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
         # table_init_ok must be used only for the following statistics!
@@ -140,7 +140,7 @@ class ConvertGnss(arocmn.StepGnss):
             ###### CONVERSION
             frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use,
                                           converter_inp=conve)
-            frnxtmp_files.append(frnxtmp)  ### list for final remove
+            self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
@@ -158,15 +158,9 @@ class ConvertGnss(arocmn.StepGnss):
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
         #### remove temporary files
-        for f in frnxtmp_files:
-            if f:
-                logger.debug("remove tmp converted RINEX file: %s", f)
-                os.remove(f)
 
-        for f in decompressed_files:
-            if f and not self.table['fpath_ori'].isin([f]).any(): # we also test if the file is not an original one!
-                logger.debug("remove tmp decompress_file RINEX file: %s", f)
-                os.remove(f)
+        self.remove_tmp_files()
+
         return None
 
     #               _   _

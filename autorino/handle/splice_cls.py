@@ -117,6 +117,8 @@ class SpliceGnss(arocmn.StepGnss):
             if rnxmod_dir != self.out_dir:
                 self.on_row_move_final(irow)
 
+        self.remove_tmp_files()
+
         return None
 
     def on_row_splice(self, irow, handle_software='converto'):
