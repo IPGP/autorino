@@ -52,6 +52,9 @@ class StepGnss():
         # thus this table_log_path attribute must be initialized as none
         self.table_log_path = None
 
+        self.tmp_rnx_files = []
+        self.tmp_decmp_files = []
+
     def __repr__(self):
         name = type(self).__name__
         out = "{} {}/{}".format(name,
@@ -686,8 +689,6 @@ class StepGnss():
 
         return files_uncmp_list
 
-
-
     def decompress_table_batch(self, table_col='fpath_inp',table_ok_col='ok_inp'):
         """
         decompress the potential compressed files in the ``table_col`` column
@@ -724,6 +725,19 @@ class StepGnss():
             self.table.loc[idx_comp, table_col].apply(os.path.basename)
 
         return files_out
+
+    def remove_tmp_files(self):
+        for f in self.tmp_rnx_files:
+            if f:
+                logger.debug("remove tmp converted RINEX file: %s", f)
+                os.remove(f)
+                self.tmp_rnx_files.remove(f)
+
+        for f in self.tmp_decmp_files:
+            if f and not self.table['fpath_ori'].isin([f]).any():  # we also test if the file is not an original one!
+                logger.debug("remove tmp decompress_file RINEX file: %s", f)
+                os.remove(f)
+                self.tmp_decmp_files.remove(f)
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |

@@ -62,6 +62,8 @@ class SplitGnss(arocmn.StepGnss):
             self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
             self.table.loc[irow, 'ok_inp'] = True
 
+        return None
+
     def split(self, rnxmod_dir_inp=None, handle_software='converto'):
         if rnxmod_dir_inp:
             rnxmod_dir = rnxmod_dir_inp
@@ -79,11 +81,19 @@ class SplitGnss(arocmn.StepGnss):
                 'tolerant_file_period': True,
                 'full_history': True}
 
-            self.on_row_decompress(irow)
-            self.on_row_split(irow, self.tmp_dir, handle_software=handle_software)
+            fdecmptmp = self.on_row_decompress(irow)
+            self.tmp_decmp_files.append(fdecmptmp)
+
+            frnxtmp = self.on_row_split(irow, self.tmp_dir, handle_software=handle_software)
+            self.tmp_rnx_files.append(frnxtmp)
+
             self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
             if rnxmod_dir != self.out_dir:
                 self.on_row_move_final(irow)
+
+        self.remove_tmp_files()
+
+        return None
 
 
     def on_row_split(self, irow, out_dir_inp, handle_software='converto'):
