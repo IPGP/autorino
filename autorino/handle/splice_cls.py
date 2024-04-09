@@ -75,6 +75,8 @@ class SpliceGnss(arocmn.StepGnss):
 
         spc_obj_lis_out = []
 
+        spc_main_obj.table["ok_inp"] = False
+
         for i_tabgrp, (t_tabgrp, tabgrp) in enumerate(grps):
             spc_obj = self.copy()
 
@@ -91,6 +93,7 @@ class SpliceGnss(arocmn.StepGnss):
             # then "fpath_inp" is an individual SpliceGnss Object !
             spc_main_obj.table.loc[i_tabgrp,"fpath_inp"] = spc_obj
             spc_main_obj.table.loc[i_tabgrp,"fname"] = os.path.basename(spc_obj.table.iloc[0]["fpath_inp"])
+            spc_main_obj.table.loc[i_tabgrp,"ok_inp"] = True
 
         return spc_main_obj , spc_obj_lis_out
 
@@ -113,6 +116,11 @@ class SpliceGnss(arocmn.StepGnss):
 
         for irow, row in self.table.iterrows():
             self.on_row_splice(irow,handle_software=handle_software)
+            if not self.table.loc[irow, 'fpath_out']:
+                logger.error("unable to splice %s, skip",
+                             self.table.loc[irow])
+                continue
+
             self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
             if rnxmod_dir != self.out_dir:
                 self.on_row_move_final(irow)
@@ -125,32 +133,37 @@ class SpliceGnss(arocmn.StepGnss):
 
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
-                           self.table.loc[irow, 'fname'])
+                           self.table.loc[irow, 'epoch_srt'])
             return None
 
         spc_row = self.table.loc[irow, 'fpath_inp']
-        spc_row.decompress_table_batch()
 
-        #### add a test here to be sure that only one epoch is inside
-
-        tmp_dir_use = self.translate_path(self.tmp_dir)
-        out_dir_use = self.translate_path(self.out_dir)
-
-        fpath_inp_lst = list(spc_row.table['fpath_inp'])
-
-        if handle_software == 'converto':
-            frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
-                                              tmp_dir_use,
-                                              converter='converto',
-                                              bin_options=['-cat'])
-        elif handle_software == 'gfzrnx':
-            frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
-                                              tmp_dir_use,
-                                              converter='gfzrnx',
-                                              bin_options=['-f'])
-        else:
-            logger.error("wrong handle_software name: %s", handle_software)
+        if not isinstance(spc_row,SpliceGnss):
+            logger.error("the fpath_inp is not a SpliceGnss object: %s", self.table.loc[irow])
             frnxtmp = None
+        else:
+            spc_row.decompress()
+
+            #### add a test here to be sure that only one epoch is inside
+
+            tmp_dir_use = self.translate_path(self.tmp_dir)
+            out_dir_use = self.translate_path(self.out_dir)
+
+            fpath_inp_lst = list(spc_row.table['fpath_inp'])
+
+            if handle_software == 'converto':
+                frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                                                  tmp_dir_use,
+                                                  converter='converto',
+                                                  bin_options=['-cat'])
+            elif handle_software == 'gfzrnx':
+                frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                                                  tmp_dir_use,
+                                                  converter='gfzrnx',
+                                                  bin_options=['-f'])
+            else:
+                logger.error("wrong handle_software name: %s", handle_software)
+                frnxtmp = None
 
         self.table.loc[irow, 'fpath_out'] = frnxtmp
 
