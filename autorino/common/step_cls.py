@@ -52,6 +52,9 @@ class StepGnss():
         # thus this table_log_path attribute must be initialized as none
         self.table_log_path = None
 
+        self.tmp_rnx_files = []
+        self.tmp_decmp_files = []
+
     def __repr__(self):
         name = type(self).__name__
         out = "{} {}/{}".format(name,
@@ -185,7 +188,7 @@ class StepGnss():
 
         if not site:
             logger.warning('no site dict given, a dummy one will be created')
-            self.site = create_dummy_site_dic()
+            self.site = arocmn.create_dummy_site_dic()
         else:
             self.site = site
 
@@ -199,7 +202,7 @@ class StepGnss():
         if not session:
             logger.warning(
                 'no session dict given, a dummy one will be created')
-            self.session = create_dummy_session_dic()
+            self.session = arocmn.create_dummy_session_dic()
         else:
             self.session = session
 
@@ -237,7 +240,7 @@ class StepGnss():
         NaT (not a time) if nothing is given
         """
         if epoch_range:
-            self.epoch_range = epoch_range
+            self.epoch_range = arocmn.epoch_range_interpret(epoch_range)
         else:
             self.epoch_range = arocmn.EpochRange(pd.NaT,pd.NaT)
 
@@ -552,8 +555,8 @@ class StepGnss():
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = input_list_reader(input_files,
-                                  inp_regex)
+        flist = arocmn.input_list_interpret(input_files,
+                                            inp_regex)
 
         self.table['fpath_inp'] = flist
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
@@ -581,6 +584,12 @@ class StepGnss():
         return None
 
     def guess_local_rnx_files(self):
+        """
+        For a given site name and date in a table, guess the potential local RINEX files
+        and write it as 'fpath_out' value in the table
+        """
+
+        #### to do: split it as a in_row fct
 
         local_paths_list = []
 
@@ -660,6 +669,26 @@ class StepGnss():
 
         return invalid_local_files_list
 
+    def decompress(self, table_col='fpath_inp', table_ok_col='ok_inp'):
+        """
+        decompress the potential compressed files in the ``table_col`` column
+        and its corresponding ``table_ok_col`` boolean column
+        (usually ``fpath_inp`` and ``ok_inp``)
+
+        It will uncompress the file if it is a
+        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file
+        (gzip only for the moment)
+
+        It will create a new column ``fpath_ori`` (for original)
+        to keep the trace of the original file
+        """
+        files_uncmp_list = []
+        for irow, row in self.table.iterrows():
+            file_uncmp = self.on_row_decompress(irow,table_col=table_col,table_ok_col=table_ok_col)
+            files_uncmp_list.append(file_uncmp)
+
+        return files_uncmp_list
+
     def decompress_table_batch(self, table_col='fpath_inp',table_ok_col='ok_inp'):
         """
         decompress the potential compressed files in the ``table_col`` column
@@ -687,7 +716,7 @@ class StepGnss():
         else:
             tmp_dir = self.tmp_dir
         files_out = \
-            self.table.loc[idx_comp, table_col].apply(arocmn.decompress,
+            self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file,
                                                       args=(tmp_dir,))
         self.table.loc[idx_comp, table_col] = files_out
         self.table.loc[idx_comp, 'ok_inp'] = \
@@ -697,25 +726,57 @@ class StepGnss():
 
         return files_out
 
-    def decompress(self, table_col='fpath_inp', table_ok_col='ok_inp'):
-        """
-        decompress the potential compressed files in the ``table_col`` column
-        and its corresponding ``table_ok_col`` boolean column
-        (usually ``fpath_inp`` and ``ok_inp``)
+    def on_row_decompress(self, irow, tmp_dir_unzipped_inp=None,
+                          table_col='fpath_inp', table_ok_col='ok_inp'):
 
-        It will uncompress the file if it is a
-        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file
-        (gzip only for the moment)
+        if not self.table.loc[irow, 'ok_inp']:
+            logger.warning("action on row skipped (input disabled): %s",
+                           self.table.loc[irow, 'fname'])
+            return None
 
-        It will create a new column ``fpath_ori`` (for original)
-        to keep the trace of the original file
-        """
-        files_uncmp_list = []
-        for irow, row in self.table.iterrows():
-            file_uncmp = self.on_row_decompress(irow,table_col=table_col,table_ok_col=table_ok_col)
-            files_uncmp_list.append(file_uncmp)
+        if tmp_dir_unzipped_inp:
+            tmp_dir_unzipped = tmp_dir_unzipped_inp
+        elif hasattr(self, 'tmp_dir_unzipped'):
+            tmp_dir_unzipped = self.tmp_dir_unzipped
+        else:
+            tmp_dir_unzipped = self.tmp_dir
 
-        return files_uncmp_list
+        bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
+        bool_ok = self.table.loc[irow, table_ok_col]
+        bool_wrk = np.logical_and(bool_comp, bool_ok)
+
+        if bool_wrk:
+            if 'fpath_ori' not in self.table.columns:  ## a 'fpath_ori' column must be created first
+                self.table['fpath_ori'] = [np.nan] * len(self.table)
+            self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow, table_col]
+
+            file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
+                                                                      tmp_dir_unzipped)
+
+            self.table.loc[irow, table_col] = file_decomp_out
+            self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
+            self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
+
+            return file_decomp_out
+
+        else:
+            return None
+
+
+    def remove_tmp_files(self):
+        for f in self.tmp_rnx_files:
+            if os.path.isfile(f):
+                logger.debug("remove tmp converted RINEX file: %s", f)
+                os.remove(f)
+                self.tmp_rnx_files.remove(f)
+
+        for f in self.tmp_decmp_files:
+            # we also test if the file is not an original one!
+            is_original = self.table['fpath_ori'].isin([f]).any()
+            if os.path.isfile(f) and not is_original:
+                logger.debug("remove tmp decompress RINEX file: %s", f)
+                os.remove(f)
+                self.tmp_decmp_files.remove(f)
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |
@@ -808,7 +869,7 @@ class StepGnss():
         ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
         nfil_total = sum(bool_out_range)
         # logical inhibition a.\overline{b}
-        nfil_spec = sum(np.logical_and(bool_out_range, self.table['ok_inp']))
+        nfil_spec = sum(nppour.logical_and(bool_out_range, self.table['ok_inp']))
 
         # final replace of ok init
         self.table['ok_inp'] = ok_inp_bool_stk
@@ -828,7 +889,7 @@ class StepGnss():
         returns the filtered raw files in a list
         """
 
-        flist_exclu = input_list_reader(filelist_exclu_inp)
+        flist_exclu = arocmn.input_list_interpret(filelist_exclu_inp)
 
         flist_out = []
         ok_inp_bool_stk = []
@@ -1022,111 +1083,3 @@ class StepGnss():
             raise e
 
         return frnxfin
-
-    def on_row_decompress(self,irow,tmp_dir_unzipped_inp=None,
-                          table_col='fpath_inp', table_ok_col='ok_inp'):
-
-        if not self.table.loc[irow, 'ok_inp']:
-            logger.warning("action on row skipped (input disabled): %s",
-                           self.table.loc[irow, 'fname'])
-            return None
-
-        if tmp_dir_unzipped_inp:
-            tmp_dir_unzipped = tmp_dir_unzipped_inp
-        elif hasattr(self, 'tmp_dir_unzipped'):
-            tmp_dir_unzipped = self.tmp_dir_unzipped
-        else:
-            tmp_dir_unzipped = self.tmp_dir
-
-
-        bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
-        bool_ok = self.table.loc[irow,table_ok_col]
-        bool_wrk = np.logical_and(bool_comp, bool_ok)
-
-        if bool_wrk:
-            if 'fpath_ori' not in self.table.columns: ## a 'fpath_ori' column must be created first 
-                self.table['fpath_ori'] = [np.nan] * len(self.table)
-            self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow,table_col]
-
-            file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
-                                                     tmp_dir_unzipped)
-
-            self.table.loc[irow, table_col] = file_decomp_out
-            self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
-            self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
-        
-            return file_decomp_out
-
-        else:
-            return None
-
-
-#  __  __ _               __                  _   _
-# |  \/  (_)             / _|                | | (_)
-# | \  / |_ ___  ___    | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
-# | |\/| | / __|/ __|   |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
-# | |  | | \__ \ (__ _  | | | |_| | | | | (__| |_| | (_) | | | \__ \
-# |_|  |_|_|___/\___(_) |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
-
-
-def create_dummy_site_dic():
-    d = dict()
-
-    d['name'] = 'XXXX'
-    d['site_id'] = 'XXXX00XXX'
-    d['domes'] = '00000X000'
-    d['sitelog_path'] = '/null'
-    d['position_xyz'] = (6378000, 0, 0)
-
-    return d
-
-
-def create_dummy_session_dic():
-    d = dict()
-
-    d['name'] = 'NA'
-    d['data_frequency'] = "30S"
-    d['tmp_dir_parent'] = '<$HOME>/autorino_workflow_tests/tmp'
-    d['tmp_dir_structure'] = '<site_id9>/%Y/%j'
-    d['log_parent_dir'] = '<$HOME>/autorino_workflow_tests/log'
-    d['log_dir_structure'] = '<site_id9>/%Y/%j'
-    d['out_dir_parent'] = '<$HOME>/autorino_workflow_tests/out'
-    d['out_dir_structure'] = '<site_id9>/%Y/%j'
-
-    return d
-
-
-def input_list_reader(inp_fil, inp_regex=".*"):
-    """
-    Handles mutiples types of input lists (in a general sense)
-    and returns a python list of the input
-
-    inp_fil can be:
-        * a python list (then nothing is done)
-        * a text file path containing a list of files (readed as a python list)
-        * a tuple containing several text files path  (recursive version of the previous point)
-        * a directory path (all the files matching inp_regex are readed)
-    """
-
-    if not inp_fil:
-        flist = []
-    elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
-        flist = list(np.hstack([open(f, "r+").readlines() for f in inp_fil]))
-        flist = [f.strip() for f in flist]
-    elif isinstance(inp_fil, list):
-        flist = inp_fil
-    elif os.path.isfile(inp_fil):
-        flist = open(inp_fil, "r+").readlines()
-        flist = [f.strip() for f in flist]
-    elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil,
-                                     inp_regex,
-                                     case_sensitive=False)
-    else:
-        flist = []
-        logger.warning("the filelist is empty")
-
-    if inp_regex != ".*":
-        flist = [f for f in flist if re.match(inp_regex, f)]
-
-    return flist
