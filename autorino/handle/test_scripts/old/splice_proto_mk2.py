@@ -13,10 +13,6 @@ from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 import hatanaka
 
-
-
-
-
 #p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded/HOUE"
 #p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded2/HOUE"
 p = "/home/sakic/031_SCRATCH_CONV/075_HOUE_week_corr_ON/"  
