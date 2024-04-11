@@ -35,7 +35,7 @@ epo = arocmn.EpochRange(dt.datetime(2023,6,4),
 
 splt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo)
 
-splt.find_rnxs_for_split(hdl_store)
+splt.find_rnxs_for_handle(hdl_store)
 
 handle_software = 'gfzrnx'
 
