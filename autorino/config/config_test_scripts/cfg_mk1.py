@@ -12,8 +12,8 @@ import autorino.common as arocmn
 import pandas as pd
 
 
-pmain = '/home/psakicki/CODES/IPGP/autorino/configfiles/autorino_main_cfg_01a.yml'
-psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/autorino_site_cfg_08a_CFNG.yml'
+pmain = '/home/psakicki/CODES/IPGP/autorino/configfiles/main/autorino_main_cfg_01a.yml'
+psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/sites/autorino_site_cfg_08a_CFNG.yml'
 
 #out = arocfg.read_configfile_sessions_list(psite)
 out = arocfg.read_cfg(psite, main_cfg_path=pmain)
