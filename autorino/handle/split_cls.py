@@ -41,49 +41,13 @@ class SplitGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
-    def find_rnxs_for_split(self, hdl_store):
-
-        self.table['ok_inp'] = False
-
-        for irow, row in self.table.iterrows():
-            epo_srt = np.datetime64(self.table.loc[irow, 'epoch_srt'])
-            epo_end = np.datetime64(self.table.loc[irow, 'epoch_end'])
-
-            epoch_srt_bol = hdl_store.table['epoch_srt'] <= epo_srt
-            epoch_end_bol = hdl_store.table['epoch_end'] >= epo_end
-
-            epoch_bol = epoch_srt_bol & epoch_end_bol
-
-            if epoch_bol.sum() == 0:
-                self.table.loc[irow, 'ok_inp'] = False
-                continue
-            elif epoch_bol.sum() > 1:
-                rnxinp_row = hdl_store.table.loc[epoch_bol].iloc[0]
-            else:
-                rnxinp_row = hdl_store.table.loc[epoch_bol].squeeze()
-
-            self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
-            self.table.loc[irow, 'ok_inp'] = True
-
-        return None
-
-    def split(self, rnxmod_dir_inp=None, handle_software='converto'):
+    def split(self, rnxmod_dir_inp=None, handle_software='converto', rinexmod_kwargs=None):
         if rnxmod_dir_inp:
             rnxmod_dir = rnxmod_dir_inp
         else:
             rnxmod_dir = self.out_dir
 
         for irow, row in self.table.iterrows():
-
-            rinexmod_kwargs = {  # 'marker': 'TOTO',
-                'compression': "gz",
-                'longname': True,
-                # 'sitelog': sitelogs,
-                'force_rnx_load': True,
-                'verbose': False,
-                'tolerant_file_period': True,
-                'full_history': True}
-
             fdecmptmp = self.on_row_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
@@ -104,14 +68,22 @@ class SplitGnss(arocmn.StepGnss):
         return None
 
 
-    def on_row_split(self, irow, out_dir_inp, handle_software='converto'):
+    def on_row_split(self, irow, out_dir_inp, table_col='fpath_inp',
+                     handle_software='converto'):
+
+        """
+        "on row" method
+
+        for each row of the table, split the 'table_col' entry,
+        typically 'fpath_inp' file
+        """
 
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'epoch_srt'])
             return None
 
-        frnx_inp = self.table.loc[irow, 'fpath_inp']
+        frnx_inp = self.table.loc[irow, table_col]
 
         tmp_dir_use = self.translate_path(self.tmp_dir)
         out_dir_use = self.translate_path(self.out_dir)
