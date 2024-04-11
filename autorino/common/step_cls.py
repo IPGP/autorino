@@ -434,7 +434,7 @@ class StepGnss():
             if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
         """
 
-        if not (isinstance(self, SplitGnss) or isinstance(self, SpliceGnss)):
+        if not (self.get_step_type() in ("SplitGnss", "SpliceGnss")):
             logger.warning("find_rnxs_for_handle recommended for SplitGnss or SpliceGnss objects only (%s here)",
                            self.get_step_type())
 
@@ -847,11 +847,24 @@ class StepGnss():
 
         for f in self.tmp_decmp_files:
             # we also test if the file is not an original one!
+
+            if 'fpath_ori' not in self.table.columns:
+                logger.warning("file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s",f)
+                continue
+
             is_original = self.table['fpath_ori'].isin([f]).any()
+
             if os.path.isfile(f) and not is_original:
+                logger.warning("uncompressed file is also an original one, we keep it for security: %s",f)
+                continue
+
+            elif os.path.isfile(f) and not is_original:
                 logger.debug("remove tmp decompress RINEX file: %s", f)
                 os.remove(f)
                 self.tmp_decmp_files.remove(f)
+            else:
+                pass
+
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |
