@@ -12,7 +12,7 @@ Created on Wed Mar  8 18:45:58 2023
 #from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 from geodezyx import utils
-import autorino.convert.converters as cv
+import autorino.convert.conv_cmd_run as cv
 import rinexmod_api
 from pathlib import Path
 import os
