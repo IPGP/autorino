@@ -103,10 +103,10 @@ def decompress_file(file_inp,
 
     if not os.path.isfile(file_inp):
         logger.warning("unable to decompress, file not exists: %s", file_inp2.name)
-        return file_inp
-
+        file_out = file_inp
+        bool_decomp_out = False
     ### RINEX Case
-    if conv.rinex_regex_search_tester(file_inp, compressed=True):
+    elif conv.rinex_regex_search_tester(file_inp, compressed=True):
         file_out = _decomp_hatanaka(file_inp, out_dir_inp, force=force)
         bool_decomp_out = True
     ### Generic gzipped case (e.g. RAW file)
