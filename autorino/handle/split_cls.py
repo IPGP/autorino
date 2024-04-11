@@ -41,7 +41,8 @@ class SplitGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
-    def split(self, rnxmod_dir_inp=None, handle_software='converto', rinexmod_options={}):
+    def split(self, rnxmod_dir_inp=None,
+              handle_software='converto', rinexmod_options={}):
         """
         "total action" method
         """
