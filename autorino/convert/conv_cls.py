@@ -78,7 +78,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.check_local_files()
             self.filter_ok_out()
 
-        self.tmp_decmp_files = self.decompress()
+        self.tmp_decmp_files , _ = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
         # table_init_ok must be used only for the following statistics!
