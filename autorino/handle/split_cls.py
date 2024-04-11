@@ -41,7 +41,10 @@ class SplitGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
-    def split(self, rnxmod_dir_inp=None, handle_software='converto', rinexmod_kwargs=None):
+    def split(self, rnxmod_dir_inp=None, handle_software='converto', rinexmod_options={}):
+        """
+        "total action" method
+        """
         if rnxmod_dir_inp:
             rnxmod_dir = rnxmod_dir_inp
         else:
@@ -51,7 +54,8 @@ class SplitGnss(arocmn.StepGnss):
             fdecmptmp = self.on_row_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
-            frnxtmp = self.on_row_split(irow, self.tmp_dir, handle_software=handle_software)
+            frnxtmp = self.on_row_split(irow, self.tmp_dir,
+                                        handle_software=handle_software)
             if not self.table.loc[irow, 'fpath_out']:
                 logger.error("unable to split %s, skip",
                              self.table.loc[irow])
@@ -59,7 +63,7 @@ class SplitGnss(arocmn.StepGnss):
 
             self.tmp_rnx_files.append(frnxtmp)
 
-            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
+            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_options)
             if rnxmod_dir != self.out_dir:
                 self.on_row_move_final(irow)
 
@@ -70,7 +74,6 @@ class SplitGnss(arocmn.StepGnss):
 
     def on_row_split(self, irow, out_dir_inp, table_col='fpath_inp',
                      handle_software='converto'):
-
         """
         "on row" method
 
