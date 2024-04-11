@@ -144,7 +144,8 @@ class SpliceGnss(arocmn.StepGnss):
             logger.error("the fpath_inp is not a SpliceGnss object: %s", self.table.loc[irow])
             frnx_spliced = None
         else:
-            self.tmp_decmp_files , _ = spc_row.decompress()
+            ### it is not the current object inputs which are decompressed, but the row sub object's ones
+            spc_row.tmp_decmp_files , _ = spc_row.decompress()
 
             #### add a test here to be sure that only one epoch is inside
 
@@ -168,7 +169,8 @@ class SpliceGnss(arocmn.StepGnss):
                 frnx_spliced = None
 
         self.table.loc[irow, 'fpath_out'] = frnx_spliced
-        
-        self.remove_tmp_files()
+
+        ### it is not the current object temps which are removed, but the row sub object's ones
+        spc_row.remove_tmp_files()
 
         return frnx_spliced
