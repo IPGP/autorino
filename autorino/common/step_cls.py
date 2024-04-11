@@ -1097,22 +1097,25 @@ class StepGnss():
                            self.table.loc[irow, 'fname'])
             return None
 
+        rinexmod_kwargs_use = {  # 'marker': 'TOTO',
+            'compression': "gz",
+            'longname': True,
+            # 'sitelog': sitelogs,
+            'force_rnx_load': True,
+            'verbose': False,
+            'tolerant_file_period': True,
+            'full_history': True}
+
         if not rinexmod_kwargs:
-            rinexmod_kwargs = {  # 'marker': 'TOTO',
-                'compression': "gz",
-                'longname': True,
-                # 'sitelog': sitelogs,
-                'force_rnx_load': True,
-                'verbose': False,
-                'tolerant_file_period': True,
-                'full_history': True}
+            rinexmod_kwargs_use.update(rinexmod_kwargs)
+
 
         frnx = self.table.loc[irow, table_col]
 
         try:
             frnxmod = rinexmod.rinexmod_api.rinexmod(frnx,
                                                      out_dir_inp,
-                                                     **rinexmod_kwargs)
+                                                     **rinexmod_kwargs_use)
             ### update table if things go well
             self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, table_col] = frnxmod

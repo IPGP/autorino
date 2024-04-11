@@ -97,7 +97,10 @@ class SpliceGnss(arocmn.StepGnss):
         return spc_main_obj , spc_obj_lis_out
 
 
-    def splice(self,rnxmod_dir_inp=None, handle_software='converto', rinexmod_kwargs=None):
+    def splice(self,rnxmod_dir_inp=None, handle_software='converto', rinexmod_options={}):
+        """
+        "total action" method
+        """
 
         if rnxmod_dir_inp:
             rnxmod_dir = rnxmod_dir_inp
@@ -111,7 +114,7 @@ class SpliceGnss(arocmn.StepGnss):
                              self.table.loc[irow])
                 continue
 
-            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
+            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_options)
             if rnxmod_dir != self.out_dir:
                 self.on_row_move_final(irow)
 

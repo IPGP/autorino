@@ -56,28 +56,21 @@ class ConvertGnss(arocmn.StepGnss):
     ###############################################
 
     def convert(self, print_table=False, force=False,
-                rinexmod_options=None):
-        logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
+                rinexmod_options={}):
+        """
+        "total action" method
+        """
+        logger.info("******** RAW > RINEX files conversion")
 
-        if not rinexmod_options:
-            rinexmod_options = {'compression': "gz",
-                                'longname': True,
-                                'force_rnx_load': True,
-                                'verbose': False,
-                                'tolerant_file_period': True,
-                                'full_history': True}
+        tmp_dir_logs_use, _, _, _ = self.set_tmp_dirs_paths()
 
         if self.sitelogs:
             site4_list = arocnv.site_list_from_sitelogs(self.sitelogs)
         else:
             site4_list = []
 
-        tmp_dir_logs_use, _, _, _ = self.set_tmp_dirs_paths()
-
         ### initialize the table as log
         self.set_table_log(out_dir=tmp_dir_logs_use)
-        ### initialize list for tmp rinexs to be removed
-        frnxtmp_files = []
 
         ### guess and deactivate existing local RINEX files
         if not force:
