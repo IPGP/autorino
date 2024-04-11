@@ -171,14 +171,22 @@ class ConvertGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(self, irow, out_dir_inp, converter_inp):
+    def on_row_convert(self, irow, out_dir_inp, converter_inp,
+                       table_col = 'fpath_inp'):
+
+        """
+        "on row" method
+
+        for each row of the table, convert the 'table_col' entry,
+        typically 'table_col' file
+        """
 
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
             return None
 
-        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, 'fpath_inp'],
+        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, table_col],
                                           out_dir_inp,
                                           converter=converter_inp)
         if frnxtmp:

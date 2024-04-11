@@ -56,7 +56,6 @@ class SpliceGnss(arocmn.StepGnss):
 
         self.table['epoch_rnd'] = epoch_rnd
 
-
         # get the main Handle object which will describe the final spliced RINEXs
         spc_main_obj_epoch_range = arocmn.EpochRange(np.min(epoch_rnd),
                                                      np.max(epoch_rnd),
@@ -80,9 +79,9 @@ class SpliceGnss(arocmn.StepGnss):
         for i_tabgrp, (t_tabgrp, tabgrp) in enumerate(grps):
             spc_obj = self.copy()
 
-            if drop_epoch_rnd:
+            if drop_epoch_rnd: ### remove the temporary epoch_rnd column
                 tabgrp_bis = tabgrp.drop('epoch_rnd', axis=1)
-            else:
+            else: ### keep the temporary epoch_rnd column
                 tabgrp_bis = pd.DataFrame(tabgrp)
 
             spc_obj.table = tabgrp_bis
@@ -98,21 +97,12 @@ class SpliceGnss(arocmn.StepGnss):
         return spc_main_obj , spc_obj_lis_out
 
 
-    def splice(self,rnxmod_dir_inp=None,handle_software='converto'):
+    def splice(self,rnxmod_dir_inp=None, handle_software='converto', rinexmod_kwargs=None):
 
         if rnxmod_dir_inp:
             rnxmod_dir = rnxmod_dir_inp
         else:
             rnxmod_dir = self.out_dir
-
-        rinexmod_kwargs = {  # 'marker': 'TOTO',
-            'compression': "gz",
-            'longname': True,
-            # 'sitelog': sitelogs,
-            'force_rnx_load': True,
-            'verbose': False,
-            'tolerant_file_period': True,
-            'full_history': True}
 
         for irow, row in self.table.iterrows():
             self.on_row_splice(irow,handle_software=handle_software)
@@ -129,7 +119,16 @@ class SpliceGnss(arocmn.StepGnss):
 
         return None
 
-    def on_row_splice(self, irow, handle_software='converto'):
+    def on_row_splice(self, irow, table_col = 'fpath_inp', handle_software='converto'):
+        """
+        "on row" method
+
+        for each row of the table, splice the 'table_col' entry,
+        typically 'fpath_inp' file
+
+        in the splice case, fpath_inp in another SpliceGnss object,
+        containing the RINEXs to splice
+        """
 
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
