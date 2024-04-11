@@ -142,9 +142,9 @@ class SpliceGnss(arocmn.StepGnss):
 
         if not isinstance(spc_row,SpliceGnss):
             logger.error("the fpath_inp is not a SpliceGnss object: %s", self.table.loc[irow])
-            frnxtmp = None
+            frnx_spliced = None
         else:
-            spc_row.decompress()
+            self.tmp_decmp_files , _ = spc_row.decompress()
 
             #### add a test here to be sure that only one epoch is inside
 
@@ -154,19 +154,21 @@ class SpliceGnss(arocmn.StepGnss):
             fpath_inp_lst = list(spc_row.table['fpath_inp'])
 
             if handle_software == 'converto':
-                frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                frnx_spliced, _ = arocnv.converter_run(fpath_inp_lst,
                                                   tmp_dir_use,
                                                   converter='converto',
                                                   bin_options=['-cat'])
             elif handle_software == 'gfzrnx':
-                frnxtmp, _ = arocnv.converter_run(fpath_inp_lst,
+                frnx_spliced, _ = arocnv.converter_run(fpath_inp_lst,
                                                   tmp_dir_use,
                                                   converter='gfzrnx',
                                                   bin_options=['-f'])
             else:
                 logger.error("wrong handle_software name: %s", handle_software)
-                frnxtmp = None
+                frnx_spliced = None
 
-        self.table.loc[irow, 'fpath_out'] = frnxtmp
+        self.table.loc[irow, 'fpath_out'] = frnx_spliced
+        
+        self.remove_tmp_files()
 
-        return frnxtmp
+        return frnx_spliced

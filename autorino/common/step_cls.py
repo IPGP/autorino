@@ -731,13 +731,26 @@ class StepGnss():
 
         It will create a new column ``fpath_ori`` (for original)
         to keep the trace of the original file
-        """
-        files_uncmp_list = []
-        for irow, row in self.table.iterrows():
-            file_uncmp = self.on_row_decompress(irow, table_col=table_col, table_ok_col=table_ok_col)
-            files_uncmp_list.append(file_uncmp)
 
-        return files_uncmp_list
+        Returns
+        -------
+        files_decmp_list
+            the DEcompressed files i.e. the one which are temporary and must be removed
+        files_uncmp_list
+            the UNcompressed files i.e. ALL the usables ones
+
+        """
+        files_decmp_list = [] #### the DEcompressed files i.e. the one which are temporary and must be removed
+        files_uncmp_list = [] #### the UNcompressed files i.e. ALL the usables ones
+
+        for irow, row in self.table.iterrows():
+            file_decmp, bool_decmp = self.on_row_decompress(irow, table_col=table_col, table_ok_col=table_ok_col)
+
+            files_uncmp_list.append(file_decmp) ### all files are stored in this list
+            if bool_decmp:
+                files_decmp_list.append(file_decmp) ### only the DEcompressed files are stored in this list (to be rm later)
+
+        return files_decmp_list, files_uncmp_list
 
     def decompress_table_batch(self, table_col='fpath_inp', table_ok_col='ok_inp'):
         """
@@ -759,22 +772,23 @@ class StepGnss():
         bool_ok = self.table[table_ok_col]
         bool_wrk = np.logical_and(bool_comp, bool_ok)
         idx_comp = self.table.loc[bool_wrk].index
+
         self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp,
         table_col]
         if hasattr(self, 'tmp_dir_unzipped'):
             tmp_dir = self.tmp_dir_unzipped
         else:
             tmp_dir = self.tmp_dir
-        files_out = \
-            self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file,
-                                                      args=(tmp_dir,))
+        files_decmp_list = self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file,
+                                                                     args=(tmp_dir,))
+
         self.table.loc[idx_comp, table_col] = files_out
         self.table.loc[idx_comp, 'ok_inp'] = \
             self.table.loc[idx_comp, table_col].apply(os.path.isfile)
         self.table.loc[idx_comp, 'fname'] = \
             self.table.loc[idx_comp, table_col].apply(os.path.basename)
 
-        return files_out
+        return files_decmp_list
 
     def on_row_decompress(self, irow, tmp_dir_unzipped_inp=None,
                           table_col='fpath_inp', table_ok_col='ok_inp'):
@@ -803,20 +817,22 @@ class StepGnss():
 
         if bool_wrk:
             if 'fpath_ori' not in self.table.columns:  ## a 'fpath_ori' column must be created first
-                self.table['fpath_ori'] = [np.nan] * len(self.table)
+                self.table['fpath_ori'] = [None] * len(self.table)
+
             self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow, table_col]
 
             file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
                                                                       tmp_dir_unzipped)
-
             self.table.loc[irow, table_col] = file_decomp_out
             self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
             self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
 
-            return file_decomp_out
-
         else:
-            return None
+            file_decomp_out = None
+            bool_decomp_out = False
+
+        return file_decomp_out, bool_decomp_out
+
 
     def remove_tmp_files(self):
         """
