@@ -51,17 +51,17 @@ class SplitGnss(arocmn.StepGnss):
             rnxmod_dir = self.out_dir
 
         for irow, row in self.table.iterrows():
-            fdecmptmp = self.on_row_decompress(irow)
+            fdecmptmp , _ = self.on_row_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
-            frnxtmp = self.on_row_split(irow, self.tmp_dir,
+            frnx_splited = self.on_row_split(irow, self.tmp_dir,
                                         handle_software=handle_software)
             if not self.table.loc[irow, 'fpath_out']:
                 logger.error("unable to split %s, skip",
                              self.table.loc[irow])
                 continue
 
-            self.tmp_rnx_files.append(frnxtmp)
+            self.tmp_rnx_files.append(frnx_splited)
 
             self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_options)
             if rnxmod_dir != self.out_dir:
