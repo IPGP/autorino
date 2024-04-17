@@ -197,7 +197,7 @@ class StepGnss():
 
     def _init_options(self, options):
         """
-        if a options dict is not given, create an empty one
+        if an options dict is not given, create an empty one
         """
 
         if not options:
