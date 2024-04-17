@@ -112,7 +112,7 @@ def read_cfg_sessions(y_sessions_dict,
                       epoch_range=None,
                       y_station=None):
     steps_lis_lis = []
-    steps_dic_dic = []
+    steps_dic_dic = {}
 
     for k_ses, y_ses in y_sessions_dict.items():
 
@@ -224,7 +224,7 @@ def read_cfg_sessions(y_sessions_dict,
         steps_lis_lis.append(steps_lis)
         steps_dic_dic[k_ses] = steps_dic
 
-    return steps_lis_lis, steps_dic_lis
+    return steps_lis_lis, steps_dic_dic
 
 
 def _check_parent_dir_existence(parent_dir):
