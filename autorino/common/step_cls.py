@@ -791,7 +791,7 @@ class StepGnss():
 
         return files_decmp_list
 
-    def on_row_decompress(self, irow, tmp_dir_unzipped_inp=None,
+    def on_row_decompress(self, irow, out_dir=None,
                           table_col='fpath_inp', table_ok_col='ok_inp'):
         """
         "on row" method
@@ -805,12 +805,13 @@ class StepGnss():
                            self.table.loc[irow, 'fname'])
             return None
 
-        if tmp_dir_unzipped_inp:
-            tmp_dir_unzipped = tmp_dir_unzipped_inp
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
         elif hasattr(self, 'tmp_dir_unzipped'):
-            tmp_dir_unzipped = self.tmp_dir_unzipped
+            out_dir_use = self.tmp_dir_unzipped
         else:
-            tmp_dir_unzipped = self.tmp_dir
+            out_dir_use = self.tmp_dir
 
         bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
         bool_ok = self.table.loc[irow, table_ok_col]
@@ -823,7 +824,7 @@ class StepGnss():
             self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow, table_col]
 
             file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
-                                                                      tmp_dir_unzipped)
+                                                                      out_dir_use)
             self.table.loc[irow, table_col] = file_decomp_out
             self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
             self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
@@ -1110,8 +1111,9 @@ class StepGnss():
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_rinexmod(self, irow, out_dir_inp, rinexmod_kwargs=None,
-                        table_col='fpath_out'):
+    def on_row_rinexmod(self, irow, out_dir=None,
+                        table_col='fpath_out',
+                        rinexmod_kwargs=None):
         """
         "on row" method
 
@@ -1126,6 +1128,14 @@ class StepGnss():
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
             return None
+
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
+        elif hasattr(self, 'tmp_dir_rinexmoded'):
+            out_dir_use = self.tmp_dir_rinexmoded
+        else:
+            out_dir_use = self.tmp_dir
         
         # default options/arguments for rinexmod
         rinexmod_kwargs_use = {
@@ -1148,7 +1158,7 @@ class StepGnss():
 
         try:
             frnxmod = rinexmod.rinexmod_api.rinexmod(frnx,
-                                                     out_dir_inp,
+                                                     out_dir_use,
                                                      **rinexmod_kwargs_use)
             ### update table if things go well
             self.table.loc[irow, 'ok_out'] = True
@@ -1167,7 +1177,7 @@ class StepGnss():
         return frnxmod
 
     def on_row_move_final(self, irow,
-                          out_dir_inp=None,
+                          out_dir=None,
                           table_col='fpath_out'):
         """
         "on row" method
@@ -1181,13 +1191,15 @@ class StepGnss():
                            self.table.loc[irow, 'fname'])
             return None
 
-        if out_dir_inp:
-            out_dir = out_dir_inp
+
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
         else:
-            out_dir = self.out_dir
+            out_dir_use = self.out_dir
 
         ### def output folders
-        outdir_use = self.translate_path(out_dir,
+        outdir_use = self.translate_path(out_dir_use,
                                          epoch_inp=self.table.loc[irow, 'epoch_srt'])
 
         frnx_to_mv = self.table.loc[irow, table_col]

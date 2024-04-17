@@ -164,7 +164,7 @@ class ConvertGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(self, irow, out_dir_inp, converter_inp,
+    def on_row_convert(self, irow, converter_inp, out_dir = None,
                        table_col = 'fpath_inp'):
 
         """
@@ -179,8 +179,16 @@ class ConvertGnss(arocmn.StepGnss):
                            self.table.loc[irow, 'fname'])
             return None
 
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
+        elif hasattr(self, 'tmp_dir_converted'):
+            out_dir_use = self.tmp_dir_converted
+        else:
+            out_dir_use = self.tmp_dir
+
         frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, table_col],
-                                          out_dir_inp,
+                                          out_dir,
                                           converter=converter_inp)
         if frnxtmp:
             ### update table if things go well

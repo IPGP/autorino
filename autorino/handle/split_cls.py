@@ -44,22 +44,16 @@ class SplitGnss(arocmn.StepGnss):
         ### temp dirs init
         self._init_tmp_dirs_paths()
 
-    def split(self, rnxmod_dir_inp=None,
-              handle_software='converto', rinexmod_options={}):
+    def split(self, handle_software='converto', rinexmod_options={}):
         """
         "total action" method
         """
-        if rnxmod_dir_inp:
-            rnxmod_dir = rnxmod_dir_inp
-        else:
-            rnxmod_dir = self.out_dir
-
         for irow, row in self.table.iterrows():
             fdecmptmp , _ = self.on_row_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
             frnx_splited = self.on_row_split(irow, self.tmp_dir,
-                                        handle_software=handle_software)
+                                             handle_software=handle_software)
             if not self.table.loc[irow, 'fpath_out']:
                 logger.error("unable to split %s, skip",
                              self.table.loc[irow])
@@ -67,8 +61,8 @@ class SplitGnss(arocmn.StepGnss):
 
             self.tmp_rnx_files.append(frnx_splited)
 
-            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_options)
-            if rnxmod_dir != self.out_dir:
+            self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded, rinexmod_options)
+            if self.tmp_dir_rinexmoded != self.out_dir:
                 self.on_row_move_final(irow)
 
         self.remove_tmp_files()
@@ -76,7 +70,7 @@ class SplitGnss(arocmn.StepGnss):
         return None
 
 
-    def on_row_split(self, irow, out_dir_inp, table_col='fpath_inp',
+    def on_row_split(self, irow, out_dir = None, table_col='fpath_inp',
                      handle_software='converto'):
         """
         "on row" method
@@ -90,10 +84,15 @@ class SplitGnss(arocmn.StepGnss):
                            self.table.loc[irow, 'epoch_srt'])
             return None
 
-        frnx_inp = self.table.loc[irow, table_col]
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
+        elif hasattr(self, 'tmp_dir_converted'):
+            out_dir_use = self.tmp_dir_converted
+        else:
+            out_dir_use = self.tmp_dir
 
-        tmp_dir_use = self.translate_path(self.tmp_dir)
-        out_dir_use = self.translate_path(self.out_dir)
+        frnx_inp = self.table.loc[irow, table_col]
 
         if handle_software == 'converto':
             conv_kwoptions = {'-st': self.table.loc[irow, 'epoch_srt'].strftime('%Y%m%d%H%M%S'),
@@ -111,7 +110,7 @@ class SplitGnss(arocmn.StepGnss):
 
         try:
             frnxtmp, _ = arocnv.converter_run(frnx_inp,
-                                              out_dir_inp,
+                                              out_dir_use,
                                               converter=handle_software,
                                               bin_options=conv_options,
                                               bin_kwoptions=conv_kwoptions)
