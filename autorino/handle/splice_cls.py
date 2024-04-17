@@ -100,15 +100,10 @@ class SpliceGnss(arocmn.StepGnss):
         return spc_main_obj , spc_obj_lis_out
 
 
-    def splice(self,rnxmod_dir_inp=None, handle_software='converto', rinexmod_options={}):
+    def splice(self, handle_software='converto', rinexmod_options={}):
         """
         "total action" method
         """
-
-        if rnxmod_dir_inp:
-            rnxmod_dir = rnxmod_dir_inp
-        else:
-            rnxmod_dir = self.out_dir
 
         for irow, row in self.table.iterrows():
             self.on_row_splice(irow,handle_software=handle_software)
@@ -117,15 +112,15 @@ class SpliceGnss(arocmn.StepGnss):
                              self.table.loc[irow])
                 continue
 
-            self.on_row_rinexmod(irow, rnxmod_dir, rinexmod_options)
-            if rnxmod_dir != self.out_dir:
+            self.on_row_rinexmod(irow, rinexmod_options)
+            if self.tmp_dir_rinexmoded != self.out_dir:
                 self.on_row_move_final(irow)
 
         self.remove_tmp_files()
 
         return None
 
-    def on_row_splice(self, irow, table_col = 'fpath_inp', handle_software='converto'):
+    def on_row_splice(self, irow, out_dir = None, table_col = 'fpath_inp', handle_software='converto'):
         """
         "on row" method
 
@@ -140,6 +135,14 @@ class SpliceGnss(arocmn.StepGnss):
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'epoch_srt'])
             return None
+
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
+        elif hasattr(self, 'tmp_dir_converted'):
+            out_dir_use = self.tmp_dir_converted
+        else:
+            out_dir_use = self.tmp_dir
 
         spc_row = self.table.loc[irow, 'fpath_inp']
 
