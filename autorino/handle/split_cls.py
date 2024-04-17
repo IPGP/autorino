@@ -41,6 +41,9 @@ class SplitGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
+        ### temp dirs init
+        self._init_tmp_dirs_paths()
+
     def split(self, rnxmod_dir_inp=None,
               handle_software='converto', rinexmod_options={}):
         """

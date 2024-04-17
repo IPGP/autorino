@@ -290,6 +290,7 @@ class StepGnss():
         effective translation and creation of temp dirs
         """
         #### this translation is also done in _init_tmp_dirs_paths
+        # but we redo it here, simply to be sure
         tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs)
         tmp_dir_unzipped_set = self.translate_path(self._tmp_dir_unzipped)
         tmp_dir_converted_set = self.translate_path(self._tmp_dir_converted)
@@ -1125,18 +1126,22 @@ class StepGnss():
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
             return None
-
-        rinexmod_kwargs_use = {  # 'marker': 'TOTO',
+        
+        # default options/arguments for rinexmod
+        rinexmod_kwargs_use = {
+            # 'marker': 'TOTO',
+            # 'sitelog': sitelogs,
             'compression': "gz",
             'longname': True,
-            # 'sitelog': sitelogs,
             'force_rnx_load': True,
             'verbose': False,
-            'tolerant_file_period': True,
+            'tolerant_file_period': False,
             'full_history': True}
 
-        if not rinexmod_kwargs:
+        # update options/arguments for rinexmod with inputs
+        if rinexmod_kwargs:
             rinexmod_kwargs_use.update(rinexmod_kwargs)
+            logger.debug("options used for rinexmod: %s",rinexmod_kwargs_use)
 
 
         frnx = self.table.loc[irow, table_col]

@@ -41,6 +41,9 @@ class SpliceGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
+        ### temp dirs init
+        self._init_tmp_dirs_paths()
+
     def divide_by_epochs(self,
                          period='1d',
                          rolling_period=False,

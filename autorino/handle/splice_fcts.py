@@ -7,17 +7,18 @@ import autorino.handle as arohdl
 import os
 
 def splice_rnx(rnxs_inp,
-               tmp_dir,out_dir,
+               tmp_dir,out_dir,log_dir=None,
                handle_software='converto',
                period='1d',
                rolling_period=False,
                rolling_ref=-1,
                round_method='floor',
-               drop_epoch_rnd=False):
+               drop_epoch_rnd=False,
+               rinexmod_options=dict()):
 
     ### define other dirs
-    rnxmod_dir = os.path.join(tmp_dir,'rinexmoded')
-    log_dir = tmp_dir
+    if not log_dir:
+        log_dir = tmp_dir
 
     #### define spc_inp: the Splice object which will store all the input RINEXs
     spc_inp = arohdl.SpliceGnss(out_dir, tmp_dir, log_dir)
@@ -31,6 +32,7 @@ def splice_rnx(rnxs_inp,
                                                           round_method=round_method,
                                                           drop_epoch_rnd=drop_epoch_rnd)
 
-    spc_main_obj.splice()
+    spc_main_obj.splice(handle_software=handle_software,
+                        rinexmod_options=rinexmod_options)
 
     return spc_main_obj

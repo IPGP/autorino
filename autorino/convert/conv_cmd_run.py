@@ -340,16 +340,20 @@ def converter_run(inp_raw_fpath: Union[Path,str,List[Path],List[str]],
         raw_fpath_multi = [Path(inp_raw_fpath)]
         raw_fpath_mono = Path(inp_raw_fpath)
         raw_fpath = raw_fpath_mono
-           
 
     #### Check if input file exists
     for f in raw_fpath_multi:
-        logger.info("input file: %s", f)
+        logger.debug("input file: %s", f)
         if not f.is_file():
             logger.error("input file not found: %s", f)
             raise FileNotFoundError
-    
-    
+
+    if len(raw_fpath_multi) < 2:
+        logger.info("input file for conversion: %s", raw_fpath_mono)
+    else:
+        logger.info("%i input file for conversion", len(raw_fpath_multi))
+
+
     # _converter_select can manage both a single file of a list*
     # then could handle both raw_fpath_mono or raw_fpath_multi
     # thus alias variable raw_fpath will work in both cases
