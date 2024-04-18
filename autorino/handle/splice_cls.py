@@ -105,16 +105,23 @@ class SpliceGnss(arocmn.StepGnss):
         "total action" method
         """
 
+        self.set_tmp_dirs_paths()
+
         for irow, row in self.table.iterrows():
-            self.on_row_splice(irow,handle_software=handle_software)
+            self.on_row_splice(irow,
+                               self.tmp_dir_converted,
+                               handle_software=handle_software)
             if not self.table.loc[irow, 'fpath_out']:
                 logger.error("unable to splice %s, skip",
                              self.table.loc[irow])
                 continue
 
-            self.on_row_rinexmod(irow, rinexmod_options)
+            self.on_row_rinexmod(irow,
+                                 self.tmp_dir_rinexmoded,
+                                 rinexmod_kwargs=rinexmod_options)
             if self.tmp_dir_rinexmoded != self.out_dir:
-                self.on_row_move_final(irow)
+                self.on_row_move_final(irow,
+                                       self.out_dir)
 
         self.remove_tmp_files()
 

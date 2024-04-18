@@ -34,6 +34,8 @@ class DownloadGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
+        self._init_tmp_dirs_paths()
+
         self.access = access
         self.remote_dir = remote_dir
         self.remote_fname = remote_fname
@@ -184,6 +186,8 @@ class DownloadGnss(arocmn.StepGnss):
         """
         download_files_list = []
 
+
+
         for irow, row in self.table.iterrows():
 
             epoch = row['epoch_srt']
@@ -205,17 +209,11 @@ class DownloadGnss(arocmn.StepGnss):
             else:  #### the local file has been guessed before
                 outdir_use = os.path.dirname(local_file)
 
-            ########### FOLCREBAD !!!!!
-
-            tmpdir_use = os.path.join(self.tmp_dir, 'downloaded')
+            tmpdir_use = self.tmp_dir_downloaded
 
             ###### create the directory if it does not exists
             if not os.path.exists(outdir_use):
                 os.makedirs(outdir_use)
-            if not os.path.exists(tmpdir_use):
-                os.makedirs(tmpdir_use)
-
-            ########### FOLCREBAD !!!!!
 
             ###### download the file
             if not self.access['protocol'] in ("ftp", "http"):
