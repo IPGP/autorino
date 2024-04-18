@@ -46,12 +46,7 @@ class ConvertGnss(arocmn.StepGnss):
         self._init_tmp_dirs_paths()
 
         ### sitelog init
-        if sitelogs:
-            sitelogs_set = self.translate_path(sitelogs)
-            self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_set,
-                                                              force=False)
-        else:
-            self.sitelogs = None
+        self._init_sitelogs(sitelogs)
 
     ###############################################
 

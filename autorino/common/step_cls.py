@@ -309,6 +309,14 @@ class StepGnss():
             tmp_dir_converted_set, tmp_dir_rinexmoded_set, \
             tmp_dir_downloaded_set
 
+    def _init_sitelogs(self,sitelogs):
+        if sitelogs:
+            sitelogs_set = self.translate_path(sitelogs)
+            self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_set,
+                                                              force=False)
+        else:
+            self.sitelogs = None
+
     #   _____                           _                  _   _               _
     #  / ____|                         | |                | | | |             | |
     # | |  __  ___ _ __   ___ _ __ __ _| |  _ __ ___   ___| |_| |__   ___   __| |___
