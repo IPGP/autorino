@@ -62,7 +62,8 @@ class ConvertGnss(arocmn.StepGnss):
         """
         logger.info("******** RAW > RINEX files conversion")
 
-        tmp_dir_logs_use, _, _, _ = self.set_tmp_dirs_paths()
+        self.set_tmp_dirs_paths()
+        ### other tmps subdirs come also later in the loop
 
         if self.sitelogs:
             site4_list = arocnv.site_list_from_sitelogs(self.sitelogs)
@@ -70,7 +71,7 @@ class ConvertGnss(arocmn.StepGnss):
             site4_list = []
 
         ### initialize the table as log
-        self.set_table_log(out_dir=tmp_dir_logs_use)
+        self.set_table_log(out_dir=self.tmp_dir_logs)
 
         ### guess and deactivate existing local RINEX files
         if not force:
@@ -107,7 +108,7 @@ class ConvertGnss(arocmn.StepGnss):
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
-            _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_tmp_dirs_paths()
+            #_ = self.set_tmp_dirs_paths()
 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the sitelogs
@@ -131,7 +132,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             ###### CONVERSION
-            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use,
+            frnxtmp = self.on_row_convert(irow, self.tmp_dir_converted,
                                           converter_inp=conve)
             self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
@@ -142,7 +143,8 @@ class ConvertGnss(arocmn.StepGnss):
             rinexmod_kwargs.update({'marker':site,
                                     'sitelog':self.sitelogs})
 
-            self.on_row_rinexmod(irow, tmp_dir_rinexmoded_use, rinexmod_kwargs)
+            self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
+                                 rinexmod_kwargs)
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################

@@ -258,7 +258,8 @@ class StepGnss():
                              tmp_subdir_logs='logs',
                              tmp_subdir_unzip='unzipped',
                              tmp_subdir_conv='converted',
-                             tmp_subdir_rnxmod='rinexmoded'):
+                             tmp_subdir_rnxmod='rinexmoded',
+                             tmp_subdir_dwnld='downloaded'):
         """
         initialize temp dirs, but keeps their generic form, with <...> and %X,
         and without creating them
@@ -276,12 +277,14 @@ class StepGnss():
                                                tmp_subdir_conv)
         self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir,
                                                 tmp_subdir_rnxmod)
-
+        self._tmp_dir_downloaded = os.path.join(self.tmp_dir,
+                                                tmp_subdir_dwnld)
         ### translation
         self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
         self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
         self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
         self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
+        self.tmp_dir_downloaded = self.translate_path(self._tmp_dir_downloaded)
 
         return None
 
@@ -291,18 +294,20 @@ class StepGnss():
         """
         #### this translation is also done in _init_tmp_dirs_paths
         # but we redo it here, simply to be sure
-        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs)
-        tmp_dir_unzipped_set = self.translate_path(self._tmp_dir_unzipped)
-        tmp_dir_converted_set = self.translate_path(self._tmp_dir_converted)
-        tmp_dir_rinexmoded_set = self.translate_path(self._tmp_dir_rinexmoded)
-
-        utils.create_dir(tmp_dir_logs_set)
-        utils.create_dir(tmp_dir_unzipped_set)
-        utils.create_dir(tmp_dir_converted_set)
-        utils.create_dir(tmp_dir_rinexmoded_set)
+        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs,
+                                               make_dir=True)
+        tmp_dir_unzipped_set = self.translate_path(self._tmp_dir_unzipped,
+                                                   make_dir=True)
+        tmp_dir_converted_set = self.translate_path(self._tmp_dir_converted,
+                                                    make_dir=True)
+        tmp_dir_rinexmoded_set = self.translate_path(self._tmp_dir_rinexmoded,
+                                                     make_dir=True)
+        tmp_dir_downloaded_set = self.translate_path(self._tmp_dir_rinexmoded,
+                                                     make_dir=True)
 
         return tmp_dir_logs_set, tmp_dir_unzipped_set, \
-            tmp_dir_converted_set, tmp_dir_rinexmoded_set
+            tmp_dir_converted_set, tmp_dir_rinexmoded_set, \
+            tmp_dir_downloaded_set
 
     #   _____                           _                  _   _               _
     #  / ____|                         | |                | | | |             | |
@@ -674,10 +679,10 @@ class StepGnss():
                 format_compression='crx.gz',
                 preset_type=None)
 
-            local_path_use = os.path.join(local_dir_use,
+            local_path_use0 = os.path.join(local_dir_use,
                                           local_fname_use)
 
-            local_path_use = self.translate_path(local_path_use,
+            local_path_use = self.translate_path(local_path_use0,
                                                  epoch)
 
             local_fname_use = os.path.basename(local_path_use)
