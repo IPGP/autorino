@@ -413,8 +413,18 @@ class StepGnss():
 
         logger.info("new %s", self.epoch_range)
 
-    def translate_path(self, path_inp, epoch_inp=None):
-        return arocmn.translator(path_inp, self.translate_dict, epoch_inp)
+    def translate_path(self, path_inp, epoch_inp=None, make_dir=False):
+        """
+        able to create a directory corresponding to the translated path
+        if make_dir = True
+        warning: it creates the directory as it is! (no dirname extraction)
+        if the translated path is a full path with a filename, 
+        you will get nasty results !!
+        """
+        trslt_dir = arocmn.translator(path_inp, self.translate_dict, epoch_inp)
+        if make_dir:
+            utils.create_dir(trslt_dir)
+        return trslt_dir
 
     def find_rnxs_for_handle(self, step_obj_store,
                              mode='split'):
