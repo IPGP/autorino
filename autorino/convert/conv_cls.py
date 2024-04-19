@@ -33,17 +33,15 @@ class ConvertGnss(arocmn.StepGnss):
                  epoch_range=None,
                  site=None,
                  session=None,
-                 sitelogs=None,
-                 options=None):
+                 options=None,
+                 sitelogs=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
                          site=site,
                          session=session,
-                         options=options)
-
-        ### sitelog init
-        self._init_sitelogs(sitelogs)
+                         options=options,
+                         sitelogs=sitelogs)
 
     ###############################################
 
