@@ -48,6 +48,9 @@ class StepGnss():
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
 
+        ### temp dirs init
+        self._init_tmp_dirs_paths()
+
         # generic log
         self.set_logfile()
         # table log is on request only (for the moment9)
