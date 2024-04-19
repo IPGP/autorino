@@ -139,7 +139,7 @@ class ConvertGnss(arocmn.StepGnss):
                                     'sitelog':self.sitelogs})
 
             self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
-                                 rinexmod_kwargs)
+                                 rinexmod_kwargs=rinexmod_kwargs)
             ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
@@ -161,7 +161,7 @@ class ConvertGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(self, irow, converter_inp, out_dir = None,
+    def on_row_convert(self, irow, out_dir = None, converter_inp='auto', 
                        table_col = 'fpath_inp'):
 
         """
