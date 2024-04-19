@@ -35,7 +35,7 @@ class StepGnss():
                  site=None,
                  session=None,
                  options=None,
-                 sitelogs=None):
+                 metadata=None):
 
         self._init_epoch_range(epoch_range)
         self._init_site(site)
@@ -45,7 +45,7 @@ class StepGnss():
         self._init_table()
 
         ### sitelog init
-        self._init_sitelogs(sitelogs)
+        self._init_sitelogs(metadata)
 
         self.translate_dict = self._set_translate_dict()
         self.out_dir = out_dir
@@ -1172,7 +1172,7 @@ class StepGnss():
         # default options/arguments for rinexmod
         rinexmod_kwargs_use = {
             # 'marker': 'TOTO',
-            # 'sitelog': sitelogs,
+            # 'sitelog': metadata,
             'compression': "gz",
             'longname': True,
             'force_rnx_load': True,

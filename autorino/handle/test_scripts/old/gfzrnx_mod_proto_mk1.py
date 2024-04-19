@@ -90,5 +90,5 @@ for (site,day),df in DFgrp:
 
  
  ##### then RINEXMOD command
- # rinexmod --sitelog /work/sitelogs/SITELOGS -t -c 'gz' -r '/home/sakic/031_SCRATCH_CONV/075_HOUE_week_corr_ON/gfzrnxed_clean' -m "HOUZ"  ./old_houe_01a.list ./rerinexmoded
+ # rinexmod --sitelog /work/metadata/SITELOGS -t -c 'gz' -r '/home/sakic/031_SCRATCH_CONV/075_HOUE_week_corr_ON/gfzrnxed_clean' -m "HOUZ"  ./old_houe_01a.list ./rerinexmoded
 

@@ -34,14 +34,14 @@ class SplitGnss(arocmn.StepGnss):
                  site=None,
                  session=None,
                  options=None,
-                 sitelogs=None):
+                 metadata=None):
         
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
                          site=site,
                          session=session,
                          options=options,
-                         sitelogs=sitelogs)
+                         metadata=metadata)
 
     def split(self, handle_software='converto', rinexmod_options={}):
         """
