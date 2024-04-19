@@ -34,7 +34,8 @@ class StepGnss():
                  epoch_range=None,
                  site=None,
                  session=None,
-                 options=None):
+                 options=None,
+                 sitelogs=None):
 
         self._init_epoch_range(epoch_range)
         self._init_site(site)
@@ -42,6 +43,9 @@ class StepGnss():
         self._init_options(options)
         self._init_site_id()
         self._init_table()
+
+        ### sitelog init
+        self._init_sitelogs(sitelogs)
 
         self.translate_dict = self._set_translate_dict()
         self.out_dir = out_dir

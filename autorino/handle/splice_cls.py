@@ -33,13 +33,15 @@ class SpliceGnss(arocmn.StepGnss):
                  epoch_range=None,
                  site=None,
                  session=None,
-                 options=None):
+                 options=None,
+                 sitelogs=sitelogs):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
                          site=site,
                          session=session,
-                         options=options)
+                         options=options,
+                         sitelogs=sitelogs)
 
     def divide_by_epochs(self,
                          period='1d',
