@@ -174,7 +174,7 @@ def read_cfg_sessions(y_sessions_dict,
 
             # appended in lis and dic at the end of the tests
 
-            elif k_stp == 'conversion':
+            elif k_stp == 'convert':
                 if not _is_cfg_bloc_active(y_stp):
                     continue
 
@@ -190,7 +190,7 @@ def read_cfg_sessions(y_sessions_dict,
                                epoch_range=epo_obj_stp,
                                site=y_station['site'],
                                session=y_ses['general'],
-                               sitelogs=sitelogs,
+                               metadata=sitelogs,
                                options=y_stp['options'])
 
             elif k_stp == 'split':
@@ -209,7 +209,7 @@ def read_cfg_sessions(y_sessions_dict,
                                epoch_range=epo_obj_stp,
                                site=y_station['site'],
                                session=y_ses['general'],
-                               sitelogs=sitelogs,
+                               metadata=sitelogs,
                                options=y_stp['options'])
 
                 # appended in lis and dic at the end of the k_stp tests
