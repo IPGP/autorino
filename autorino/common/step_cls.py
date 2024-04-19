@@ -45,7 +45,7 @@ class StepGnss():
         self._init_table()
 
         ### sitelog init
-        self._init_sitelogs(metadata)
+        self._init_metadata(metadata)
 
         self.translate_dict = self._set_translate_dict()
         self.out_dir = out_dir
@@ -318,7 +318,7 @@ class StepGnss():
             tmp_dir_converted_set, tmp_dir_rinexmoded_set, \
             tmp_dir_downloaded_set
 
-    def _init_sitelogs(self,sitelogs):
+    def _init_metadata(self, sitelogs):
         if sitelogs:
             sitelogs_set = self.translate_path(sitelogs)
             self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_set,
