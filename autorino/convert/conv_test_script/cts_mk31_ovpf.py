@@ -32,10 +32,10 @@ maxyear = 2024
 nyear = 5
 
 
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 
-CONV = arcv.ConvertGnss(pout,pout,pout,
-                        sitelogs=psitelogs)
+CONV = arcv.ConvertGnss(pout, pout, pout,
+                        metadata=psitelogs)
 
 
 

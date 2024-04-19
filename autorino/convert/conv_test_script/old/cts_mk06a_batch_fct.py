@@ -119,7 +119,7 @@ def converter_batch(input_files,
     
 
     ###############################################
-    ### read sitelogs        
+    ### read metadata
     if os.path.isdir(sitelogs_inp):
         sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
                                                      force=False)
@@ -237,7 +237,7 @@ minyear = 2019
 
 #### OUT DIRECTORY
 outdir = "/scratch/convgnss/040_big_conv_PF/"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 keywords_path_excl=['Problem','Rinex','ZIP',"MAIG"]
     
 ######################### OVSG
@@ -259,7 +259,7 @@ if True:
 
 #### OUT DIRECTORY
 outdir = "/scratch/convgnss/090_compar_IPGPTeria_GP/"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 keywords_path_excl=['Problem','Rinex','ZIP',"MAIG"]
 
 ##################################################################

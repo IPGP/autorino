@@ -27,14 +27,14 @@ class DownloadGnss(arocmn.StepGnss):
                  site=None,
                  session=None,
                  options=None,
-                 sitelogs=None):
+                 metadata=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range,
                          site=site,
                          session=session,
                          options=options,
-                         sitelogs=sitelogs)
+                         metadata=metadata)
 
         self.access = access
         self.remote_dir = remote_dir

@@ -30,7 +30,7 @@ logger.setLevel("INFO")
 
 def site_list_from_sitelogs(sitelogs_inp):
     """
-    From a list of sitelogs, get a site id list (4 chars)
+    From a list of metadata, get a site id list (4 chars)
     """
     ###############################################
     ### read sitelogs

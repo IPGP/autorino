@@ -1,6 +1,6 @@
 station:
     site:
-        sitelog_path: <$HOME>/sitelogs/OVPF/  ###  can be a specific file or a directory path containing the sitelogs
+        sitelog_path: <$HOME>/metadata/OVPF/  ###  can be a specific file or a directory path containing the sitelogs
     sessions:
         session_15m01s: ####Keep session in dictionnary / Object not necessary
             general:
