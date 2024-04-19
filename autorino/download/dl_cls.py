@@ -34,8 +34,6 @@ class DownloadGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
-        self._init_tmp_dirs_paths()
-
         self.access = access
         self.remote_dir = remote_dir
         self.remote_fname = remote_fname

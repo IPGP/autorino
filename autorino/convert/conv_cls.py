@@ -42,9 +42,6 @@ class ConvertGnss(arocmn.StepGnss):
                          session=session,
                          options=options)
 
-        ### temp dirs init
-        self._init_tmp_dirs_paths()
-
         ### sitelog init
         self._init_sitelogs(sitelogs)
 
