@@ -35,7 +35,7 @@ if True:
 
 #### OUT DIRECTORY
 outdir = "/scratch/convgnss/090_compar_IPGPTeria_GP/"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 keywords_path_excl=['Problem','Rinex','ZIP']
 
 ##################################################################

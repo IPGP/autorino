@@ -35,7 +35,7 @@ Y1 = yaml.safe_load(open(pconfig))
 #EPOC = REQ.epoch_range
 
 pout = "/home/sakic/090_TEMP/convcls_test"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 
 SES = arogen.create_dummy_session()
 EPOC = arogen.create_dummy_epochrange()

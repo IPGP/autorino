@@ -48,7 +48,7 @@ for irow,row in hdl_split.table.iterrows():
     rinexmod_kwargs = {#'marker': 'TOTO',
                        'compression': "gz",
                        'longname': True,
-                       #'sitelog': sitelogs,
+                       #'sitelog': metadata,
                        'force_rnx_load': True,
                        'verbose': False,
                        'tolerant_file_period': True,
