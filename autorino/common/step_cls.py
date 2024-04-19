@@ -22,6 +22,8 @@ from geodezyx import utils, conv, operational
 import autorino.common as arocmn
 import autorino.config as arocfg
 
+from rinexmod import rinexmod_api
+
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
