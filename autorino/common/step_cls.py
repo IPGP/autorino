@@ -1202,9 +1202,11 @@ class StepGnss():
             self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, table_col] = frnxmod
             self.table.loc[irow, 'size_out'] = os.path.getsize(frnxmod)
-            epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxmod)
-            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
-            self.table.loc[irow, 'epoch_end'] = epo_end_ok
+            if not self.table.loc[irow, 'epoch_srt'] or not self.table.loc[irow, 'epoch_end']:
+                epo_srt_ok, epo_end_ok = rinexmod.rinexfile.dates_from_rinex_filename(frnxmod)
+                self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
+                self.table.loc[irow, 'epoch_end'] = epo_end_ok
+
             self.write_in_table_log(self.table.loc[irow])
         else:
             ### update table if things go wrong

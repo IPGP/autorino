@@ -63,7 +63,8 @@ class SplitGnss(arocmn.StepGnss):
 
             self.tmp_rnx_files.append(frnx_splited)
 
-            self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded, rinexmod_options)
+            self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded, rinexmod_kwargs=rinexmod_options)
+
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.on_row_move_final(irow)
 
