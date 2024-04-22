@@ -697,7 +697,7 @@ class StepGnss():
                 preset_type=None)
 
             local_path_use0 = os.path.join(local_dir_use,
-                                          local_fname_use)
+                                           local_fname_use)
 
             local_path_use = self.translate_path(local_path_use0,
                                                  epoch)
@@ -773,15 +773,16 @@ class StepGnss():
             the UNcompressed files i.e. ALL the usables ones
 
         """
-        files_decmp_list = [] #### the DEcompressed files i.e. the one which are temporary and must be removed
-        files_uncmp_list = [] #### the UNcompressed files i.e. ALL the usables ones
+        files_decmp_list = []  #### the DEcompressed files i.e. the one which are temporary and must be removed
+        files_uncmp_list = []  #### the UNcompressed files i.e. ALL the usables ones
 
         for irow, row in self.table.iterrows():
             file_decmp, bool_decmp = self.on_row_decompress(irow, table_col=table_col, table_ok_col=table_ok_col)
 
-            files_uncmp_list.append(file_decmp) ### all files are stored in this list
+            files_uncmp_list.append(file_decmp)  ### all files are stored in this list
             if bool_decmp:
-                files_decmp_list.append(file_decmp) ### only the DEcompressed files are stored in this list (to be rm later)
+                files_decmp_list.append(
+                    file_decmp)  ### only the DEcompressed files are stored in this list (to be rm later)
 
         return files_decmp_list, files_uncmp_list
 
@@ -867,7 +868,6 @@ class StepGnss():
 
         return file_decomp_out, bool_decomp_out
 
-
     def remove_tmp_files(self):
         """
         will remove the temporary files which have been stored in the two lists
@@ -883,13 +883,14 @@ class StepGnss():
             # we also test if the file is not an original one!
 
             if 'fpath_ori' not in self.table.columns:
-                logger.warning("file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s",f)
+                logger.warning(
+                    "file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s", f)
                 continue
 
             is_original = self.table['fpath_ori'].isin([f]).any()
 
             if os.path.isfile(f) and not is_original:
-                logger.warning("uncompressed file is also an original one, we keep it for security: %s",f)
+                logger.warning("uncompressed file is also an original one, we keep it for security: %s", f)
                 continue
 
             elif os.path.isfile(f) and not is_original:
@@ -898,7 +899,6 @@ class StepGnss():
                 self.tmp_decmp_files.remove(f)
             else:
                 pass
-
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |
@@ -1168,7 +1168,7 @@ class StepGnss():
             out_dir_use = self.tmp_dir_rinexmoded
         else:
             out_dir_use = self.tmp_dir
-        
+
         # default options/arguments for rinexmod
         rinexmod_kwargs_use = {
             # 'marker': 'TOTO',
@@ -1183,8 +1183,7 @@ class StepGnss():
         # update options/arguments for rinexmod with inputs
         if rinexmod_kwargs:
             rinexmod_kwargs_use.update(rinexmod_kwargs)
-            logger.debug("options used for rinexmod: %s",rinexmod_kwargs_use)
-
+            logger.debug("options used for rinexmod: %s", rinexmod_kwargs_use)
 
         frnx = self.table.loc[irow, table_col]
 
@@ -1192,19 +1191,26 @@ class StepGnss():
             frnxmod = rinexmod.rinexmod_api.rinexmod(frnx,
                                                      out_dir_use,
                                                      **rinexmod_kwargs_use)
+        except Exception as e:
+            logger.error("something went wrong for %s",
+                         frnx)
+            logger.error("Exception raised: %s", e)
+            frnxmod = None
+
+        if frnxmod:
             ### update table if things go well
             self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, table_col] = frnxmod
             self.table.loc[irow, 'size_out'] = os.path.getsize(frnxmod)
+            epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxmod)
+            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
+            self.table.loc[irow, 'epoch_end'] = epo_end_ok
             self.write_in_table_log(self.table.loc[irow])
-
-        except Exception as e:
+        else:
             ### update table if things go wrong
-            logger.error(e)
             self.table.loc[irow, 'ok_out'] = False
             self.write_in_table_log(self.table.loc[irow])
-            frnxmod = None
-            raise e
+            #raise e
 
         return frnxmod
 
@@ -1223,7 +1229,6 @@ class StepGnss():
                            self.table.loc[irow, 'fname'])
             return None
 
-
         # definition of the output directory (after the action)
         if out_dir:
             out_dir_use = out_dir
@@ -1240,14 +1245,21 @@ class StepGnss():
             ### do the move
             utils.create_dir(outdir_use)
             frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
+        except Exception as e:
+            logger.error("something went wrong for %s",
+                         frnx)
+            logger.error("Exception raised: %s", e)
+            frnxfin = None
+
+        if frnxfin:
+            ### update table if things go well
             self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, table_col] = frnxfin
             self.table.loc[irow, 'size_out'] = os.path.getsize(frnxfin)
-        except Exception as e:
-            logger.error(e)
+        else:
+            ### update table if things go wrong
             self.table.loc[irow, 'ok_out'] = False
             self.write_in_table_log(self.table.loc[irow])
-            frnxfin = None
-            raise e
+            #raise e
 
         return frnxfin

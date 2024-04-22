@@ -105,9 +105,8 @@ class SplitGnss(arocmn.StepGnss):
             conv_kwoptions = {'-epo_beg': self.table.loc[irow, 'epoch_srt'].strftime('%Y%m%d_%H%M%S'),
                               '-d': duration}
             conv_options = ['-f']
-
         else:
-            logger.error('wrong handle_software value: %s', handle_software)
+            logger.critical('wrong handle_software value: %s', handle_software)
             raise ValueError
 
         try:
@@ -116,14 +115,17 @@ class SplitGnss(arocmn.StepGnss):
                                               converter=handle_software,
                                               bin_options=conv_options,
                                               bin_kwoptions=conv_kwoptions)
-
-            self.table.loc[irow, 'fpath_out'] = frnxtmp
-            self.table.loc[irow, 'ok_out'] = True
         except Exception as e:
-            logger.error(e)
-            self.table.loc[irow, 'ok_out'] = False
-            self.write_in_table_log(self.table.loc[irow])
+            logger.error("something went wrong for %s",
+                         frnx_inp)
+            logger.error("Exception raised: %s", e)
             frnxtmp = None
-            raise e
+
+        if frnxtmp:
+            self.table.loc[irow, 'ok_out'] = True
+            self.table.loc[irow, 'fpath_out'] = frnxtmp
+        else:
+            self.table.loc[irow, 'ok_out'] = False
+            #raise e
 
         return frnxtmp

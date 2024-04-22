@@ -125,7 +125,6 @@ class ConvertGnss(arocmn.StepGnss):
             frnxtmp = self.on_row_convert(irow, self.tmp_dir_converted,
                                           converter_inp=conve)
             self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
             ###### RINEXMOD
@@ -135,15 +134,12 @@ class ConvertGnss(arocmn.StepGnss):
 
             self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
                                  rinexmod_kwargs=rinexmod_kwargs)
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
             ###### FINAL MOVE
             self.on_row_move_final(irow)
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
         #### remove temporary files
-
         self.remove_tmp_files()
 
         return None
@@ -179,16 +175,23 @@ class ConvertGnss(arocmn.StepGnss):
         else:
             out_dir_use = self.tmp_dir
 
-        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, table_col],
-                                          out_dir,
-                                          converter=converter_inp)
+        try:
+            frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, table_col],
+                                              out_dir,
+                                              converter=converter_inp)
+        except Exception as e:
+            logger.error("something went wrong for %s",
+                         self.table.loc[irow, table_col])
+            logger.error("Exception raised: %s",e)
+            frnxtmp = None
+
         if frnxtmp:
             ### update table if things go well
+            self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, 'fpath_out'] = frnxtmp
             epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
             self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
             self.table.loc[irow, 'epoch_end'] = epo_end_ok
-            self.table.loc[irow, 'ok_out'] = True
         else:
             ### update table if things go wrong
             self.table.loc[irow, 'ok_out'] = False
