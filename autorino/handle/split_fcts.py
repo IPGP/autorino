@@ -7,7 +7,8 @@ import autorino.handle as arohdl
 import os
 
 def split_rnx(rnxs_inp,epo_inp,tmp_dir,out_dir,log_dir,
-              handle_software='converto'):
+              handle_software='converto',
+              rinexmod_options=None):
 
     ### define other dirs
     if not log_dir:
