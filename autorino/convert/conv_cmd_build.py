@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 14 12:05:28 2023
+Created on Tue Mar 14 12:05:28 2023cd
 
 @author: psakic
 
@@ -30,6 +30,14 @@ from pathlib import Path
 #from pathlib3x import Path
 from geodezyx import utils
 
+
+import autorino.config.env_read as aroenv
+
+
+#### IMPORT AUTORINO ENVIRONNEMENT VARABLES
+## software paths
+aro_env = aroenv.read_env()
+aro_env_soft = aro_env["conv_software_paths"]
 
 def _kw_options_dict2str(kw_options):
     """
@@ -125,7 +133,7 @@ def cmd_build_trm2rinex(inp_raw_fpath,
                         out_dir,
                         bin_options_custom=[],
                         bin_kwoptions_custom=dict(),
-                        bin_path="trm2rinex:cli-light"):
+                        bin_path=aro_env_soft["trimble"]):
     """
     Build a command to launch trm2rinex, the Trimble converter
     
@@ -197,7 +205,7 @@ def cmd_build_mdb2rinex(inp_raw_fpath,
                         out_dir,
                         bin_options_custom=[],
                         bin_kwoptions_custom=dict(),
-                        bin_path="mdb2rinex"):
+                        bin_path=aro_env_soft["leica"]):
     
     """
     Build a command to launch mdb2rinex, the Leica converter
@@ -260,7 +268,7 @@ def cmd_build_sbf2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="sbf2rin"):
+                      bin_path=aro_env_soft["septentrio"]):
 
     """
     Build a command to launch sbf2rin, the Septentrio converter
@@ -427,7 +435,7 @@ def cmd_build_runpkr00(inp_raw_fpath,
                        out_dir,
                        bin_options_custom=[],
                        bin_kwoptions_custom=dict(),
-                       bin_path="runpkr00"):
+                       bin_path=aro_env_soft["trimble_runpkr00"]):
     """
     Build a command to launch runpkr00, the Trimble > teqc converter
     
@@ -508,7 +516,7 @@ def cmd_build_convbin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="convbin"):    
+                      bin_path=aro_env_soft['convbin']):
     """
     Build a command to launch convbin, the RTKLIB converter, for BINEX
     
@@ -668,7 +676,7 @@ def cmd_build_tps2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="tps2rin.exe"):
+                      bin_path=aro_env_soft['topcon']):
     """
     Build a command to launch tps2rin, for Topcon
     
@@ -842,7 +850,7 @@ def cmd_build_teqc(inp_raw_fpath,
                    out_dir,
                    bin_options_custom=[],
                    bin_kwoptions_custom=dict(),
-                   bin_path="teqc"):
+                   bin_path=aro_env_soft['teqc']):
     """
     Build a command to launch teqc, for legacy conversion and RINEX Handeling
     
@@ -903,7 +911,7 @@ def cmd_build_converto(inp_raw_fpath,
                        out_dir,
                        bin_options_custom=[],
                        bin_kwoptions_custom=dict(),
-                       bin_path="/home/psakicki/SOFTWARE_INSTALL/Converto/ConvertoCpp-master_1_6_0_5/bin/Release/ConvertoCPP"):
+                       bin_path=aro_env_soft['converto']):
     """
     Build a command to launch teqc, for legacy conversion and RINEX Handeling
     
@@ -1093,7 +1101,7 @@ def cmd_build_gfzrnx(inp_raw_fpath,
                      out_dir,
                      bin_options_custom=[],
                      bin_kwoptions_custom=dict(),
-                     bin_path="gfzrnx"):
+                     bin_path=aro_env_soft['gfzrnx']):
     """
     Build a command to launch gfzrnx, for RINEX Handeling
     
@@ -1381,8 +1389,3 @@ def cmd_build_gfzrnx(inp_raw_fpath,
     cmd_use = [cmd_str]
     
     return cmd_use, cmd_list, cmd_str
-
-                    
-
-
-

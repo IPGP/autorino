@@ -3,7 +3,7 @@
 """
 Created on Thu Dec  1 15:47:05 2022
 
-@author: psakicki
+@author: psakic
 """
 
 import os
