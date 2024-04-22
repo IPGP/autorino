@@ -81,9 +81,9 @@ class SpliceGnss(arocmn.StepGnss):
         for i_tabgrp, (t_tabgrp, tabgrp) in enumerate(grps):
             spc_obj = self.copy()
 
-            if drop_epoch_rnd: ### remove the temporary epoch_rnd column
+            if drop_epoch_rnd:  ### remove the temporary epoch_rnd column
                 tabgrp_bis = tabgrp.drop('epoch_rnd', axis=1)
-            else: ### keep the temporary epoch_rnd column
+            else:  ### keep the temporary epoch_rnd column
                 tabgrp_bis = pd.DataFrame(tabgrp)
 
             spc_obj.table = tabgrp_bis
@@ -92,12 +92,11 @@ class SpliceGnss(arocmn.StepGnss):
 
             # fill the main object with the individuals
             # then "fpath_inp" is an individual SpliceGnss Object !
-            spc_main_obj.table.loc[i_tabgrp,"fpath_inp"] = spc_obj
-            spc_main_obj.table.loc[i_tabgrp,"fname"] = os.path.basename(spc_obj.table.iloc[0]["fpath_inp"])
-            spc_main_obj.table.loc[i_tabgrp,"ok_inp"] = True
+            spc_main_obj.table.loc[i_tabgrp, "fpath_inp"] = spc_obj
+            spc_main_obj.table.loc[i_tabgrp, "fname"] = os.path.basename(spc_obj.table.iloc[0]["fpath_inp"])
+            spc_main_obj.table.loc[i_tabgrp, "ok_inp"] = True
 
-        return spc_main_obj , spc_obj_lis_out
-
+        return spc_main_obj, spc_obj_lis_out
 
     def splice(self, handle_software='converto', rinexmod_options={}):
         """
@@ -126,7 +125,7 @@ class SpliceGnss(arocmn.StepGnss):
 
         return None
 
-    def on_row_splice(self, irow, out_dir = None, table_col = 'fpath_inp', handle_software='converto'):
+    def on_row_splice(self, irow, out_dir=None, table_col='fpath_inp', handle_software='converto'):
         """
         "on row" method
 
@@ -152,35 +151,43 @@ class SpliceGnss(arocmn.StepGnss):
 
         spc_row = self.table.loc[irow, 'fpath_inp']
 
-        if not isinstance(spc_row,SpliceGnss):
+        if not isinstance(spc_row, SpliceGnss):
             logger.error("the fpath_inp is not a SpliceGnss object: %s", self.table.loc[irow])
             frnx_spliced = None
         else:
             ### it is not the current object inputs which are decompressed, but the row sub object's ones
-            spc_row.tmp_decmp_files , _ = spc_row.decompress()
+            spc_row.tmp_decmp_files, _ = spc_row.decompress()
 
             #### add a test here to be sure that only one epoch is inside
-
-            tmp_dir_use = self.translate_path(self.tmp_dir)
             out_dir_use = self.translate_path(self.out_dir)
 
             fpath_inp_lst = list(spc_row.table['fpath_inp'])
 
             if handle_software == 'converto':
-                frnx_spliced, _ = arocnv.converter_run(fpath_inp_lst,
-                                                  tmp_dir_use,
-                                                  converter='converto',
-                                                  bin_options=['-cat'])
+                bin_options = ['-cat']
             elif handle_software == 'gfzrnx':
-                frnx_spliced, _ = arocnv.converter_run(fpath_inp_lst,
-                                                  tmp_dir_use,
-                                                  converter='gfzrnx',
-                                                  bin_options=['-f'])
+                bin_options = ['-f']
             else:
-                logger.error("wrong handle_software name: %s", handle_software)
+                logger.critical('wrong handle_software value: %s', handle_software)
+                raise ValueError
+
+            try:
+                frnx_spliced, _ = arocnv.converter_run(fpath_inp_lst,
+                                                       out_dir_use,
+                                                       converter=handle_software,
+                                                       bin_options=bin_options)
+            except Exception as e:
+                logger.error("something went wrong for %s",
+                             fpath_inp_lst)
+                logger.error("Exception raised: %s", e)
                 frnx_spliced = None
 
-        self.table.loc[irow, 'fpath_out'] = frnx_spliced
+        if frnx_spliced:
+            self.table.loc[irow, 'ok_out'] = True
+            self.table.loc[irow, 'fpath_out'] = frnx_spliced
+        else:
+            self.table.loc[irow, 'ok_out'] = False
+            #raise e
 
         ### it is not the current object temps which are removed, but the row sub object's ones
         spc_row.remove_tmp_files()

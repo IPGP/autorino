@@ -19,12 +19,9 @@ import yaml
 import glob
 import collections.abc
 
-
 # Create a logger object.
 import logging
-
 logger = logging.getLogger(__name__)
-
 
 def autorino_run(cfg_in,main_cfg_in):
     if os.path.isdir(cfg_in):
