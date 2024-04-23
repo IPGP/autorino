@@ -44,7 +44,7 @@ class StepGnss():
         self._init_site_id()
         self._init_table()
         
-        self.translate_dict = self._set_translate_dict()
+        self.set_translate_dict()
 
         ### sitelog init (needs translate dict)
         self._init_metadata(metadata)
@@ -242,7 +242,7 @@ class StepGnss():
 
         return None
 
-    def _set_translate_dict(self):
+    def set_translate_dict(self):
         """
         generate the translation dict based on the access and session dicts
         object attributes + site id
@@ -262,7 +262,9 @@ class StepGnss():
             trsltdict[s.upper()] = str(getattr(self, s)).upper()
             trsltdict[s.lower()] = str(getattr(self, s)).lower()
 
-        return trsltdict
+        self.translate_dict = trsltdict
+
+        return None
 
     def _init_tmp_dirs_paths(self,
                              tmp_subdir_logs='logs',

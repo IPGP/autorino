@@ -14,6 +14,7 @@ import dateutil
 import docker
 from pathlib import Path
 
+import rinexmod.rinexmod_api
 from geodezyx import utils, operational
 
 import autorino.common as arocmn
@@ -61,10 +62,8 @@ class ConvertGnss(arocmn.StepGnss):
         ### other tmps subdirs come also later in the loop
 
         if self.metadata:
-            print("BBBBBBBBBBBBBBBBBB", self.metadata)
             site4_list = arocnv.site_list_from_sitelogs(self.metadata)
         else:
-            print("AAAAAAAAAAAAAAAAAAAAAA")
             site4_list = []
 
         ### initialize the table as log
@@ -111,7 +110,15 @@ class ConvertGnss(arocmn.StepGnss):
             # we search it w.r.t. the sites from the metadata
             site = arocnv.site_search_from_list(fraw,
                                                 site4_list)
-            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok = site
+
+            ##### something better must be done with
+            # rinexmod.rinexmod_api.metadata_find_site() !!!!
+            # clarify the site4 and the site9 usage
+
+            ### we update the table row and the translate dic (necessary for the output dir)
+            self.table.loc[irow, 'site'] = site
+            self.site_id = site
+            self.set_translate_dict()
 
             ### do a first converter selection by removing odd files 
             converter_name_use = arocnv.select_conv_odd_file(fraw)
