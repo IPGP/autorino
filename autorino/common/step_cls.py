@@ -17,7 +17,7 @@ import re
 import copy
 
 import rinexmod
-from geodezyx import utils, conv, operational
+from geodezyx import utils, conv
 
 import autorino.common as arocmn
 import autorino.config as arocfg
@@ -43,11 +43,12 @@ class StepGnss():
         self._init_options(options)
         self._init_site_id()
         self._init_table()
+        
+        self.translate_dict = self._set_translate_dict()
 
-        ### sitelog init
+        ### sitelog init (needs translate dict)
         self._init_metadata(metadata)
 
-        self.translate_dict = self._set_translate_dict()
         self.out_dir = out_dir
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
@@ -377,8 +378,7 @@ class StepGnss():
                 conv.rinex_regex_search_tester).apply(bool)
 
         if is_rnx.sum() == 0:
-            logger.warning("epoch update impossible, \
-                        no file matches a RINEX pattern in %s", self)
+            logger.warning("epoch update impossible, no file matches a RINEX pattern in %s", self)
             return
 
         for irow, row in self.table.iterrows():
@@ -497,7 +497,8 @@ class StepGnss():
                 self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
 
             elif epoch_bol.sum() > 1 and mode == 'splice':
-                spc_obj = arohdl.SpliceGnss(out_dir=self.out_dir,
+                import autorino.handle.splice_cls as arospc
+                spc_obj = arospc.SpliceGnss(out_dir=self.out_dir,
                                             tmp_dir=self.tmp_dir,
                                             log_dir=self.log_dir,
                                             epoch_range=step_obj_store.epoch_range,
@@ -816,7 +817,7 @@ class StepGnss():
         files_decmp_list = self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file,
                                                                      args=(tmp_dir,))
 
-        self.table.loc[idx_comp, table_col] = files_out
+        self.table.loc[idx_comp, table_col] = files_decmp_list
         self.table.loc[idx_comp, 'ok_inp'] = \
             self.table.loc[idx_comp, table_col].apply(os.path.isfile)
         self.table.loc[idx_comp, 'fname'] = \
@@ -873,12 +874,14 @@ class StepGnss():
         will remove the temporary files which have been stored in the two lists
         self.tmp_rnx_files and self.tmp_decmp_files
         """
+        # TEMP RINEX Files
         for f in self.tmp_rnx_files:
             if os.path.isfile(f):
                 logger.debug("remove tmp converted RINEX file: %s", f)
                 os.remove(f)
                 self.tmp_rnx_files.remove(f)
 
+        # TEMP decompressed Files
         for f in self.tmp_decmp_files:
             # we also test if the file is not an original one!
 
@@ -889,7 +892,7 @@ class StepGnss():
 
             is_original = self.table['fpath_ori'].isin([f]).any()
 
-            if os.path.isfile(f) and not is_original:
+            if os.path.isfile(f) and is_original:
                 logger.warning("uncompressed file is also an original one, we keep it for security: %s", f)
                 continue
 
@@ -991,7 +994,7 @@ class StepGnss():
         ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
         nfil_total = sum(bool_out_range)
         # logical inhibition a.\overline{b}
-        nfil_spec = sum(nppour.logical_and(bool_out_range, self.table['ok_inp']))
+        nfil_spec = sum(np.logical_and(bool_out_range, self.table['ok_inp']))
 
         # final replace of ok init
         self.table['ok_inp'] = ok_inp_bool_stk
@@ -1145,14 +1148,14 @@ class StepGnss():
 
     def on_row_rinexmod(self, irow, out_dir=None,
                         table_col='fpath_out',
-                        rinexmod_kwargs=None):
+                        rinexmod_options=None):
         """
         "on row" method
 
         for each row of the table, rinexmod the 'table_col' entry,
         typically 'fpath_out' file
 
-        if no rinexmod options given with rinexmod_kwargs dictionnary,
+        if no rinexmod options given with rinexmod_options dictionnary,
         apply default rinexmod options
         """
 
@@ -1170,8 +1173,8 @@ class StepGnss():
             out_dir_use = self.tmp_dir
 
         # default options/arguments for rinexmod
-        rinexmod_kwargs_use = {
-            # 'marker': 'TOTO',
+        rinexmod_options_use = {
+            # 'marker': 'XXXX',
             # 'sitelog': metadata,
             'compression': "gz",
             'longname': True,
@@ -1181,16 +1184,16 @@ class StepGnss():
             'full_history': True}
 
         # update options/arguments for rinexmod with inputs
-        if rinexmod_kwargs:
-            rinexmod_kwargs_use.update(rinexmod_kwargs)
-            logger.debug("options used for rinexmod: %s", rinexmod_kwargs_use)
+        if rinexmod_options:
+            rinexmod_options_use.update(rinexmod_options)
+            logger.debug("options used for rinexmod: %s", rinexmod_options_use)
 
         frnx = self.table.loc[irow, table_col]
 
         try:
             frnxmod = rinexmod.rinexmod_api.rinexmod(frnx,
                                                      out_dir_use,
-                                                     **rinexmod_kwargs_use)
+                                                     **rinexmod_options_use)
         except Exception as e:
             logger.error("something went wrong for %s",
                          frnx)
@@ -1249,7 +1252,7 @@ class StepGnss():
             frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
         except Exception as e:
             logger.error("something went wrong for %s",
-                         frnx)
+                         frnx_to_mv)
             logger.error("Exception raised: %s", e)
             frnxfin = None
 
