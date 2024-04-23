@@ -33,7 +33,7 @@ def site_list_from_sitelogs(sitelogs_inp):
     From a list of metadata, get a site id list (4 chars)
     """
     ###############################################
-    ### read sitelogs
+    ### read metadata
     if not type(sitelogs_inp) is list and os.path.isdir(sitelogs_inp):
         sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
                                                      force=False)
