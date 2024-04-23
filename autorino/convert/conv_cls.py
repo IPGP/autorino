@@ -46,10 +46,15 @@ class ConvertGnss(arocmn.StepGnss):
     ###############################################
 
     def convert(self, print_table=False, force=False,
-                rinexmod_options={}):
+                rinexmod_options=None):
         """
         "total action" method
         """
+
+        ### here the None to dict is necessary, because we use a defaut rinexmod_options bellow
+        if rinexmod_options is None:
+            rinexmod_options = {}
+
         logger.info("******** RAW > RINEX files conversion")
 
         self.set_tmp_dirs_paths()
@@ -106,11 +111,11 @@ class ConvertGnss(arocmn.StepGnss):
                                                 site4_list)
 
             ### do a first converter selection by removing odd files 
-            conve = arocnv.select_conv_odd_file(fraw)
+            converter_name_use = arocnv.select_conv_odd_file(fraw)
 
-            logger.info("extension/converter: %s/%s", ext, conve)
+            logger.info("extension/converter: %s/%s", ext, converter_name_use)
 
-            if not conve:
+            if not converter_name_use:
                 logger.info("file skipped, no converter found: %s", fraw)
                 self.table.loc[irow, 'note'] = "no converter found"
                 self.table.loc[irow, 'ok_inp'] = False
@@ -123,17 +128,17 @@ class ConvertGnss(arocmn.StepGnss):
             #############################################################
             ###### CONVERSION
             frnxtmp = self.on_row_convert(irow, self.tmp_dir_converted,
-                                          converter_inp=conve)
+                                          converter_inp=converter_name_use)
             self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
 
             #############################################################
             ###### RINEXMOD
-            rinexmod_kwargs = rinexmod_options.copy()
-            rinexmod_kwargs.update({'marker':site,
-                                    'sitelog':self.sitelogs})
+            rinexmod_options_use = rinexmod_options.copy()
+            rinexmod_options_use.update({'marker':site,
+                                         'sitelog':self.sitelogs})
 
             self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
-                                 rinexmod_kwargs=rinexmod_kwargs)
+                                 rinexmod_options=rinexmod_options_use)
 
             #############################################################
             ###### FINAL MOVE

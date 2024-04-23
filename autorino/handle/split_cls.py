@@ -5,12 +5,9 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
-import numpy as np
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
-
-import pandas as pd
 
 # Create a logger object.
 import logging
@@ -35,7 +32,7 @@ class SplitGnss(arocmn.StepGnss):
                  session=None,
                  options=None,
                  metadata=None):
-        
+
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
                          site=site,
@@ -43,7 +40,7 @@ class SplitGnss(arocmn.StepGnss):
                          options=options,
                          metadata=metadata)
 
-    def split(self, handle_software='converto', rinexmod_options={}):
+    def split(self, handle_software='converto', rinexmod_options=None):
         """
         "total action" method
         """
@@ -51,7 +48,7 @@ class SplitGnss(arocmn.StepGnss):
         self.set_tmp_dirs_paths()
 
         for irow, row in self.table.iterrows():
-            fdecmptmp , _ = self.on_row_decompress(irow)
+            fdecmptmp, _ = self.on_row_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
             frnx_splited = self.on_row_split(irow, self.tmp_dir_converted,
@@ -63,7 +60,8 @@ class SplitGnss(arocmn.StepGnss):
 
             self.tmp_rnx_files.append(frnx_splited)
 
-            self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded, rinexmod_kwargs=rinexmod_options)
+            self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
+                                 rinexmod_options=rinexmod_options)
 
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.on_row_move_final(irow)
@@ -72,8 +70,7 @@ class SplitGnss(arocmn.StepGnss):
 
         return None
 
-
-    def on_row_split(self, irow, out_dir = None, table_col='fpath_inp',
+    def on_row_split(self, irow, out_dir=None, table_col='fpath_inp',
                      handle_software='converto'):
         """
         "on row" method
