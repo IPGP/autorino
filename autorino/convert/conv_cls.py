@@ -60,9 +60,11 @@ class ConvertGnss(arocmn.StepGnss):
         self.set_tmp_dirs_paths()
         ### other tmps subdirs come also later in the loop
 
-        if self.sitelogs:
-            site4_list = arocnv.site_list_from_sitelogs(self.sitelogs)
+        if self.metadata:
+            print("BBBBBBBBBBBBBBBBBB", self.metadata)
+            site4_list = arocnv.site_list_from_sitelogs(self.metadata)
         else:
+            print("AAAAAAAAAAAAAAAAAAAAAA")
             site4_list = []
 
         ### initialize the table as log
@@ -106,9 +108,10 @@ class ConvertGnss(arocmn.StepGnss):
             #_ = self.set_tmp_dirs_paths()
 
             ### since the site code from fraw can be poorly formatted
-            # we search it w.r.t. the sites from the sitelogs
+            # we search it w.r.t. the sites from the metadata
             site = arocnv.site_search_from_list(fraw,
                                                 site4_list)
+            self.table.loc[irow, 'epoch_srt'] = epo_srt_ok = site
 
             ### do a first converter selection by removing odd files 
             converter_name_use = arocnv.select_conv_odd_file(fraw)
@@ -135,7 +138,7 @@ class ConvertGnss(arocmn.StepGnss):
             ###### RINEXMOD
             rinexmod_options_use = rinexmod_options.copy()
             rinexmod_options_use.update({'marker':site,
-                                         'sitelog':self.sitelogs})
+                                         'sitelog':self.metadata})
 
             self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
                                  rinexmod_options=rinexmod_options_use)

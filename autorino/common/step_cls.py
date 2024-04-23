@@ -319,13 +319,13 @@ class StepGnss():
             tmp_dir_converted_set, tmp_dir_rinexmoded_set, \
             tmp_dir_downloaded_set
 
-    def _init_metadata(self, sitelogs):
-        if sitelogs:
-            sitelogs_set = self.translate_path(sitelogs)
-            self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_set,
+    def _init_metadata(self, metadata):
+        if metadata:
+            metadata_set = self.translate_path(metadata)
+            self.metadata = rinexmod_api.sitelog_input_manage(metadata_set,
                                                               force=False)
         else:
-            self.sitelogs = None
+            self.metadata = None
 
     #   _____                           _                  _   _               _
     #  / ____|                         | |                | | | |             | |
@@ -875,33 +875,37 @@ class StepGnss():
         self.tmp_rnx_files and self.tmp_decmp_files
         """
         # TEMP RINEX Files
+        tmp_rnx_files_new = []
         for f in self.tmp_rnx_files:
             if os.path.isfile(f):
                 logger.debug("remove tmp converted RINEX file: %s", f)
                 os.remove(f)
-                self.tmp_rnx_files.remove(f)
+            else:
+                tmp_rnx_files_new.append(f)
+        self.tmp_rnx_files = tmp_rnx_files_new
 
         # TEMP decompressed Files
+        tmp_decmp_files_new = []
         for f in self.tmp_decmp_files:
             # we also test if the file is not an original one!
-
             if 'fpath_ori' not in self.table.columns:
-                logger.warning(
-                    "file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s", f)
+                logger.warning("file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s", f)
+                tmp_decmp_files_new.append(f)
                 continue
 
             is_original = self.table['fpath_ori'].isin([f]).any()
 
             if os.path.isfile(f) and is_original:
                 logger.warning("uncompressed file is also an original one, we keep it for security: %s", f)
+                tmp_decmp_files_new.append(f)
                 continue
-
             elif os.path.isfile(f) and not is_original:
                 logger.debug("remove tmp decompress RINEX file: %s", f)
                 os.remove(f)
-                self.tmp_decmp_files.remove(f)
             else:
                 pass
+
+        self.tmp_decmp_files = tmp_decmp_files_new
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |
