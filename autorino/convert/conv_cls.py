@@ -114,6 +114,7 @@ class ConvertGnss(arocmn.StepGnss):
             ##### something better must be done with
             # rinexmod.rinexmod_api.metadata_find_site() !!!!
             # clarify the site4 and the site9 usage
+            # create method update_site_table_from_fname
 
             ### we update the table row and the translate dic (necessary for the output dir)
             self.table.loc[irow, 'site'] = site
