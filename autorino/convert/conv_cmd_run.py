@@ -12,7 +12,7 @@ import os
 import re
 import subprocess
 from subprocess import Popen, PIPE
-from geodezyx import utils, operational, conv
+from geodezyx import utils, conv
 import datetime as dt
 
 import autorino.convert as arcv
@@ -150,7 +150,9 @@ def _converter_select(converter_inp, inp_raw_fpath=None):
             fname = Path(Path(fname).stem).name.upper()
 
     else:
+        inp_raw_fpath = Path(inp_raw_fpath)
         ext = ""
+        fname = inp_raw_fpath.name.upper()
 
     ##### TRIMBLE
     if ext in (".T00", ".T02") or converter_inp == "trm2rinex":
