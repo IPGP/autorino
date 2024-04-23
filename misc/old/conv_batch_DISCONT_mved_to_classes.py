@@ -45,7 +45,7 @@ def converter_batch(input_files,
     
 
     ###############################################
-    ### read sitelogs        
+    ### read metadata
     if os.path.isdir(sitelogs_inp):
         sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
                                                      force=False)
@@ -113,7 +113,7 @@ def converter_batch(input_files,
         logger.info("***** input raw file for conversion: %s",fraw.name)
 
         ### since the fraw name can be poorly formatted
-        # we search it w.r.t. the sites from the sitelogs
+        # we search it w.r.t. the sites from the metadata
 
         site =  _site_search_from_list(fraw,site4_list)       
 
