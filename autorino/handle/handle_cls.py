@@ -55,7 +55,7 @@ class HandleGnss(arocmn.StepGnss):
                                                      period=period,
                                                      round_method=round_method)
 
-        spc_main_obj = SpliceGnss(out_dir=self.out_dir,
+        spc_main_obj = HandleGnss(out_dir=self.out_dir,
                                   tmp_dir=self.tmp_dir,
                                   log_dir=self.log_dir,
                                   epoch_range=spc_main_obj_epoch_range,
@@ -151,7 +151,7 @@ class HandleGnss(arocmn.StepGnss):
 
         spc_row = self.table.loc[irow, 'fpath_inp']
 
-        if not isinstance(spc_row, SpliceGnss):
+        if not isinstance(spc_row, HandleGnss):
             logger.error("the fpath_inp is not a SpliceGnss object: %s", self.table.loc[irow])
             frnx_spliced = None
         else:
