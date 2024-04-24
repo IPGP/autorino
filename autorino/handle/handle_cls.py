@@ -290,3 +290,69 @@ class HandleGnss(arocmn.StepGnss):
             #raise e
 
         return frnxtmp
+
+
+    def find_rnxs_for_handle(self, step_obj_store,
+                             mode='split'):
+        """
+        For a HandleGnss object, with a predefined epoch range
+        find the corresponding RINEX for splice/split in the step_obj_store StepGnss,
+        which a list of possible RINEXs candidates for the splice/split operation
+
+        Parameters
+        ----------
+        step_obj_store
+            StepGnss object, which a list of possible RINEXs candidates
+            for the splice/split operation
+
+        mode
+            split or splice
+            if split: for fpath_inp, only one RINEX is returned
+            if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
+        """
+
+        if not (self.get_step_type() in ("HandleGnss", )):
+            logger.warning("find_rnxs_for_handle recommended for SplitGnss or SpliceGnss objects only (%s here)",
+                           self.get_step_type())
+
+        self.table['ok_inp'] = False
+
+        for irow, row in self.table.iterrows():
+            epo_srt = np.datetime64(self.table.loc[irow, 'epoch_srt'])
+            epo_end = np.datetime64(self.table.loc[irow, 'epoch_end'])
+
+            epoch_srt_bol = step_obj_store.table['epoch_srt'] <= epo_srt
+            epoch_end_bol = step_obj_store.table['epoch_end'] >= epo_end
+
+            epoch_bol = epoch_srt_bol & epoch_end_bol
+
+            if epoch_bol.sum() == 0:
+                self.table.loc[irow, 'ok_inp'] = False
+                self.table.loc[irow, 'fpath_inp'] = None
+
+            elif epoch_bol.sum() == 1:
+                rnxinp_row = step_obj_store.table.loc[epoch_bol].squeeze()
+                self.table.loc[irow, 'ok_inp'] = True
+                self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
+
+            elif epoch_bol.sum() > 1 and mode == 'split':
+                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
+                self.table.loc[irow, 'ok_inp'] = True
+                self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
+
+            elif epoch_bol.sum() > 1 and mode == 'splice':
+                import autorino.handle.splice_cls as arospc
+                spc_obj = HandleGnss(out_dir=self.out_dir,
+                                     tmp_dir=self.tmp_dir,
+                                     log_dir=self.log_dir,
+                                     epoch_range=step_obj_store.epoch_range,
+                                     site=step_obj_store.site,
+                                     session=step_obj_store.session)
+
+                spc_obj.table = step_obj_store.table.loc[epoch_bol]
+                spc_obj.update_epoch_range_from_table()
+
+                self.table.loc[irow, 'ok_inp'] = True
+                self.table.loc[irow, 'fpath_inp'] = spc_obj
+
+        return None
