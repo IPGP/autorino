@@ -22,7 +22,7 @@ def convert_rnx(rnxs_inp, tmp_dir, out_dir, log_dir=None,
 
     cnv.load_table_from_filelist(rnxs_inp)
     # cnv.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
-
+    
     cnv.convert(force=True,  ### always force (so far), because we can't guess local RINEX
                 rinexmod_options=rinexmod_options)
 
