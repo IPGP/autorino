@@ -1,11 +1,12 @@
 conv_software_paths:
   convbin : "convbin"
-  leica : "mdb2rinex"
+  #leica : "mdb2rinex"
+  leica : "/home/psakicki/SOFTWARE_INSTALL/GNSS_CONVERTERS/Leica_mdb2rinex/mdb2rinex"
   septentrio : "sbf2rin"
   topcon : "tps2rin.exe"
   trimble : "trm2rinex:cli-light"
   trimble_runpkr00 : "runpkr00"
   ### RINEX handeling
-  converto : "ConvertoCPP"
+  converto : "/home/psakicki/SOFTWARE_INSTALL/Converto/ConvertoCpp-master_1_6_0_5/bin/Release/ConvertoCPP"
   gfzrnx : "gfzrnx"
   teqc : "teqc"
