@@ -1127,7 +1127,7 @@ class StepGnss():
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
             rinexmod_options_use.update(rinexmod_options)
-            logger.debug("options used for rinexmod: %s", rinexmod_options_use)
+            #logger.debug("options used for rinexmod: %s", rinexmod_options_use)
 
         frnx = self.table.loc[irow, table_col]
 
@@ -1170,7 +1170,7 @@ class StepGnss():
         typically 'fpath_out' file
         """
 
-        if not self.table.loc[irow, 'ok_inp']:
+        if not self.table.loc[irow, 'ok_out']: ### for mv it's ok_out column the one to check!!!!
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
             return None

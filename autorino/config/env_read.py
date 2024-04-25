@@ -25,8 +25,6 @@ def read_env(envfile_path=None):
                                     "autorino_env_default.yml")
 
     if envfile_path:
-        logger.debug("load environement config file: %s",
-                     envfile_path)
         envfile_path_use = envfile_path
     elif 'AUTORINO_ENV' in os.environ:
         envfile_path_use = os.environ['AUTORINO_ENV']
@@ -37,6 +35,8 @@ def read_env(envfile_path=None):
         logger.warning("environement config file not found, fallback to default values: %s",
                        envfile_path_use)
         envfile_path_use = envfile_path_def
+
+    logger.debug("load environement config file: %s",envfile_path_use)
 
     y_dic = yaml.safe_load(open(envfile_path_use))
 
