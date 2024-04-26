@@ -30,9 +30,7 @@ def _translator_epoch(path_inp,epoch_inp):
     set the correct epoch in path_input string the with the strftime aliases
     https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
     """
-    print("AAAAAAAAAAAAAA")
     path_translated = str(path_inp)
-    print("BBBBBBBBBBBBBBB")
     path_translated = epoch_inp.strftime(path_translated)
 
     #the <HOURCHAR> and <hourchar> alias in a time information,
