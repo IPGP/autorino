@@ -17,7 +17,7 @@ from autorino import convert as arocnv
 
 
 ###################### OVPF
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 
 ########## MAIN 
 if 0:
