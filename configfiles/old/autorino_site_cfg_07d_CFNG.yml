@@ -5,15 +5,15 @@ station:
         name: CFNG 
         site_id: CFNG00REU 
         domes: 
-        sitelog_path: <$HOME>/metadata/OVPF ###  can be a specific file or a directory path containing the sitelogs
+        sitelog_path: #<$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
         position_xyz: (1,2,3)
     device:
         attributes_from_sitelog: True
         ant_manufacturer: NA
         ant_model: NA
         ant_sn: NA
-        rec_manufacturer: AUTO_FROM_SITELOG # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
-        rec_model: AUTO_FROM_SITELOG
+        rec_manufacturer: NA # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        rec_model: NA
         rec_sn: NA 
     access:
         protocol: "ftp"
@@ -21,13 +21,13 @@ station:
         login: "***REMOVED***"
         password: "***REMOVED***"
     sessions_list:
-      - session: ####Keep session in dictionnary / Object not necessary
+      - session_general: ####Keep session in dictionnary / Object not necessary
             name: NA 
             data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
-            tmp_dir_parent: '<$HOME>/autorino_workflow_tests/temp'
-            tmp_dir_structure: '<SITE_ID>' # /%Y/%j  
+            tmp_dir_parent: '<$HOME>/autorino_workflow_tests/tmp'
+            tmp_structure: '<SITE_ID>' # /%Y/%j  
             log_dir_parent: '<$HOME>/autorino_workflow_tests/log'
-            log_dir_structure: '' #<SITE_ID>/%Y/%j  
+            log_structure: '' #<SITE_ID>/%Y/%j  
         epoch_range:
           #epoch1: '2 days ago at 14:00'
           #epoch2: '2 days ago at 16:00'
@@ -40,13 +40,15 @@ station:
             download:
                 active: True
                 inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
-                inp_fname_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
-                out_dir_parent: '<$HOME>/autorino_workflow_tests/download_tests/'
-                out_dir_structure: <SITE_ID>/%Y/%j
-            conversion_rinex_header_mod:
+                inp_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
+                out_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
+                out_structure: <SITE_ID>/%Y/%j
+                #options:
+            conversion:
                 active: True
                 converter : auto
-                inp_dir_parent: '<$HOME>/autorino_workflow_tests/download_tests/'
-                inp_dir_structure: <SITE_ID>/%Y/%j
-                out_dir_parent: '<$HOME>/autorino_workflow_tests/conv_tests/'
-                out_dir_structure: <SITE_ID>/%Y/%j
+                inp_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
+                inp_structure: <SITE_ID>/%Y/%j
+                out_dir_parent: '<$HOME>/autorino_workflow_tests/rnx/'
+                out_structure: <SITE_ID>/%Y/%j
+                #options:

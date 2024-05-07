@@ -23,7 +23,7 @@ flist = utils.find_recursive(p,"*crx.gz")
 outdir_rinexmoded = "/scratch/convgnss/031_SONEL_conv_redo_PF"
 
 ########### SITELOGS
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
 
 

@@ -14,7 +14,7 @@ from geodezyx.megalib.megalib import *   # Import the legacy modules names
 import autorino.convert.conv_batch as cvb
 
 ###################### OVSG for SONEL
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 
 
 #p="/net/baiededix/ovsm/ACQUI/Deformations/GPS/data" 

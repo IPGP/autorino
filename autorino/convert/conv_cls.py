@@ -14,6 +14,7 @@ import dateutil
 import docker
 from pathlib import Path
 
+import rinexmod.rinexmod_api
 from geodezyx import utils, operational
 
 import autorino.common as arocmn
@@ -33,51 +34,40 @@ class ConvertGnss(arocmn.StepGnss):
                  epoch_range=None,
                  site=None,
                  session=None,
-                 sitelogs=None,
-                 options=None):
+                 options=None,
+                 metadata=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
                          site=site,
                          session=session,
-                         options=options)
-
-        ### temp dirs init
-        self._init_tmp_dirs_paths()
-
-        ### sitelog init
-        if sitelogs:
-            sitelogs_set = self.translate_path(sitelogs)
-            self.sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_set,
-                                                              force=False)
-        else:
-            self.sitelogs = None
+                         options=options,
+                         metadata=metadata)
 
     ###############################################
 
     def convert(self, print_table=False, force=False,
                 rinexmod_options=None):
-        logger.info("******** RAW > RINEX files conversion / Header mod ('rinexmod')")
+        """
+        "total action" method
+        """
 
-        if not rinexmod_options:
-            rinexmod_options = {'compression': "gz",
-                                'longname': True,
-                                'force_rnx_load': True,
-                                'verbose': False,
-                                'tolerant_file_period': True,
-                                'full_history': True}
+        ### here the None to dict is necessary, because we use a defaut rinexmod_options bellow
+        if rinexmod_options is None:
+            rinexmod_options = {}
 
-        if self.sitelogs:
-            site4_list = site_list_from_sitelogs(self.sitelogs)
+        logger.info("******** RAW > RINEX files conversion")
+
+        self.set_tmp_dirs_paths()
+        ### other tmps subdirs come also later in the loop
+
+        if self.metadata:
+            site4_list = arocnv.site_list_from_sitelogs(self.metadata)
         else:
             site4_list = []
 
-        tmp_dir_logs_use, _, _, _ = self.set_tmp_dirs_paths()
-
         ### initialize the table as log
-        self.set_table_log(out_dir=tmp_dir_logs_use)
-        ### initialize list for tmp rinexs to be removed
-        frnxtmp_files = []
+        self.set_table_log(out_dir=self.tmp_dir_logs)
 
         ### guess and deactivate existing local RINEX files
         if not force:
@@ -85,7 +75,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.check_local_files()
             self.filter_ok_out()
 
-        self.tmp_decmp_files = self.decompress()
+        self.tmp_decmp_files , _ = self.decompress()
 
         ### get a table with only the good files (ok_inp == True)
         # table_init_ok must be used only for the following statistics!
@@ -114,19 +104,29 @@ class ConvertGnss(arocmn.StepGnss):
             logger.info("***** input raw file for conversion: %s",
                         fraw.name)
 
-            _, tmp_dir_unzipped_use, tmp_dir_converted_use, tmp_dir_rinexmoded_use = self.set_tmp_dirs_paths()
+            #_ = self.set_tmp_dirs_paths()
 
             ### since the site code from fraw can be poorly formatted
-            # we search it w.r.t. the sites from the sitelogs
-            site = _site_search_from_list(fraw,
-                                          site4_list)
+            # we search it w.r.t. the sites from the metadata
+            site = arocnv.site_search_from_list(fraw,
+                                                site4_list)
+
+            ##### something better must be done with
+            # rinexmod.rinexmod_api.metadata_find_site() !!!!
+            # clarify the site4 and the site9 usage
+            # create method update_site_table_from_fname
+
+            ### we update the table row and the translate dic (necessary for the output dir)
+            self.table.loc[irow, 'site'] = site
+            self.site_id = site
+            self.set_translate_dict()
 
             ### do a first converter selection by removing odd files 
-            conve = _select_conv_odd_file(fraw)
+            converter_name_use = arocnv.select_conv_odd_file(fraw)
 
-            logger.info("extension/converter: %s/%s", ext, conve)
+            logger.info("extension/converter: %s/%s", ext, converter_name_use)
 
-            if not conve:
+            if not converter_name_use:
                 logger.info("file skipped, no converter found: %s", fraw)
                 self.table.loc[irow, 'note'] = "no converter found"
                 self.table.loc[irow, 'ok_inp'] = False
@@ -134,31 +134,28 @@ class ConvertGnss(arocmn.StepGnss):
 
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
-            stop_long_running_containers()
+            arocnv.stop_long_running_containers()
 
             #############################################################
             ###### CONVERSION
-            frnxtmp = self.on_row_convert(irow, tmp_dir_converted_use,
-                                          converter_inp=conve)
+            frnxtmp = self.on_row_convert(irow, self.tmp_dir_converted,
+                                          converter_inp=converter_name_use)
             self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
             ###### RINEXMOD
-            rinexmod_kwargs = rinexmod_options.copy()
-            rinexmod_kwargs.update({'marker':site,
-                                    'sitelog':self.sitelogs})
+            rinexmod_options_use = rinexmod_options.copy()
+            rinexmod_options_use.update({'marker':site,
+                                         'sitelog':self.metadata})
 
-            self.on_row_rinexmod(irow, tmp_dir_rinexmoded_use, rinexmod_kwargs)
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
+            self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
+                                 rinexmod_options=rinexmod_options_use)
 
             #############################################################
             ###### FINAL MOVE
             self.on_row_move_final(irow)
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
         #### remove temporary files
-
         self.remove_tmp_files()
 
         return None
@@ -171,128 +168,47 @@ class ConvertGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(self, irow, out_dir_inp, converter_inp):
+    def on_row_convert(self, irow, out_dir = None, converter_inp='auto', 
+                       table_col = 'fpath_inp'):
+
+        """
+        "on row" method
+
+        for each row of the table, convert the 'table_col' entry,
+        typically 'table_col' file
+        """
 
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
             return None
 
-        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, 'fpath_inp'],
-                                          out_dir_inp,
-                                          converter=converter_inp)
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
+        elif hasattr(self, 'tmp_dir_converted'):
+            out_dir_use = self.tmp_dir_converted
+        else:
+            out_dir_use = self.tmp_dir
+
+        try:
+            frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, table_col],
+                                              out_dir,
+                                              converter=converter_inp)
+        except Exception as e:
+            logger.error("something went wrong for %s",
+                         self.table.loc[irow, table_col])
+            logger.error("Exception raised: %s",e)
+            frnxtmp = None
+
         if frnxtmp:
             ### update table if things go well
+            self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, 'fpath_out'] = frnxtmp
             epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
             self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
             self.table.loc[irow, 'epoch_end'] = epo_end_ok
-            self.table.loc[irow, 'ok_out'] = True
         else:
             ### update table if things go wrong
             self.table.loc[irow, 'ok_out'] = False
         return frnxtmp
-
- 
-
-#########################################################################
-#### Misc functions 
-
-def site_list_from_sitelogs(sitelogs_inp):
-    """
-    From a list of sitelogs, get a site id list (4 chars)
-    """
-    ###############################################
-    ### read sitelogs        
-    if not type(sitelogs_inp) is list and os.path.isdir(sitelogs_inp):
-        sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
-                                                     force=False)
-    else:
-        sitelogs = sitelogs_inp
-
-    ### get the site (4chars) as a list 
-    site4_list = [s.site4char for s in sitelogs]
-
-    return site4_list
-
-
-def _site_search_from_list(fraw_inp, site4_list_inp):
-    """
-    from a raw file with an approximate site name and a list of correct 
-    site names, search the correct site name of the raw file
-    """
-    site_out = None
-    for s4 in site4_list_inp:
-        if re.search(s4, fraw_inp.name, re.IGNORECASE):
-            site_out = s4
-            break
-    if not site_out:  # last chance, get the 4 1st chars of the raw file
-        site_out = fraw_inp.name[:4]
-    return site_out
-
-
-def _select_conv_odd_file(fraw_inp,
-                          ext_excluded=None):
-    """
-    do a high level case matching to identify the right converter 
-    for raw file with an unconventional extension, or exclude the file
-    if its extension matches an excluded one
-    """
-
-    if ext_excluded is None:
-        ext_excluded = [".TG!$",
-                        ".DAT",
-                        ".Z",
-                        ".BCK",
-                        "^.[0-9]{3}$",
-                        ".A$",
-                        "Trimble",
-                        ".ORIG"]
-
-    fraw = Path(fraw_inp)
-    ext = fraw.suffix.upper()
-
-    if not ext or len(ext) == 0:
-        conve = "tps2rin"
-    elif re.match(".M[0-9][0-9]", ext):
-        conve = "mdb2rinex"
-    ### here we skip all the weird files    
-    else:
-        ### per default
-        conve = "auto"
-        for ext_exl in ext_excluded:
-            if re.match(ext_exl, ext):
-                conve = None
-                logger.warn("%s will be skipped, excluded extention %s",
-                            fraw.name,
-                            ext_exl)
-                break
-
-    return conve
-
-
-def stop_long_running_containers(max_running_time=120):
-    """
-    kill Docker container running for a too long time
-    Useful for the trm2rinex dockers
-    """
-    try:
-        client = docker.from_env()
-    except docker.errors.DockerException:
-        logger.warning('Permission denied for Docker')
-        return None
-    containers = client.containers.list()
-
-    for container in containers:
-        ### Calculate the time elapsed since the container was started
-        #created_at = container.attrs['Created']
-        started_at = container.attrs['State']['StartedAt']
-
-        started_at = dateutil.parser.parse(started_at)
-        elapsed_time = dt.datetime.now(dt.timezone.utc) - started_at
-
-        if elapsed_time > dt.timedelta(seconds=max_running_time):
-            container.stop()
-            logger.warning(f'Stopped container {container.name} after {elapsed_time} seconds.')
-
-    return None
