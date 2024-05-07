@@ -26,13 +26,15 @@ class DownloadGnss(arocmn.StepGnss):
                  remote_fname,
                  site=None,
                  session=None,
-                 options=None):
+                 options=None,
+                 metadata=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range,
                          site=site,
                          session=session,
-                         options=options)
+                         options=options,
+                         metadata=metadata)
 
         self.access = access
         self.remote_dir = remote_dir
@@ -68,7 +70,8 @@ class DownloadGnss(arocmn.StepGnss):
                                            rmot_fname_use)
 
             rmot_path_use = self.translate_path(rmot_path_use,
-                                                epoch)
+                                                epoch,
+                                                make_dir=False)
 
             rmot_fname_use = os.path.basename(rmot_path_use)
 
@@ -111,7 +114,8 @@ class DownloadGnss(arocmn.StepGnss):
                                           local_fname_use)
 
             local_path_use = self.translate_path(local_path_use,
-                                                 epoch)
+                                                 epoch,
+                                                 make_dir=False)
 
             local_fname_use = os.path.basename(local_path_use)
 
@@ -138,7 +142,8 @@ class DownloadGnss(arocmn.StepGnss):
         for epoch in self.epoch_range.epoch_range_list():
             rmot_dir_use = str(self.remote_dir)
             rmot_dir_use = self.translate_path(rmot_dir_use,
-                                               epoch)
+                                               epoch,
+                                               make_dir=False)
             rmot_dir_list.append(rmot_dir_use)
 
         rmot_dir_list = sorted(list(set(rmot_dir_list)))
@@ -154,7 +159,7 @@ class DownloadGnss(arocmn.StepGnss):
                                                      rmot_dir_use)
                 rmot_files_list = rmot_files_list + list_
             elif self.access['protocol'] == "ftp":
-                list_ = arodl.list_remoteo_files_ftp(self.access['hostname'],
+                list_ = arodl.list_remote_files_ftp(self.access['hostname'],
                                                      rmot_dir_use,
                                                      self.access['login'],
                                                      self.access['password'])
@@ -181,6 +186,8 @@ class DownloadGnss(arocmn.StepGnss):
         """
         download_files_list = []
 
+
+
         for irow, row in self.table.iterrows():
 
             epoch = row['epoch_srt']
@@ -197,17 +204,16 @@ class DownloadGnss(arocmn.StepGnss):
             if not local_file:  #### the local file has not been guessed
                 outdir_use = str(self.out_dir)
                 outdir_use = self.translate_path(outdir_use,
-                                                 epoch)
+                                                 epoch,
+                                                 make_dir=True)
             else:  #### the local file has been guessed before
                 outdir_use = os.path.dirname(local_file)
 
-            tmpdir_use = os.path.join(self.tmp_dir, 'downloaded')
+            tmpdir_use = self.tmp_dir_downloaded
 
             ###### create the directory if it does not exists
             if not os.path.exists(outdir_use):
                 os.makedirs(outdir_use)
-            if not os.path.exists(tmpdir_use):
-                os.makedirs(tmpdir_use)
 
             ###### download the file
             if not self.access['protocol'] in ("ftp", "http"):
