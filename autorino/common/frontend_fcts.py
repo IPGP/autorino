@@ -9,7 +9,8 @@ Created on 23/04/2024 14:21:56
 import autorino.convert as arocnv
 import autorino.handle as arohdl
 
-def convert_rnx(rnxs_inp, tmp_dir, out_dir, log_dir=None,
+
+def convert_rnx(raws_inp, tmp_dir, out_dir, log_dir=None,
                 rinexmod_options=None,
                 metadata=None):
     ### define other dirs
@@ -20,16 +21,16 @@ def convert_rnx(rnxs_inp, tmp_dir, out_dir, log_dir=None,
     cnv = arocnv.ConvertGnss(out_dir, tmp_dir, log_dir,
                              metadata=metadata)
 
-    cnv.load_table_from_filelist(rnxs_inp)
+    cnv.load_table_from_filelist(raws_inp)
     # cnv.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
-    
+
     cnv.convert(force=True,  ### always force (so far), because we can't guess local RINEX
                 rinexmod_options=rinexmod_options)
 
     return None
 
 
-def split_rnx(rnxs_inp, epo_inp, tmp_dir, out_dir, log_dir = None,
+def split_rnx(rnxs_inp, epo_inp, tmp_dir, out_dir, log_dir=None,
               handle_software='converto',
               rinexmod_options=None,
               metadata=None):
