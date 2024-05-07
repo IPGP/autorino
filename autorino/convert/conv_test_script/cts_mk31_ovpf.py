@@ -11,10 +11,7 @@ from geodezyx import *                   # Import the GeodeZYX modules
 from geodezyx.externlib import *         # Import the external modules
 from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
-import autorino.convert as arcv
-from autorino import configread as arcfg
-#from autorino import epochrange as aroepo
-#from autorino import  session as aroses
+import autorino.convert as arocnv
 import autorino.common  as arocmn
 
 import yaml
@@ -26,7 +23,10 @@ flist="/scratch/temp_stuffs/Raw_PF_2023_365_topcon_mk1a.list"
 flist="/home/sakic/090_TEMP/Raw_PF_2023_100_265_mk01a.list"
 flist="/home/sakic/090_TEMP/Raw_PF_TKRG_CFNG_2023_mk1.list"
 regex=".*"
-pout = "/scratch/convgnss/044_PF_CFNG_TKRG_2023"
+p = "/scratch/convgnss/044_PF_CFNG_TKRG_2023/"
+plog = p + '/log' 
+ptmp = p + '/tmp' 
+pout = p + '/out' 
 minyear = 2023
 maxyear = 2024
 nyear = 5
@@ -34,8 +34,8 @@ nyear = 5
 
 psitelogs = "/work/sitelogs/SITELOGS"
 
-CONV = arcv.ConvertGnss(pout,pout,pout,
-                        sitelogs=psitelogs)
+CONV = arocnv.ConvertGnss(pout,ptmp,plog,
+                          sitelogs=psitelogs)
 
 
 

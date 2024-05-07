@@ -46,6 +46,8 @@ class StepGnss():
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
 
+        self.set_dirs()
+
         # generic log
         self.set_logfile()
         # table log is on request only (for the moment9)
@@ -295,6 +297,15 @@ class StepGnss():
         self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
 
         return None
+
+
+    def set_dirs(self):
+        utils.create_dir(self.out_dir)
+        utils.create_dir(self.tmp_dir)
+        utils.create_dir(self.log_dir)
+        return None
+
+
 
     def set_tmp_dirs_paths(self):
         """
