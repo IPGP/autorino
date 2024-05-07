@@ -341,7 +341,6 @@ class HandleGnss(arocmn.StepGnss):
                 self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
 
             elif epoch_bol.sum() > 1 and mode == 'splice':
-                import autorino.handle.splice_cls as arospc
                 spc_obj = HandleGnss(out_dir=self.out_dir,
                                      tmp_dir=self.tmp_dir,
                                      log_dir=self.log_dir,
