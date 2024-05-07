@@ -9,6 +9,7 @@ Created on 23/04/2024 14:21:56
 import autorino.convert as arocnv
 import autorino.handle as arohdl
 
+
 def convert_rnx(raws_inp, out_dir, tmp_dir, log_dir=None,
                 rinexmod_options=None,
                 metadata=None):
