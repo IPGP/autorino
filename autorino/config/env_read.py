@@ -5,11 +5,12 @@ Created on 22/04/2024 16:16:23
 
 @author: psakic
 """
-import os
-import yaml
-
 # Create a logger object.
 import logging
+import os
+
+import yaml
+
 logger = logging.getLogger(__name__)
 
 def read_env(envfile_path=None):

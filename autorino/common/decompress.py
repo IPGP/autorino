@@ -9,15 +9,16 @@ This module, decompress.py, provides functions for decompressing files,
 specifically those that are gzipped or in Hatanaka-compressed RINEX format.
 """
 
-from geodezyx import conv
-from pathlib import Path
 import gzip
-import shutil
-import hatanaka
-import os
-
 # Import the logger
 import logging
+import os
+import shutil
+from pathlib import Path
+
+import hatanaka
+
+from geodezyx import conv
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")

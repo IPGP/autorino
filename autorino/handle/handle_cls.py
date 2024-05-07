@@ -5,16 +5,15 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
+# Create a logger object.
+import logging
+import os
+
 import numpy as np
+import pandas as pd
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
-
-import pandas as pd
-import os
-
-# Create a logger object.
-import logging
 
 logger = logging.getLogger(__name__)
 

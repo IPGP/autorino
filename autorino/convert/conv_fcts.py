@@ -6,23 +6,17 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakic
 """
 
-import os
-import re
-import numpy as np
 import datetime as dt
-import dateutil
-import docker
-from pathlib import Path
-
-from geodezyx import utils, operational
-
-import autorino.common as arocmn
-import autorino.convert as arocnv
-
-from rinexmod import rinexmod_api
-
 #### Import the logger
 import logging
+import os
+import re
+from pathlib import Path
+
+import dateutil
+import docker
+
+from rinexmod import rinexmod_api
 
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")

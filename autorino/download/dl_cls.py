@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import ftplib
-import pandas as pd
-import numpy as np
 import os
 import shutil
-import autorino.download as arodl
+
+import numpy as np
+import pandas as pd
+
 import autorino.common as arocmn
+import autorino.download as arodl
 
 pd.options.mode.chained_assignment = 'warn'
 

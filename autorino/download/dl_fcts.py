@@ -6,21 +6,22 @@ Created on Mon Mar 27 09:16:34 2023
 @author: psakicki
 """
 
-from bs4 import BeautifulSoup
 import ftplib
-import os
-import urllib
-from urllib.parse import urlparse
-import urllib.request                 
-from tqdm import tqdm
-import requests
 import io
-import socket
-from ftplib import FTP, error_temp
-from time import sleep
-
 # Create a logger object.
 import logging
+import os
+import socket
+import urllib
+import urllib.request
+from ftplib import error_temp
+from time import sleep
+from urllib.parse import urlparse
+
+import requests
+from bs4 import BeautifulSoup
+from tqdm import tqdm
+
 logger = logging.getLogger(__name__)
 
 

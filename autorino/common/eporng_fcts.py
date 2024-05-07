@@ -7,8 +7,8 @@ Created on Mon Jan  8 15:47:58 2024
 """
 
 import dateparser
-import pandas as pd
 import numpy as np
+import pandas as pd
 from pandas.tseries.frequencies import to_offset
 
 import autorino.common as arocmn

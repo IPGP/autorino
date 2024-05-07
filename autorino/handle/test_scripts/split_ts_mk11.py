@@ -5,16 +5,11 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
-import numpy as np
-
-import autorino.common as arocmn
-import autorino.convert as arocnv
-import autorino.handle as arohdl
 
 import datetime as dt
 
+import autorino.common as arocmn
 from geodezyx import utils
-
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/tmp'
 out_dir = '/home/psakicki/autorino_workflow_tests/split'

@@ -6,12 +6,10 @@ Created on Fri Apr  7 14:27:21 2023
 @author: psakicki
 """
 
-#### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
-
 import autorino.convert.conv_batch as cvb
+
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
 
 ###################### OVSG for SONEL
 psitelogs = "/work/metadata/SITELOGS"

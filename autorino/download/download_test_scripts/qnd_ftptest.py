@@ -1,6 +1,4 @@
 from autorino import download as arodl
-from autorino import configread as arocfg
-
 
 sta_user="admin"
 sta_pass="W1F10VPF"

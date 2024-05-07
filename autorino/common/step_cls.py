@@ -6,22 +6,20 @@ Created on Mon Jan  8 16:53:51 2024
 @author: psakic
 """
 
+import copy
 # Import the logger
 import logging
-import shutil
-
-import pandas as pd
-import numpy as np
 import os
 import re
-import copy
+import shutil
 
-import rinexmod
-from geodezyx import utils, conv
+import numpy as np
+import pandas as pd
 
 import autorino.common as arocmn
 import autorino.config as arocfg
-
+import rinexmod
+from geodezyx import utils, conv
 from rinexmod import rinexmod_api
 
 logger = logging.getLogger(__name__)
