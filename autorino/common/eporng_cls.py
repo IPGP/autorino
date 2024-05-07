@@ -8,10 +8,13 @@ Created on Mon Jan  8 15:47:58 2024
 This module, eporng_cls.py, provides a class for handling ranges of epochs.
 """
 
-import pandas as pd
-import numpy as np
 import re
+
+import numpy as np
+import pandas as pd
+
 import autorino.common as arocmn
+
 
 class EpochRange:
     """

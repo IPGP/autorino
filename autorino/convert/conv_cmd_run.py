@@ -6,19 +6,18 @@ Created on Tue Feb 21 16:23:06 2023
 @author: psakic
 """
 
-from typing import Union, List
-from pathlib import Path
+import datetime as dt
+#### Import the logger
+import logging
 import os
 import re
 import subprocess
-from subprocess import Popen, PIPE
-from geodezyx import utils, conv
-import datetime as dt
+from pathlib import Path
+from subprocess import PIPE
+from typing import Union, List
 
 import autorino.convert as arcv
-
-#### Import the logger
-import logging
+from geodezyx import utils, conv
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")

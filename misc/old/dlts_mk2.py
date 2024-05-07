@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import datetime as dt
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+
 from autorino import download as ardl
+
 
 def _dir_translator_date(dir_input,date):
     dir_translated = str(dir_input)

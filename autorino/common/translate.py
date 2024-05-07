@@ -6,9 +6,11 @@ Created on Thu Jan 25 19:20:22 2024
 @author: psakic
 """
 
-from geodezyx import utils
+import os
 import re
-import os 
+
+from geodezyx import utils
+
 
 ##### Frontend function
 

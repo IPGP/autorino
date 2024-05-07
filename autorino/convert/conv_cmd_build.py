@@ -27,10 +27,10 @@ cmd_str : string
 
 #### Import star style
 from pathlib import Path
-#from pathlib3x import Path
-from geodezyx import utils
 
 import autorino.config.env_read as aroenv
+# from pathlib3x import Path
+from geodezyx import utils
 
 #### IMPORT AUTORINO ENVIRONNEMENT VARABLES
 ## software paths

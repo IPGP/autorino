@@ -5,10 +5,9 @@
 # from autorino import download as arodl
 # from autorino import convert as arocnv
 # from autorino import general as arocmn
-from autorino import config as arocfg
-
 import yaml
 
+from autorino import config as arocfg
 
 ###########################################################################################
 

@@ -7,12 +7,11 @@ Created on Mon Jan  8 16:53:51 2024
 """
 
 import logging
-
-import numpy as np
 import os
 import re
 
-import rinexmod
+import numpy as np
+
 from geodezyx import utils
 
 logger = logging.getLogger(__name__)

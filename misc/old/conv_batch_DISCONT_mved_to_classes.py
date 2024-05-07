@@ -11,20 +11,22 @@ WILL  BE DISCONTINUED WHEN CLASSES WILL BE OPE
 
 """
 
-from geodezyx import utils,  operational
-import autorino.convert as arcv
-from rinexmod import rinexmod_api
-from pathlib import Path
-import os
-import re 
-import numpy as np
 import datetime as dt
-import dateutil
-import docker
-import pandas as pd
-
 #### Import the logger
 import logging
+import os
+import re
+from pathlib import Path
+
+import dateutil
+import docker
+import numpy as np
+import pandas as pd
+
+import autorino.convert as arcv
+from geodezyx import utils, operational
+from rinexmod import rinexmod_api
+
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
