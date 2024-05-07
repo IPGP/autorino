@@ -7,19 +7,13 @@ Created on Mon Jan  8 16:53:51 2024
 """
 
 import logging
-import shutil
 
-import pandas as pd
 import numpy as np
 import os
 import re
-import copy
 
 import rinexmod
-from geodezyx import utils, conv, operational
-
-import autorino.common as arocmn
-import autorino.config as arocfg
+from geodezyx import utils
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
