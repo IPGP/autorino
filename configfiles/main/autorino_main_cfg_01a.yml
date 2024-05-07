@@ -1,6 +1,6 @@
 station:
     site:
-        sitelog_path: <$HOME>/sitelogs/OVPF/  ###  can be a specific file or a directory path containing the sitelogs
+        sitelog_path: <$HOME>/metadata/OVPF/  ###  can be a specific file or a directory path containing the sitelogs
     sessions:
         session_15m01s: ####Keep session in dictionnary / Object not necessary
             general:
@@ -27,7 +27,7 @@ station:
                         FROM_SESSION
                     options:
                         force: False
-                conversion:
+                convert:
                     inp_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
                     inp_structure: <SITE_ID>/%Y/%j
                     out_dir_parent: '<$HOME>/autorino_workflow_tests/rnx/'

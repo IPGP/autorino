@@ -16,7 +16,7 @@ import converters as cv
 import rinexmod_api
 
 p="/net/baiededix/ovpf/miroir_ovpf/DonneesAcquisition/geodesie/GPSPermanent/" 
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 outdir_converted = "/scratch/convgnss/010_tests_autorino_converters/converted"
 outdir_rinexmoded = "/scratch/convgnss/010_tests_autorino_converters/rinexmoded" 
 utils.create_dir(outdir_rinexmoded)

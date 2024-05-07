@@ -1,4 +1,5 @@
 ###### BASED on GeodeZYX log
+# THE loggers KEY MUST DESCRIBES THE CURRENT MODULE/PROJECT!!!!
 
 ###### USEFUL TUTOS
 ## https://coderzcolumn.com/tutorials/python/logging-simple-guide-to-log-events-in-python
@@ -15,7 +16,7 @@ log_config_dict = {
     },
     
     'loggers': {
-        "autorino" : {
+        "autorino" : { # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
             "handlers" : ["console_gyxz"],
             "level": "DEBUG",
             "propagate": False
