@@ -12,8 +12,9 @@ Created on Tue Mar 14 12:03:40 2023
 #### thus annex regex will finally not include the main
 """
 
-from pathlib import Path
 import re
+from pathlib import Path
+
 
 ###################################################################
 

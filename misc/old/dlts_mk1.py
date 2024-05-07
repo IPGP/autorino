@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import datetime as dt
-from autorino import download as ardl
 
+from autorino import download as ardl
 
 ############################################################
 protocol = "http"

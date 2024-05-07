@@ -6,13 +6,13 @@ Created on Tue Apr  4 15:43:28 2023
 @author: psakicki
 """
 
-#### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
-
-import rinexmod_api, os
 from pathlib import Path
+
+import os
+import rinexmod_api
+
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
 
 p = "/scratch/convgnss/021_SONEL_conv_GP/rinexmoded"
 flist = utils.find_recursive(p,"*crx.gz")

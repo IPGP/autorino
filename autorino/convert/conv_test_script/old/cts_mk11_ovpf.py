@@ -8,13 +8,13 @@ Created on Fri Apr  7 14:27:21 2023
 
 #### Import star style
 from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 #import autorino.convert.conv_batch as cvb
 from autorino import convert as arocnv
-
-
+# import autorino.convert.conv_batch as cvb
+from autorino import convert as arocnv
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
 
 ###################### OVPF
 psitelogs = "/work/metadata/SITELOGS"

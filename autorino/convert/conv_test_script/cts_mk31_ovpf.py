@@ -6,20 +6,13 @@ Created on Fri Apr  7 14:27:21 2023
 @author: psakicki
 """
 
-#### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
-
 import autorino.convert as arcv
-from autorino import configread as arcfg
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
+from geodezyx.externlib import *  # Import the external modules
+
 #from autorino import epochrange as aroepo
 #from autorino import  session as aroses
-import autorino.common  as arocmn
-
-import yaml
-
-import timeit
 
 ##### 2023
 flist="/scratch/temp_stuffs/Raw_PF_2023_365_topcon_mk1a.list"
