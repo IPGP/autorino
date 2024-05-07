@@ -31,7 +31,7 @@ REQ = REQlist
 EPOC = REQ.epoch_range
 
 pout = "/home/sakic/020_TEMP/convcls_test"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 
 CONV = arcv.ConvertGnss(SES,
                         EPOC,

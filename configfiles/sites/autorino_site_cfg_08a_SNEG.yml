@@ -42,7 +42,7 @@ station:
                         FROM_MAIN
                     options:
                         FROM_MAIN
-                conversion:
+                convert:
                     FROM_MAIN
 
                     
