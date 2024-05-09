@@ -3,7 +3,7 @@
 """
 Created on Mon Mar 27 09:16:34 2023
 
-@author: psakicki
+@author: psakic
 """
 
 import ftplib
@@ -68,7 +68,7 @@ def join_url(protocol_inp,hostname_inp,dir_inp,fname_inp):
     
     ### safty warning to check a stupid cpoy/paste
     if fname_inp in dirr:
-        logger.warn("%s file's name also appears in dir name, check your config file",fname_inp)
+        logger.warning("%s file's name also appears in dir name, check your config file",fname_inp)
         
     url_out = os.path.join(prot_n_host,
                            dirr,
@@ -109,7 +109,7 @@ def list_remote_files_ftp(host_name, remote_dir, username, password,
     host_name = host_name.replace('/',"")
     remote_dir = remote_dir.replace(host_name,"")
     
-    join_url()
+    #join_url()
     
     # connect to FTP server
     ftp = ftplib.FTP(host_name,timeout=timeout)
