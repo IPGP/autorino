@@ -3,7 +3,7 @@
 """
 Created on Mon Jan  8 15:47:58 2024
 
-@author: psakicki
+@author: psakic
 """
 
 import dateparser

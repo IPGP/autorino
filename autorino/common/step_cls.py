@@ -959,7 +959,7 @@ class StepGnss():
                 if year_in_inp_path:
                     year_folder = int(fpath_inp.split("/")[year_in_inp_path])
                 else:
-                    rgx = re.search(r"\/(19|20)[0-9]{2}\/", fpath_inp)
+                    rgx = re.search(r"/(19|20)[0-9]{2}/", fpath_inp)
                     year_folder = int(rgx.group()[1:-1])
                 return year_folder
             except Exception:

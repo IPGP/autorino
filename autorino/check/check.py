@@ -3,7 +3,7 @@
 """
 Created on Fri Jun  2 10:56:52 2023
 
-@author: psakicki
+@author: psakic
 """
 
 # Create a logger object.

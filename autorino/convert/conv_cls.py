@@ -54,7 +54,7 @@ class ConvertGnss(arocmn.StepGnss):
         ### other tmps subdirs come also later in the loop
 
         if self.metadata:
-            site4_list = arocnv.site_list_from_sitelogs(self.metadata)
+            site4_list = arocnv.site_list_from_metadata(self.metadata)
         else:
             site4_list = []
 

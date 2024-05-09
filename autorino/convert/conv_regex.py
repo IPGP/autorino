@@ -3,7 +3,7 @@
 """
 Created on Tue Mar 14 12:03:40 2023
 
-@author: psakicki
+@author: psakic
 
 #### converted files regular expressions functions
 #### main = the regex for the main file i.e. the Observation RINEX
