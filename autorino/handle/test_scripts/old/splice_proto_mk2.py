@@ -6,12 +6,11 @@ Created on Mon Oct  2 14:35:28 2023
 @author: psakic
 """
 
-#### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
-
 import hatanaka
+
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
+from geodezyx.externlib import *  # Import the external modules
 
 #p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded/HOUE"
 #p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded2/HOUE"

@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import ftplib
-import pandas as pd
-import numpy as np
 import os
 import shutil
-import autorino.download as arodl
+
+import numpy as np
+import pandas as pd
+
 import autorino.common as arocmn
+import autorino.download as arodl
 
 pd.options.mode.chained_assignment = 'warn'
 
@@ -153,6 +155,7 @@ class DownloadGnss(arocmn.StepGnss):
     def ask_remote_files(self):
         rmot_dir_list = self._guess_remote_directories()
         rmot_files_list = []
+        list_ = []
         for rmot_dir_use in rmot_dir_list:
             if self.access['protocol'] == "http":
                 list_ = arodl.list_remote_files_http(self.access['hostname'],
@@ -235,8 +238,8 @@ class DownloadGnss(arocmn.StepGnss):
                                                           tmpdir_use,
                                                           self.access['login'],
                                                           self.access['password'])
-                    file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
                     dl_ok = True
+                    file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
                 except ftplib.error_perm as e:
                     logger.error("FTP download error: %s", str(e))
                     dl_ok = False

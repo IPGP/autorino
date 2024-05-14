@@ -6,12 +6,11 @@ Created on Thu Feb 29 17:25:11 2024
 @author: psakic
 """
 
-import autorino.common as arocmn
-import autorino.handle as arohdl
-
-from geodezyx import utils
 import datetime as dt
 
+import autorino.common as arocmn
+import autorino.handle as arohdl
+from geodezyx import utils
 
 tmp_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/temp'
 rnxmod_dir = '/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/rinexmoded'

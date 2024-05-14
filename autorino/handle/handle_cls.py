@@ -5,16 +5,15 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
+# Create a logger object.
+import logging
+import os
+
 import numpy as np
+import pandas as pd
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
-
-import pandas as pd
-import os
-
-# Create a logger object.
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -341,7 +340,6 @@ class HandleGnss(arocmn.StepGnss):
                 self.table.loc[irow, 'fpath_inp'] = rnxinp_row['fpath_inp']
 
             elif epoch_bol.sum() > 1 and mode == 'splice':
-                import autorino.handle.splice_cls as arospc
                 spc_obj = HandleGnss(out_dir=self.out_dir,
                                      tmp_dir=self.tmp_dir,
                                      log_dir=self.log_dir,

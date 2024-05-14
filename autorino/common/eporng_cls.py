@@ -3,19 +3,46 @@
 """
 Created on Mon Jan  8 15:47:58 2024
 
-@author: psakicki
+@author: psakic
+
+This module, eporng_cls.py, provides a class for handling ranges of epochs.
 """
 
-
-import pandas as pd
-import numpy as np
 import re
-from pandas.tseries.frequencies import to_offset
+
+import numpy as np
+import pandas as pd
+
 import autorino.common as arocmn
 
 
-
 class EpochRange:
+    """
+    A class used to represent a range of epochs.
+
+    ...
+
+    Attributes
+    ----------
+    period : str
+        the rounding period. Use the pandas' frequency aliases convention.
+    round_method : str
+        the method used for rounding the epochs.
+    tz : str
+        the timezone used for the epochs.
+    _epoch1_raw : datetime
+        the raw start of the epoch range.
+    _epoch2_raw : datetime
+        the raw end of the epoch range.
+
+    Methods
+    -------
+    epoch_range_list(end_bound=False):
+        Computes the list of epochs corresponding to the EpochRange.
+    is_valid():
+        Checks if the epoch range is valid.
+    """
+
     def __init__(self,
                  epoch1,
                  epoch2,
@@ -23,18 +50,23 @@ class EpochRange:
                  round_method="round",
                  tz="UTC"):
         """
-        period : str, optional
-            the rounding period. 
-            Use the pandas' frequency aliases convention (see bellow for details).
-            
-        Note
-        ----
-        Pandas' frequency aliases memo
-        https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+        Constructs all the necessary attributes for the epoch range object.
+
+        Parameters
+        ----------
+            epoch1 : datetime
+                the start of the epoch range.
+            epoch2 : datetime
+                the end of the epoch range.
+            period : str, optional
+                the rounding period. Use the pandas' frequency aliases convention.
+            round_method : str, optional
+                the method used for rounding the epochs.
+            tz : str, optional
+                the timezone used for the epochs.
         """
 
         self.period = period
-        #see also self.period_values, the period int and str values
         self.round_method = round_method
         self.tz = tz
 
@@ -57,10 +89,12 @@ class EpochRange:
     ############ getters and setters
     @property
     def epoch_start(self):
+        """Gets the start of the epoch range."""
         return self._epoch_start
 
     @epoch_start.setter
     def epoch_start(self, value):
+        """Sets the start of the epoch range."""
         self._epoch_start = arocmn.dateparser_interpret(value, tz=self.tz)
         self._epoch_start = arocmn.round_date(self._epoch_start,
                                               self.period,
@@ -68,10 +102,12 @@ class EpochRange:
 
     @property
     def epoch_end(self):
+        """Gets the end of the epoch range."""
         return self._epoch_end
 
     @epoch_end.setter
     def epoch_end(self, value):
+        """Sets the end of the epoch range."""
         self._epoch_end = arocmn.dateparser_interpret(value)  #,tz=self.tz)
         self._epoch_end = arocmn.round_date(self._epoch_end,
                                             self.period,
@@ -80,7 +116,7 @@ class EpochRange:
     @property
     def period_values(self):
         """
-        for a period, e.g. 15min, 1H...
+        For a period, e.g. 15min, 1H...
         Returns the value (e.g. 15, 1) and the unit (e.g. min, H)
         """
         numbers = re.findall(r'[0-9]+', self.period)
@@ -98,12 +134,13 @@ class EpochRange:
 
         Parameters
         ----------
-        end_bound
+        end_bound : bool, optional
+            If True, gives the end bound of the range.
 
         Returns
         -------
-        list of epochs
-
+        list
+            List of epochs.
         """
         if not self.is_valid(): ### NaT case
             eporng = [pd.NaT]
@@ -123,9 +160,15 @@ class EpochRange:
         return list(eporng)
 
     def is_valid(self):
+        """
+        Checks if the epoch range is valid.
+
+        Returns
+        -------
+        bool
+            True if the epoch range is valid, False otherwise.
+        """
         if pd.isna(self.epoch_start) or pd.isna(self.epoch_end):
             return False
         else:
             return True
-
-

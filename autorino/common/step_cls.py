@@ -6,22 +6,20 @@ Created on Mon Jan  8 16:53:51 2024
 @author: psakic
 """
 
+import copy
 # Import the logger
 import logging
-import shutil
-
-import pandas as pd
-import numpy as np
 import os
 import re
-import copy
+import shutil
 
-import rinexmod
-from geodezyx import utils, conv
+import numpy as np
+import pandas as pd
 
 import autorino.common as arocmn
 import autorino.config as arocfg
-
+import rinexmod
+from geodezyx import utils, conv
 from rinexmod import rinexmod_api
 
 logger = logging.getLogger(__name__)
@@ -29,6 +27,31 @@ logger.setLevel("DEBUG")
 
 
 class StepGnss():
+    """
+    The StepGnss class represents a step in a GNSS processing chain. It contains methods for initializing and managing
+    various aspects of a processing step, including epoch ranges, sites, sessions, options, and metadata. It also provides
+    methods for handling temporary directories, logging, and table management.
+
+    Attributes
+    ----------
+    out_dir : str
+        The output directory for the step.
+    tmp_dir : str
+        The temporary directory for the step.
+    log_dir : str
+        The log directory for the step.
+    epoch_range : EpochRange
+        The epoch range for the step.
+    site : dict
+        The site information for the step.
+    session : dict
+        The session information for the step.
+    options : dict
+        The options for the step.
+    metadata : dict
+        The metadata for the step.
+    """
+
     def __init__(self,
                  out_dir, tmp_dir, log_dir,
                  epoch_range=None,
@@ -36,14 +59,35 @@ class StepGnss():
                  session=None,
                  options=None,
                  metadata=None):
+        """
+        Initializes a new instance of the StepGnss class.
 
+        Parameters
+        ----------
+        out_dir : str
+            The output directory for the step.
+        tmp_dir : str
+            The temporary directory for the step.
+        log_dir : str
+            The log directory for the step.
+        epoch_range : EpochRange, optional
+            The epoch range for the step. If not provided, a dummy epoch range is created.
+        site : dict, optional
+            The site information for the step. If not provided, a dummy site is created.
+        session : dict, optional
+            The session information for the step. If not provided, a dummy session is created.
+        options : dict, optional
+            The options for the step. If not provided, an empty options dictionary is created.
+        metadata : dict, optional
+            The metadata for the step. If not provided, a dummy metadata is created.
+        """
         self._init_epoch_range(epoch_range)
         self._init_site(site)
         self._init_session(session)
         self._init_options(options)
         self._init_site_id()
         self._init_table()
-        
+
         self.set_translate_dict()
 
         ### sitelog init (needs translate dict)
@@ -65,7 +109,6 @@ class StepGnss():
         #### list to stack temporarily the temporary files before their delete
         self.tmp_rnx_files = []
         self.tmp_decmp_files = []
-
     def __repr__(self):
         name = type(self).__name__
         out = "{} {}/{}".format(name,
@@ -916,7 +959,7 @@ class StepGnss():
                 if year_in_inp_path:
                     year_folder = int(fpath_inp.split("/")[year_in_inp_path])
                 else:
-                    rgx = re.search(r"\/(19|20)[0-9]{2}\/", fpath_inp)
+                    rgx = re.search(r"/(19|20)[0-9]{2}/", fpath_inp)
                     year_folder = int(rgx.group()[1:-1])
                 return year_folder
             except Exception:
