@@ -11,10 +11,12 @@ Created on Wed Mar  8 18:45:58 2023
 #from geodezyx.externlib import *         # Import the external modules
 #from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
-from geodezyx import utils
+import os
+
 import converters as cv
 import rinexmod_api
-import os
+
+from geodezyx import utils
 
 p="/net/baiededix/ovpf/miroir_ovpf/DonneesAcquisition/geodesie/GPSPermanent/2023" 
 p="/home/psakicki/GFZ_WORK/IPGP_WORK/OVS/GNSS_OVS/0010_work_area/2202_DataExemple/binex_mtq"

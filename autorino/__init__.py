@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging.config
 import os
 from os import path
-import logging.config
-
-
 
 #### IMPORT CONFIG FOR LOGGER
 log_file_path = os.path.join(path.dirname(path.abspath(__file__)),

@@ -1,12 +1,6 @@
-import datetime as dt
-import pandas as pd
-import numpy as np
-import os
-from autorino import download as ardl
-from autorino import configread as arcfg
-
 import yaml
 
+from autorino import configread as arcfg
 
 ###########################################################################################
 

@@ -3,34 +3,41 @@
 """
 Created on Mon Jan 29 11:53:09 2024
 
-@author: psakicki
+@author: psakic
+
+This module, decompress.py, provides functions for decompressing files,
+specifically those that are gzipped or in Hatanaka-compressed RINEX format.
 """
 
-from geodezyx import conv
-from pathlib import Path
 import gzip
-import shutil
-import hatanaka
-import os
-
-#### Import the logger
+# Import the logger
 import logging
+import os
+import shutil
+from pathlib import Path
+
+import hatanaka
+
+from geodezyx import conv
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 
-#  _____                                               _
-# |  __ \                                             (_)
-# | |  | | ___  ___ ___  _ __ ___  _ __  _ __ ___  ___ _  ___  _ __
-# | |  | |/ _ \/ __/ _ \| '_ ` _ \| '_ \| '__/ _ \/ __| |/ _ \| '_ \
-# | |__| |  __/ (_| (_) | | | | | | |_) | | |  __/\__ \ | (_) | | | |
-# |_____/ \___|\___\___/|_| |_| |_| .__/|_|  \___||___/_|\___/|_| |_|
-#                                 | |
-#                                 |_|
-
-
 def is_compressed(file_inp):
+    """
+    Checks if a file is compressed based on its extension.
+
+    Parameters
+    ----------
+    file_inp : str
+        The input file to check.
+
+    Returns
+    -------
+    bool
+        True if the file is compressed, False otherwise.
+    """
     file_inp2 = Path(file_inp)
 
     ext = file_inp2.suffix.lower()
@@ -44,6 +51,24 @@ def is_compressed(file_inp):
 
 
 def _decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
+    """
+    Decompresses a gzipped file.
+
+    Parameters
+    ----------
+    gzip_file_inp : str
+        The input gzipped file to decompress.
+    out_dir_inp : str, optional
+        The output directory where the decompressed file will be stored.
+        If not provided, the decompressed file will be stored in the same directory as the input file.
+    force : bool, optional
+        If True, the file will be decompressed even if a decompressed file already exists.
+
+    Returns
+    -------
+    str
+        The path to the decompressed file.
+    """
     gzip_file_inp = str(gzip_file_inp)
     gzip_file2 = Path(gzip_file_inp)
 
@@ -56,7 +81,6 @@ def _decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
 
     if file_out.exists() and not force:
         pass
-        #logger.debug("%s already exists, no decompression", file_out)
     else:
         with gzip.open(gzip_file_inp, 'rb') as f_in:
             with open(file_out, 'wb') as f_out:
@@ -68,6 +92,24 @@ def _decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
 
 
 def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
+    """
+    Decompresses a Hatanaka-compressed RINEX file.
+
+    Parameters
+    ----------
+    crx_file_inp : str
+        The input Hatanaka-compressed RINEX file to decompress.
+    out_dir_inp : str, optional
+        The output directory where the decompressed file will be stored.
+        If not provided, the decompressed file will be stored in the same directory as the input file.
+    force : bool, optional
+        If True, the file will be decompressed even if a decompressed file already exists.
+
+    Returns
+    -------
+    str
+        The path to the decompressed file.
+    """
     crx_file_inp = str(crx_file_inp)
     crx_file_inp2 = Path(crx_file_inp)
 
@@ -84,7 +126,6 @@ def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
     rnx_file_potential = os.path.join(out_dir, rnx_name_potential)
 
     if os.path.isfile(rnx_file_potential) and not force:
-        #logger.debug("%s already exists, no decompression", rnx_file_potential)
         rnx_file_out = rnx_file_potential
     else:
         rnx_file_out = hatanaka.decompress_on_disk(crx_file, delete=dell)
@@ -97,6 +138,26 @@ def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
 def decompress_file(file_inp,
                     out_dir_inp=None,
                     force=False):
+    """
+    Decompresses a file. The file can be gzipped or in Hatanaka-compressed RINEX format.
+
+    Parameters
+    ----------
+    file_inp : str
+        The input file to decompress.
+    out_dir_inp : str, optional
+        The output directory where the decompressed file will be stored.
+        If not provided, the decompressed file will be stored in the same directory as the input file.
+    force : bool, optional
+        If True, the file will be decompressed even if a decompressed file already exists.
+
+    Returns
+    -------
+    str
+        The path to the decompressed file.
+    bool
+        True if the file was decompressed, False otherwise.
+    """
     file_inp = str(file_inp)
     file_inp2 = Path(file_inp)
     ext = file_inp2.suffix.lower()
@@ -105,19 +166,18 @@ def decompress_file(file_inp,
         logger.warning("unable to decompress, file not exists: %s", file_inp2.name)
         file_out = file_inp
         bool_decomp_out = False
-    ### RINEX Case
+    ## RINEX Case
     elif conv.rinex_regex_search_tester(file_inp, compressed=True):
         file_out = _decomp_hatanaka(file_inp, out_dir_inp, force=force)
         bool_decomp_out = True
-    ### Generic gzipped case (e.g. RAW file)
+    ## Generic gzipped case (e.g. RAW file)
     elif ext == ".gz":
         file_out = _decomp_gzip(file_inp, out_dir_inp, force=force)
         bool_decomp_out = True
     else:
         logger.debug("no valid compression for %s, nothing is done",
-                    file_inp2.name)
+                     file_inp2.name)
         file_out = file_inp
-        bool_decomp_out = False 
+        bool_decomp_out = False
 
     return file_out, bool_decomp_out
-

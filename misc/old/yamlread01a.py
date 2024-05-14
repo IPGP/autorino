@@ -7,9 +7,6 @@ Created on Thu Dec  1 15:47:05 2022
 """
 
 #### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 import yaml 
 
