@@ -491,6 +491,7 @@ class StepGnss():
         trslt_dir = arocmn.translator(path_inp, self.translate_dict, epoch_inp)
         if make_dir:
             utils.create_dir(trslt_dir)
+            logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
 
     #  _                       _
