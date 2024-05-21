@@ -357,7 +357,7 @@ class StepGnss():
                                                     make_dir=True)
         tmp_dir_rinexmoded_set = self.translate_path(self._tmp_dir_rinexmoded,
                                                      make_dir=True)
-        tmp_dir_downloaded_set = self.translate_path(self._tmp_dir_rinexmoded,
+        tmp_dir_downloaded_set = self.translate_path(self._tmp_dir_downloaded,
                                                      make_dir=True)
 
         return tmp_dir_logs_set, tmp_dir_unzipped_set, \
@@ -489,7 +489,7 @@ class StepGnss():
         you will get nasty results !!
         """
         trslt_dir = arocmn.translator(path_inp, self.translate_dict, epoch_inp)
-        if make_dir:
+        if make_dir and not os.path.isdir(trslt_dir):
             utils.create_dir(trslt_dir)
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
