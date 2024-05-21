@@ -7,9 +7,6 @@ Created on Tue Apr  4 14:48:49 2023
 """
 
 #### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 
 import rinexmod_api
@@ -19,7 +16,7 @@ import rinexmod_api
 
 
 ########### SITELOGS
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
 
 

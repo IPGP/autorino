@@ -6,20 +6,22 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakicki
 """
 
-from geodezyx import utils,  operational
-import autorino.convert as arcv
-import rinexmod_api
-from pathlib import Path
-import os
-import re 
-import numpy as np
 import datetime as dt
-import dateutil
-import docker
-import pandas as pd
-
 #### Import the logger
 import logging
+import os
+import re
+from pathlib import Path
+
+import dateutil
+import docker
+import numpy as np
+import pandas as pd
+import rinexmod_api
+
+import autorino.convert as arcv
+from geodezyx import utils, operational
+
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
@@ -27,7 +29,7 @@ logger.setLevel("INFO")
 def site_list_from_sitelogs(sitelogs_inp):
     
     ###############################################
-    ### read sitelogs        
+    ### read metadata
     if os.path.isdir(sitelogs_inp):
         sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
                                                      force=False)
@@ -119,7 +121,7 @@ class ConvertRinexModGnss():
             logger.info("***** input raw file for conversion: %s",fraw.name)
     
             ### since the fraw name can be poorly formatted
-            # we search it w.r.t. the sites from the sitelogs
+            # we search it w.r.t. the sites from the metadata
     
             site =  _site_search_from_list(fraw,
                                            site4_list)       

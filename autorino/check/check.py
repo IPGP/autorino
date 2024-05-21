@@ -3,23 +3,23 @@
 """
 Created on Fri Jun  2 10:56:52 2023
 
-@author: psakicki
+@author: psakic
 """
-
-#### Import star style
-# geodeZYX modules
-from geodezyx import operational as opera
-from geodezyx import conv
-import pandas as pd
-import os 
-import rinexmod_api as rma
-import numpy as np
-
-import termcolor
-import pandas
 
 # Create a logger object.
 import logging
+import os
+
+import numpy as np
+import pandas as pd
+import rinexmod_api as rma
+import termcolor
+
+from geodezyx import conv
+#### Import star style
+# geodeZYX modules
+from geodezyx import operational as opera
+
 logger = logging.getLogger(__name__)
 
 

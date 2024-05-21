@@ -6,13 +6,10 @@ Created on Mon Oct  2 14:35:28 2023
 @author: psakic
 """
 
-#### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
-
 import rinexfile
 
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
 
 #p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded/HOUE"
 #p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded2/HOUE"
@@ -90,5 +87,5 @@ for (site,day),df in DFgrp:
 
  
  ##### then RINEXMOD command
- # rinexmod --sitelog /work/sitelogs/SITELOGS -t -c 'gz' -r '/home/sakic/031_SCRATCH_CONV/075_HOUE_week_corr_ON/gfzrnxed_clean' -m "HOUZ"  ./old_houe_01a.list ./rerinexmoded
+ # rinexmod --sitelog /work/metadata/SITELOGS -t -c 'gz' -r '/home/sakic/031_SCRATCH_CONV/075_HOUE_week_corr_ON/gfzrnxed_clean' -m "HOUZ"  ./old_houe_01a.list ./rerinexmoded
 

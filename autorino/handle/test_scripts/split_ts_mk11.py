@@ -5,16 +5,11 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
-import numpy as np
-
-import autorino.common as arocmn
-import autorino.convert as arocnv
-import autorino.handle as arohdl
 
 import datetime as dt
 
+import autorino.common as arocmn
 from geodezyx import utils
-
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/tmp'
 out_dir = '/home/psakicki/autorino_workflow_tests/split'
@@ -30,4 +25,4 @@ epo = (dt.datetime(2024, 2, 28, 1),
 p = "/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"
 L = utils.find_recursive(p, "*gz")
 
-arohdl.split_rnx(L,epo,tmp_dir,out_dir)
+arocmn.split_rnx(L,epo,tmp_dir,out_dir,tmp_dir)

@@ -5,10 +5,9 @@
 # from autorino import download as arodl
 # from autorino import convert as arocnv
 # from autorino import general as arocmn
-from autorino import config as arocfg
-
 import yaml
 
+from autorino import config as arocfg
 
 ###########################################################################################
 
@@ -39,7 +38,7 @@ dwl.print_table()
 # dwl.print_table()
 
 # out = "/home/sysop/workflow_tests/convert_tests"
-# sitelog_dir = '/home/sysop/sitelogs/OVPF'
+# sitelog_dir = '/home/sysop/metadata/OVPF'
 
 # conv = arocnv.ConvertGnss(ses,dwl.epoch_range,out,sitelog_dir)
 

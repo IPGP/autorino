@@ -1,6 +1,4 @@
 from autorino import download as arodl
-from autorino import configread as arocfg
-
 
 sta_user="***REMOVED***"
 sta_pass="***REMOVED***"

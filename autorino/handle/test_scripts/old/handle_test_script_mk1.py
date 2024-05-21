@@ -7,20 +7,14 @@ Created on Tue Jan 16 12:17:17 2024
 """
 
 #### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
-
-import numpy as np
-import pandas as pd
 
 
 import autorino.general as arogen
-#import autorino.workflow as arowkf
-#import autorino.epochrange as aroepo
-#import autorino.session as aroses
-import autorino.handle as arohdl
 
+# import autorino.workflow as arowkf
+# import autorino.epochrange as aroepo
+# import autorino.session as aroses
+import autorino.handle as arohdl
 
 epo = arogen.create_dummy_epochrange()
 ses = arogen.create_dummy_session()

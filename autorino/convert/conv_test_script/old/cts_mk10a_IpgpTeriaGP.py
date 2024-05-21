@@ -7,9 +7,6 @@ Created on Fri Apr  7 14:27:01 2023
 """
 
 #### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 import autorino.convert.conv_batch as cvb
 
@@ -35,7 +32,7 @@ if True:
 
 #### OUT DIRECTORY
 outdir = "/scratch/convgnss/090_compar_IPGPTeria_GP/"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 keywords_path_excl=['Problem','Rinex','ZIP']
 
 ##################################################################

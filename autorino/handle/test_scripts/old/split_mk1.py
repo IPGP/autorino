@@ -6,12 +6,11 @@ Created on Thu Feb 29 17:25:11 2024
 @author: psakic
 """
 
-import autorino.common as arocmn
-import autorino.handle as arohdl
-
-from geodezyx import utils
 import datetime as dt
 
+import autorino.common as arocmn
+import autorino.handle as arohdl
+from geodezyx import utils
 
 tmp_dir = '/home/psakicki/autorino_workflow_tests/temp'
 rnxmod_dir = '/home/psakicki/autorino_workflow_tests/rinexmoded'
@@ -48,7 +47,7 @@ for irow,row in hdl_split.table.iterrows():
     rinexmod_kwargs = {#'marker': 'TOTO',
                        'compression': "gz",
                        'longname': True,
-                       #'sitelog': sitelogs,
+                       #'sitelog': metadata,
                        'force_rnx_load': True,
                        'verbose': False,
                        'tolerant_file_period': True,

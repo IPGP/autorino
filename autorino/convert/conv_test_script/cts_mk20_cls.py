@@ -6,16 +6,13 @@ Created on Fri Apr  7 14:27:21 2023
 @author: psakicki
 """
 
-#### Import star style
-from geodezyx import *                   # Import the GeodeZYX modules
-from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
+import yaml
 
 import autorino.convert as arcv
 from autorino import configread as arcfg
-import yaml
-
-import timeit
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
+from geodezyx.externlib import *  # Import the external modules
 
 pconfig = "/home/gps/tests_pierres/autorino/configfiles/proto_config_HOUE_03a.yml"
 pconfig = "/home/gps/tests_pierres/autorino/configfiles/proto_config_PSA1_03a.yml"
@@ -31,7 +28,7 @@ REQ = REQlist
 EPOC = REQ.epoch_range
 
 pout = "/home/sakic/020_TEMP/convcls_test"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 
 CONV = arcv.ConvertGnss(SES,
                         EPOC,
