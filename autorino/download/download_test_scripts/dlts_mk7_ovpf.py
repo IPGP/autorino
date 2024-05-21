@@ -1,14 +1,8 @@
-import datetime as dt
-import pandas as pd
-import numpy as np
-import os
-from autorino import download as arodl
 from autorino import convert as arocnv
-from autorino import general as arogen
-from autorino import configread as arocfg
-
 import yaml
 
+from autorino import configread as arocfg
+from autorino import convert as arocnv
 
 ###########################################################################################
 
@@ -35,7 +29,7 @@ dwl.download_remote_files()
 dwl.print_table()
 
 out = "/home/sysop/workflow_tests/convert_tests"
-sitelog_dir = '/home/sysop/sitelogs/OVPF'
+sitelog_dir = '/home/sysop/metadata/OVPF'
 
 conv = arocnv.ConvertGnss(ses, dwl.epoch_range, out, sitelog_dir)
 

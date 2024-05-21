@@ -3,24 +3,25 @@
 """
 Created on Mon Mar 27 09:16:34 2023
 
-@author: psakicki
+@author: psakic
 """
 
-from bs4 import BeautifulSoup
 import ftplib
-import os
-import urllib
-from urllib.parse import urlparse
-import urllib.request                 
-from tqdm import tqdm
-import requests
 import io
-import socket
-from ftplib import FTP, error_temp
-from time import sleep
-
 # Create a logger object.
 import logging
+import os
+import socket
+import urllib
+import urllib.request
+from ftplib import error_temp
+from time import sleep
+from urllib.parse import urlparse
+
+import requests
+from bs4 import BeautifulSoup
+from tqdm import tqdm
+
 logger = logging.getLogger(__name__)
 
 
@@ -67,7 +68,7 @@ def join_url(protocol_inp,hostname_inp,dir_inp,fname_inp):
     
     ### safty warning to check a stupid cpoy/paste
     if fname_inp in dirr:
-        logger.warn("%s file's name also appears in dir name, check your config file",fname_inp)
+        logger.warning("%s file's name also appears in dir name, check your config file",fname_inp)
         
     url_out = os.path.join(prot_n_host,
                            dirr,
@@ -108,7 +109,7 @@ def list_remote_files_ftp(host_name, remote_dir, username, password,
     host_name = host_name.replace('/',"")
     remote_dir = remote_dir.replace(host_name,"")
     
-    join_url()
+    #join_url()
     
     # connect to FTP server
     ftp = ftplib.FTP(host_name,timeout=timeout)

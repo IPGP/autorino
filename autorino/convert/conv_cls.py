@@ -6,23 +6,16 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakic
 """
 
-import os
-import re
-import numpy as np
-import datetime as dt
-import dateutil
-import docker
-from pathlib import Path
-
-from geodezyx import utils, operational
-
-import autorino.common as arocmn
-import autorino.convert as arocnv
-
-from rinexmod import rinexmod_api
 
 #### Import the logger
 import logging
+from pathlib import Path
+
+import numpy as np
+
+import autorino.common as arocmn
+import autorino.convert as arocnv
+from geodezyx import operational
 
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
@@ -33,35 +26,35 @@ class ConvertGnss(arocmn.StepGnss):
                  epoch_range=None,
                  site=None,
                  session=None,
-                 sitelogs=None,
-                 options=None):
+                 options=None,
+                 metadata=None):
 
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
                          site=site,
                          session=session,
-                         options=options)
-
-        ### temp dirs init
-        self._init_tmp_dirs_paths()
-
-        ### sitelog init
-        self._init_sitelogs(sitelogs)
+                         options=options,
+                         metadata=metadata)
 
     ###############################################
 
     def convert(self, print_table=False, force=False,
-                rinexmod_options={}):
+                rinexmod_options=None):
         """
         "total action" method
         """
+
+        ### here the None to dict is necessary, because we use a defaut rinexmod_options bellow
+        if rinexmod_options is None:
+            rinexmod_options = {}
+
         logger.info("******** RAW > RINEX files conversion")
 
         self.set_tmp_dirs_paths()
         ### other tmps subdirs come also later in the loop
 
-        if self.sitelogs:
-            site4_list = arocnv.site_list_from_sitelogs(self.sitelogs)
+        if self.metadata:
+            site4_list = arocnv.site_list_from_metadata(self.metadata)
         else:
             site4_list = []
 
@@ -106,16 +99,26 @@ class ConvertGnss(arocmn.StepGnss):
             #_ = self.set_tmp_dirs_paths()
 
             ### since the site code from fraw can be poorly formatted
-            # we search it w.r.t. the sites from the sitelogs
+            # we search it w.r.t. the sites from the metadata
             site = arocnv.site_search_from_list(fraw,
                                                 site4_list)
 
+            ##### something better must be done with
+            # rinexmod.rinexmod_api.metadata_find_site() !!!!
+            # clarify the site4 and the site9 usage
+            # create method update_site_table_from_fname
+
+            ### we update the table row and the translate dic (necessary for the output dir)
+            self.table.loc[irow, 'site'] = site
+            self.site_id = site
+            self.set_translate_dict()
+
             ### do a first converter selection by removing odd files 
-            conve = arocnv.select_conv_odd_file(fraw)
+            converter_name_use = arocnv.select_conv_odd_file(fraw)
 
-            logger.info("extension/converter: %s/%s", ext, conve)
+            logger.info("extension/converter: %s/%s", ext, converter_name_use)
 
-            if not conve:
+            if not converter_name_use:
                 logger.info("file skipped, no converter found: %s", fraw)
                 self.table.loc[irow, 'note'] = "no converter found"
                 self.table.loc[irow, 'ok_inp'] = False
@@ -128,27 +131,23 @@ class ConvertGnss(arocmn.StepGnss):
             #############################################################
             ###### CONVERSION
             frnxtmp = self.on_row_convert(irow, self.tmp_dir_converted,
-                                          converter_inp=conve)
+                                          converter_inp=converter_name_use)
             self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
             #############################################################
             ###### RINEXMOD
-            rinexmod_kwargs = rinexmod_options.copy()
-            rinexmod_kwargs.update({'marker':site,
-                                    'sitelog':self.sitelogs})
+            rinexmod_options_use = rinexmod_options.copy()
+            rinexmod_options_use.update({'marker':site,
+                                         'sitelog':self.metadata})
 
             self.on_row_rinexmod(irow, self.tmp_dir_rinexmoded,
-                                 rinexmod_kwargs=rinexmod_kwargs)
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
+                                 rinexmod_options=rinexmod_options_use)
 
             #############################################################
             ###### FINAL MOVE
             self.on_row_move_final(irow)
-            ### NO MORE EXCEPTION HERE FOR THE MOMENT !!!!!
 
         #### remove temporary files
-
         self.remove_tmp_files()
 
         return None
@@ -184,16 +183,23 @@ class ConvertGnss(arocmn.StepGnss):
         else:
             out_dir_use = self.tmp_dir
 
-        frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, table_col],
-                                          out_dir,
-                                          converter=converter_inp)
+        try:
+            frnxtmp, _ = arocnv.converter_run(self.table.loc[irow, table_col],
+                                              out_dir,
+                                              converter=converter_inp)
+        except Exception as e:
+            logger.error("something went wrong for %s",
+                         self.table.loc[irow, table_col])
+            logger.error("Exception raised: %s",e)
+            frnxtmp = None
+
         if frnxtmp:
             ### update table if things go well
+            self.table.loc[irow, 'ok_out'] = True
             self.table.loc[irow, 'fpath_out'] = frnxtmp
             epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
             self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
             self.table.loc[irow, 'epoch_end'] = epo_end_ok
-            self.table.loc[irow, 'ok_out'] = True
         else:
             ### update table if things go wrong
             self.table.loc[irow, 'ok_out'] = False

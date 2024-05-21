@@ -3,28 +3,25 @@
 """
 Created on Thu Dec  1 15:47:05 2022
 
-@author: psakicki
+@author: psakic
 """
 
-import os
-import autorino.common as arocmn
-import autorino.download as arodwl
-import autorino.convert as arocnv
-import autorino.handle as arohdl
-
-#import autorino.session as aroses
-#import autorino.epochrange as aroepo
-
-import yaml
-import glob
 import collections.abc
-
-
+import glob
 # Create a logger object.
 import logging
+import os
 
+import yaml
+
+import autorino.common as arocmn
+import autorino.convert as arocnv
+import autorino.download as arodwl
+import autorino.handle as arohdl
+
+# import autorino.session as aroses
+# import autorino.epochrange as aroepo
 logger = logging.getLogger(__name__)
-
 
 def autorino_run(cfg_in,main_cfg_in):
     if os.path.isdir(cfg_in):
@@ -174,7 +171,7 @@ def read_cfg_sessions(y_sessions_dict,
 
             # appended in lis and dic at the end of the tests
 
-            elif k_stp == 'conversion':
+            elif k_stp == 'convert':
                 if not _is_cfg_bloc_active(y_stp):
                     continue
 
@@ -190,7 +187,7 @@ def read_cfg_sessions(y_sessions_dict,
                                epoch_range=epo_obj_stp,
                                site=y_station['site'],
                                session=y_ses['general'],
-                               sitelogs=sitelogs,
+                               metadata=sitelogs,
                                options=y_stp['options'])
 
             elif k_stp == 'split':
@@ -209,7 +206,7 @@ def read_cfg_sessions(y_sessions_dict,
                                epoch_range=epo_obj_stp,
                                site=y_station['site'],
                                session=y_ses['general'],
-                               sitelogs=sitelogs,
+                               metadata=sitelogs,
                                options=y_stp['options'])
 
                 # appended in lis and dic at the end of the k_stp tests

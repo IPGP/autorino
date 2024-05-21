@@ -11,12 +11,13 @@ Created on Wed Mar  8 18:45:58 2023
 #from geodezyx.externlib import *         # Import the external modules
 #from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
-from geodezyx import utils
 import converters as cv
 import rinexmod_api
 
+from geodezyx import utils
+
 p="/net/baiededix/ovpf/miroir_ovpf/DonneesAcquisition/geodesie/GPSPermanent/" 
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 outdir_converted = "/scratch/convgnss/010_tests_autorino_converters/converted"
 outdir_rinexmoded = "/scratch/convgnss/010_tests_autorino_converters/rinexmoded" 
 utils.create_dir(outdir_rinexmoded)

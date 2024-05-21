@@ -3,12 +3,12 @@
 """
 Created on Mon Jan  8 15:47:58 2024
 
-@author: psakicki
+@author: psakic
 """
 
 import dateparser
-import pandas as pd
 import numpy as np
+import pandas as pd
 from pandas.tseries.frequencies import to_offset
 
 import autorino.common as arocmn
@@ -16,9 +16,20 @@ import autorino.common as arocmn
 
 def epoch_range_interpret(epo_inp):
     """
-    interpreter function to get an output EpochRange object from a
-    tuple, typically (epo1, epo2, period)
-    or an input EpochRange (then nothing is done)
+    This function interprets an input to get an output EpochRange object. The input can either be a tuple,
+    typically in the form of (epo1, epo2, period), or an instance of the EpochRange class. If the input is
+    an EpochRange object, it is returned as is. If the input is a tuple, a new EpochRange object is created
+    using the elements of the tuple.
+
+    Parameters
+    ----------
+    epo_inp : tuple or EpochRange
+        The input to be interpreted. If it's a tuple, it should be in the form of (epo1, epo2, period).
+
+    Returns
+    -------
+    epo_range_out : EpochRange
+        The interpreted EpochRange object.
     """
     if type(epo_inp) is arocmn.EpochRange:
         epo_range_out = epo_inp
@@ -30,13 +41,28 @@ def epoch_range_interpret(epo_inp):
 
 def dateparser_interpret(date_inp, tz="UTC"):
     """
-    Interpreter function to parse a string/datetime
-    to a Pandas Timestamp
-    (standard used for the DownloadGnss object)
-    Also apply a timezone (UTC per default)
+    This function interprets a string or datetime-like object to a Pandas Timestamp.
+    It also applies a timezone (UTC by default). Note that rounding does not take place here
+    as rounding is not a parsing operation.
 
-    NB: the rounding will not take place here
-    rounding is not a parsing operation
+    Parameters
+    ----------
+    date_inp : str or datetime-like
+        The input date to be interpreted.
+    tz : str, optional
+        The timezone to be applied. The default is "UTC".
+
+    Returns
+    -------
+    date_out : Timestamp
+        The interpreted date as a Pandas Timestamp.
+
+    Note
+    ----
+    If the input date is a string, it is parsed using the dateparser library.
+    If the input date is a datetime-like object, it is converted to a Pandas Timestamp.
+    If the resulting date is a NaT (Not a Time) type, it is returned as is.
+    If the resulting date does not have a timezone, the specified timezone is applied.
     """
 
     if type(date_inp) is str:
@@ -52,19 +78,40 @@ def dateparser_interpret(date_inp, tz="UTC"):
 
     return date_out
 
-
 def dates_list2epoch_range(dates_list_inp,
                            period=None,
                            round_method='floor'):
+    """
+    Converts a list of dates to an EpochRange.
+
+    Parameters
+    ----------
+    dates_list_inp : list
+        The input list of dates.
+    period : str, optional
+        The rounding period. If not provided, the period is determined as the unique difference between consecutive dates in the input list. The default is None.
+    round_method : str, optional
+        The method used for rounding the epochs. The default is 'floor'.
+
+    Returns
+    -------
+    EpochRange
+        The converted EpochRange.
+
+    Note
+    ----
+    The current method for determining the period when not provided is a simple calculation of the unique difference between consecutive dates. This may not be the most accurate or desired method and should be improved in future iterations of this function.
+    """
     epoch1 = np.min(dates_list_inp)
     epoch2 = np.max(dates_list_inp)
 
     if period:
         period_use = period
     else:
-        period_use = np.unique(np.diff(dates_list_inp))[0]  ### poor, must be improved
+        period_use = np.unique(np.diff(dates_list_inp))[0]  # poor, must be improved
 
-    epo_out = EpochRange(epoch1, epoch2, period=period_use, round_method=round_method)
+    epo_out = arocmn.EpochRange(epoch1, epoch2, period=period_use,
+                                round_method=round_method)
 
     return epo_out
 
@@ -76,7 +123,7 @@ def round_date(date_in, period, round_method="round"):
 
     Parameters
     ----------
-    date_inp : Pandas Serie or a datetime-like object
+    date_in : Pandas Serie or a datetime-like object
         Input date .
     period : str, optional
         the rounding period.

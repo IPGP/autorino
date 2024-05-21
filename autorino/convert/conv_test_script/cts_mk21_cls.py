@@ -9,17 +9,22 @@ Created on Fri Apr  7 14:27:21 2023
 #### Import star style
 from geodezyx import *                   # Import the GeodeZYX modules
 from geodezyx.externlib import *         # Import the external modules
-from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
 import autorino.convert as arcv
-from autorino import configread as arcfg
 #from autorino import epochrange as aroepo
 #from autorino import  session as aroses
 import autorino.general as arogen
 
 import yaml
+# from autorino import epochrange as aroepo
+# from autorino import  session as aroses
+import autorino.general as arogen
+import yaml
 
-import timeit
+import autorino.convert as arcv
+#### Import star style
+from geodezyx import *  # Import the GeodeZYX modules
+from geodezyx.externlib import *  # Import the external modules
 
 pconfig = "/home/gps/tests_pierres/autorino/configfiles/proto_config_HOUE_03a.yml"
 pconfig = "/home/gps/tests_pierres/autorino/configfiles/proto_config_PSA1_03a.yml"
@@ -35,7 +40,7 @@ Y1 = yaml.safe_load(open(pconfig))
 #EPOC = REQ.epoch_range
 
 pout = "/home/sakic/090_TEMP/convcls_test"
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 
 SES = arogen.create_dummy_session()
 EPOC = arogen.create_dummy_epochrange()

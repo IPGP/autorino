@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import datetime as dt
-import pandas as pd
-import numpy as np
-import os
-from autorino import download as ardl
-
 # Create a logger object.
 import logging
+import os
+
+import numpy as np
+import pandas as pd
+
+from autorino import download as ardl
+
 logger = logging.getLogger(__name__)
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 14 12:05:28 2023
+Created on Tue Mar 14 12:05:28 2023cd
 
 @author: psakic
 
@@ -27,8 +27,15 @@ cmd_str : string
 
 #### Import star style
 from pathlib import Path
-#from pathlib3x import Path
+
+import autorino.config.env_read as aroenv
+# from pathlib3x import Path
 from geodezyx import utils
+
+#### IMPORT AUTORINO ENVIRONNEMENT VARABLES
+## software paths
+aro_env = aroenv.read_env()
+aro_env_soft_path = aro_env["conv_software_paths"]
 
 
 def _kw_options_dict2str(kw_options):
@@ -44,18 +51,17 @@ def _kw_options_dict2str(kw_options):
     """
     cmd_list = []
 
-
     if utils.is_iterable(kw_options):
         pass
     else:
         kw_options = [kw_options]
-    
+
     for kwo in kw_options:
-        for key,val in kwo.items():
+        for key, val in kwo.items():
             cmd_list = cmd_list + [str(key), str(val)]
-        
+
     cmd_str = " ".join(cmd_list)
-    
+
     return cmd_list, cmd_str
 
 
@@ -75,11 +81,10 @@ def _options_list2str(options):
             cmd_list.append(opt)
         else:
             cmd_list = cmd_list + opt
-        
-    cmd_str = " ".join(cmd_list)
-    
-    return cmd_list, cmd_str
 
+    cmd_str = " ".join(cmd_list)
+
+    return cmd_list, cmd_str
 
 
 ###################################################################
@@ -91,41 +96,42 @@ def cmd_build_generic(program="",
                       kw_options=dict(),
                       arguments="",
                       options_bis=[""],
-                      kw_options_bis=dict()): 
+                      kw_options_bis=dict()):
     """
     Build a command to launch a generic converter
     It has to be used for developement purposes only
     """
-    
+
     cmd = []
 
     if utils.is_iterable(program):
         cmd = [str(e) for e in program]
     else:
-        cmd = [str(program)]    
-        
-    for key,val in kw_options.items():
-        cmd = cmd + [str(key),str(val)]
+        cmd = [str(program)]
 
-    for key,val in kw_options_bis.items():
-        cmd = cmd + [str(key),str(val)]
-        
+    for key, val in kw_options.items():
+        cmd = cmd + [str(key), str(val)]
+
+    for key, val in kw_options_bis.items():
+        cmd = cmd + [str(key), str(val)]
+
     if utils.is_iterable(arguments):
         arguments = [str(e) for e in arguments]
     else:
         arguments = [str(arguments)]
-        
+
     cmd = cmd + options + options_bis + arguments
-    
+
     cmd_str = " ".join(cmd)
-    
+
     return cmd, cmd_str
+
 
 def cmd_build_trm2rinex(inp_raw_fpath,
                         out_dir,
                         bin_options_custom=[],
                         bin_kwoptions_custom=dict(),
-                        bin_path="trm2rinex:cli-light"):
+                        bin_path=aro_env_soft_path["trimble"]):
     """
     Build a command to launch trm2rinex, the Trimble converter
     
@@ -177,28 +183,28 @@ def cmd_build_trm2rinex(inp_raw_fpath,
     out_dir = Path(out_dir)
 
     ### out_dir must be writable by root => 777
-    out_dir_access_rights = out_dir.stat().st_mode  
+    out_dir_access_rights = out_dir.stat().st_mode
     out_dir.chmod(0o777)
 
-    cmd_docker_list = ['docker','run','--rm','-v', str(inp_raw_fpath.parent) + ':/inp','-v', str(out_dir) + ':/out']
-    cmd_trm2rinex_list = [bin_path, 'inp/' + inp_raw_fpath.name,'-n','-d','-s','-v','3.04','-p', 'out/']
+    cmd_docker_list = ['docker', 'run', '--rm', '-v', str(inp_raw_fpath.parent) + ':/inp', '-v', str(out_dir) + ':/out']
+    cmd_trm2rinex_list = [bin_path, 'inp/' + inp_raw_fpath.name, '-n', '-d', '-s', '-v', '3.04', '-p', 'out/']
 
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-    
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
     cmd_list = cmd_docker_list + cmd_trm2rinex_list + cmd_opt_list + cmd_kwopt_list
     cmd_list = [str(e) for e in cmd_list]
-    cmd_str  = " ".join(cmd_list)
+    cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
+
 
 def cmd_build_mdb2rinex(inp_raw_fpath,
                         out_dir,
                         bin_options_custom=[],
                         bin_kwoptions_custom=dict(),
-                        bin_path="mdb2rinex"):
-    
+                        bin_path=aro_env_soft_path["leica"]):
     """
     Build a command to launch mdb2rinex, the Leica converter
     
@@ -241,27 +247,27 @@ def cmd_build_mdb2rinex(inp_raw_fpath,
     -f [ --files ] arg    Mdb input file list
     
     """
-    
+
     #### Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-   
-    cmd_list = [bin_path,'--out', out_dir,'--files', inp_raw_fpath] + cmd_opt_list + cmd_kwopt_list
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = [bin_path, '--out', out_dir, '--files', inp_raw_fpath] + cmd_opt_list + cmd_kwopt_list
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
+
 
 def cmd_build_sbf2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="sbf2rin"):
-
+                      bin_path=aro_env_soft_path["septentrio"]):
     """
     Build a command to launch sbf2rin, the Septentrio converter
     
@@ -405,21 +411,21 @@ def cmd_build_sbf2rin(inp_raw_fpath,
    -v              Run in verbose mode.
    -V              Display the sbf2rin version.
     """
-    
+
     #### Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-   
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
     out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_sbf2rin")
-   
-    cmd_list = [bin_path,'-f', inp_raw_fpath, '-o', out_fpath ] + cmd_opt_list + cmd_kwopt_list
+
+    cmd_list = [bin_path, '-f', inp_raw_fpath, '-o', out_fpath] + cmd_opt_list + cmd_kwopt_list
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
 
 
@@ -427,7 +433,7 @@ def cmd_build_runpkr00(inp_raw_fpath,
                        out_dir,
                        bin_options_custom=[],
                        bin_kwoptions_custom=dict(),
-                       bin_path="runpkr00"):
+                       bin_path=aro_env_soft_path["trimble_runpkr00"]):
     """
     Build a command to launch runpkr00, the Trimble > teqc converter
     
@@ -489,26 +495,27 @@ def cmd_build_runpkr00(inp_raw_fpath,
               runpkr00 -demv gs00233a+gs00233b+gs00233c comb2330
               runpkr00 -demv @r00.lst comb2330
     """
-    
+
     #### Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-   
-    cmd_list = [bin_path,"-g","-d"] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath,out_dir]
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = [bin_path, "-g", "-d"] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath, out_dir]
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
-    
+
+
 def cmd_build_convbin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="convbin"):    
+                      bin_path=aro_env_soft_path['convbin']):
     """
     Build a command to launch convbin, the RTKLIB converter, for BINEX
     
@@ -649,26 +656,27 @@ def cmd_build_convbin(inp_raw_fpath,
         *.obs,*.*o    RINEX OBS
         *.rnx         RINEX OBS     *.nav,*.*n    RINEX NAV
     """
-    
+
     #### Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-    
-    cmd_list = [bin_path,'-d',out_dir,'-os','-od','-r','binex'] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = [bin_path, '-d', out_dir, '-os', '-od', '-r', 'binex'] + cmd_opt_list + cmd_kwopt_list + [inp_raw_fpath]
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
+
 
 def cmd_build_tps2rin(inp_raw_fpath,
                       out_dir,
                       bin_options_custom=[],
                       bin_kwoptions_custom=dict(),
-                      bin_path="tps2rin.exe"):
+                      bin_path=aro_env_soft_path['topcon']):
     """
     Build a command to launch tps2rin, for Topcon
     
@@ -822,27 +830,27 @@ def cmd_build_tps2rin(inp_raw_fpath,
       --utf8             Log file has UTF-8 charset.
     ```
     """
-    
+
     #### Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-    
-    cmd_list = ['wine',bin_path,'-o',out_dir] + cmd_opt_list + cmd_kwopt_list + ['-i',inp_raw_fpath]
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = ['wine', bin_path, '-o', out_dir] + cmd_opt_list + cmd_kwopt_list + ['-i', inp_raw_fpath]
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
-    
+
 
 def cmd_build_teqc(inp_raw_fpath,
                    out_dir,
                    bin_options_custom=[],
                    bin_kwoptions_custom=dict(),
-                   bin_path="teqc"):
+                   bin_path=aro_env_soft_path['teqc']):
     """
     Build a command to launch teqc, for legacy conversion and RINEX Handeling
     
@@ -873,37 +881,36 @@ def cmd_build_teqc(inp_raw_fpath,
     cmd_str : string
         the command as a concatenated string.
     """
-        
-    
+
     #### Convert the paths as Path objects    
     out_dir = Path(out_dir)
     ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
     if utils.is_iterable(inp_raw_fpath):
         raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
         raw_fpath_mono = raw_fpath_multi[0]
-    else: # a single  file, most common case
+    else:  # a single  file, most common case
         raw_fpath_multi = [Path(inp_raw_fpath)]
         raw_fpath_mono = Path(inp_raw_fpath)
-           
+
     raw_fpath_str_lst = [str(e) for e in raw_fpath_multi]
-    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_teqc")   
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-    
-    cmd_list = [bin_path,'+out',out_fpath] + cmd_opt_list + cmd_kwopt_list + raw_fpath_str_lst
+    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_teqc")
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = [bin_path, '+out', out_fpath] + cmd_opt_list + cmd_kwopt_list + raw_fpath_str_lst
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
-    
+
 
 def cmd_build_converto(inp_raw_fpath,
                        out_dir,
                        bin_options_custom=[],
                        bin_kwoptions_custom=dict(),
-                       bin_path="/home/psakicki/SOFTWARE_INSTALL/Converto/ConvertoCpp-master_1_6_0_5/bin/Release/ConvertoCPP"):
+                       bin_path=aro_env_soft_path['converto']):
     """
     Build a command to launch teqc, for legacy conversion and RINEX Handeling
     
@@ -1063,37 +1070,37 @@ def cmd_build_converto(inp_raw_fpath,
     ##############################################################
 
     """
-        
-    
+
     #### Convert the paths as Path objects    
     out_dir = Path(out_dir)
     ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
     if utils.is_iterable(inp_raw_fpath):
         raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
         raw_fpath_mono = raw_fpath_multi[0]
-    else: # a single  file, most common case
+    else:  # a single  file, most common case
         raw_fpath_multi = [Path(inp_raw_fpath)]
         raw_fpath_mono = Path(inp_raw_fpath)
-           
+
     raw_fpath_str_lst = [str(e) for e in raw_fpath_multi]
-    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_converto")   
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-    
-    cmd_list = [bin_path,'-i'] + raw_fpath_str_lst  + ['-o', out_fpath] + cmd_opt_list + cmd_kwopt_list
+    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_converto")
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = [bin_path, '-i'] + raw_fpath_str_lst + ['-o', out_fpath] + cmd_opt_list + cmd_kwopt_list
 
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
-    
+
+
 def cmd_build_gfzrnx(inp_raw_fpath,
                      out_dir,
                      bin_options_custom=[],
                      bin_kwoptions_custom=dict(),
-                     bin_path="gfzrnx"):
+                     bin_path=aro_env_soft_path['gfzrnx']):
     """
     Build a command to launch gfzrnx, for RINEX Handeling
     
@@ -1365,24 +1372,19 @@ def cmd_build_gfzrnx(inp_raw_fpath,
     if utils.is_iterable(inp_raw_fpath):
         raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
         raw_fpath_mono = raw_fpath_multi[0]
-    else: # a single  file, most common case
+    else:  # a single  file, most common case
         raw_fpath_multi = [Path(inp_raw_fpath)]
         raw_fpath_mono = Path(inp_raw_fpath)
-           
+
     raw_fpath_str_lst = [str(e) for e in raw_fpath_multi]
-    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_gfzrnx")   
-    
-    cmd_opt_list , _ = _options_list2str(bin_options_custom)
-    cmd_kwopt_list , _ = _kw_options_dict2str(bin_kwoptions_custom)
-    
-    cmd_list = [bin_path,'-finp'] + raw_fpath_str_lst  + ['-fout', out_fpath] + cmd_opt_list + cmd_kwopt_list
+    out_fpath = out_dir.joinpath(raw_fpath_mono.name + ".rnx_gfzrnx")
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = [bin_path, '-finp'] + raw_fpath_str_lst + ['-fout', out_fpath] + cmd_opt_list + cmd_kwopt_list
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-    
+
     return cmd_use, cmd_list, cmd_str
-
-                    
-
-
-

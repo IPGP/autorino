@@ -11,20 +11,22 @@ WILL  BE DISCONTINUED WHEN CLASSES WILL BE OPE
 
 """
 
-from geodezyx import utils,  operational
-import autorino.convert as arcv
-from rinexmod import rinexmod_api
-from pathlib import Path
-import os
-import re 
-import numpy as np
 import datetime as dt
-import dateutil
-import docker
-import pandas as pd
-
 #### Import the logger
 import logging
+import os
+import re
+from pathlib import Path
+
+import dateutil
+import docker
+import numpy as np
+import pandas as pd
+
+import autorino.convert as arcv
+from geodezyx import utils, operational
+from rinexmod import rinexmod_api
+
 logger = logging.getLogger(__name__)
 logger.setLevel("INFO")
 
@@ -45,7 +47,7 @@ def converter_batch(input_files,
     
 
     ###############################################
-    ### read sitelogs        
+    ### read metadata
     if os.path.isdir(sitelogs_inp):
         sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
                                                      force=False)
@@ -113,7 +115,7 @@ def converter_batch(input_files,
         logger.info("***** input raw file for conversion: %s",fraw.name)
 
         ### since the fraw name can be poorly formatted
-        # we search it w.r.t. the sites from the sitelogs
+        # we search it w.r.t. the sites from the metadata
 
         site =  _site_search_from_list(fraw,site4_list)       
 

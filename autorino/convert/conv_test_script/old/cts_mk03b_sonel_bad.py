@@ -11,14 +11,14 @@ Created on Wed Mar  8 18:45:58 2023
 #from geodezyx.externlib import *         # Import the external modules
 #from geodezyx.megalib.megalib import *   # Import the legacy modules names
 
-from geodezyx import utils
-import autorino.convert.conv_cmd_run as cv
-import rinexmod_api
-from pathlib import Path
 import os
-import re 
+import re
+from pathlib import Path
 
+import rinexmod_api
 
+import autorino.convert.conv_cmd_run as cv
+from geodezyx import utils
 
 ########### RAW FILES 
 #### OVPF
@@ -36,7 +36,7 @@ flist = [f for f in flist if not "ZIP" in f]
 
 
 ########### SITELOGS
-psitelogs = "/work/sitelogs/SITELOGS"
+psitelogs = "/work/metadata/SITELOGS"
 sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
 
 

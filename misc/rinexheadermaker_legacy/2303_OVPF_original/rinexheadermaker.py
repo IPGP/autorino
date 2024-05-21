@@ -28,10 +28,11 @@
 #       	-type, numero de serie
 #------------------------------------------------------
 
-import re
-import os
 import getopt
+import os
+import re
 import sys
+
 
 def usage():
 	print ("rinexheadermaker.py -f SITELOGFILE -d yyyy/mm/jj ")
