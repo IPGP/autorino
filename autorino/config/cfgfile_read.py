@@ -137,11 +137,13 @@ def read_cfg_sessions(y_sessions_dict,
         #y_workflow_main = y_ses_main['workflow']
 
         for k_stp, y_stp in y_steps.items():
+            logger.debug("k_stp, y_stp AAA %s %s ",k_stp, y_stp )
 
             #y_step_main = y_workflow_main[k_stp]
             #y_step = update_w_main_dic(y_step, y_step_main)
 
             ##### EPOCH RANGE AT THE STEP LEVEL
+
             if y_stp['epoch_range'] == 'FROM_SESSION':
                 epo_obj_stp = epo_obj_ses
                 y_stp['epoch_range'] = y_ses['epoch_range']

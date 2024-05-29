@@ -6,7 +6,6 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakic
 """
 
-
 #### Import the logger
 import logging
 from pathlib import Path
@@ -22,13 +21,64 @@ logger.setLevel("INFO")
 
 
 class ConvertGnss(arocmn.StepGnss):
+    """
+    A class used to represent the GNSS conversion process.
+
+    This class inherits from the StepGnss class and is used to handle the conversion of GNSS data.
+
+    Attributes
+    ----------
+    out_dir : str
+        The directory where the output of the conversion should be stored.
+    tmp_dir : str
+        The directory where temporary files during the conversion process should be stored.
+    log_dir : str
+        The directory where log files should be stored.
+    epoch_range : tuple, optional
+        A tuple containing the start and end epochs for the conversion process.
+    site : str, optional
+        The site for which the conversion process should be performed.
+    session : str, optional
+        The session for which the conversion process should be performed.
+    options : dict, optional
+        A dictionary containing any additional options for the conversion process.
+    metadata : str, optional
+        The metadata associated with the conversion process.
+
+    Methods
+    -------
+    __init__(self, out_dir, tmp_dir, log_dir, epoch_range=None, site=None, session=None, options=None, metadata=None)
+        Initializes the ConvertGnss class with the specified parameters.
+    """
+
     def __init__(self, out_dir, tmp_dir, log_dir,
                  epoch_range=None,
                  site=None,
                  session=None,
                  options=None,
                  metadata=None):
+        """
+        Initializes the ConvertGnss class with the specified parameters.
 
+        Parameters
+        ----------
+        out_dir : str
+            The directory where the output of the conversion should be stored.
+        tmp_dir : str
+            The directory where temporary files during the conversion process should be stored.
+        log_dir : str
+            The directory where log files should be stored.
+        epoch_range : tuple, optional
+            A tuple containing the start and end epochs for the conversion process.
+        site : str, optional
+            The site for which the conversion process should be performed.
+        session : str, optional
+            The session for which the conversion process should be performed.
+        options : dict, optional
+            A dictionary containing any additional options for the conversion process.
+        metadata : str, optional
+            The metadata associated with the conversion process.
+        """
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
                          site=site,
@@ -38,11 +88,31 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert(self, print_table=False, force=False,
-                rinexmod_options=None):
-        """
-        "total action" method
-        """
+def convert(self, print_table=False, force=False, rinexmod_options=None):
+    """
+    "total action" method
+
+    Executes the total conversion process for GNSS data.
+
+    This method handles the entire conversion process for GNSS data.
+    It sets up temporary directories, guesses and deactivates existing local RINEX files, decompresses files,
+    filters and converts input files, applies rinexmod options, and finally moves the converted files to
+    the final directory.
+    It also handles logging and error checking throughout the process.
+
+    Parameters
+    ----------
+    print_table : bool, optional
+        If True, prints the conversion table. Default is False.
+    force : bool, optional
+        If True, forces the conversion even if output files already exist. Default is False.
+    rinexmod_options : dict, optional
+        A dictionary containing options for the rinexmod process. If not specified, default options are used.
+
+    Returns
+    -------
+    None
+    """
 
         ### here the None to dict is necessary, because we use a defaut rinexmod_options bellow
         if rinexmod_options is None:
@@ -160,14 +230,32 @@ class ConvertGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(self, irow, out_dir = None, converter_inp='auto', 
-                       table_col = 'fpath_inp'):
-
+    def on_row_convert(self, irow, out_dir = None, converter_inp='auto', table_col = 'fpath_inp'):
         """
         "on row" method
 
-        for each row of the table, convert the 'table_col' entry,
-        typically 'table_col' file
+        Converts the 'table_col' entry for each row of the table.
+
+        This method is applied to each row of the table. It converts the 'table_col' entry, typically a file.
+        The conversion is performed using the specified converter. If no converter is specified, an automatic converter is used.
+        The output of the conversion is stored in the specified output directory. If no output directory is specified, the output is stored in the temporary directory.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to be converted.
+        out_dir : str, optional
+            The directory where the output of the conversion should be stored. If not specified, the output is stored
+            in the temporary directory.
+        converter_inp : str, optional
+            The converter to be used for the conversion. If not specified, an automatic converter is used.
+        table_col : str, optional
+            The column in the table that should be converted. Typically, this is a file. Default is 'fpath_inp'.
+
+        Returns
+        -------
+        str
+            The path of the converted file.
         """
 
         if not self.table.loc[irow, 'ok_inp']:
