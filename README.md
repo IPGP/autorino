@@ -36,9 +36,15 @@ based on _autorino_'s spinoff tool [_rinexmod_](https://github.com/IPGP/rinexmod
 For the time being, the package is not available on PyPi, so you need to install it by adding the path of the _autorino_
 package to your Python path.
 
+### External dependencies
+_autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
+```
+pip install pandas numpy shutil subprocess os glob datetime logging
+```
+
 ## External utilities (GNSS converters)
 
-### Download
+### Download external utilities
 To properly use the _autorino_ package, you need to install the official GNSS raw data converters from the different 
 GNSS manufacturers websites.
 You can find the official converters here:
@@ -70,7 +76,7 @@ You might also need RINEX handeling/legacy converter software:
 
 NB: GFZRNX usage is **not allowed** in _routine mode_ without a proper commercial license. Be sure to comply with it.
 
-#### Setup 
+### Setup external utilities
 Once the converters are installed, you need to set the converter paths in the _autorino_'s `env` configuration file.
 
 This configuration file is located here:
