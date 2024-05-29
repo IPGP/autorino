@@ -46,16 +46,30 @@ def create_dummy_session_dic():
 
 def input_list_interpret(inp_fil, inp_regex=".*"):
     """
-    Handles multiple types of input lists (in a general sense)
-    and returns a python list of the input
+    Handles multiple types of input lists and returns a python list of the input.
 
-    inp_fil can be:
-        * a python list (then nothing is done)
-        * a text file path containing a list of files (read as a python list)
-        * a tuple containing several text files path  (recursive version of the previous point)
-        * a directory path (all the files matching inp_regex are read)
+    This function can handle various types of input lists and convert them into a python list.
+    The input can be:
+     * a python list
+     * a text file path containing a list of files
+     * a tuple containing several text files path
+     * a directory path.
+    If the input is a directory path, all the files matching the regular expression specified by 'inp_regex' are read.
+
+    Parameters
+    ----------
+    inp_fil : list or str or tuple
+        The input list to be interpreted. It can be a python list, a text file path containing a list of files,
+        a tuple containing several text files path, or a directory path.
+    inp_regex : str, optional
+        The regular expression used to filter the files when 'inp_fil' is a directory path.
+        Default is ".*" which matches any file.
+
+    Returns
+    -------
+    list
+        The interpreted list.
     """
-
     if not inp_fil:
         flist = []
     elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
