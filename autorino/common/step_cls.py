@@ -188,15 +188,25 @@ class StepGnss():
                     table_cols: list = None,
                     init_epoch: bool = True):
         """
-        initialize the table of a Step object
+        Initializes the table of a StepGnss object.
+
+        This method creates a new pandas DataFrame with specified columns. If no columns are provided,
+        it creates a DataFrame with default columns. If `init_epoch` is True, it also initializes the
+        'epoch_srt' and 'epoch_end' columns with the epoch range of the StepGnss object and the 'site'
+        column with the site ID of the StepGnss object.
 
         Parameters
         ----------
-        table_cols
-        init_epoch: bool
+        table_cols : list of str, optional
+            The columns to include in the table. If not provided, default columns are used.
+        init_epoch : bool, optional
+            If True, initializes the 'epoch_srt' and 'epoch_end' columns with the epoch range of the
+            StepGnss object and the 'site' column with the site ID of the StepGnss object. Default is True.
 
+        Returns
+        -------
+        None
         """
-
         if table_cols is None:
             table_cols = ['fname',
                           'site',
@@ -220,12 +230,23 @@ class StepGnss():
 
         self.table = df
         return None
-
     def _init_site(self, site):
         """
-        if a site dict is not given, create a dummy one
-        """
+        Initializes the site attribute of the StepGnss object.
 
+        If a site dictionary is not provided, a warning is logged and a dummy site dictionary is created and set as the
+        site attribute.
+        If a site dictionary is provided, it is set as the site attribute.
+
+        Parameters
+        ----------
+        site : dict, optional
+            The site information for the step. If not provided, a dummy site is created.
+
+        Returns
+        -------
+        None
+        """
         if not site:
             logger.warning('no site dict given, a dummy one will be created')
             self.site = arocmn.create_dummy_site_dic()
@@ -236,9 +257,21 @@ class StepGnss():
 
     def _init_session(self, session):
         """
-        if a session dict is not given, create a dummy one
-        """
+        Initializes the session attribute of the StepGnss object.
 
+        If a session dictionary is not provided, a warning is logged and a dummy session dictionary is created
+        and set as the session attribute.
+        If a session dictionary is provided, it is set as the session attribute.
+
+        Parameters
+        ----------
+        session : dict, optional
+            The session information for the step. If not provided, a dummy session is created.
+
+        Returns
+        -------
+        None
+        """
         if not session:
             logger.warning(
                 'no session dict given, a dummy one will be created')
@@ -250,9 +283,20 @@ class StepGnss():
 
     def _init_options(self, options):
         """
-        if an options dict is not given, create an empty one
-        """
+        Initializes the options attribute of the StepGnss object.
 
+        This method sets the options attribute of the StepGnss object. If an options dictionary is not provided,
+        it creates an empty dictionary and sets it as the options attribute.
+
+        Parameters
+        ----------
+        options : dict, optional
+            The options for the step. If not provided, an empty dictionary is created.
+
+        Returns
+        -------
+        None
+        """
         if not options:
             self.options = {}
         else:
@@ -262,9 +306,14 @@ class StepGnss():
 
     def _init_site_id(self):
         """
-        if a site id is not explicitly given, take the one from the site dict
-        A dummy site dict will be created in the worst case, ensuring that
-        site_id will be always initialized
+        Initializes the site_id attribute of the StepGnss object.
+
+        This method checks if a 'site_id' is provided in the site dictionary. If it is, it sets the 'site_id' attribute of the StepGnss object to the provided 'site_id'.
+        If a 'site_id' is not provided, it sets the 'site_id' attribute to 'XXXX' as a default value.
+
+        Returns
+        -------
+        None
         """
         if 'site_id' in self.site.keys():
             self.site_id = self.site['site_id']
@@ -275,8 +324,19 @@ class StepGnss():
 
     def _init_epoch_range(self, epoch_range):
         """
-        initialize the epoch range if given, and create a dummy one between 
-        NaT (not a time) if nothing is given
+        Initializes the epoch range of the StepGnss object.
+
+        This method sets the epoch range of the StepGnss object. If an epoch range is provided, it interprets the epoch range using the `epoch_range_interpret` function from the `arocmn` module.
+        If an epoch range is not provided, it creates a dummy epoch range between 'NaT' (not a time) using the `EpochRange` function from the `arocmn` module.
+
+        Parameters
+        ----------
+        epoch_range : str, optional
+            The epoch range for the step. If not provided, a dummy epoch range is created.
+
+        Returns
+        -------
+        None
         """
         if epoch_range:
             self.epoch_range = arocmn.epoch_range_interpret(epoch_range)
@@ -287,54 +347,73 @@ class StepGnss():
 
     def set_translate_dict(self):
         """
-        generate the translation dict based on the access and session dicts
-        object attributes + site id
+        Generates the translation dictionary based on the site and session dictionaries,
+        object attributes, and site id.
 
-        site code have 2x3 declinations:
-        <site_id(4|9|)> (lowercase) and <SITE_ID(4|9|)> (uppercase)
+        The translation dictionary is used to replace placeholders in the path strings with actual values.
+        It includes keys for each attribute in the site and session dictionaries, as well as for the site id.
+        The site id has three variations: 'site_id', 'site_id4', and 'site_id9', each in both lower and upper case.
+
+        The method does not take any parameters and does not return any value. It directly modifies the 'translate_dict' attribute of the object.
+
+        Returns
+        -------
+        None
         """
         trsltdict = dict()
 
-        for dic in (self.site,
-                    self.session):
+        # Add each attribute from the site and session dictionaries to the translation dictionary
+        for dic in (self.site, self.session):
             for k, v in dic.items():
                 trsltdict[k] = v
 
-        # site have a specific loop
+        # Add each variation of the site id to the translation dictionary
         for s in ('site_id', 'site_id4', 'site_id9'):
             trsltdict[s.upper()] = str(getattr(self, s)).upper()
             trsltdict[s.lower()] = str(getattr(self, s)).lower()
 
+        # Update the translate_dict attribute of the object
         self.translate_dict = trsltdict
 
         return None
 
     def _init_tmp_dirs_paths(self,
-                             tmp_subdir_logs='logs',
-                             tmp_subdir_unzip='unzipped',
-                             tmp_subdir_conv='converted',
-                             tmp_subdir_rnxmod='rinexmoded',
-                             tmp_subdir_dwnld='downloaded'):
+                         tmp_subdir_logs='logs',
+                         tmp_subdir_unzip='unzipped',
+                         tmp_subdir_conv='converted',
+                         tmp_subdir_rnxmod='rinexmoded',
+                         tmp_subdir_dwnld='downloaded'):
         """
-        initialize temp dirs, but keeps their generic form, with <...> and %X,
-        and without creating them
+        Initializes the temporary directories paths for the StepGnss object.
 
-        see set_tmp_dirs_paths() for the effective translation and
-        creation of these temp dirs
+        This method sets the paths for the temporary directories of the StepGnss object. It creates the paths in a generic form, with placeholders and without creating the actual directories.
+        The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
+
+        Parameters
+        ----------
+        tmp_subdir_logs : str, optional
+            The subdirectory for logs. Default is 'logs'.
+        tmp_subdir_unzip : str, optional
+            The subdirectory for unzipped files. Default is 'unzipped'.
+        tmp_subdir_conv : str, optional
+            The subdirectory for converted files. Default is 'converted'.
+        tmp_subdir_rnxmod : str, optional
+            The subdirectory for rinexmoded files. Default is 'rinexmoded'.
+        tmp_subdir_dwnld : str, optional
+            The subdirectory for downloaded files. Default is 'downloaded'.
+
+        Returns
+        -------
+        None
         """
+        # Internal versions have not been translated
+        self._tmp_dir_logs = os.path.join(self.tmp_dir, tmp_subdir_logs)
+        self._tmp_dir_unzipped = os.path.join(self.tmp_dir, tmp_subdir_unzip)
+        self._tmp_dir_converted = os.path.join(self.tmp_dir, tmp_subdir_conv)
+        self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir, tmp_subdir_rnxmod)
+        self._tmp_dir_downloaded = os.path.join(self.tmp_dir, tmp_subdir_dwnld)
 
-        ### internal (_) versions have not been translated
-        self._tmp_dir_logs = os.path.join(self.tmp_dir,
-                                          tmp_subdir_logs)
-        self._tmp_dir_unzipped = os.path.join(self.tmp_dir,
-                                              tmp_subdir_unzip)
-        self._tmp_dir_converted = os.path.join(self.tmp_dir,
-                                               tmp_subdir_conv)
-        self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir,
-                                                tmp_subdir_rnxmod)
-        self._tmp_dir_downloaded = os.path.join(self.tmp_dir,
-                                                tmp_subdir_dwnld)
-        ### translation
+        # Translation of the paths
         self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
         self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
         self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
@@ -345,9 +424,24 @@ class StepGnss():
 
     def set_tmp_dirs_paths(self):
         """
-        effective translation and creation of temp dirs
+        Translates and creates temporary directories.
+
+        This method translates the paths of the temporary directories and creates them if they do not exist.
+        The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
+        The paths are translated using the `translate_path` method of the StepGnss object, which replaces placeholders
+        in the paths with actual values.
+        The directories are created if the `make_dir` parameter of the `translate_path` method is set to True.
+
+        Note: This translation is also done in the `_init_tmp_dirs_paths` method, but it is redone here
+        to ensure accuracy.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the paths of the logs, unzipped, converted, rinexmoded, and downloaded directories,
+            in that order.
         """
-        #### this translation is also done in _init_tmp_dirs_paths
+        # This translation is also done in _init_tmp_dirs_paths
         # but we redo it here, simply to be sure
         tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs,
                                                make_dir=True)
@@ -357,7 +451,7 @@ class StepGnss():
                                                     make_dir=True)
         tmp_dir_rinexmoded_set = self.translate_path(self._tmp_dir_rinexmoded,
                                                      make_dir=True)
-        tmp_dir_downloaded_set = self.translate_path(self._tmp_dir_rinexmoded,
+        tmp_dir_downloaded_set = self.translate_path(self._tmp_dir_downloaded,
                                                      make_dir=True)
 
         return tmp_dir_logs_set, tmp_dir_unzipped_set, \
@@ -365,6 +459,23 @@ class StepGnss():
             tmp_dir_downloaded_set
 
     def _init_metadata(self, metadata):
+        """
+        Initializes the metadata attribute of the StepGnss object.
+
+        This method checks if a 'metadata' is provided. If it is, it translates the path of the metadata,
+        manages the site log input using the `sitelog_input_manage` function from the `rinexmod_api` module,
+        and sets the 'metadata' attribute of the StepGnss object to the managed site log input.
+        If a 'metadata' is not provided, it sets the 'metadata' attribute to None.
+
+        Parameters
+        ----------
+        metadata : str, optional
+            The metadata for the step. If not provided, the 'metadata' attribute is set to None.
+
+        Returns
+        -------
+        None
+        """
         if metadata:
             metadata_set = self.translate_path(metadata)
             self.metadata = rinexmod_api.sitelog_input_manage(metadata_set,
@@ -381,13 +492,29 @@ class StepGnss():
 
     def copy(self):
         """
-        return a duplicate (deep copy) of the current StepGnss object
+        Creates a duplicate of the current StepGnss object.
+
+        This method uses the deepcopy function from the copy module to create a new instance of the StepGnss class that is a
+        complete copy of the current instance. All attributes of the current instance are copied to the new instance.
+
+        Returns
+        -------
+        StepGnss
+            A new instance of the StepGnss class that is a copy of the current instance.
         """
         return copy.deepcopy(self)
 
     def get_step_type(self):
         """
-        return the type of the step as a string
+        Returns the type of the step as a string.
+
+        This method is used to identify the type of the current step in the GNSS processing chain.
+        It returns the name of the class to which the current instance belongs.
+
+        Returns
+        -------
+        str
+            The name of the class to which the current instance belongs.
         """
         return type(self).__name__
 
@@ -395,47 +522,40 @@ class StepGnss():
                                           use_rnx_filename_only=False,
                                           update_epoch_range=True):
         """
-        If the StepGnss object **contains RINEX files**,
-        Update the StepGnss table's columns ``epoch_srt`` and ``epoch_end``
-        based on the RINEX files.
+        Updates the StepGnss table's columns 'epoch_srt' and 'epoch_end' based on the RINEX files.
+
+        If the StepGnss object contains RINEX files, this function updates the 'epoch_srt' and 'epoch_end' columns
+        of the StepGnss table based on the RINEX files. The start and end epochs and the period of the RINEX file
+        can be determined based on its name only (if use_rnx_filename_only is True). This function is much faster
+        but less reliable. At the end of the table update, it can also update the EpochRange object associated to
+        the StepGnss object (if update_epoch_range is True).
 
         Parameters
         ----------
         use_rnx_filename_only : bool, optional
-            determine the start epochm the end epoch and the period of the
-            RINEX file based on its name only. (The RINEX is not readed).
-            This function is much faster but less reliable.
-            The default is False.
+            If True, determines the start epoch, the end epoch and the period of the RINEX file based on its name only.
+            The RINEX file is not read. This function is much faster but less reliable. Default is False.
         update_epoch_range : bool, optional
-            at the end of the table update, update also
-            the EpochRange object associated to the StepGnss object
-            (recommended).
-            The default is True.
+            If True, at the end of the table update, also updates the EpochRange object associated to the StepGnss object.
+            This is recommended. Default is True.
 
         Returns
         -------
-        None.
-
+        None
         """
-
-        is_rnx = \
-            self.table['fname'].apply(
-                conv.rinex_regex_search_tester).apply(bool)
+        is_rnx = self.table['fname'].apply(conv.rinex_regex_search_tester).apply(bool)
 
         if is_rnx.sum() == 0:
             logger.warning("epoch update impossible, no file matches a RINEX pattern in %s", self)
             return
 
         for irow, row in self.table.iterrows():
-
             if not use_rnx_filename_only:
                 rnx = rinexmod.rinexfile.RinexFile(row['fpath_inp'])
                 epo_srt = rnx.start_date
                 epo_end = rnx.end_date
             else:
-                epo_srt, epo_end, _ = \
-                    rinexmod.rinexfile.dates_from_rinex_filename(
-                        row['fpath_inp'])
+                epo_srt, epo_end, _ = rinexmod.rinexfile.dates_from_rinex_filename(row['fpath_inp'])
 
             self.table.loc[irow, 'epoch_srt'] = epo_srt
             self.table.loc[irow, 'epoch_end'] = epo_end
@@ -446,14 +566,28 @@ class StepGnss():
         if update_epoch_range:
             self.update_epoch_range_from_table()
 
-        return
+        return None
 
     def update_epoch_range_from_table(self,
                                       column_srt='epoch_srt',
                                       column_end='epoch_end'):
         """
-        update the EpochRange of the StepGnss object with
-        the min/max of the epochs in the object's table
+        Updates the EpochRange of the StepGnss object based on the min/max epochs in the object's table.
+
+        This function calculates the minimum and maximum epochs from the specified columns in the table.
+        It then calculates the most common period (time difference between start and end epochs) in the table.
+        The function updates the EpochRange of the StepGnss object with these calculated values.
+
+        Parameters
+        ----------
+        column_srt : str, optional
+            The name of the column in the table that contains the start epochs. Default is 'epoch_srt'.
+        column_end : str, optional
+            The name of the column in the table that contains the end epochs. Default is 'epoch_end'.
+
+        Notes
+        -----
+        If the period spacing in the table is not uniform, the function will keep the most common period.
         """
         epomin = self.table[column_srt].min()
         epomax = self.table[column_srt].max()
@@ -480,19 +614,37 @@ class StepGnss():
 
         logger.info("new %s", self.epoch_range)
 
-    def translate_path(self, path_inp, epoch_inp=None, make_dir=False):
+    def translate_path(self, path_inp: str, epoch_inp=None, make_dir: bool = False) -> str:
         """
-        able to create a directory corresponding to the translated path
-        if make_dir = True
-        warning: it creates the directory as it is! (no dirname extraction)
-        if the translated path is a full path with a filename, 
-        you will get nasty results !!
+        Translates a given path using the object's translation dictionary and optionally creates the directory.
+
+        This function is able to create a directory corresponding to the translated path if `make_dir` is True.
+        Warning: it creates the directory as it is! (no dirname extraction)
+        If the translated path is a full path with a filename, you will get nasty results!
+
+        Parameters
+        ----------
+        path_inp : str
+            The input path to be translated.
+        epoch_inp : str, optional
+            The epoch input to be used in the translation. Default is None.
+        make_dir : bool, optional
+            If True, the function will create the directory corresponding to the translated path. Default is False.
+
+        Returns
+        -------
+        str
+            The translated directory path.
+
+        Notes
+        -----
+        The function uses the `translator` function from the `arocmn` module to perform the translation.
         """
         trslt_dir = arocmn.translator(path_inp, self.translate_dict, epoch_inp)
-        if make_dir:
+        if make_dir and not os.path.isdir(trslt_dir):
             utils.create_dir(trslt_dir)
+            logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
-
     #  _                       _
     # | |                     (_)
     # | |     ___   __ _  __ _ _ _ __   __ _
@@ -579,8 +731,49 @@ class StepGnss():
                     no_print=False,
                     no_return=True,
                     max_colwidth=33):
+        """
+        Prints the table of the StepGnss object with specified formatting.
+
+        This method formats and prints the table of the StepGnss object. It shrinks the strings in the 'fraw',
+        'fpath_inp', and 'fpath_out' columns to a specified maximum length and formats the 'epoch_srt' and 'epoch_end'
+        columns as strings
+        with a specific date-time format. The method then prints the formatted table to the logger.
+
+        Parameters
+        ----------
+        no_print : bool, optional
+            If True, the function does not print the table to the logger. Default is False.
+        no_return : bool, optional
+            If True, the function does not return the formatted table. Default is True.
+        max_colwidth : int, optional
+            The maximum length of the strings in the 'fraw', 'fpath_inp', and 'fpath_out' columns. Default is 33.
+
+        Returns
+        -------
+        str or None
+            The formatted table as a string if 'no_return' is False. Otherwise, None.
+        """
 
         def _shrink_str(str_inp, maxlen=max_colwidth):
+            """
+            Shrinks a string to a specified maximum length.
+
+            This function shrinks a string to a specified maximum length by keeping the first and last parts of the string
+            and replacing the middle part with '..'. The length of the first and last parts is half of the maximum length.
+
+            Parameters
+            ----------
+            str_inp : str
+                The input string to be shrunk.
+            maxlen : int, optional
+                The maximum length of the output string. Default is the value of the 'max_colwidth' parameter of the
+                'print_table' method.
+
+            Returns
+            -------
+            str
+                The shrunk string.
+            """
             if len(str_inp) <= maxlen:
                 return str_inp
             else:
@@ -615,7 +808,27 @@ class StepGnss():
                                  input_files,
                                  inp_regex=".*",
                                  reset_table=True):
-        #update_epoch_range=False):
+        """
+        Loads the table from a list of input files.
+
+        This method takes a list of input files and uses it to update the current step's table.
+        It sets the 'fpath_inp', 'fname', and 'ok_inp' columns of the table based on the input files.
+        If 'reset_table' is True, it resets the current table before loading the new data.
+
+        Parameters
+        ----------
+        input_files : list
+            The list of input files to be loaded into the table.
+        inp_regex : str, optional
+            The regular expression used to filter the input files. Default is ".*" which matches any file.
+        reset_table : bool, optional
+            If True, the current table is reset before loading the new data. Default is True.
+
+        Returns
+        -------
+        list
+            The list of input files that were loaded into the table.
+        """
         if reset_table:
             self._init_table(init_epoch=False)
 
@@ -626,14 +839,27 @@ class StepGnss():
         self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
         self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
 
-        #if update_epoch_range:
-        #    self.update_epoch_range_from_table()
-
         return flist
 
-    def load_table_from_prev_step_table(self,
-                                        input_table,
-                                        reset_table=True):
+    def load_table_from_prev_step_table(self, input_table, reset_table=True):
+        """
+        Loads the table from the previous step's table.
+
+        This method takes the table from the previous step in the processing chain and uses it to update the current step's table.
+        It copies the 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns from the input table to the current table.
+        If 'reset_table' is True, it resets the current table before loading the new data.
+
+        Parameters
+        ----------
+        input_table : pandas.DataFrame
+            The table from the previous step in the processing chain. It should contain 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
+        reset_table : bool, optional
+            If True, the current table is reset before loading the new data. Default is True.
+
+        Returns
+        -------
+        None
+        """
         if reset_table:
             self._init_table(init_epoch=False)
 
@@ -699,10 +925,21 @@ class StepGnss():
 
     def check_local_files(self):
         """
-        check the existence of the local files, and set the corresponding
-        booleans in the ok_out column
-        """
+        Checks the existence of the local files and updates the corresponding
+        booleans in the 'ok_out' column of the table.
 
+        This method iterates over each row in the table. For each row, it checks if the local file specified in
+        the 'fpath_out' entry exists and is not empty.
+        If the file exists and is not empty, the method sets the 'ok_out' entry for the file in the table to True and
+        updates the 'size_out' entry with the size of the file.
+        If the file does not exist or is empty, the method sets the 'ok_out' entry for the file in the table to False.
+        The method returns a list of the paths of the existing and non-empty local files.
+
+        Returns
+        -------
+        list
+            The list of paths of the existing and non-empty local files.
+        """
         local_files_list = []
 
         for irow, row in self.table.iterrows():
@@ -718,14 +955,24 @@ class StepGnss():
 
     def invalidate_small_local_files(self, threshold=.80):
         """
-        if the local file is smaller than threshold * median 
-        of the considered local files in the request table
-        the ok_out boolean is set at False, and the local file 
-        is redownloaded
-        
-        check_local_files must be launched 1st
-        """
+        Invalidates local files that are smaller than a certain threshold.
 
+        This method checks if the size of each local file is smaller than the threshold times the median size of all local files.
+        If a file is smaller, the method sets the 'ok_out' entry for the file in the table to False, indicating that the file is invalid and needs to be redownloaded.
+        The method returns a list of the paths of the invalidated files.
+
+        Note: The 'check_local_files' method must be called before this method to ensure that the 'size_out' and 'ok_out' entries in the table are up-to-date.
+
+        Parameters
+        ----------
+        threshold : float, optional
+            The threshold for the file size, as a fraction of the median file size. Default is 0.80.
+
+        Returns
+        -------
+        list
+            The list of paths of the invalidated files.
+        """
         med = self.table['size_out'].median(skipna=True)
         valid_bool = threshold * med < self.table['size_out']
         self.table.loc[:, 'ok_out'] = valid_bool
@@ -769,39 +1016,45 @@ class StepGnss():
 
     def decompress_table_batch(self, table_col='fpath_inp', table_ok_col='ok_inp'):
         """
-        decompress the potential compressed files in the ``table_col`` column
-        and its corresponding ``table_ok_col`` boolean column
-        (usually ``fpath_inp`` and ``ok_inp``)
+        Decompresses the potential compressed files in the specified column of the table.
 
-        It will uncompress the file if it is a
-        (gzip+)Hatanaka-compressed RINEX, or a generic-compressed file (gzip)
+        This method checks if the files specified in the 'table_col' column of the table are compressed.
+        If they are, the method decompresses the files and updates the 'table_col' column with the paths of
+        the decompressed files.
+        It also updates the 'ok_inp' column with the existence of the decompressed files and the 'fname'
+        column with the basenames of the decompressed files.
+        If the files are not compressed or the 'ok_inp' column is False, the method does nothing.
+        The method processes a complete table at once, which is faster than row-iterative decompression done by
+        `decompress`.
 
-        It will create a new column ``fpath_ori`` (for original)
-        to keep the trace of the original file
+        Parameters
+        ----------
+        table_col : str, optional
+            The column in the table where the paths of the files are stored. Default is 'fpath_inp'.
+        table_ok_col : str, optional
+            The column in the table where the boolean indicating the existence of the files is stored.
+            Default is 'ok_inp'.
 
-        This function process a complete table at once, and is faster than
-        row-iterative ``decompress``
+        Returns
+        -------
+        list
+            The list of paths of the decompressed files.
         """
         bool_comp = self.table[table_col].apply(arocmn.is_compressed)
-        ### we also ensure the fact that the boolean ok column is True
         bool_ok = self.table[table_ok_col]
         bool_wrk = np.logical_and(bool_comp, bool_ok)
         idx_comp = self.table.loc[bool_wrk].index
 
-        self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp,
-        table_col]
+        self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp, table_col]
         if hasattr(self, 'tmp_dir_unzipped'):
             tmp_dir = self.tmp_dir_unzipped
         else:
             tmp_dir = self.tmp_dir
-        files_decmp_list = self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file,
-                                                                     args=(tmp_dir,))
+        files_decmp_list = self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file, args=(tmp_dir,))
 
         self.table.loc[idx_comp, table_col] = files_decmp_list
-        self.table.loc[idx_comp, 'ok_inp'] = \
-            self.table.loc[idx_comp, table_col].apply(os.path.isfile)
-        self.table.loc[idx_comp, 'fname'] = \
-            self.table.loc[idx_comp, table_col].apply(os.path.basename)
+        self.table.loc[idx_comp, 'ok_inp'] = self.table.loc[idx_comp, table_col].apply(os.path.isfile)
+        self.table.loc[idx_comp, 'fname'] = self.table.loc[idx_comp, table_col].apply(os.path.basename)
 
         return files_decmp_list
 
@@ -810,10 +1063,29 @@ class StepGnss():
         """
         "on row" method
 
-        for each row of the table, decompress the 'table_col' entry,
-        typically 'fpath_inp' file
-        """
+        Decompresses the file specified in the 'table_col' entry of a given row in the table.
 
+        This method checks if the file specified in the 'table_col' entry of the given row is compressed.
+        If it is, the method decompresses the file and updates the 'table_col' entry with the path of the decompressed file.
+        It also updates the 'ok_inp' entry with the existence of the decompressed file and the 'fname' entry with the basename of the decompressed file.
+        If the file is not compressed or the 'ok_inp' entry is False, the method does nothing.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table.
+        out_dir : str, optional
+            The output directory where the decompressed file will be stored. If not provided, the method uses the 'tmp_dir_unzipped' attribute if it exists, otherwise it uses the 'tmp_dir' attribute.
+        table_col : str, optional
+            The column in the table where the path of the file is stored. Default is 'fpath_inp'.
+        table_ok_col : str, optional
+            The column in the table where the boolean indicating the existence of the file is stored. Default is 'ok_inp'.
+
+        Returns
+        -------
+        str, bool
+            The path of the decompressed file and a boolean indicating whether the file was decompressed.
+        """
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
@@ -851,8 +1123,18 @@ class StepGnss():
 
     def remove_tmp_files(self):
         """
-        will remove the temporary files which have been stored in the two lists
-        self.tmp_rnx_files and self.tmp_decmp_files
+        Removes the temporary files which have been stored in the two lists
+        self.tmp_rnx_files and self.tmp_decmp_files.
+
+        This method iterates over the lists of temporary RINEX and decompressed files.
+        If a file exists and is not an original file, it is removed and its path is removed from the list.
+        If a file does not exist or is an original file, its path is kept in the list for future reference.
+
+        Note: This method modifies the 'tmp_rnx_files' and 'tmp_decmp_files' attributes of the object.
+
+        Returns
+        -------
+        None
         """
         # TEMP RINEX Files
         tmp_rnx_files_new = []
@@ -896,10 +1178,23 @@ class StepGnss():
 
     def filter_bad_keywords(self, keywords_path_excl):
         """
-        Filter a list of raw files if the full path contains certain keywords
+        Filters a list of raw files if the full path contains certain keywords.
 
-        modify the boolean "ok_inp" of the object's table
-        returns the filtered raw files in a list
+        This method checks if the full path of the raw files contains any of the provided keywords.
+        If a keyword is found in the full path of a raw file, the file is filtered out.
+        The method modifies the 'ok_inp' column of the object's table to reflect the filtering.
+        The method returns a list of filtered raw files.
+
+        Parameters
+        ----------
+        keywords_path_excl : list
+            The list of keywords to filter the raw files. For example, if keywords_path_excl is ['badword1', 'badword2'],
+            any file whose full path contains either 'badword1' or 'badword2' will be filtered out.
+
+        Returns
+        -------
+        list
+            The list of filtered raw files.
         """
         flist_out = []
         ok_inp_bool_stk = []
@@ -909,8 +1204,7 @@ class StepGnss():
             boolbad = utils.patterns_in_string_checker(f, *keywords_path_excl)
             if boolbad:
                 self.table.iloc[irow, 'ok_inp'] = False
-                logger.debug("file filtered, contains an excluded keyword: %s",
-                             f)
+                logger.debug("file filtered, contains an excluded keyword: %s", f)
                 nfil += 1
             else:
                 if not row.ok_inp:  # ok_inp is already false
@@ -922,39 +1216,56 @@ class StepGnss():
         # final replace of ok init
         self.table['ok_inp'] = ok_inp_bool_stk
 
-        logger.info("%6i files filtered, their paths contain bad keywords",
-                    nfil)
+        logger.info("%6i files filtered, their paths contain bad keywords", nfil)
         return flist_out
 
-    def filter_year_min_max(self,
-                            year_min=1980,
-                            year_max=2099,
-                            year_in_inp_path=None):
+    def filter_year_min_max(self, year_min=1980, year_max=2099, year_in_inp_path=None):
         """
-        Filter a list of raw files if they are not in a year range
-        it is the year in the file path which is tested
+        Filters a list of raw files based on their year range.
 
-        year_in_inp_path is the position of the year in the absolute path
-        e.g.
-        if the absolute path is:
-        /home/user/input_data/raw/2011/176/PSA1201106250000a.T00
-        year_in_inp_path is 4
+        This method checks if the year in the file path is within a specified range.
+        The year is determined either by its position in the absolute path (if provided) or by a regex search.
+        The method modifies the 'ok_inp' column of the object's table to reflect the filtering.
+        The method returns a list of filtered raw files.
 
-        if no year_in_inp_path provided, a regex search is performed
-        (more versatile, but less robust)
+        Parameters
+        ----------
+        year_min : int, optional
+            The minimum year for the range. Default is 1980.
+        year_max : int, optional
+            The maximum year for the range. Default is 2099.
+        year_in_inp_path : int, optional
+            The position of the year in the absolute path. If not provided, a regex search is performed.
+            For example, if the absolute path is:
+            /home/user/input_data/raw/2011/176/PSA1201106250000a.T00
+            year_in_inp_path is 4
 
-
-        year min and year max are included in the range
-
-        modify the boolean "ok_inp" of the object's table
-        returns the filtered raw files in a list
+        Returns
+        -------
+        list
+            The list of filtered raw files.
         """
-        flist_out = []
-        # nfil = 0
-
-        ok_inp_bool_stk = []
 
         def _year_detect(fpath_inp, year_in_inp_path=None):
+            """
+            Detects the year in the file path.
+
+            This function checks if a year_in_inp_path is provided. If it is, it gets the year from the specified position in the file path.
+            If a year_in_inp_path is not provided, it performs a regex search to find the year.
+            If the year cannot be found, it logs a warning and returns NaN.
+
+            Parameters
+            ----------
+            fpath_inp : str
+                The input file path.
+            year_in_inp_path : int, optional
+                The position of the year in the absolute path.
+
+            Returns
+            -------
+            int or NaN
+                The detected year or NaN if the year cannot be found.
+            """
             try:
                 if year_in_inp_path:
                     year_folder = int(fpath_inp.split("/")[year_in_inp_path])
@@ -963,24 +1274,18 @@ class StepGnss():
                     year_folder = int(rgx.group()[1:-1])
                 return year_folder
             except Exception:
-                logger.warning("unable to get the year in path: %s",
-                               fpath_inp)
+                logger.warning("unable to get the year in path: %s", fpath_inp)
                 return np.nan
 
-        years = self.table['fraw'].apply(
-            _year_detect, args=(year_in_inp_path,))
+        years = self.table['fraw'].apply(_year_detect, args=(year_in_inp_path,))
 
         bool_out_range = (years < year_min) | (years > year_max)
         bool_in_range = np.logical_not(bool_out_range)
 
-        #############################
-
         ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
         nfil_total = sum(bool_out_range)
-        # logical inhibition a.\overline{b}
         nfil_spec = sum(np.logical_and(bool_out_range, self.table['ok_inp']))
 
-        # final replace of ok init
         self.table['ok_inp'] = ok_inp_bool_stk
 
         logger.info("%6i/%6i files filtered (total/specific) not in the year min/max range (%4i/%4i)",
@@ -988,16 +1293,28 @@ class StepGnss():
 
         return flist_out
 
-    def filter_filelist(self, filelist_exclu_inp,
-                        message_manu_exclu=False):
+    def filter_filelist(self, filelist_exclu_inp, message_manu_exclu=False):
         """
-        Filter a list of raw files if they are present in a text file list
-        e.g. an OK log or manual exclusion list
+        Filters a list of raw files based on their presence in a provided exclusion list.
 
-        modify the boolean "ok_inp" of the object's table
-        returns the filtered raw files in a list
+        This method checks if the raw files are present in the provided exclusion list.
+        If a raw file is present in the exclusion list, it is filtered out.
+        The method modifies the 'ok_inp' column of the object's table to reflect the filtering.
+        The method returns a list of filtered raw files.
+
+        Parameters
+        ----------
+        filelist_exclu_inp : str or list
+            The exclusion list. It can be a string representing a path to a text file containing the exclusion list,
+            or a list of strings representing the exclusion list.
+        message_manu_exclu : bool, optional
+            If True, a debug message is logged for each file that is manually filtered in the exclusion list.
+
+        Returns
+        -------
+        list
+            The list of filtered raw files.
         """
-
         flist_exclu = arocmn.input_list_interpret(filelist_exclu_inp)
 
         flist_out = []
@@ -1036,26 +1353,44 @@ class StepGnss():
 
     def filter_ok_out(self):
         """
-        Filter a list of raw files if they have a positive ok_out boolean
-        (i.e. the converted file exists already) 
-        
-        modify the boolean "ok_inp" of the object's table
-        returns the filtered raw files in a list
+        Filters the raw files based on the 'ok_out' boolean column of the object's table.
+
+        This method checks if the raw files have a positive 'ok_out' boolean (i.e., the converted file already exists).
+        It modifies the 'ok_inp' boolean column of the object's table and returns the filtered raw files in a list.
+
+        Returns
+        -------
+        list
+            The list of filtered raw files.
         """
 
         def _not_impl(ok_inp, ok_out):
             """
-            The truth table we want is this one
+            Implements the negation of an implication logic operation.
+
+            This function takes two boolean inputs and returns the result of the operation
+            "NOT(ok_inp => ok_out)" i.e. "ok_inp AND NOT(ok_out)".
+            This operation is equivalent to the negation of an implication,
+            as shown in the truth table below:
+
             ok_inp ok_out result
             0      0      0
             1      0      1
             0      1      0
             1      1      0
-            
-            it is the negation of an implication
-            i.e. NOT(ok_inp => ok_out) i.e. ok_inp AND NOT(ok_out)
-            """
 
+            Parameters
+            ----------
+            ok_inp : bool
+                The first boolean input to the logic operation.
+            ok_out : bool
+                The second boolean input to the logic operation.
+
+            Returns
+            -------
+            bool
+                The result of the logic operation "ok_inp AND NOT(ok_out)".
+            """
             res = np.logical_and(ok_inp, np.logical_not(ok_out))
             return res
 
@@ -1068,22 +1403,29 @@ class StepGnss():
 
         return flist_out
 
-    def filter_previous_tables(self,
-                               df_prev_tab):
+    def filter_previous_tables(self, df_prev_tab):
         """
-        Filter a list of raw files if they are present in previous
-        conversion tables stored as log
+        Filters the raw files based on their presence in previous conversion tables.
 
-        modify the boolean "ok_inp" of the object's table
-        returns the filtered raw files in a list
+        This method checks if the raw files are present in previous conversion tables that are stored as logs.
+        If a raw file is present in the previous conversion tables, it is filtered out.
+        The method modifies the 'ok_inp' column of the object's table to reflect the filtering.
+        The method returns a list of filtered raw files.
+
+        Parameters
+        ----------
+        df_prev_tab : pandas.DataFrame
+            The previous conversion tables stored as a DataFrame.
+
+        Returns
+        -------
+        list
+            The list of filtered raw files.
         """
-
         col_ok_names = ["ok_inp", "ok_conv", "ok_rnxmod"]
 
-        # previous files when everthing was ok
-        prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce,
-                                                       axis=1)
-
+        # previous files when everything was ok
+        prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce, axis=1)
         prev_files_ok = df_prev_tab[prev_bool_ok].fraw
 
         # current files which have been already OK and which have already
@@ -1094,13 +1436,11 @@ class StepGnss():
         curr_files_ok_prev = self.table['fraw'].isin(prev_files_ok)
         curr_files_off_already = np.logical_not(self.table['ok_inp'])
 
-        curr_files_skip = np.logical_or(curr_files_ok_prev,
-                                        curr_files_off_already)
+        curr_files_skip = np.logical_or(curr_files_ok_prev, curr_files_off_already)
 
         self.table['ok_inp'] = np.logical_not(curr_files_skip)
 
-        logger.info("%6i files filtered, were OK during a previous run (table list)",
-                    curr_files_ok_prev.sum())
+        logger.info("%6i files filtered, were OK during a previous run (table list)", curr_files_ok_prev.sum())
 
         flist_out = list(self.table['fraw', self.table['ok_inp']])
 
@@ -1108,10 +1448,25 @@ class StepGnss():
 
     def filter_purge(self, col='ok_inp', inplace=False):
         """
-        filter the table according to a "ok" column
-        i.e. remove all the values with a False values
-        """
+        Filters the table based on the values in a specified column.
 
+        This method removes all rows in the table where the value in the specified column is False.
+        The method can either return a new DataFrame with the filtered data or modify the existing DataFrame in place.
+
+        Parameters
+        ----------
+        col : str, optional
+            The name of the column to use for filtering. The column should contain boolean values. Defaults to 'ok_inp'.
+        inplace : bool, optional
+            If True, the method will modify the existing DataFrame in place. If False, the method will return a new
+            DataFrame with the filtered data. Defaults to False.
+
+        Returns
+        -------
+        pandas.DataFrame or list
+            If inplace is False, returns a new DataFrame with the filtered data. If inplace is True, returns a list of
+            values in the specified column after filtering.
+        """
         if len(self.table) == 0:
             logger.warning("the table is empty, unable to purge it")
             out = pd.DataFrame([])
@@ -1136,13 +1491,30 @@ class StepGnss():
         """
         "on row" method
 
-        for each row of the table, rinexmod the 'table_col' entry,
-        typically 'fpath_out' file
+        Applies the rinexmod function to the 'table_col' entry of a specific row in the table.
 
-        if no rinexmod options given with rinexmod_options dictionnary,
-        apply default rinexmod options
+        This method is applied on each row of the table. It checks if the 'ok_inp' column is True for the row.
+        If it is, it applies the rinexmod function to the file specified in the 'table_col' column.
+        The rinexmod function modifies the RINEX file according to the provided rinexmod_options.
+        The modified file is then saved to the specified output directory.
+        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the success of the operation.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table on which the method is applied.
+        out_dir : str, optional
+            The directory to which the modified file is saved. If not provided, the 'tmp_dir_rinexmoded' attribute of the object is used.
+        table_col : str, optional
+            The column in the table which contains the file path to be modified. Defaults to 'fpath_out'.
+        rinexmod_options : dict, optional
+            The options to be used by the rinexmod function. If not provided, default options are used.
+
+        Returns
+        -------
+        str or None
+            The path of the modified file if the operation is successful, None otherwise.
         """
-
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
@@ -1202,17 +1574,33 @@ class StepGnss():
             #raise e
 
         return frnxmod
-
-    def on_row_move_final(self, irow,
-                          out_dir=None,
-                          table_col='fpath_out'):
+    def on_row_move_final(self, irow, out_dir=None, table_col='fpath_out'):
         """
         "on row" method
 
-        for each row of the table, move the 'table_col' entry to a final destination,
-        typically 'fpath_out' file
-        """
+        Moves the 'table_col' entry to a final destination for each row of the table.
 
+        This method is applied on each row of the table. It checks if the 'ok_out' column is True for the row.
+        If it is, it moves the file specified in the 'table_col' column to a final destination directory.
+        The final destination directory is either provided as an argument or it defaults to the 'out_dir' attribute of
+        the object.
+        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the
+        success of the operation.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table on which the method is applied.
+        out_dir : str, optional
+            The directory to which the file is moved. If not provided, the 'out_dir' attribute of the object is used.
+        table_col : str, optional
+            The column in the table which contains the file path to be moved. Defaults to 'fpath_out'.
+
+        Returns
+        -------
+        str or None
+            The final path of the moved file if the operation is successful, None otherwise.
+        """
         if not self.table.loc[irow, 'ok_out']: ### for mv it's ok_out column the one to check!!!!
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])

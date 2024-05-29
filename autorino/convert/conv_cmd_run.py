@@ -27,13 +27,34 @@ logger.setLevel("DEBUG")
 ### Low level functions
 
 
-def _find_converted_files(directory, pattern_main, pattern_annex):
+def _find_converted_files(directory, pattern_main, pattern_annex, n_sec =10):
     """
-    Search for the files in a directory recently created (<10sec)
-    matching main & annex patterns 
+    Searches for the files in a directory that were recently created (within the last n_sec seconds)
+    and match the main and annex patterns.
+
+    This function iterates over all files in the specified directory and checks if they were created within the last n_sec seconds
+    and if their names match the main or annex patterns. It returns two lists of files that match the main and annex patterns, respectively.
+
+    Parameters
+    ----------
+    directory : str
+        The directory in which to search for files.
+    pattern_main : str
+        The regular expression pattern that the main files should match.
+    pattern_annex : str
+        The regular expression pattern that the annex files should match.
+    n_sec : int, optional
+        The number of seconds in the past to consider for file creation. Default is 10.
+
+    Returns
+    -------
+    list
+        The list of main files that were found.
+    list
+        The list of annex files that were found.
     """
     now = dt.datetime.now()
-    delta = dt.timedelta(seconds=10)
+    delta = dt.timedelta(seconds=n_sec)
     files_main = []
     files_annex = []
     files_main_time = []
@@ -51,17 +72,16 @@ def _find_converted_files(directory, pattern_main, pattern_annex):
             else:
                 pass
 
-    #we sort the files found
+    # Sort the files found
     files_main = [x for _, x in sorted(zip(files_main_time, files_main))]
     files_annex = [x for _, x in sorted(zip(files_annex_time, files_annex))]
 
     if len(files_main) > 1:
-        logger.warning("several converted main files found %s", files_main)
+        logger.warning("Several converted main files found %s", files_main)
         files_main = [files_main[-1]]
-        logger.warning("keep most recent only: %s", files_main[0])
+        logger.warning("Keeping most recent only: %s", files_main[0])
 
     return files_main, files_annex
-
 
 ## https://stackoverflow.com/questions/36495669/difference-between-terms-option-argument-and-parameter
 ## https://tinf2.vub.ac.be/~dvermeir/mirrors/www-wks.acs.ohio-state.edu/unix_course/intro-14.html
@@ -69,9 +89,28 @@ def _find_converted_files(directory, pattern_main, pattern_annex):
 
 def _ashtech_name_2_date(inp_raw_fpath):
     """
-    get the record date from an ASHTECH file name
-    returns the year, day of year, GPS week, and day of week, and 
-    Python datetime
+    Extracts the record date from an ASHTECH file name.
+
+    This function extracts the year, day of year, GPS week, and day of week from the name of an ASHTECH file.
+    It also returns the date as a Python datetime object.
+
+    Parameters
+    ----------
+    inp_raw_fpath : str
+        The path of the input ASHTECH file.
+
+    Returns
+    -------
+    int
+        The year extracted from the file name.
+    int
+        The day of the year extracted from the file name.
+    int
+        The GPS week extracted from the file name.
+    int
+        The day of the week extracted from the file name.
+    datetime
+        The date extracted from the file name as a Python datetime object.
     """
 
     inp_raw_fpath = Path(inp_raw_fpath)
