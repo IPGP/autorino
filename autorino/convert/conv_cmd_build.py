@@ -40,13 +40,24 @@ aro_env_soft_path = aro_env["conv_software_paths"]
 
 def _kw_options_dict2str(kw_options):
     """
-    from a dict of keywords/values, generate the corresponding 
-    command line part as list and string
-    
-    e.g.
-    kw_options["-a"] = "valueA"
-    kw_options["-b"] = "42"
-    returns
+    Converts a dictionary of keyword options into a command line string.
+
+    This function takes a dictionary where the keys are command line option flags (e.g., "-a", "-b") and the values are the corresponding values for these flags. It returns a string that represents these options in a format that can be used in a command line interface.
+
+    Parameters
+    ----------
+    kw_options : dict
+        A dictionary where the keys are command line option flags and the values are the corresponding values for these flags.
+
+    Returns
+    -------
+    str
+        A string that represents the command line options and their values.
+
+    Examples
+    --------
+    >>> kw_options = {"-a": "valueA", "-b": "42"}
+    >>> _kw_options_dict2str(kw_options)
     '-a valueA -b 42'
     """
     cmd_list = []
@@ -64,16 +75,27 @@ def _kw_options_dict2str(kw_options):
 
     return cmd_list, cmd_str
 
-
 def _options_list2str(options):
     """
-    from a dict of keywords/values, generate the corresponding 
-    command line part as list and string
-    
-    e.g.
-    ["-a",Path(valueA),"-b",42] 
-    returns
-    '-a valueA -b 42'
+    Converts a list of options into a command line string.
+
+    This function takes a list where the elements are command line options (e.g., "-a", Path(valueA), "-b", 42) and returns a string that represents these options in a format that can be used in a command line interface.
+
+    Parameters
+    ----------
+    options : list
+        A list where the elements are command line options.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the command list and the command string.
+
+    Examples
+    --------
+    >>> options = ["-a", Path(valueA), "-b", 42]
+    >>> _options_list2str(options)
+    (['-a', 'valueA', '-b', '42'], '-a valueA -b 42')
     """
     cmd_list = []
     for opt in options:
@@ -98,8 +120,29 @@ def cmd_build_generic(program="",
                       options_bis=[""],
                       kw_options_bis=dict()):
     """
-    Build a command to launch a generic converter
-    It has to be used for developement purposes only
+    Builds a command to launch a generic converter.
+
+    This function is primarily used for development purposes. It constructs a command by concatenating the provided parameters in a specific order. The command can then be used to launch a generic converter.
+
+    Parameters
+    ----------
+    program : str, optional
+        The name of the program or converter to be launched. Default is an empty string.
+    options : list, optional
+        A list of options to be passed to the program. Default is an empty list.
+    kw_options : dict, optional
+        A dictionary of keyword options to be passed to the program. Default is an empty dictionary.
+    arguments : str, optional
+        The arguments to be passed to the program. Default is an empty string.
+    options_bis : list, optional
+        A second list of options to be passed to the program. Default is an empty list.
+    kw_options_bis : dict, optional
+        A second dictionary of keyword options to be passed to the program. Default is an empty dictionary.
+
+    Returns
+    -------
+    list
+        The constructed command as a list of strings.
     """
 
     cmd = []

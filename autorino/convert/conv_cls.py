@@ -6,7 +6,6 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakic
 """
 
-
 #### Import the logger
 import logging
 from pathlib import Path
