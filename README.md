@@ -50,12 +50,12 @@ converter here: [sbf2rin](https://www.septentrio.com/en/products/software/rxtool
 converter here: [tps2rin](https://mytopcon.topconpositioning.com/support/products/tps2rin-converter)
 YOu need to emulate it with `wine`. Detailled precedure will be added soon.
 ##### BINEX
-converter here: [convbin](https://github.com/rtklibexplorer/RTKLIB)
-`convbin` is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.
+converter here: [convbin](https://github.com/rtklibexplorer/RTKLIB)  
+`convbin` is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.  
 Detailled procedure will be added soon.
 ##### Trimble
-converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)
-This docker image is a wrapper around Trimble's official converter `trm2rinex` which is not available for Linux.
+converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)  
+This docker image is a wrapper around Trimble's official converter `trm2rinex` which is not available for Linux.  
 A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.
 ##### Trimble's runpkr00
 for legacy RINEX2 conversion
