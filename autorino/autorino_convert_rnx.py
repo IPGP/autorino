@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument('tmp_dir', help='The temporary directory used during the conversion process')
     parser.add_argument('--log_dir', help='The directory where logs will be stored. If not provided, it defaults to tmp_dir')
     parser.add_argument('--rinexmod_options', type=dict, help='The options for modifying the RINEX files during the conversion')
-    parser.add_argument('--metadata', type=dict, help='The metadata to be included in the converted RINEX files')
+    parser.add_argument('--metadata', help='The metadata to be included in the converted RINEX files')
 
     args = parser.parse_args()
 
