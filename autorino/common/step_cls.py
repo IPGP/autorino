@@ -663,10 +663,14 @@ class StepGnss():
 
         if not log_dir_inp:
             log_dir = self.log_dir
+            if not os.path.isdir(log_dir):
+                self.set_tmp_dirs_paths()
         else:
             log_dir = log_dir_inp
 
         log_dir_use = self.translate_path(log_dir)
+
+
 
         _logger = logging.getLogger('autorino')
 

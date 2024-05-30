@@ -8,33 +8,46 @@ Created on 23/04/2024 14:21:56
 
 import autorino.convert as arocnv
 import autorino.handle as arohdl
+import os
 
 
-def convert_rnx(raws_inp, out_dir, tmp_dir, log_dir=None,
+def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,
                 rinexmod_options=None,
                 metadata=None):
     """
-    Frontend function to perform RAW > RINEX conversion
+    Frontend function that performs RAW > RINEX conversion.
 
     Parameters
     ----------
     raws_inp : list
-        The input RAW files to be converted
+        The input RAW files to be converted.
     out_dir : str
-        The output directory where the converted files will be stored
-    tmp_dir : str
-        The temporary directory used during the conversion process
+        The output directory where the converted files will be stored.
+    tmp_dir : str, optional
+        The temporary directory used during the conversion process.
+        If not provided, it defaults to <out_dir>/tmp_convert_rnx.
+        Defaults to None.
     log_dir : str, optional
-        The directory where logs will be stored. If not provided, it defaults to tmp_dir
+        The directory where logs will be stored. If not provided, it defaults to tmp_dir.
+         Defaults to None.
     rinexmod_options : dict, optional
-        The options for modifying the RINEX files during the conversion
-    metadata : dict, optional
-        The metadata to be included in the converted RINEX files
+        The options for modifying the RINEX files during the conversion. Defaults to None.
+    metadata : str or list, optional
+        The metadata to be included in the converted RINEX files. Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object. Defaults to None.
 
     Returns
     -------
     None
     """
+
+    if not tmp_dir:
+        tmp_dir = os.path.join(out_dir, 'tmp_convert_rnx')
+
     if not log_dir:
         log_dir = tmp_dir
 
@@ -68,8 +81,14 @@ def split_rnx(rnxs_inp, epo_inp, out_dir, tmp_dir, log_dir=None,
         The software to be used for handling the RINEX files during the split operation
     rinexmod_options : dict, optional
         The options for modifying the RINEX files during the split operation
-    metadata : dict, optional
+    metadata : str or list, optional
         The metadata to be included in the split RINEX files
+        Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object
 
     Returns
     -------
@@ -126,9 +145,14 @@ def splice_rnx(rnxs_inp,
         Whether to drop the rounded epochs during the splice operation
     rinexmod_options : dict, optional
         The options for modifying the RINEX files during the splice operation
-    metadata : dict, optional
+    metadata : str or list, optional
         The metadata to be included in the spliced RINEX files
-
+        Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object
     Returns
     -------
     spc_main_obj : object
