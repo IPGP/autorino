@@ -39,7 +39,7 @@ def site_list_from_metadata(metadata_inp):
      * list of MetaData objects
      * single MetaData object
 
-    see also `rinexmod_api.sitelog_input_manage`
+    see also `rinexmod_api.metadata_input_manage`
 
     Returns
     -------
@@ -53,8 +53,8 @@ def site_list_from_metadata(metadata_inp):
     ###############################################
     ### read metadata
     if not type(metadata_inp) is list and os.path.isdir(metadata_inp):
-        metadata = rinexmod_api.sitelog_input_manage(metadata_inp,
-                                                     force=False)
+        metadata = rinexmod_api.metadata_input_manage(metadata_inp,
+                                                      force=False)
     else:
         metadata = metadata_inp
 

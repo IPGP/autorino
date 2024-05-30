@@ -463,7 +463,7 @@ class StepGnss():
         Initializes the metadata attribute of the StepGnss object.
 
         This method checks if a 'metadata' is provided. If it is, it translates the path of the metadata,
-        manages the site log input using the `sitelog_input_manage` function from the `rinexmod_api` module,
+        manages the site log input using the `metadata_input_manage` function from the `rinexmod_api` module,
         and sets the 'metadata' attribute of the StepGnss object to the managed site log input.
         If a 'metadata' is not provided, it sets the 'metadata' attribute to None.
 
@@ -478,8 +478,8 @@ class StepGnss():
         """
         if metadata:
             metadata_set = self.translate_path(metadata)
-            self.metadata = rinexmod_api.sitelog_input_manage(metadata_set,
-                                                              force=False)
+            self.metadata = rinexmod_api.metadata_input_manage(metadata_set,
+                                                               force=False)
         else:
             self.metadata = None
 

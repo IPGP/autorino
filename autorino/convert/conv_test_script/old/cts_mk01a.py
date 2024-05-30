@@ -32,7 +32,7 @@ verbose=False
 
 nmax = 10
 
-sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
+sitelogs = rinexmod_api.metadata_input_manage(psitelogs, force=False)
 
 regex_trm2rinex=".*(FEUG|GBNG|GB1G|TRCG|HDLG|GBSG).*T02"
 
