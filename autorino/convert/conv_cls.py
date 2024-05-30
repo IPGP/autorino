@@ -42,8 +42,14 @@ class ConvertGnss(arocmn.StepGnss):
         The session for which the conversion process should be performed.
     options : dict, optional
         A dictionary containing any additional options for the conversion process.
-    metadata : str, optional
-        The metadata associated with the conversion process.
+    metadata : str or list, optional
+        The metadata to be included in the converted RINEX files
+        Possible inputs are:
+        * list of string (sitelog file paths),
+        * single string (single sitelog file path)
+        * single string (directory containing the sitelogs)
+        * list of MetaData objects
+        * single MetaData object
 
     Methods
     -------
@@ -76,8 +82,14 @@ class ConvertGnss(arocmn.StepGnss):
             The session for which the conversion process should be performed.
         options : dict, optional
             A dictionary containing any additional options for the conversion process.
-        metadata : str, optional
-            The metadata associated with the conversion process.
+        metadata : str or list, optional
+            The metadata to be included in the converted RINEX files
+            Possible inputs are:
+            * list of string (sitelog file paths),
+            * single string (single sitelog file path)
+            * single string (directory containing the sitelogs)
+            * list of MetaData objects
+            * single MetaData object
         """
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,

@@ -14,10 +14,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert RAW files to RINEX.')
     parser.add_argument('raws_inp', nargs='+', help='The input RAW files to be converted')
     parser.add_argument('out_dir', help='The output directory where the converted files will be stored')
-    parser.add_argument('tmp_dir', help='The temporary directory used during the conversion process')
+    parser.add_argument('--tmp_dir', help='The temporary directory used during the conversion process')
     parser.add_argument('--log_dir', help='The directory where logs will be stored. If not provided, it defaults to tmp_dir')
     parser.add_argument('--rinexmod_options', type=dict, help='The options for modifying the RINEX files during the conversion')
-    parser.add_argument('--metadata', help='The metadata to be included in the converted RINEX files')
+    parser.add_argument('--metadata', help='''The metadata to be included in the converted RINEX files. \n Possible inputs are: \n 
+         * list of string (sitelog file paths), 
+         * single string (single sitelog file path),
+         * single string (directory containing the sitelogs),
+         * list of MetaData objects,
+         * single MetaData object')''')
 
     args = parser.parse_args()
 
