@@ -88,31 +88,31 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-def convert(self, print_table=False, force=False, rinexmod_options=None):
-    """
-    "total action" method
+    def convert(self, print_table=False, force=False, rinexmod_options=None):
+        """
+        "total action" method
 
-    Executes the total conversion process for GNSS data.
+        Executes the total conversion process for GNSS data.
 
-    This method handles the entire conversion process for GNSS data.
-    It sets up temporary directories, guesses and deactivates existing local RINEX files, decompresses files,
-    filters and converts input files, applies rinexmod options, and finally moves the converted files to
-    the final directory.
-    It also handles logging and error checking throughout the process.
+        This method handles the entire conversion process for GNSS data.
+        It sets up temporary directories, guesses and deactivates existing local RINEX files, decompresses files,
+        filters and converts input files, applies rinexmod options, and finally moves the converted files to
+        the final directory.
+        It also handles logging and error checking throughout the process.
 
-    Parameters
-    ----------
-    print_table : bool, optional
-        If True, prints the conversion table. Default is False.
-    force : bool, optional
-        If True, forces the conversion even if output files already exist. Default is False.
-    rinexmod_options : dict, optional
-        A dictionary containing options for the rinexmod process. If not specified, default options are used.
+        Parameters
+        ----------
+        print_table : bool, optional
+            If True, prints the conversion table. Default is False.
+        force : bool, optional
+            If True, forces the conversion even if output files already exist. Default is False.
+        rinexmod_options : dict, optional
+            A dictionary containing options for the rinexmod process. If not specified, default options are used.
 
-    Returns
-    -------
-    None
-    """
+        Returns
+        -------
+        None
+        """
 
         ### here the None to dict is necessary, because we use a defaut rinexmod_options bellow
         if rinexmod_options is None:
@@ -215,7 +215,7 @@ def convert(self, print_table=False, force=False, rinexmod_options=None):
 
             #############################################################
             ###### FINAL MOVE
-            self.on_row_move_final(irow)
+            self.on_row_mv_final(irow)
 
         #### remove temporary files
         self.remove_tmp_files()

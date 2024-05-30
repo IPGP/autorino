@@ -57,7 +57,7 @@ for irow,row in hdl_split.table.iterrows():
 
     hdl_split.on_row_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
 
-    hdl_split.on_row_move_final(irow)
+    hdl_split.on_row_mv_final(irow)
 
 
 
