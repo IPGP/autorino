@@ -6,10 +6,10 @@ _Assisted Unloading, Treatment & Organisation of RINex Observations_
 **Version 0.1.0 / 2024-05-29**, README Revision: 2024-05-29
 
 **Authors & Contributors:**
-* Pierre Sakic (@PierreS-alpha, IPGP-OVS, Paris, France) 
-* Patrice Boissier (OVPF-IPGP, La Réunion, France)
-* Jean-Marie Saurel (IPGP-OVS, Paris, France)
-* Cyprien Griot (OVPF-IPGP, La Réunion, France)
+* [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
+* [Patrice Boissier](https://github.com/PBoissier) (OVPF-IPGP, La Réunion, France)
+* [Jean-Marie Saurel](https://github.com/jmsaurel) (IPGP-OVS, Paris, France)
+* [Cyprien Griot](https://github.com/cyprien-griot) (OVPF-IPGP, La Réunion, France)
 * Diane Pacaud (OVPF-IPGP, La Réunion, France)
 * Aurélie Panetier (IPGP, Paris, France)
 
