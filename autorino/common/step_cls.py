@@ -1574,7 +1574,7 @@ class StepGnss():
             #raise e
 
         return frnxmod
-    def on_row_move_final(self, irow, out_dir=None, table_col='fpath_out'):
+    def on_row_mv_final(self, irow, out_dir=None, table_col='fpath_out'):
         """
         "on row" method
 
