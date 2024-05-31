@@ -147,6 +147,9 @@ class ConvertGnss(arocmn.StepGnss):
         if not force:
             self.guess_local_rnx_files()
             self.check_local_files()
+            prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
+            if len(prv_tbl_df) > 0:
+                self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
 
         self.tmp_decmp_files , _ = self.decompress()

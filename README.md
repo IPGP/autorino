@@ -50,9 +50,10 @@ In your .bashrc or .bash_profile file, add the following lines:
 ```bash
 export AUTORINO_ENV="/home/user/path_to/autorino/configfiles/env/autorino_env.yml"
 ```
-If `$AUTORINO_ENV` is not set, _autorino_ will use the default configuration file located in the package's `configfiles/env/` folder.
-
 This configuration file is a YAML file that contains the paths to the different GNSS raw data converters, described in the next section below.
+
+If `$AUTORINO_ENV` is not set, _autorino_ will use the default configuration file located in the package's `configfiles/env/` folder.  
+Per defaults values assume that the converter executables are known by your system and (e.g. set in your `$PATH`).
 
 ## External utilities (GNSS converters)
 
@@ -94,7 +95,7 @@ Once the converters are installed, you need to set the converter paths in the _a
 You must have set the `$AUTORINO_ENV` environment variable to point to the `env` configuration file. 
 (see dedicated section above)
 
-To configure the external utilities, in the  you can:
+To configure the external utilities, in the you can:
 * set the full executable's paths to the in the `env` configuration file
 * set the paths in your `$PATH` environment variable, and then simply set the executable's names in the `env` 
 configuration file.
