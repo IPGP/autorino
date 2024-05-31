@@ -117,8 +117,8 @@ class HandleGnss(arocmn.StepGnss):
                                  self.tmp_dir_rinexmoded,
                                  rinexmod_options=rinexmod_options)
             if self.tmp_dir_rinexmoded != self.out_dir:
-                self.on_row_move_final(irow,
-                                       self.out_dir)
+                self.on_row_mv_final(irow,
+                                     self.out_dir)
 
         self.remove_tmp_files()
 
@@ -226,7 +226,7 @@ class HandleGnss(arocmn.StepGnss):
                                  rinexmod_options=rinexmod_options)
 
             if self.tmp_dir_rinexmoded != self.out_dir:
-                self.on_row_move_final(irow)
+                self.on_row_mv_final(irow)
 
         self.remove_tmp_files()
 
