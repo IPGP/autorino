@@ -228,11 +228,28 @@ def read_cfg_sessions(y_sessions_dict,
 
 def _check_parent_dir_existence(parent_dir):
     """
-    Check if a parent dictionary exists
-    
-    will translate it with the environment variable first
-    
-    internal function for read_cfg
+    Checks if a parent directory exists and translates it with the environment variable first.
+
+    This function takes a string representing a directory path. It first translates the directory path with the environment variable. Then, it checks if the translated directory exists. If it does not exist, it raises a FileNotFoundError with a custom error message. If it does exist, it returns None.
+
+    This function is an internal function for the read_cfg function.
+
+    Will translate it with the environment variable first.
+
+    Parameters
+    ----------
+    parent_dir : str
+        A string representing a directory path.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the translated directory does not exist.
+
+    Returns
+    -------
+    None
+        If the translated directory exists.
     """
     parent_dir_out = arocmn.translator(parent_dir)
 
@@ -242,8 +259,28 @@ def _check_parent_dir_existence(parent_dir):
     else:
         return None
 
-
 def _is_cfg_bloc_active(ywkf):
+    """
+    Checks if a configuration block is active.
+
+    This function takes a dictionary representing a configuration block.
+    It checks if the 'active' key is present in the dictionary.
+    If it is, it returns the value of the 'active' key.
+    If the 'active' key is not present,
+    it assumes the block is active and returns True.
+
+    Internal function for read_cfg
+
+    Parameters
+    ----------
+    ywkf : dict
+        A dictionary representing a configuration block.
+
+    Returns
+    -------
+    bool
+        True if the 'active' key is present and its value is True, or if the 'active' key is not present. False if the 'active' key is present and its value is False.
+    """
     if 'active' in ywkf.keys():
         if ywkf['active']:
             return True
@@ -266,9 +303,33 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
                              epoch_range_dic['tz'])
 
 
-def _get_dir_path(y_step,
-                  dir_type='out',
-                  check_parent_dir_existence=True):
+def _get_dir_path(y_step, dir_type='out', check_parent_dir_existence=True):
+    """
+    Constructs a directory path based on the provided parameters.
+
+    This function takes a dictionary containing step information,
+     a directory type, and a flag indicating whether to check if
+     the parent directory exists. It constructs a directory
+     path by joining the parent directory and the structure.
+     If the flag to check the existence of the parent directory
+     is set to True, it checks if the parent directory exists.
+
+    Parameters
+    ----------
+    y_step : dict
+        A dictionary containing step information.
+    dir_type : str, optional
+        The type of directory to be constructed. Default is 'out'.
+    check_parent_dir_existence : bool, optional
+        A flag indicating whether to check if the parent directory exists.
+        Default is True.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the constructed directory path,
+        the parent directory, and the structure.
+    """
     dir_parent = y_step[dir_type + '_dir_parent']
     structure = y_step[dir_type + '_structure']
     if check_parent_dir_existence:

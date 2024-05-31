@@ -11,6 +11,7 @@ import os
 import re
 
 import numpy as np
+import pandas as pd
 
 from geodezyx import utils
 
@@ -92,3 +93,16 @@ def input_list_interpret(inp_fil, inp_regex=".*"):
         flist = [f for f in flist if re.match(inp_regex, f)]
 
     return flist
+
+
+def load_previous_tables(log_dir):
+    tables_files = utils.find_recursive(log_dir, "*table.log")
+    if not tables_files:
+        logger.warning("No previous tables found in the log directory.")
+        return pd.DataFrame([])
+    else:
+        return pd.concat([pd.read_csv(t) for t in tables_files])
+
+
+
+
