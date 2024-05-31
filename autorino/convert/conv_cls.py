@@ -42,8 +42,14 @@ class ConvertGnss(arocmn.StepGnss):
         The session for which the conversion process should be performed.
     options : dict, optional
         A dictionary containing any additional options for the conversion process.
-    metadata : str, optional
-        The metadata associated with the conversion process.
+    metadata : str or list, optional
+        The metadata to be included in the converted RINEX files
+        Possible inputs are:
+        * list of string (sitelog file paths),
+        * single string (single sitelog file path)
+        * single string (directory containing the sitelogs)
+        * list of MetaData objects
+        * single MetaData object
 
     Methods
     -------
@@ -76,8 +82,14 @@ class ConvertGnss(arocmn.StepGnss):
             The session for which the conversion process should be performed.
         options : dict, optional
             A dictionary containing any additional options for the conversion process.
-        metadata : str, optional
-            The metadata associated with the conversion process.
+        metadata : str or list, optional
+            The metadata to be included in the converted RINEX files
+            Possible inputs are:
+            * list of string (sitelog file paths),
+            * single string (single sitelog file path)
+            * single string (directory containing the sitelogs)
+            * list of MetaData objects
+            * single MetaData object
         """
         super().__init__(out_dir, tmp_dir, log_dir,
                          epoch_range=epoch_range,
@@ -88,31 +100,31 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-def convert(self, print_table=False, force=False, rinexmod_options=None):
-    """
-    "total action" method
+    def convert(self, print_table=False, force=False, rinexmod_options=None):
+        """
+        "total action" method
 
-    Executes the total conversion process for GNSS data.
+        Executes the total conversion process for GNSS data.
 
-    This method handles the entire conversion process for GNSS data.
-    It sets up temporary directories, guesses and deactivates existing local RINEX files, decompresses files,
-    filters and converts input files, applies rinexmod options, and finally moves the converted files to
-    the final directory.
-    It also handles logging and error checking throughout the process.
+        This method handles the entire conversion process for GNSS data.
+        It sets up temporary directories, guesses and deactivates existing local RINEX files, decompresses files,
+        filters and converts input files, applies rinexmod options, and finally moves the converted files to
+        the final directory.
+        It also handles logging and error checking throughout the process.
 
-    Parameters
-    ----------
-    print_table : bool, optional
-        If True, prints the conversion table. Default is False.
-    force : bool, optional
-        If True, forces the conversion even if output files already exist. Default is False.
-    rinexmod_options : dict, optional
-        A dictionary containing options for the rinexmod process. If not specified, default options are used.
+        Parameters
+        ----------
+        print_table : bool, optional
+            If True, prints the conversion table. Default is False.
+        force : bool, optional
+            If True, forces the conversion even if output files already exist. Default is False.
+        rinexmod_options : dict, optional
+            A dictionary containing options for the rinexmod process. If not specified, default options are used.
 
-    Returns
-    -------
-    None
-    """
+        Returns
+        -------
+        None
+        """
 
         ### here the None to dict is necessary, because we use a defaut rinexmod_options bellow
         if rinexmod_options is None:
@@ -135,6 +147,9 @@ def convert(self, print_table=False, force=False, rinexmod_options=None):
         if not force:
             self.guess_local_rnx_files()
             self.check_local_files()
+            prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
+            if len(prv_tbl_df) > 0:
+                self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
 
         self.tmp_decmp_files , _ = self.decompress()
@@ -183,7 +198,7 @@ def convert(self, print_table=False, force=False, rinexmod_options=None):
             self.site_id = site
             self.set_translate_dict()
 
-            ### do a first converter selection by removing odd files 
+            ### do a first converter selection by identifying odd files
             converter_name_use = arocnv.select_conv_odd_file(fraw)
 
             logger.info("extension/converter: %s/%s", ext, converter_name_use)
@@ -215,7 +230,7 @@ def convert(self, print_table=False, force=False, rinexmod_options=None):
 
             #############################################################
             ###### FINAL MOVE
-            self.on_row_move_final(irow)
+            self.on_row_mv_final(irow)
 
         #### remove temporary files
         self.remove_tmp_files()

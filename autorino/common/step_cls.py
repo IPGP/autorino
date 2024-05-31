@@ -463,7 +463,7 @@ class StepGnss():
         Initializes the metadata attribute of the StepGnss object.
 
         This method checks if a 'metadata' is provided. If it is, it translates the path of the metadata,
-        manages the site log input using the `sitelog_input_manage` function from the `rinexmod_api` module,
+        manages the site log input using the `metadata_input_manage` function from the `rinexmod_api` module,
         and sets the 'metadata' attribute of the StepGnss object to the managed site log input.
         If a 'metadata' is not provided, it sets the 'metadata' attribute to None.
 
@@ -478,8 +478,8 @@ class StepGnss():
         """
         if metadata:
             metadata_set = self.translate_path(metadata)
-            self.metadata = rinexmod_api.sitelog_input_manage(metadata_set,
-                                                              force=False)
+            self.metadata = rinexmod_api.metadata_input_manage(metadata_set,
+                                                               force=False)
         else:
             self.metadata = None
 
@@ -663,10 +663,14 @@ class StepGnss():
 
         if not log_dir_inp:
             log_dir = self.log_dir
+            if not os.path.isdir(log_dir):
+                self.set_tmp_dirs_paths()
         else:
             log_dir = log_dir_inp
 
         log_dir_use = self.translate_path(log_dir)
+
+
 
         _logger = logging.getLogger('autorino')
 
@@ -883,6 +887,16 @@ class StepGnss():
 
         local_paths_list = []
 
+        ### no epoch at all, you are surely in convert mode
+        if pd.isna(self.table['epoch_srt']).all():
+            logger.debug("unable to get the epochs to generate local RINEX paths (normal in epoch-blind convert mode)")
+            return []
+
+        ### some epochs are here, this is weirder
+        if pd.isna(self.table['epoch_srt']).any():
+            logger.debug("unable to get the epochs to generate local RINEX paths (something went wrong)")
+            return []
+
         for iepoch, epoch in self.table['epoch_srt'].items():
             # guess the potential local files
             local_dir_use = str(self.out_dir)
@@ -941,13 +955,15 @@ class StepGnss():
             The list of paths of the existing and non-empty local files.
         """
         local_files_list = []
-
         for irow, row in self.table.iterrows():
             local_file = row['fpath_out']
-            if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
-                self.table.loc[irow, 'ok_out'] = True
-                self.table.loc[irow, 'size_out'] = os.path.getsize(local_file)
-                local_files_list.append(local_file)
+            if not np.isnan(local_file): ### might be a NaN if it is not initialized
+                if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
+                    self.table.loc[irow, 'ok_out'] = True
+                    self.table.loc[irow, 'size_out'] = os.path.getsize(local_file)
+                    local_files_list.append(local_file)
+                else:
+                    self.table.loc[irow, 'ok_out'] = False
             else:
                 self.table.loc[irow, 'ok_out'] = False
 
@@ -1089,7 +1105,10 @@ class StepGnss():
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'fname'])
-            return None
+            file_decomp_out = None
+            bool_decomp_out = False
+
+            return file_decomp_out, bool_decomp_out
 
         # definition of the output directory (after the action)
         if out_dir:
@@ -1288,6 +1307,8 @@ class StepGnss():
 
         self.table['ok_inp'] = ok_inp_bool_stk
 
+        flist_out = list(self.table.loc[self.table['ok_inp'], 'fraw'])
+
         logger.info("%6i/%6i files filtered (total/specific) not in the year min/max range (%4i/%4i)",
                     nfil_total, nfil_spec, year_min, year_max)
 
@@ -1422,27 +1443,28 @@ class StepGnss():
         list
             The list of filtered raw files.
         """
-        col_ok_names = ["ok_inp", "ok_conv", "ok_rnxmod"]
+        col_ok_names = ["ok_inp", "ok_out"]
 
         # previous files when everything was ok
         prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce, axis=1)
-        prev_files_ok = df_prev_tab[prev_bool_ok].fraw
+        prev_files_ok = df_prev_tab.loc[prev_bool_ok,'fpath_inp']
 
         # current files which have been already OK and which have already
         # ok_inp == False
         # here the boolean value are inverted compared to the table:
         # True = skip me / False = keep me
         # a logical not inverts everything at the end
-        curr_files_ok_prev = self.table['fraw'].isin(prev_files_ok)
+        curr_files_ok_prev = self.table['fpath_inp'].isin(prev_files_ok)
         curr_files_off_already = np.logical_not(self.table['ok_inp'])
 
         curr_files_skip = np.logical_or(curr_files_ok_prev, curr_files_off_already)
 
         self.table['ok_inp'] = np.logical_not(curr_files_skip)
+        self.table['ok_out'] = curr_files_ok_prev
 
         logger.info("%6i files filtered, were OK during a previous run (table list)", curr_files_ok_prev.sum())
 
-        flist_out = list(self.table['fraw', self.table['ok_inp']])
+        flist_out = list(self.table.loc[self.table['ok_inp'], 'fpath_inp'])
 
         return flist_out
 
@@ -1574,7 +1596,7 @@ class StepGnss():
             #raise e
 
         return frnxmod
-    def on_row_move_final(self, irow, out_dir=None, table_col='fpath_out'):
+    def on_row_mv_final(self, irow, out_dir=None, table_col='fpath_out'):
         """
         "on row" method
 
@@ -1622,6 +1644,7 @@ class StepGnss():
             ### do the move
             utils.create_dir(outdir_use)
             frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
+            logger.debug("file moved to final destination: %s", frnxfin)
         except Exception as e:
             logger.error("something went wrong for %s",
                          frnx_to_mv)

@@ -17,7 +17,7 @@ import rinexmod_api
 
 ########### SITELOGS
 psitelogs = "/work/metadata/SITELOGS"
-sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
+sitelogs = rinexmod_api.metadata_input_manage(psitelogs, force=False)
 
 
 # print("TOTOTOTO")

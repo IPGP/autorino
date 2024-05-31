@@ -24,7 +24,7 @@ outdir_rinexmoded = "/scratch/convgnss/031_SONEL_conv_redo_PF"
 
 ########### SITELOGS
 psitelogs = "/work/metadata/SITELOGS"
-sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
+sitelogs = rinexmod_api.metadata_input_manage(psitelogs, force=False)
 
 
 for frnxtmp in flist:
