@@ -6,10 +6,10 @@ Created on 23/04/2024 14:21:56
 @author: psakic
 """
 
-import autorino.convert as arocnv
-import autorino.handle as arohdl
 import os
 
+import autorino.convert as arocnv
+import autorino.handle as arohdl
 
 
 def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,

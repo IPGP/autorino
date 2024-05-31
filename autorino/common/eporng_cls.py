@@ -43,12 +43,7 @@ class EpochRange:
         Checks if the epoch range is valid.
     """
 
-    def __init__(self,
-                 epoch1,
-                 epoch2,
-                 period="1d",
-                 round_method="round",
-                 tz="UTC"):
+    def __init__(self, epoch1, epoch2, period="1d", round_method="round", tz="UTC"):
         """
         Constructs all the necessary attributes for the epoch range object.
 
@@ -82,9 +77,9 @@ class EpochRange:
         self.epoch_end = _epoch_max_tmp  ### setter bellow
 
     def __repr__(self):
-        return "epoch range from {} to {}, period {}".format(self.epoch_start,
-                                                             self.epoch_end,
-                                                             self.period)
+        return "epoch range from {} to {}, period {}".format(
+            self.epoch_start, self.epoch_end, self.period
+        )
 
     ############ getters and setters
     @property
@@ -96,9 +91,9 @@ class EpochRange:
     def epoch_start(self, value):
         """Sets the start of the epoch range."""
         self._epoch_start = arocmn.dateparser_interpret(value, tz=self.tz)
-        self._epoch_start = arocmn.round_date(self._epoch_start,
-                                              self.period,
-                                              self.round_method)
+        self._epoch_start = arocmn.round_date(
+            self._epoch_start, self.period, self.round_method
+        )
 
     @property
     def epoch_end(self):
@@ -108,10 +103,10 @@ class EpochRange:
     @epoch_end.setter
     def epoch_end(self, value):
         """Sets the end of the epoch range."""
-        self._epoch_end = arocmn.dateparser_interpret(value)  #,tz=self.tz)
-        self._epoch_end = arocmn.round_date(self._epoch_end,
-                                            self.period,
-                                            self.round_method)
+        self._epoch_end = arocmn.dateparser_interpret(value)  # ,tz=self.tz)
+        self._epoch_end = arocmn.round_date(
+            self._epoch_end, self.period, self.round_method
+        )
 
     @property
     def period_values(self):
@@ -119,8 +114,8 @@ class EpochRange:
         For a period, e.g. 15min, 1H...
         Returns the value (e.g. 15, 1) and the unit (e.g. min, H)
         """
-        numbers = re.findall(r'[0-9]+', self.period)
-        alphabets = re.findall(r'[a-zA-Z]+', self.period)
+        numbers = re.findall(r"[0-9]+", self.period)
+        alphabets = re.findall(r"[a-zA-Z]+", self.period)
         val = int("".join(*numbers))
         unit = str("".join(*alphabets))
         return val, unit
@@ -142,20 +137,20 @@ class EpochRange:
         list
             List of epochs.
         """
-        if not self.is_valid(): ### NaT case
+        if not self.is_valid():  ### NaT case
             eporng = [pd.NaT]
         elif not end_bound:  ### start bound
-            eprrng_srt = pd.date_range(self.epoch_start,
-                                       self.epoch_end,
-                                       freq=self.period)
+            eprrng_srt = pd.date_range(
+                self.epoch_start, self.epoch_end, freq=self.period
+            )
             eporng = eprrng_srt
         else:  ### end bound
             plus_one = pd.Timedelta(self.period)
-            eprrng_end = pd.date_range(self.epoch_start,
-                                       self.epoch_end + plus_one,
-                                       freq=self.period)
+            eprrng_end = pd.date_range(
+                self.epoch_start, self.epoch_end + plus_one, freq=self.period
+            )
             # subtract one second for security reason
-            eporng = eprrng_end[1:] - np.timedelta64(1, 's')
+            eporng = eprrng_end[1:] - np.timedelta64(1, "s")
 
         return list(eporng)
 

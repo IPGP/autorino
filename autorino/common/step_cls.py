@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 
-class StepGnss():
+class StepGnss:
     """
     The StepGnss class represents a step in a GNSS processing chain. It contains methods for initializing and managing
     various aspects of a processing step, including epoch ranges, sites, sessions, options, and metadata. It also provides
@@ -52,13 +52,17 @@ class StepGnss():
         The metadata for the step.
     """
 
-    def __init__(self,
-                 out_dir, tmp_dir, log_dir,
-                 epoch_range=None,
-                 site=None,
-                 session=None,
-                 options=None,
-                 metadata=None):
+    def __init__(
+        self,
+        out_dir,
+        tmp_dir,
+        log_dir,
+        epoch_range=None,
+        site=None,
+        session=None,
+        options=None,
+        metadata=None,
+    ):
         """
         Initializes a new instance of the StepGnss class.
 
@@ -109,11 +113,10 @@ class StepGnss():
         #### list to stack temporarily the temporary files before their delete
         self.tmp_rnx_files = []
         self.tmp_decmp_files = []
+
     def __repr__(self):
         name = type(self).__name__
-        out = "{} {}/{}".format(name,
-                                self.site_id,
-                                self.epoch_range)
+        out = "{} {}/{}".format(name, self.site_id, self.epoch_range)
         return out
 
     # getter and setter
@@ -184,9 +187,7 @@ class StepGnss():
         self._table = value
         # designed for future safety tests
 
-    def _init_table(self,
-                    table_cols: list = None,
-                    init_epoch: bool = True):
+    def _init_table(self, table_cols: list = None, init_epoch: bool = True):
         """
         Initializes the table of a StepGnss object.
 
@@ -208,28 +209,31 @@ class StepGnss():
         None
         """
         if table_cols is None:
-            table_cols = ['fname',
-                          'site',
-                          'epoch_srt',
-                          'epoch_end',
-                          'ok_inp',
-                          'ok_out',
-                          'fpath_inp',
-                          'fpath_out',
-                          'size_inp',
-                          'size_out',
-                          'note']
+            table_cols = [
+                "fname",
+                "site",
+                "epoch_srt",
+                "epoch_end",
+                "ok_inp",
+                "ok_out",
+                "fpath_inp",
+                "fpath_out",
+                "size_inp",
+                "size_out",
+                "note",
+            ]
 
         df = pd.DataFrame([], columns=table_cols)
 
         if init_epoch:
-            df['epoch_srt'] = self.epoch_range.epoch_range_list()
-            df['epoch_end'] = self.epoch_range.epoch_range_list(end_bound=True)
+            df["epoch_srt"] = self.epoch_range.epoch_range_list()
+            df["epoch_end"] = self.epoch_range.epoch_range_list(end_bound=True)
 
-            df['site'] = self.site_id
+            df["site"] = self.site_id
 
         self.table = df
         return None
+
     def _init_site(self, site):
         """
         Initializes the site attribute of the StepGnss object.
@@ -248,7 +252,7 @@ class StepGnss():
         None
         """
         if not site:
-            logger.warning('no site dict given, a dummy one will be created')
+            logger.warning("no site dict given, a dummy one will be created")
             self.site = arocmn.create_dummy_site_dic()
         else:
             self.site = site
@@ -273,8 +277,7 @@ class StepGnss():
         None
         """
         if not session:
-            logger.warning(
-                'no session dict given, a dummy one will be created')
+            logger.warning("no session dict given, a dummy one will be created")
             self.session = arocmn.create_dummy_session_dic()
         else:
             self.session = session
@@ -308,17 +311,18 @@ class StepGnss():
         """
         Initializes the site_id attribute of the StepGnss object.
 
-        This method checks if a 'site_id' is provided in the site dictionary. If it is, it sets the 'site_id' attribute of the StepGnss object to the provided 'site_id'.
+        This method checks if a 'site_id' is provided in the site dictionary.
+        If it is, it sets the 'site_id' attribute of the StepGnss object to the provided 'site_id'.
         If a 'site_id' is not provided, it sets the 'site_id' attribute to 'XXXX' as a default value.
 
         Returns
         -------
         None
         """
-        if 'site_id' in self.site.keys():
-            self.site_id = self.site['site_id']
+        if "site_id" in self.site.keys():
+            self.site_id = self.site["site_id"]
         else:
-            self.site_id = 'XXXX'
+            self.site_id = "XXXX"
 
         return None
 
@@ -326,8 +330,11 @@ class StepGnss():
         """
         Initializes the epoch range of the StepGnss object.
 
-        This method sets the epoch range of the StepGnss object. If an epoch range is provided, it interprets the epoch range using the `epoch_range_interpret` function from the `arocmn` module.
-        If an epoch range is not provided, it creates a dummy epoch range between 'NaT' (not a time) using the `EpochRange` function from the `arocmn` module.
+        This method sets the epoch range of the StepGnss object.
+        If an epoch range is provided, it interprets the epoch range using the `epoch_range_interpret` function
+        from the `arocmn` module.
+        If an epoch range is not provided, it creates a dummy epoch range between 'NaT' (not a time) using
+        the `EpochRange` function from the `arocmn` module.
 
         Parameters
         ----------
@@ -354,7 +361,8 @@ class StepGnss():
         It includes keys for each attribute in the site and session dictionaries, as well as for the site id.
         The site id has three variations: 'site_id', 'site_id4', and 'site_id9', each in both lower and upper case.
 
-        The method does not take any parameters and does not return any value. It directly modifies the 'translate_dict' attribute of the object.
+        The method does not take any parameters and does not return any value.
+        It directly modifies the 'translate_dict' attribute of the object.
 
         Returns
         -------
@@ -368,7 +376,7 @@ class StepGnss():
                 trsltdict[k] = v
 
         # Add each variation of the site id to the translation dictionary
-        for s in ('site_id', 'site_id4', 'site_id9'):
+        for s in ("site_id", "site_id4", "site_id9"):
             trsltdict[s.upper()] = str(getattr(self, s)).upper()
             trsltdict[s.lower()] = str(getattr(self, s)).lower()
 
@@ -377,12 +385,14 @@ class StepGnss():
 
         return None
 
-    def _init_tmp_dirs_paths(self,
-                         tmp_subdir_logs='logs',
-                         tmp_subdir_unzip='unzipped',
-                         tmp_subdir_conv='converted',
-                         tmp_subdir_rnxmod='rinexmoded',
-                         tmp_subdir_dwnld='downloaded'):
+    def _init_tmp_dirs_paths(
+        self,
+        tmp_subdir_logs="logs",
+        tmp_subdir_unzip="unzipped",
+        tmp_subdir_conv="converted",
+        tmp_subdir_rnxmod="rinexmoded",
+        tmp_subdir_dwnld="downloaded",
+    ):
         """
         Initializes the temporary directories paths for the StepGnss object.
 
@@ -443,20 +453,27 @@ class StepGnss():
         """
         # This translation is also done in _init_tmp_dirs_paths
         # but we redo it here, simply to be sure
-        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs,
-                                               make_dir=True)
-        tmp_dir_unzipped_set = self.translate_path(self._tmp_dir_unzipped,
-                                                   make_dir=True)
-        tmp_dir_converted_set = self.translate_path(self._tmp_dir_converted,
-                                                    make_dir=True)
-        tmp_dir_rinexmoded_set = self.translate_path(self._tmp_dir_rinexmoded,
-                                                     make_dir=True)
-        tmp_dir_downloaded_set = self.translate_path(self._tmp_dir_downloaded,
-                                                     make_dir=True)
+        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs, make_dir=True)
+        tmp_dir_unzipped_set = self.translate_path(
+            self._tmp_dir_unzipped, make_dir=True
+        )
+        tmp_dir_converted_set = self.translate_path(
+            self._tmp_dir_converted, make_dir=True
+        )
+        tmp_dir_rinexmoded_set = self.translate_path(
+            self._tmp_dir_rinexmoded, make_dir=True
+        )
+        tmp_dir_downloaded_set = self.translate_path(
+            self._tmp_dir_downloaded, make_dir=True
+        )
 
-        return tmp_dir_logs_set, tmp_dir_unzipped_set, \
-            tmp_dir_converted_set, tmp_dir_rinexmoded_set, \
-            tmp_dir_downloaded_set
+        return (
+            tmp_dir_logs_set,
+            tmp_dir_unzipped_set,
+            tmp_dir_converted_set,
+            tmp_dir_rinexmoded_set,
+            tmp_dir_downloaded_set,
+        )
 
     def _init_metadata(self, metadata):
         """
@@ -478,8 +495,9 @@ class StepGnss():
         """
         if metadata:
             metadata_set = self.translate_path(metadata)
-            self.metadata = rinexmod_api.metadata_input_manage(metadata_set,
-                                                               force=False)
+            self.metadata = rinexmod_api.metadata_input_manage(
+                metadata_set, force=False
+            )
         else:
             self.metadata = None
 
@@ -518,9 +536,9 @@ class StepGnss():
         """
         return type(self).__name__
 
-    def update_epoch_table_from_rnx_fname(self,
-                                          use_rnx_filename_only=False,
-                                          update_epoch_range=True):
+    def update_epoch_table_from_rnx_fname(
+        self, use_rnx_filename_only=False, update_epoch_range=True
+    ):
         """
         Updates the StepGnss table's columns 'epoch_srt' and 'epoch_end' based on the RINEX files.
 
@@ -543,34 +561,38 @@ class StepGnss():
         -------
         None
         """
-        is_rnx = self.table['fname'].apply(conv.rinex_regex_search_tester).apply(bool)
+        is_rnx = self.table["fname"].apply(conv.rinex_regex_search_tester).apply(bool)
 
         if is_rnx.sum() == 0:
-            logger.warning("epoch update impossible, no file matches a RINEX pattern in %s", self)
+            logger.warning(
+                "epoch update impossible, no file matches a RINEX pattern in %s", self
+            )
             return
 
         for irow, row in self.table.iterrows():
             if not use_rnx_filename_only:
-                rnx = rinexmod.rinexfile.RinexFile(row['fpath_inp'])
+                rnx = rinexmod.rinexfile.RinexFile(row["fpath_inp"])
                 epo_srt = rnx.start_date
                 epo_end = rnx.end_date
             else:
-                epo_srt, epo_end, _ = rinexmod.rinexfile.dates_from_rinex_filename(row['fpath_inp'])
+                epo_srt, epo_end, _ = rinexmod.rinexfile.dates_from_rinex_filename(
+                    row["fpath_inp"]
+                )
 
-            self.table.loc[irow, 'epoch_srt'] = epo_srt
-            self.table.loc[irow, 'epoch_end'] = epo_end
+            self.table.loc[irow, "epoch_srt"] = epo_srt
+            self.table.loc[irow, "epoch_end"] = epo_end
 
-        self.table['epoch_srt'] = pd.to_datetime(self.table['epoch_srt'])
-        self.table['epoch_end'] = pd.to_datetime(self.table['epoch_end'])
+        self.table["epoch_srt"] = pd.to_datetime(self.table["epoch_srt"])
+        self.table["epoch_end"] = pd.to_datetime(self.table["epoch_end"])
 
         if update_epoch_range:
             self.update_epoch_range_from_table()
 
         return None
 
-    def update_epoch_range_from_table(self,
-                                      column_srt='epoch_srt',
-                                      column_end='epoch_end'):
+    def update_epoch_range_from_table(
+        self, column_srt="epoch_srt", column_end="epoch_end"
+    ):
         """
         Updates the EpochRange of the StepGnss object based on the min/max epochs in the object's table.
 
@@ -601,20 +623,28 @@ class StepGnss():
         v_tdelta = tdelta.mode()[0]
 
         if len(n_tdelta) > 1:
-            logger.warning("the period spacing of %s is not uniform, keep the most common", self)
+            logger.warning(
+                "the period spacing of %s is not uniform, keep the most common", self
+            )
             logger.warning("%s", n_tdelta)
             # be sure to keep the 1st one!!!
 
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
         logger.debug("new period, %s, %s", v_tdelta, period_new)
 
-        self.epoch_range = arocmn.EpochRange(epoch1, epoch2, period_new,
-                                             round_method=self.epoch_range.round_method,
-                                             tz=self.epoch_range.tz)
+        self.epoch_range = arocmn.EpochRange(
+            epoch1,
+            epoch2,
+            period_new,
+            round_method=self.epoch_range.round_method,
+            tz=self.epoch_range.tz,
+        )
 
         logger.info("new %s", self.epoch_range)
 
-    def translate_path(self, path_inp: str, epoch_inp=None, make_dir: bool = False) -> str:
+    def translate_path(
+        self, path_inp: str, epoch_inp=None, make_dir: bool = False
+    ) -> str:
         """
         Translates a given path using the object's translation dictionary and optionally creates the directory.
 
@@ -645,6 +675,7 @@ class StepGnss():
             utils.create_dir(trslt_dir)
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
+
     #  _                       _
     # | |                     (_)
     # | |     ___   __ _  __ _ _ _ __   __ _
@@ -654,9 +685,7 @@ class StepGnss():
     #               __/ | __/ |         __/ |
     #              |___/ |___/         |___/
 
-    def set_logfile(self,
-                    log_dir_inp=None,
-                    step_suffix=''):
+    def set_logfile(self, log_dir_inp=None, step_suffix=""):
         """
         set logging in a file
         """
@@ -670,23 +699,21 @@ class StepGnss():
 
         log_dir_use = self.translate_path(log_dir)
 
-
-
-        _logger = logging.getLogger('autorino')
+        _logger = logging.getLogger("autorino")
 
         ts = utils.get_timestamp()
         log_name = "_".join((ts, step_suffix, ".log"))
         log_path = os.path.join(log_dir_use, log_name)
 
         log_cfg_dic = arocfg.logcfg.log_config_dict
-        fmt_dic = log_cfg_dic['formatters']['fmtgzyx_nocolor']
+        fmt_dic = log_cfg_dic["formatters"]["fmtgzyx_nocolor"]
 
         logfile_handler = logging.FileHandler(log_path)
 
         fileformatter = logging.Formatter(**fmt_dic)
 
         logfile_handler.setFormatter(fileformatter)
-        logfile_handler.setLevel('DEBUG')
+        logfile_handler.setLevel("DEBUG")
 
         # the root logger
         # https://stackoverflow.com/questions/48712206/what-is-the-name-of-pythons-root-logger
@@ -696,9 +723,7 @@ class StepGnss():
 
         return logfile_handler
 
-    def set_table_log(self,
-                      out_dir=None,
-                      step_suffix=''):
+    def set_table_log(self, out_dir=None, step_suffix=""):
         if not out_dir:
             out_dir = self.tmp_dir
 
@@ -716,10 +741,9 @@ class StepGnss():
         return talo_path
 
     def write_in_table_log(self, row_in):
-        pd.DataFrame(row_in).T.to_csv(self.table_log_path,
-                                      mode='a',
-                                      index=False,
-                                      header=False)
+        pd.DataFrame(row_in).T.to_csv(
+            self.table_log_path, mode="a", index=False, header=False
+        )
         return None
 
     #  _______    _     _                                                                    _
@@ -731,10 +755,7 @@ class StepGnss():
     #                                                         __/ |
     #                                                        |___/
 
-    def print_table(self,
-                    no_print=False,
-                    no_return=True,
-                    max_colwidth=33):
+    def print_table(self, no_print=False, no_return=True, max_colwidth=33):
         """
         Prints the table of the StepGnss object with specified formatting.
 
@@ -782,36 +803,29 @@ class StepGnss():
                 return str_inp
             else:
                 halflen = int((maxlen / 2) - 1)
-                str_out = str_inp[:halflen] + '..' + str_inp[-halflen:]
+                str_out = str_inp[:halflen] + ".." + str_inp[-halflen:]
                 return str_out
 
         form = dict()
-        form['fraw'] = _shrink_str
-        form['fpath_inp'] = _shrink_str
-        form['fpath_out'] = _shrink_str
+        form["fraw"] = _shrink_str
+        form["fpath_inp"] = _shrink_str
+        form["fpath_out"] = _shrink_str
 
-        form['epoch_srt'] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
-        form['epoch_end'] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
+        form["epoch_srt"] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
+        form["epoch_end"] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
 
-        str_out = self.table.to_string(max_colwidth=max_colwidth + 1,
-                                       formatters=form)
+        str_out = self.table.to_string(max_colwidth=max_colwidth + 1, formatters=form)
         # add +1 in max_colwidth for safety
         if not no_print:
             # print it in the logger (if silent , just return it)
             name = type(self).__name__
-            logger.info("%s %s/%s\n%s", name,
-                        self.site_id,
-                        self.epoch_range,
-                        str_out)
+            logger.info("%s %s/%s\n%s", name, self.site_id, self.epoch_range, str_out)
         if no_return:
             return None
         else:
             return str_out
 
-    def load_table_from_filelist(self,
-                                 input_files,
-                                 inp_regex=".*",
-                                 reset_table=True):
+    def load_table_from_filelist(self, input_files, inp_regex=".*", reset_table=True):
         """
         Loads the table from a list of input files.
 
@@ -836,12 +850,11 @@ class StepGnss():
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = arocmn.input_list_interpret(input_files,
-                                            inp_regex)
+        flist = arocmn.input_list_interpret(input_files, inp_regex)
 
-        self.table['fpath_inp'] = flist
-        self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
-        self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
+        self.table["fpath_inp"] = flist
+        self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
+        self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
 
         return flist
 
@@ -867,13 +880,13 @@ class StepGnss():
         if reset_table:
             self._init_table(init_epoch=False)
 
-        self.table['fpath_inp'] = input_table['fpath_out'].values
-        self.table['size_inp'] = input_table['size_out'].values
-        self.table['fname'] = self.table['fpath_inp'].apply(os.path.basename)
-        self.table['site'] = input_table['site'].values
-        self.table['epoch_srt'] = input_table['epoch_srt'].values
-        self.table['epoch_end'] = input_table['epoch_end'].values
-        self.table['ok_inp'] = self.table['fpath_inp'].apply(os.path.isfile)
+        self.table["fpath_inp"] = input_table["fpath_out"].values
+        self.table["size_inp"] = input_table["size_out"].values
+        self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
+        self.table["site"] = input_table["site"].values
+        self.table["epoch_srt"] = input_table["epoch_srt"].values
+        self.table["epoch_end"] = input_table["epoch_end"].values
+        self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
 
         return None
 
@@ -888,23 +901,29 @@ class StepGnss():
         local_paths_list = []
 
         ### no epoch at all, you are surely in convert mode
-        if pd.isna(self.table['epoch_srt']).all():
-            logger.debug("unable to get the epochs to generate local RINEX paths (normal in epoch-blind convert mode)")
+        if pd.isna(self.table["epoch_srt"]).all():
+            logger.debug(
+                "unable to get the epochs to generate local RINEX paths (normal in epoch-blind convert mode)"
+            )
             return []
 
         ### some epochs are here, this is weirder
-        if pd.isna(self.table['epoch_srt']).any():
-            logger.debug("unable to get the epochs to generate local RINEX paths (something went wrong)")
+        if pd.isna(self.table["epoch_srt"]).any():
+            logger.debug(
+                "unable to get the epochs to generate local RINEX paths (something went wrong)"
+            )
             return []
 
-        for iepoch, epoch in self.table['epoch_srt'].items():
+        for iepoch, epoch in self.table["epoch_srt"].items():
             # guess the potential local files
             local_dir_use = str(self.out_dir)
-            #local_fname_use = str(self.remote_fname)
+            # local_fname_use = str(self.remote_fname)
 
             epo_dt_srt = epoch.to_pydatetime()
-            epo_dt_end = self.table.loc[iepoch, 'epoch_end'].to_pydatetime()
-            prd_str = rinexmod.rinexfile.file_period_from_timedelta(epo_dt_srt, epo_dt_end)[0]
+            epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
+            prd_str = rinexmod.rinexfile.file_period_from_timedelta(
+                epo_dt_srt, epo_dt_end
+            )[0]
 
             local_fname_use = conv.statname_dt2rinexname_long(
                 self.site_id9,
@@ -912,25 +931,24 @@ class StepGnss():
                 country="XXX",
                 data_source="R",  ### always will be with autorino
                 file_period=prd_str,
-                data_freq=self.session['data_frequency'],
+                data_freq=self.session["data_frequency"],
                 data_type="MO",
-                format_compression='crx.gz',
-                preset_type=None)
+                format_compression="crx.gz",
+                preset_type=None,
+            )
 
-            local_path_use0 = os.path.join(local_dir_use,
-                                           local_fname_use)
+            local_path_use0 = os.path.join(local_dir_use, local_fname_use)
 
-            local_path_use = self.translate_path(local_path_use0,
-                                                 epoch)
+            local_path_use = self.translate_path(local_path_use0, epoch)
 
             local_fname_use = os.path.basename(local_path_use)
 
             local_paths_list.append(local_path_use)
 
-            #iepoch = self.table[self.table['epoch_srt'] == epoch].index
+            # iepoch = self.table[self.table['epoch_srt'] == epoch].index
 
-            #self.table.loc[iepoch, 'fname'] = local_fname_use
-            self.table.loc[iepoch, 'fpath_out'] = local_path_use
+            # self.table.loc[iepoch, 'fname'] = local_fname_use
+            self.table.loc[iepoch, "fpath_out"] = local_path_use
             logger.debug("local RINEX file guessed: %s", local_path_use)
 
         logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))
@@ -956,28 +974,31 @@ class StepGnss():
         """
         local_files_list = []
         for irow, row in self.table.iterrows():
-            local_file = row['fpath_out']
-            if not np.isnan(local_file): ### might be a NaN if it is not initialized
+            local_file = row["fpath_out"]
+            if not np.isnan(local_file):  ### might be a NaN if it is not initialized
                 if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
-                    self.table.loc[irow, 'ok_out'] = True
-                    self.table.loc[irow, 'size_out'] = os.path.getsize(local_file)
+                    self.table.loc[irow, "ok_out"] = True
+                    self.table.loc[irow, "size_out"] = os.path.getsize(local_file)
                     local_files_list.append(local_file)
                 else:
-                    self.table.loc[irow, 'ok_out'] = False
+                    self.table.loc[irow, "ok_out"] = False
             else:
-                self.table.loc[irow, 'ok_out'] = False
+                self.table.loc[irow, "ok_out"] = False
 
         return local_files_list
 
-    def invalidate_small_local_files(self, threshold=.80):
+    def invalidate_small_local_files(self, threshold=0.80):
         """
         Invalidates local files that are smaller than a certain threshold.
 
-        This method checks if the size of each local file is smaller than the threshold times the median size of all local files.
-        If a file is smaller, the method sets the 'ok_out' entry for the file in the table to False, indicating that the file is invalid and needs to be redownloaded.
+        This method checks if the size of each local file is smaller than the threshold times
+        the median size of all local files.
+        If a file is smaller, the method sets the 'ok_out' entry for the file in the table to False,
+        indicating that the file is invalid and needs to be redownloaded.
         The method returns a list of the paths of the invalidated files.
 
-        Note: The 'check_local_files' method must be called before this method to ensure that the 'size_out' and 'ok_out' entries in the table are up-to-date.
+        Note: The 'check_local_files' method must be called before this method to ensure that
+        the 'size_out' and 'ok_out' entries in the table are up-to-date.
 
         Parameters
         ----------
@@ -989,14 +1010,14 @@ class StepGnss():
         list
             The list of paths of the invalidated files.
         """
-        med = self.table['size_out'].median(skipna=True)
-        valid_bool = threshold * med < self.table['size_out']
-        self.table.loc[:, 'ok_out'] = valid_bool
-        invalid_local_files_list = list(self.table.loc[valid_bool, 'fpath_out'])
+        med = self.table["size_out"].median(skipna=True)
+        valid_bool = threshold * med < self.table["size_out"]
+        self.table.loc[:, "ok_out"] = valid_bool
+        invalid_local_files_list = list(self.table.loc[valid_bool, "fpath_out"])
 
         return invalid_local_files_list
 
-    def decompress(self, table_col='fpath_inp', table_ok_col='ok_inp'):
+    def decompress(self, table_col="fpath_inp", table_ok_col="ok_inp"):
         """
         decompress the potential compressed files in the ``table_col`` column
         and its corresponding ``table_ok_col`` boolean column
@@ -1017,20 +1038,25 @@ class StepGnss():
             the UNcompressed files i.e. ALL the usables ones
 
         """
-        files_decmp_list = []  #### the DEcompressed files i.e. the one which are temporary and must be removed
+        files_decmp_list = (
+            []
+        )  #### the DEcompressed files i.e. the one which are temporary and must be removed
         files_uncmp_list = []  #### the UNcompressed files i.e. ALL the usables ones
 
         for irow, row in self.table.iterrows():
-            file_decmp, bool_decmp = self.on_row_decompress(irow, table_col=table_col, table_ok_col=table_ok_col)
+            file_decmp, bool_decmp = self.on_row_decompress(
+                irow, table_col=table_col, table_ok_col=table_ok_col
+            )
 
             files_uncmp_list.append(file_decmp)  ### all files are stored in this list
             if bool_decmp:
                 files_decmp_list.append(
-                    file_decmp)  ### only the DEcompressed files are stored in this list (to be rm later)
+                    file_decmp
+                )  ### only the DEcompressed files are stored in this list (to be rm later)
 
         return files_decmp_list, files_uncmp_list
 
-    def decompress_table_batch(self, table_col='fpath_inp', table_ok_col='ok_inp'):
+    def decompress_table_batch(self, table_col="fpath_inp", table_ok_col="ok_inp"):
         """
         Decompresses the potential compressed files in the specified column of the table.
 
@@ -1061,21 +1087,28 @@ class StepGnss():
         bool_wrk = np.logical_and(bool_comp, bool_ok)
         idx_comp = self.table.loc[bool_wrk].index
 
-        self.table.loc[idx_comp, 'fpath_ori'] = self.table.loc[idx_comp, table_col]
-        if hasattr(self, 'tmp_dir_unzipped'):
+        self.table.loc[idx_comp, "fpath_ori"] = self.table.loc[idx_comp, table_col]
+        if hasattr(self, "tmp_dir_unzipped"):
             tmp_dir = self.tmp_dir_unzipped
         else:
             tmp_dir = self.tmp_dir
-        files_decmp_list = self.table.loc[idx_comp, table_col].apply(arocmn.decompress_file, args=(tmp_dir,))
+        files_decmp_list = self.table.loc[idx_comp, table_col].apply(
+            arocmn.decompress_file, args=(tmp_dir,)
+        )
 
         self.table.loc[idx_comp, table_col] = files_decmp_list
-        self.table.loc[idx_comp, 'ok_inp'] = self.table.loc[idx_comp, table_col].apply(os.path.isfile)
-        self.table.loc[idx_comp, 'fname'] = self.table.loc[idx_comp, table_col].apply(os.path.basename)
+        self.table.loc[idx_comp, "ok_inp"] = self.table.loc[idx_comp, table_col].apply(
+            os.path.isfile
+        )
+        self.table.loc[idx_comp, "fname"] = self.table.loc[idx_comp, table_col].apply(
+            os.path.basename
+        )
 
         return files_decmp_list
 
-    def on_row_decompress(self, irow, out_dir=None,
-                          table_col='fpath_inp', table_ok_col='ok_inp'):
+    def on_row_decompress(
+        self, irow, out_dir=None, table_col="fpath_inp", table_ok_col="ok_inp"
+    ):
         """
         "on row" method
 
@@ -1102,9 +1135,11 @@ class StepGnss():
         str, bool
             The path of the decompressed file and a boolean indicating whether the file was decompressed.
         """
-        if not self.table.loc[irow, 'ok_inp']:
-            logger.warning("action on row skipped (input disabled): %s",
-                           self.table.loc[irow, 'fname'])
+        if not self.table.loc[irow, "ok_inp"]:
+            logger.warning(
+                "action on row skipped (input disabled): %s",
+                self.table.loc[irow, "fname"],
+            )
             file_decomp_out = None
             bool_decomp_out = False
 
@@ -1113,7 +1148,7 @@ class StepGnss():
         # definition of the output directory (after the action)
         if out_dir:
             out_dir_use = out_dir
-        elif hasattr(self, 'tmp_dir_unzipped'):
+        elif hasattr(self, "tmp_dir_unzipped"):
             out_dir_use = self.tmp_dir_unzipped
         else:
             out_dir_use = self.tmp_dir
@@ -1123,16 +1158,23 @@ class StepGnss():
         bool_wrk = np.logical_and(bool_comp, bool_ok)
 
         if bool_wrk:
-            if 'fpath_ori' not in self.table.columns:  ## a 'fpath_ori' column must be created first
-                self.table['fpath_ori'] = [None] * len(self.table)
+            if (
+                "fpath_ori" not in self.table.columns
+            ):  ## a 'fpath_ori' column must be created first
+                self.table["fpath_ori"] = [None] * len(self.table)
 
-            self.table.loc[irow, 'fpath_ori'] = self.table.loc[irow, table_col]
+            self.table.loc[irow, "fpath_ori"] = self.table.loc[irow, table_col]
 
-            file_decomp_out, bool_decomp_out = arocmn.decompress_file(self.table.loc[irow, table_col],
-                                                                      out_dir_use)
+            file_decomp_out, bool_decomp_out = arocmn.decompress_file(
+                self.table.loc[irow, table_col], out_dir_use
+            )
             self.table.loc[irow, table_col] = file_decomp_out
-            self.table.loc[irow, 'ok_inp'] = os.path.isfile(self.table.loc[irow, table_col])
-            self.table.loc[irow, 'fname'] = os.path.basename(self.table.loc[irow, table_col])
+            self.table.loc[irow, "ok_inp"] = os.path.isfile(
+                self.table.loc[irow, table_col]
+            )
+            self.table.loc[irow, "fname"] = os.path.basename(
+                self.table.loc[irow, table_col]
+            )
 
         else:
             file_decomp_out = None
@@ -1169,15 +1211,21 @@ class StepGnss():
         tmp_decmp_files_new = []
         for f in self.tmp_decmp_files:
             # we also test if the file is not an original one!
-            if 'fpath_ori' not in self.table.columns:
-                logger.warning("file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s", f)
+            if "fpath_ori" not in self.table.columns:
+                logger.warning(
+                    "file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s",
+                    f,
+                )
                 tmp_decmp_files_new.append(f)
                 continue
 
-            is_original = self.table['fpath_ori'].isin([f]).any()
+            is_original = self.table["fpath_ori"].isin([f]).any()
 
             if os.path.isfile(f) and is_original:
-                logger.warning("uncompressed file is also an original one, we keep it for security: %s", f)
+                logger.warning(
+                    "uncompressed file is also an original one, we keep it for security: %s",
+                    f,
+                )
                 tmp_decmp_files_new.append(f)
                 continue
             elif os.path.isfile(f) and not is_original:
@@ -1207,7 +1255,8 @@ class StepGnss():
         Parameters
         ----------
         keywords_path_excl : list
-            The list of keywords to filter the raw files. For example, if keywords_path_excl is ['badword1', 'badword2'],
+            The list of keywords to filter the raw files.
+            For example, if keywords_path_excl is ['badword1', 'badword2'],
             any file whose full path contains either 'badword1' or 'badword2' will be filtered out.
 
         Returns
@@ -1219,10 +1268,10 @@ class StepGnss():
         ok_inp_bool_stk = []
         nfil = 0
         for irow, row in self.table.iterrows():
-            f = row['fname']
+            f = row["fname"]
             boolbad = utils.patterns_in_string_checker(f, *keywords_path_excl)
             if boolbad:
-                self.table.iloc[irow, 'ok_inp'] = False
+                self.table.iloc[irow, "ok_inp"] = False
                 logger.debug("file filtered, contains an excluded keyword: %s", f)
                 nfil += 1
             else:
@@ -1233,7 +1282,7 @@ class StepGnss():
                     flist_out.append(f)
 
         # final replace of ok init
-        self.table['ok_inp'] = ok_inp_bool_stk
+        self.table["ok_inp"] = ok_inp_bool_stk
 
         logger.info("%6i files filtered, their paths contain bad keywords", nfil)
         return flist_out
@@ -1269,7 +1318,8 @@ class StepGnss():
             """
             Detects the year in the file path.
 
-            This function checks if a year_in_inp_path is provided. If it is, it gets the year from the specified position in the file path.
+            This function checks if a year_in_inp_path is provided.
+            If it is, it gets the year from the specified position in the file path.
             If a year_in_inp_path is not provided, it performs a regex search to find the year.
             If the year cannot be found, it logs a warning and returns NaN.
 
@@ -1296,21 +1346,26 @@ class StepGnss():
                 logger.warning("unable to get the year in path: %s", fpath_inp)
                 return np.nan
 
-        years = self.table['fraw'].apply(_year_detect, args=(year_in_inp_path,))
+        years = self.table["fraw"].apply(_year_detect, args=(year_in_inp_path,))
 
         bool_out_range = (years < year_min) | (years > year_max)
         bool_in_range = np.logical_not(bool_out_range)
 
-        ok_inp_bool_stk = bool_in_range & self.table['ok_inp']
+        ok_inp_bool_stk = bool_in_range & self.table["ok_inp"]
         nfil_total = sum(bool_out_range)
-        nfil_spec = sum(np.logical_and(bool_out_range, self.table['ok_inp']))
+        nfil_spec = sum(np.logical_and(bool_out_range, self.table["ok_inp"]))
 
-        self.table['ok_inp'] = ok_inp_bool_stk
+        self.table["ok_inp"] = ok_inp_bool_stk
 
-        flist_out = list(self.table.loc[self.table['ok_inp'], 'fraw'])
+        flist_out = list(self.table.loc[self.table["ok_inp"], "fraw"])
 
-        logger.info("%6i/%6i files filtered (total/specific) not in the year min/max range (%4i/%4i)",
-                    nfil_total, nfil_spec, year_min, year_max)
+        logger.info(
+            "%6i/%6i files filtered (total/specific) not in the year min/max range (%4i/%4i)",
+            nfil_total,
+            nfil_spec,
+            year_min,
+            year_max,
+        )
 
         return flist_out
 
@@ -1349,10 +1404,11 @@ class StepGnss():
                 ok_inp_bool_stk.append(False)
                 if not message_manu_exclu:
                     logger.debug(
-                        "file filtered, was OK during a previous run (legacy simple list): %s", f)
+                        "file filtered, was OK during a previous run (legacy simple list): %s",
+                        f,
+                    )
                 else:
-                    logger.debug(
-                        "file filtered manually in the exclusion list: %s", f)
+                    logger.debug("file filtered manually in the exclusion list: %s", f)
             else:
                 if not row.ok_inp:  # ok_inp is already false
                     ok_inp_bool_stk.append(False)
@@ -1362,13 +1418,14 @@ class StepGnss():
 
         if not message_manu_exclu:
             logger.info(
-                "%6i files filtered, were OK during a previous run (legacy simple OK list)", nfil)
+                "%6i files filtered, were OK during a previous run (legacy simple OK list)",
+                nfil,
+            )
         else:
-            logger.info(
-                "%6i files manually filtered in the exclusion list,", nfil)
+            logger.info("%6i files manually filtered in the exclusion list,", nfil)
 
         # final replace of ok init
-        self.table['ok_inp'] = ok_inp_bool_stk
+        self.table["ok_inp"] = ok_inp_bool_stk
 
         return flist_out
 
@@ -1415,12 +1472,11 @@ class StepGnss():
             res = np.logical_and(ok_inp, np.logical_not(ok_out))
             return res
 
-        ok_inp_new = _not_impl(self.table['ok_inp'].values,
-                               self.table['ok_out'].values)
+        ok_inp_new = _not_impl(self.table["ok_inp"].values, self.table["ok_out"].values)
 
-        flist_out = list(self.table['fpath_inp'][ok_inp_new])
+        flist_out = list(self.table["fpath_inp"][ok_inp_new])
 
-        self.table['ok_inp'] = ok_inp_new
+        self.table["ok_inp"] = ok_inp_new
 
         return flist_out
 
@@ -1447,28 +1503,31 @@ class StepGnss():
 
         # previous files when everything was ok
         prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce, axis=1)
-        prev_files_ok = df_prev_tab.loc[prev_bool_ok,'fpath_inp']
+        prev_files_ok = df_prev_tab.loc[prev_bool_ok, "fpath_inp"]
 
         # current files which have been already OK and which have already
         # ok_inp == False
         # here the boolean value are inverted compared to the table:
         # True = skip me / False = keep me
         # a logical not inverts everything at the end
-        curr_files_ok_prev = self.table['fpath_inp'].isin(prev_files_ok)
-        curr_files_off_already = np.logical_not(self.table['ok_inp'])
+        curr_files_ok_prev = self.table["fpath_inp"].isin(prev_files_ok)
+        curr_files_off_already = np.logical_not(self.table["ok_inp"])
 
         curr_files_skip = np.logical_or(curr_files_ok_prev, curr_files_off_already)
 
-        self.table['ok_inp'] = np.logical_not(curr_files_skip)
-        self.table['ok_out'] = curr_files_ok_prev
+        self.table["ok_inp"] = np.logical_not(curr_files_skip)
+        self.table["ok_out"] = curr_files_ok_prev
 
-        logger.info("%6i files filtered, were OK during a previous run (table list)", curr_files_ok_prev.sum())
+        logger.info(
+            "%6i files filtered, were OK during a previous run (table list)",
+            curr_files_ok_prev.sum(),
+        )
 
-        flist_out = list(self.table.loc[self.table['ok_inp'], 'fpath_inp'])
+        flist_out = list(self.table.loc[self.table["ok_inp"], "fpath_inp"])
 
         return flist_out
 
-    def filter_purge(self, col='ok_inp', inplace=False):
+    def filter_purge(self, col="ok_inp", inplace=False):
         """
         Filters the table based on the values in a specified column.
 
@@ -1507,9 +1566,9 @@ class StepGnss():
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_rinexmod(self, irow, out_dir=None,
-                        table_col='fpath_out',
-                        rinexmod_options=None):
+    def on_row_rinexmod(
+        self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
+    ):
         """
         "on row" method
 
@@ -1537,15 +1596,17 @@ class StepGnss():
         str or None
             The path of the modified file if the operation is successful, None otherwise.
         """
-        if not self.table.loc[irow, 'ok_inp']:
-            logger.warning("action on row skipped (input disabled): %s",
-                           self.table.loc[irow, 'fname'])
+        if not self.table.loc[irow, "ok_inp"]:
+            logger.warning(
+                "action on row skipped (input disabled): %s",
+                self.table.loc[irow, "fname"],
+            )
             return None
 
         # definition of the output directory (after the action)
         if out_dir:
             out_dir_use = out_dir
-        elif hasattr(self, 'tmp_dir_rinexmoded'):
+        elif hasattr(self, "tmp_dir_rinexmoded"):
             out_dir_use = self.tmp_dir_rinexmoded
         else:
             out_dir_use = self.tmp_dir
@@ -1554,49 +1615,55 @@ class StepGnss():
         rinexmod_options_use = {
             # 'marker': 'XXXX',
             # 'sitelog': metadata,
-            'compression': "gz",
-            'longname': True,
-            'force_rnx_load': True,
-            'verbose': False,
-            'tolerant_file_period': False,
-            'full_history': True}
+            "compression": "gz",
+            "longname": True,
+            "force_rnx_load": True,
+            "verbose": False,
+            "tolerant_file_period": False,
+            "full_history": True,
+        }
 
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
             rinexmod_options_use.update(rinexmod_options)
-            #logger.debug("options used for rinexmod: %s", rinexmod_options_use)
+            # logger.debug("options used for rinexmod: %s", rinexmod_options_use)
 
         frnx = self.table.loc[irow, table_col]
 
         try:
-            frnxmod = rinexmod.rinexmod_api.rinexmod(frnx,
-                                                     out_dir_use,
-                                                     **rinexmod_options_use)
+            frnxmod = rinexmod.rinexmod_api.rinexmod(
+                frnx, out_dir_use, **rinexmod_options_use
+            )
         except Exception as e:
-            logger.error("something went wrong for %s",
-                         frnx)
+            logger.error("something went wrong for %s", frnx)
             logger.error("Exception raised: %s", e)
             frnxmod = None
 
         if frnxmod:
             ### update table if things go well
-            self.table.loc[irow, 'ok_out'] = True
+            self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, table_col] = frnxmod
-            self.table.loc[irow, 'size_out'] = os.path.getsize(frnxmod)
-            if not self.table.loc[irow, 'epoch_srt'] or not self.table.loc[irow, 'epoch_end']:
-                epo_srt_ok, epo_end_ok = rinexmod.rinexfile.dates_from_rinex_filename(frnxmod)
-                self.table.loc[irow, 'epoch_srt'] = epo_srt_ok
-                self.table.loc[irow, 'epoch_end'] = epo_end_ok
+            self.table.loc[irow, "size_out"] = os.path.getsize(frnxmod)
+            if (
+                not self.table.loc[irow, "epoch_srt"]
+                or not self.table.loc[irow, "epoch_end"]
+            ):
+                epo_srt_ok, epo_end_ok = rinexmod.rinexfile.dates_from_rinex_filename(
+                    frnxmod
+                )
+                self.table.loc[irow, "epoch_srt"] = epo_srt_ok
+                self.table.loc[irow, "epoch_end"] = epo_end_ok
 
             self.write_in_table_log(self.table.loc[irow])
         else:
             ### update table if things go wrong
-            self.table.loc[irow, 'ok_out'] = False
+            self.table.loc[irow, "ok_out"] = False
             self.write_in_table_log(self.table.loc[irow])
-            #raise e
+            # raise e
 
         return frnxmod
-    def on_row_mv_final(self, irow, out_dir=None, table_col='fpath_out'):
+
+    def on_row_mv_final(self, irow, out_dir=None, table_col="fpath_out"):
         """
         "on row" method
 
@@ -1623,9 +1690,13 @@ class StepGnss():
         str or None
             The final path of the moved file if the operation is successful, None otherwise.
         """
-        if not self.table.loc[irow, 'ok_out']: ### for mv it's ok_out column the one to check!!!!
-            logger.warning("action on row skipped (input disabled): %s",
-                           self.table.loc[irow, 'fname'])
+        if not self.table.loc[
+            irow, "ok_out"
+        ]:  ### for mv it's ok_out column the one to check!!!!
+            logger.warning(
+                "action on row skipped (input disabled): %s",
+                self.table.loc[irow, "fname"],
+            )
             return None
 
         # definition of the output directory (after the action)
@@ -1635,8 +1706,9 @@ class StepGnss():
             out_dir_use = self.out_dir
 
         ### def output folders
-        outdir_use = self.translate_path(out_dir_use,
-                                         epoch_inp=self.table.loc[irow, 'epoch_srt'])
+        outdir_use = self.translate_path(
+            out_dir_use, epoch_inp=self.table.loc[irow, "epoch_srt"]
+        )
 
         frnx_to_mv = self.table.loc[irow, table_col]
 
@@ -1646,20 +1718,19 @@ class StepGnss():
             frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
             logger.debug("file moved to final destination: %s", frnxfin)
         except Exception as e:
-            logger.error("something went wrong for %s",
-                         frnx_to_mv)
+            logger.error("something went wrong for %s", frnx_to_mv)
             logger.error("Exception raised: %s", e)
             frnxfin = None
 
         if frnxfin:
             ### update table if things go well
-            self.table.loc[irow, 'ok_out'] = True
+            self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, table_col] = frnxfin
-            self.table.loc[irow, 'size_out'] = os.path.getsize(frnxfin)
+            self.table.loc[irow, "size_out"] = os.path.getsize(frnxfin)
         else:
             ### update table if things go wrong
-            self.table.loc[irow, 'ok_out'] = False
+            self.table.loc[irow, "ok_out"] = False
             self.write_in_table_log(self.table.loc[irow])
-            #raise e
+            # raise e
 
         return frnxfin
