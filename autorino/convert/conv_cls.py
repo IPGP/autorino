@@ -198,7 +198,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.site_id = site
             self.set_translate_dict()
 
-            ### do a first converter selection by removing odd files 
+            ### do a first converter selection by identifying odd files
             converter_name_use = arocnv.select_conv_odd_file(fraw)
 
             logger.info("extension/converter: %s/%s", ext, converter_name_use)

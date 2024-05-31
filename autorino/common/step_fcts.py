@@ -96,13 +96,32 @@ def input_list_interpret(inp_fil, inp_regex=".*"):
 
 
 def load_previous_tables(log_dir):
+    """
+    Load all previous tables from the log directory.
+
+    This function searches for all files ending with "*table.log" in the log directory
+    and concatenates them into a single pandas DataFrame. If no such files are found,
+    it returns an empty DataFrame and logs a warning.
+
+    Parameters
+    ----------
+    log_dir : str
+        The directory where the log files are stored.
+
+    Returns
+    -------
+    pandas.DataFrame
+        A DataFrame containing the concatenated data from all found log files. If no files are found,
+        an empty DataFrame is returned.
+    """
+    # Find all files ending with "*table.log" in the log directory
     tables_files = utils.find_recursive(log_dir, "*table.log")
+
+    # If no such files are found, log a warning and return an empty DataFrame
     if not tables_files:
         logger.warning("No previous tables found in the log directory.")
         return pd.DataFrame([])
     else:
+        # If files are found, read each file into a DataFrame and concatenate them into a single DataFrame
         return pd.concat([pd.read_csv(t) for t in tables_files])
-
-
-
 

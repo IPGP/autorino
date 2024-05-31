@@ -284,8 +284,7 @@ def _converter_select(converter_inp, inp_raw_fpath=None):
         conv_regex_fct = arcv.conv_regex_converto
         bin_options = []
         bin_kwoptions = dict()
-
-
+        
     else:
         logger.error("unable to find the right converter for %s",
                      inp_raw_fpath)
