@@ -78,9 +78,8 @@ def dateparser_interpret(date_inp, tz="UTC"):
 
     return date_out
 
-def dates_list2epoch_range(dates_list_inp,
-                           period=None,
-                           round_method='floor'):
+
+def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
     """
     Converts a list of dates to an EpochRange.
 
@@ -110,8 +109,9 @@ def dates_list2epoch_range(dates_list_inp,
     else:
         period_use = np.unique(np.diff(dates_list_inp))[0]  # poor, must be improved
 
-    epo_out = arocmn.EpochRange(epoch1, epoch2, period=period_use,
-                                round_method=round_method)
+    epo_out = arocmn.EpochRange(
+        epoch1, epoch2, period=period_use, round_method=round_method
+    )
 
     return epo_out
 
@@ -180,11 +180,9 @@ def round_date(date_in, period, round_method="round"):
     return date_out
 
 
-def round_epochs(epochs_inp,
-                 period='1d',
-                 rolling_period=False,
-                 rolling_ref=-1,
-                 round_method='floor'):
+def round_epochs(
+    epochs_inp, period="1d", rolling_period=False, rolling_ref=-1, round_method="floor"
+):
     """
     High-level function to round several epochs to a common one.
     Useful to group and then splice RINEX
@@ -233,7 +231,7 @@ def round_epochs(epochs_inp,
             rolling_ref_use = rolling_ref
 
         ### add one second to be sure that the rolling_ref is included in a group
-        rolling_ref_use = rolling_ref_use + np.timedelta64(1, 's')
+        rolling_ref_use = rolling_ref_use + np.timedelta64(1, "s")
 
         roll_diff = epochs_use - rolling_ref_use
         epochs_rnd = arocmn.round_date(roll_diff, period, round_method)
@@ -279,7 +277,5 @@ def create_dummy_epochrange():
 
     """
 
-    epo = arocmn.EpochRange(epoch1=pd.NaT,
-                            epoch2=pd.NaT,
-                            period='15min')
+    epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period="15min")
     return epo

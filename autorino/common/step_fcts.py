@@ -18,14 +18,15 @@ from geodezyx import utils
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
+
 def create_dummy_site_dic():
     d = dict()
 
-    d['name'] = 'XXXX'
-    d['site_id'] = 'XXXX00XXX'
-    d['domes'] = '00000X000'
-    d['sitelog_path'] = '/null'
-    d['position_xyz'] = (6378000, 0, 0)
+    d["name"] = "XXXX"
+    d["site_id"] = "XXXX00XXX"
+    d["domes"] = "00000X000"
+    d["sitelog_path"] = "/null"
+    d["position_xyz"] = (6378000, 0, 0)
 
     return d
 
@@ -33,14 +34,14 @@ def create_dummy_site_dic():
 def create_dummy_session_dic():
     d = dict()
 
-    d['name'] = 'NA'
-    d['data_frequency'] = "30S"
-    d['tmp_dir_parent'] = '<$HOME>/autorino_workflow_tests/tmp'
-    d['tmp_dir_structure'] = '<site_id9>/%Y/%j'
-    d['log_parent_dir'] = '<$HOME>/autorino_workflow_tests/log'
-    d['log_dir_structure'] = '<site_id9>/%Y/%j'
-    d['out_dir_parent'] = '<$HOME>/autorino_workflow_tests/out'
-    d['out_dir_structure'] = '<site_id9>/%Y/%j'
+    d["name"] = "NA"
+    d["data_frequency"] = "30S"
+    d["tmp_dir_parent"] = "<$HOME>/autorino_workflow_tests/tmp"
+    d["tmp_dir_structure"] = "<site_id9>/%Y/%j"
+    d["log_parent_dir"] = "<$HOME>/autorino_workflow_tests/log"
+    d["log_dir_structure"] = "<site_id9>/%Y/%j"
+    d["out_dir_parent"] = "<$HOME>/autorino_workflow_tests/out"
+    d["out_dir_structure"] = "<site_id9>/%Y/%j"
 
     return d
 
@@ -82,9 +83,7 @@ def input_list_interpret(inp_fil, inp_regex=".*"):
         flist = open(inp_fil, "r+").readlines()
         flist = [f.strip() for f in flist]
     elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil,
-                                     inp_regex,
-                                     case_sensitive=False)
+        flist = utils.find_recursive(inp_fil, inp_regex, case_sensitive=False)
     else:
         flist = []
         logger.warning("the filelist is empty")
@@ -124,4 +123,3 @@ def load_previous_tables(log_dir):
     else:
         # If files are found, read each file into a DataFrame and concatenate them into a single DataFrame
         return pd.concat([pd.read_csv(t) for t in tables_files])
-
