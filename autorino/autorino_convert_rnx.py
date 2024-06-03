@@ -33,8 +33,10 @@ if __name__ == "__main__":
                              * single MetaData object''')
     parser.add_argument('--force', action='store_true',
                         help='Force the conversion even if the output files already exist', default=False)
+    parser.add_argument('--list_file_input', action='store_true',
+                        help='If set to True, the input RAW files are provided as a list in a file', default=False)
 
     args = parser.parse_args()
 
     arocmn.convert_rnx(args.raws_inp, args.out_dir, args.tmp_dir, args.log_dir, args.out_dir_structure,
-                       args.rinexmod_options, args.metadata, args.force)
+                       args.rinexmod_options, args.metadata, args.force, args.list_file_input)

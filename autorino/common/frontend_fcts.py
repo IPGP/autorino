@@ -10,13 +10,15 @@ import os
 
 import autorino.convert as arocnv
 import autorino.handle as arohdl
+import autorino.common as arocmn
 
 
 def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,
                 out_dir_structure='<SITE_ID4>/%Y/',
                 rinexmod_options=None,
                 metadata=None,
-                force=False):
+                force=False,
+                list_file_input=False):
     """
     Frontend function that performs RAW > RINEX conversion.
 
@@ -24,6 +26,11 @@ def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,
     ----------
     raws_inp : list
         The input RAW files to be converted.
+        The input can be:
+        * a python list
+        * a text file path containing a list of files
+        * a tuple containing several text files path
+        * a directory path.
     out_dir : str
         The output directory where the converted files will be stored.
     tmp_dir : str, optional
@@ -50,6 +57,9 @@ def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,
     force : bool, optional
         If set to True, the conversion will be forced even if the output files already exist.
         Defaults to False.
+    list_file_input : bool, optional
+        If set to True, the input is a list file containing the paths of the RAW files to be converted.
+        Defaults to False.
 
     Returns
     -------
@@ -66,8 +76,13 @@ def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,
     else:
         out_dir_use = out_dir
 
+    if list_file_input:
+        raws_use = tuple(raws_inp)
+    else:
+        raws_use = raws_inp
+
     cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
-    cnv.load_table_from_filelist(raws_inp)
+    cnv.load_table_from_filelist(raws_use)
     cnv.convert(force=force, rinexmod_options=rinexmod_options)
 
     return None

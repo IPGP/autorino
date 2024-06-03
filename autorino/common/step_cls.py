@@ -837,6 +837,11 @@ class StepGnss:
         ----------
         input_files : list
             The list of input files to be loaded into the table.
+            The input can be:
+            * a python list
+            * a text file path containing a list of files
+            * a tuple containing several text files path
+            * a directory path.
         inp_regex : str, optional
             The regular expression used to filter the input files. Default is ".*" which matches any file.
         reset_table : bool, optional
@@ -850,7 +855,7 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = arocmn.input_list_interpret(input_files, inp_regex)
+        flist = arocmn.files_input_manage(input_files, inp_regex)
 
         self.table["fpath_inp"] = flist
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
@@ -1391,7 +1396,7 @@ class StepGnss:
         list
             The list of filtered raw files.
         """
-        flist_exclu = arocmn.input_list_interpret(filelist_exclu_inp)
+        flist_exclu = arocmn.files_input_manage(filelist_exclu_inp)
 
         flist_out = []
         ok_inp_bool_stk = []
