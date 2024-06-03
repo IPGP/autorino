@@ -146,6 +146,9 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     Returns directly those attributes based on `converter_inp` keyword,
     or can do a basic research based on the RAW file extension
 
+    See also autorino.conv_fcts.select_conv_odd_file
+    for the converter selection of oddly named files
+
     Parameters
     ----------
     converter_inp : str
