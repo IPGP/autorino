@@ -138,7 +138,7 @@ def _ashtech_name_2_date(inp_raw_fpath):
 #### conversion function
 
 
-def _converter_select(converter_inp, inp_raw_fpath=None):
+def _convert_select(converter_inp, inp_raw_fpath=None):
     """
     internal function for ``converter_run``.
     Find the correct RAW > RINEX converter and gives its corresponding attributes
@@ -298,6 +298,7 @@ def _converter_select(converter_inp, inp_raw_fpath=None):
         )
         raise Exception
 
+    logger.debug("brand & converter selected: %s, %s", brand, converter_name)
     return (
         converter_name,
         brand,
@@ -346,7 +347,7 @@ def converter_run(
             * 'tps2rin' (Topcon),
             * 'converto' (RINEX Handeling)
             * 'gfzrnx' (RINEX Handeling)
-        see ``_converter_select`` function and ``cmd_build`` module
+        see ``_convert_select`` function and ``cmd_build`` module
         for more details.
         The default is 'auto'.
     timeout : int, optional
@@ -409,12 +410,12 @@ def converter_run(
     else:
         logger.info("%i input file for conversion", len(raw_fpath_multi))
 
-    # _converter_select can manage both a single file of a list*
+    # _convert_select can manage both a single file of a list*
     # then could handle both raw_fpath_mono or raw_fpath_multi
     # thus alias variable raw_fpath will work in both cases
     # *. but we thus we just keep the 1st list elt as the representent
     # of the full list (we assue it homogene)
-    out_conv_sel = _converter_select(converter, raw_fpath)
+    out_conv_sel = _convert_select(converter, raw_fpath)
     (
         converter_name,
         brand,

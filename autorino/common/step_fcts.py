@@ -46,7 +46,7 @@ def create_dummy_session_dic():
     return d
 
 
-def input_list_interpret(inp_fil, inp_regex=".*"):
+def files_input_manage(inp_fil, inp_regex=".*"):
     """
     Handles multiple types of input lists and returns a python list of the input.
 
