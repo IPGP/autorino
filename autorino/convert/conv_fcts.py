@@ -106,6 +106,9 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
     This function performs a high-level case matching to determine the appropriate converter for a raw file.
     If the file's extension matches one in the excluded list, the file is skipped.
 
+    See also autorino.conv_cmd_run._convert_select
+    for the regular converter selection
+
     Parameters
     ----------
     fraw_inp : str
