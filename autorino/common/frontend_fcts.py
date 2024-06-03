@@ -58,7 +58,7 @@ def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,
         If set to True, the conversion will be forced even if the output files already exist.
         Defaults to False.
     list_file_input : bool, optional
-        If set to True, the input is a list file containing the paths of the RAW files to be converted.
+        If set to True, the input is a text list file containing the paths of the RAW files to be converted.
         Defaults to False.
 
     Returns

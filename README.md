@@ -153,6 +153,12 @@ def convert_rnx(raws_inp, out_dir, tmp_dir, log_dir=None,
     """
 ```
 
+### Convert RAW file to RINEX in CLI mode
+
+#### `autorino_convert_rnx` minimal example
+``` bash
+python3 /home/psakicki/CODES/IPGP/autorino/autorino/autorino_convert_rnx.py  --force   --metadata /home/psakicki/GFZ_WORK/IPGP_WORK/OVS/GNSS_OVS/0030_sites_manage_n_M3G/0020_sitelogs/030_sitelogs_M3G/2205_automatic_download  --out_dir_structure '<SITE_ID4>/%Y' --list_file_input  /home/psakicki/aaa_FOURBI/T02.list /home/psakicki/aaa_FOURBI/out4```
+
 ### Call a Step workflow in CLI mode
 
 ## The configuration files

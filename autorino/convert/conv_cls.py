@@ -139,7 +139,7 @@ class ConvertGnss(arocmn.StepGnss):
         if rinexmod_options is None:
             rinexmod_options = {}
 
-        logger.info("******** RAW > RINEX files conversion")
+        logger.info("⮞⮞⮞⮞⮞⮞ RAW > RINEX files conversion")
 
         self.set_tmp_dirs_paths()
         ### other tmps subdirs come also later in the loop
@@ -190,7 +190,7 @@ class ConvertGnss(arocmn.StepGnss):
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
 
-            logger.info("***** input raw file for conversion: %s", fraw.name)
+            logger.info("⮞⮞⮞ input raw file for conversion: %s", fraw.name)
 
             # _ = self.set_tmp_dirs_paths()
 
