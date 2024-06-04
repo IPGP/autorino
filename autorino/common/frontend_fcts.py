@@ -6,12 +6,13 @@ Created on 23/04/2024 14:21:56
 @author: psakic
 """
 
+import glob
+import logging
 import os
 
+import autorino.config as arocfg
 import autorino.convert as arocnv
 import autorino.handle as arohdl
-import autorino.config as arocfg
-import glob
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
     None
     """
     if os.path.isdir(cfg_in):
-        cfg_use_lis = glob.glob(cfg_in + '/*yml')
+        cfg_use_lis = glob.glob(cfg_in + "/*yml")
     elif os.path.isfile(cfg_in):
         cfg_use_lis = [cfg_in]
     else:
@@ -49,26 +50,26 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
         raise Exception
 
     for cfg_use in cfg_use_lis:
-        steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(configfile_path=cfg_use,
-                                                                  main_cfg_path=main_cfg_in)
+        steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
+            configfile_path=cfg_use, main_cfg_path=main_cfg_in
+        )
         for steps_lis in steps_lis_lis:
             arocfg.run_steps(steps_lis)
 
     return None
 
 
-def download_raws(raws_inp, out_dir, tmp_dir=None, log_dir=None):
-
-
-
-
-def convert_rnx(raws_inp, out_dir,
-                tmp_dir=None, log_dir=None,
-                out_dir_structure='<SITE_ID4>/%Y/',
-                rinexmod_options=None,
-                metadata=None,
-                force=False,
-                list_file_input=False):
+def convert_rnx(
+    raws_inp,
+    out_dir,
+    tmp_dir=None,
+    log_dir=None,
+    out_dir_structure="<SITE_ID4>/%Y/",
+    rinexmod_options=None,
+    metadata=None,
+    force=False,
+    list_file_input=False,
+):
     """
     Frontend function that performs RAW > RINEX conversion.
 
@@ -116,7 +117,7 @@ def convert_rnx(raws_inp, out_dir,
     None
     """
     if not tmp_dir:
-        tmp_dir = os.path.join(out_dir, 'tmp_convert_rnx')
+        tmp_dir = os.path.join(out_dir, "tmp_convert_rnx")
 
     if not log_dir:
         log_dir = tmp_dir
@@ -138,10 +139,16 @@ def convert_rnx(raws_inp, out_dir,
     return None
 
 
-def split_rnx(rnxs_inp, epo_inp, out_dir, tmp_dir, log_dir=None,
-              handle_software='converto',
-              rinexmod_options=None,
-              metadata=None):
+def split_rnx(
+    rnxs_inp,
+    epo_inp,
+    out_dir,
+    tmp_dir,
+    log_dir=None,
+    handle_software="converto",
+    rinexmod_options=None,
+    metadata=None,
+):
     """
     Frontend function to split RINEX files based on certain criteria
 
@@ -188,16 +195,20 @@ def split_rnx(rnxs_inp, epo_inp, out_dir, tmp_dir, log_dir=None,
     return None
 
 
-def splice_rnx(rnxs_inp,
-               out_dir, tmp_dir, log_dir=None,
-               handle_software='converto',
-               period='1d',
-               rolling_period=False,
-               rolling_ref=-1,
-               round_method='floor',
-               drop_epoch_rnd=False,
-               rinexmod_options=None,
-               metadata=None):
+def splice_rnx(
+    rnxs_inp,
+    out_dir,
+    tmp_dir,
+    log_dir=None,
+    handle_software="converto",
+    period="1d",
+    rolling_period=False,
+    rolling_ref=-1,
+    round_method="floor",
+    drop_epoch_rnd=False,
+    rinexmod_options=None,
+    metadata=None,
+):
     """
     Frontend function to splice RINEX files together based on certain criteria
 
@@ -245,12 +256,16 @@ def splice_rnx(rnxs_inp,
     spc_inp.load_table_from_filelist(rnxs_inp)
     spc_inp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-    spc_main_obj, spc_objs_lis = spc_inp.divide_by_epochs(period=period,
-                                                          rolling_period=rolling_period,
-                                                          rolling_ref=rolling_ref,
-                                                          round_method=round_method,
-                                                          drop_epoch_rnd=drop_epoch_rnd)
+    spc_main_obj, spc_objs_lis = spc_inp.divide_by_epochs(
+        period=period,
+        rolling_period=rolling_period,
+        rolling_ref=rolling_ref,
+        round_method=round_method,
+        drop_epoch_rnd=drop_epoch_rnd,
+    )
 
-    spc_main_obj.splice(handle_software=handle_software, rinexmod_options=rinexmod_options)
+    spc_main_obj.splice(
+        handle_software=handle_software, rinexmod_options=rinexmod_options
+    )
 
     return spc_main_obj
