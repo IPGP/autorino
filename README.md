@@ -10,8 +10,8 @@ _Assisted Unloading, Treatment & Organisation of RINex Observations_
 * [Patrice Boissier](https://github.com/PBoissier) (OVPF-IPGP, La Réunion, France)
 * [Jean-Marie Saurel](https://github.com/jmsaurel) (IPGP-OVS, Paris, France)
 * [Cyprien Griot](https://github.com/cyprien-griot) (OVPF-IPGP, La Réunion, France)
-* Diane Pacaud (OVPF-IPGP, La Réunion, France)
-* Aurélie Panetier (IPGP, Paris, France)
+* [Diane Pacaud](https://github.com/DianouPac) (OVPF-IPGP, La Réunion, France)
+* [Aurélie Panetier](https://github.com/aureliep972) (IPGP, Paris, France)
 
 **Contact e-mail:** sakic@ipgp.fr
 
@@ -79,11 +79,14 @@ converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)
 This docker image is a wrapper around Trimble's official converter `trm2rinex` which is not available for Linux.  
 A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.
 #### Trimble's runpkr00
-for legacy RINEX2 conversion  
+for legacy RINEX2 conversion with _teqc_ 
 converter here: [runpkr00](https://kb.unavco.org/article/trimble-runpkr00-latest-versions-744.html)
+#### teqc
+for legacy RINEX2 conversion with the well-known but discontinued UNAVCO's _teqc_ software 
+converter here: [teqc](https://www.unavco.org/software/data-management/teqc/teqc.html)
 #### RINEX handling software
-You might also need RINEX handeling/legacy converter software:  
-* [teqc](https://www.unavco.org/software/data-management/teqc/teqc.html)  
+You might also need RINEX handeling software:  
+* [teqc](https://www.unavco.org/software/data-management/teqc/teqc.html)  (for legacy RINEX2 only)
 * [GFZRNX](https://www.gfz-potsdam.de/en/section/global-geodetic-observation-and-modelling/software/gfzrinex/)
 * IGN's _converto_  
 
@@ -99,7 +102,6 @@ To configure the external utilities, in the you can:
 * set the full executable's paths to the in the `env` configuration file
 * set the paths in your `$PATH` environment variable, and then simply set the executable's names in the `env` 
 configuration file.
-
 
 ## Getting started: some simple examples
 
@@ -119,38 +121,69 @@ l = glob.glob(p,"*BNX")
 
 ### Define the output folder
 out_dir = "/home/user/where_your/rinex_data/will_be_saved/"
+tmp_dir = out_dir
 
 ### Call the conversion function
-arocmn.convert_rnx(l,out_dir,out_dir)
+arocmn.convert_rnx(l,out_dir,tmp_dir)
 ```
 
-#### convert_rnx function docstring
-``` python
-def convert_rnx(raws_inp, out_dir, tmp_dir, log_dir=None,
-                rinexmod_options=None,
-                metadata=None):
-    """
-    Frontend function to perform RAW > RINEX conversion
+#### `convert_rnx` function definition
+[go to source code](https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx)
 
-    Parameters
-    ----------
-    raws_inp : list
-        The input RAW files to be converted
-    out_dir : str
-        The output directory where the converted files will be stored
-    tmp_dir : str
-        The temporary directory used during the conversion process
-    log_dir : str, optional
-        The directory where logs will be stored. If not provided, it defaults to tmp_dir
-    rinexmod_options : dict, optional
-        The options for modifying the RINEX files during the conversion
-    metadata : dict, optional
-        The metadata to be included in the converted RINEX files
+### Convert RAW file to RINEX in CLI mode
 
-    Returns
-    -------
-    None
-    """
+#### `autorino_convert_rnx` minimal example
+``` bash
+python3 autorino_convert_rnx.py  --force  --metadata /home/user/path/of/your/sitelogs  --out_dir_structure '<SITE_ID4>/%Y' --list_file_input  /home/user/where_your/raw_data/are_stored/raw_data.list /home/user/where_your/rinex_data/will_be_saved/```
+```
+
+#### `autorino_convert_rnx` help
+``` 
+usage: autorino_convert_rnx.py [-h] [-l] [-s OUT_DIR_STRUCTURE] [-tmp TMP_DIR]
+                               [-log LOG_DIR] [-rnmo RINEXMOD_OPTIONS]
+                               [-m METADATA] [-f]
+                               raws_inp [raws_inp ...] out_dir
+
+Convert RAW files to RINEX.
+
+positional arguments:
+  raws_inp              The input RAW files to be convertedPossible inputs
+                        are: * one single RAW file path * a list of RAW path *
+                        a text file containing a list of RAW paths (then
+                        --list_file_input must be activated) * a directory
+                        containing RAW files
+  out_dir               The output directory where the converted files will be
+                        stored
+
+options:
+  -h, --help            show this help message and exit
+  -l, --list_file_input
+                        If set to True, the input RAW files are provided as a
+                        list in a text file
+  -s OUT_DIR_STRUCTURE, --out_dir_structure OUT_DIR_STRUCTURE
+                        The structure of the output directory.If provided, the
+                        converted files will be stored in a subdirectory of
+                        out_dir following this structure.See README.md for
+                        more information.Typical values are '<SITE_ID4>/%Y/'
+                        or '%Y/%j/
+  -tmp TMP_DIR, --tmp_dir TMP_DIR
+                        The temporary directory used during the conversion
+                        process
+  -log LOG_DIR, --log_dir LOG_DIR
+                        The directory where logs will be stored. If not
+                        provided, it defaults to tmp_dir
+  -rnmo RINEXMOD_OPTIONS, --rinexmod_options RINEXMOD_OPTIONS
+                        The options for modifying the RINEX files during the
+                        conversion
+  -m METADATA, --metadata METADATA
+                        The metadata to be included in the converted RINEX
+                        files. Possible inputs are: * list of string (sitelog
+                        file paths), * single string (single sitelog file
+                        path), * single string (directory containing the
+                        sitelogs), * list of MetaData objects, * single
+                        MetaData object
+  -f, --force           Force the conversion even if the output files already
+                        exist
 ```
 
 ### Call a Step workflow in CLI mode
