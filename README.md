@@ -119,45 +119,22 @@ l = glob.glob(p,"*BNX")
 
 ### Define the output folder
 out_dir = "/home/user/where_your/rinex_data/will_be_saved/"
+tmp_dir = out_dir
 
 ### Call the conversion function
-arocmn.convert_rnx(l,out_dir,out_dir)
+arocmn.convert_rnx(l,out_dir,tmp_dir)
 ```
 
-#### convert_rnx function docstring
-``` python
-def convert_rnx(raws_inp, out_dir, tmp_dir, log_dir=None,
-                rinexmod_options=None,
-                metadata=None):
-    """
-    Frontend function to perform RAW > RINEX conversion
+#### convert_rnx function definition
+[go to source code](https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx)
 
-    Parameters
-    ----------
-    raws_inp : list
-        The input RAW files to be converted
-    out_dir : str
-        The output directory where the converted files will be stored
-    tmp_dir : str
-        The temporary directory used during the conversion process
-    log_dir : str, optional
-        The directory where logs will be stored. If not provided, it defaults to tmp_dir
-    rinexmod_options : dict, optional
-        The options for modifying the RINEX files during the conversion
-    metadata : dict, optional
-        The metadata to be included in the converted RINEX files
-
-    Returns
-    -------
-    None
-    """
-```
 
 ### Convert RAW file to RINEX in CLI mode
 
 #### `autorino_convert_rnx` minimal example
 ``` bash
 python3 /home/psakicki/CODES/IPGP/autorino/autorino/autorino_convert_rnx.py  --force   --metadata /home/psakicki/GFZ_WORK/IPGP_WORK/OVS/GNSS_OVS/0030_sites_manage_n_M3G/0020_sitelogs/030_sitelogs_M3G/2205_automatic_download  --out_dir_structure '<SITE_ID4>/%Y' --list_file_input  /home/psakicki/aaa_FOURBI/T02.list /home/psakicki/aaa_FOURBI/out4```
+```
 
 ### Call a Step workflow in CLI mode
 
