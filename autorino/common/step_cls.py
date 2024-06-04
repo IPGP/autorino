@@ -522,19 +522,32 @@ class StepGnss:
         """
         return copy.deepcopy(self)
 
-    def get_step_type(self):
+    def get_step_type(self, full_object_name=False):
         """
         Returns the type of the step as a string.
 
         This method is used to identify the type of the current step in the GNSS processing chain.
-        It returns the name of the class to which the current instance belongs.
+        It returns the name of the class to which the current instance belongs. If the 'full_object_name'
+        parameter is False, it returns a shortened version of the class name, in lower case and without
+        the 'Gnss' suffix.
+
+        Parameters
+        ----------
+        full_object_name : bool, optional
+            If True, the full name of the class is returned. If False, a shortened version of the class name,
+            in lower case, and without the 'Gnss' suffix.
+            Default is False.
 
         Returns
         -------
         str
-            The name of the class to which the current instance belongs.
+            The name of the class to which the current instance belongs. If 'full_object_name' is False,
+            the last 4 characters are removed from the class name.
         """
-        return type(self).__name__
+        if full_object_name:
+            return type(self).__name__
+        else:
+            return type(self).__name__[:-4].lower()
 
     def update_epoch_table_from_rnx_fname(
         self, use_rnx_filename_only=False, update_epoch_range=True

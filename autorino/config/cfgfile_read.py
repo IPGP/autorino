@@ -23,69 +23,72 @@ import autorino.handle as arohdl
 # import autorino.epochrange as aroepo
 logger = logging.getLogger(__name__)
 
-def autorino_run(cfg_in,main_cfg_in):
-    if os.path.isdir(cfg_in):
-        cfg_use_lis = glob.glob(cfg_in + '/*yml')
-    elif os.path.isfile(cfg_in):
-        cfg_use_lis = [cfg_in]
-    else:
-        logger.error("%s does not exist, check input config file/dir", cfg_in)
-        raise Exception
 
-    for cfg_use in cfg_use_lis:
-        steps_lis_lis, steps_dic_dic, y_station = read_cfg(configfile_path=cfg_use, main_cfg_path=main_cfg_in)
-        for steps_lis in steps_lis_lis:
-            run_steps(steps_lis)
+def run_steps(steps_lis, step_select=[], print_table=True):
+    """
+    Executes the steps in the provided list.
 
-    return None
+    This function takes a list of StepGnss objects, an optional list of selected steps, and an optional boolean flag for printing tables.
+    It iterates over the list of StepGnss objects and executes the 'download' or 'convert' method depending on the type of the step.
+    If a list of selected steps is provided, only the steps in the list will be executed.
+    If the 'print_table' flag is set to True, the tables will be printed during the execution of the steps.
 
+    Parameters
+    ----------
+    steps_lis : list
+        A list of StepGnss objects to be executed.
+    step_select : list, optional
+        A list of selected steps to be executed. If not provided, all steps in 'steps_lis' will be executed.
+        Default is an empty list.
+    print_table : bool, optional
+        A flag indicating whether to print the tables during the execution of the steps. Default is True.
 
-def run_steps(steps_lis, print_table=True):
+    Returns
+    -------
+    None
+    """
     wkf_prev = None
     for istp, stp in enumerate(steps_lis):
         if istp > 0:
             wkf_prev = steps_lis[istp - 1]
 
-        if stp.get_step_type() == "DownloadGnss":
+        if step_select and stp.get_step_type() not in step_select:
+            continue
+
+        if stp.get_step_type() == "download":
             stp.download(print_table)
-        elif stp.get_step_type() == "ConvertGnss":
+        elif stp.get_step_type() == "convert":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.convert(print_table)
 
-
-def read_cfg(configfile_path,
-             epoch_range=None,
-             main_cfg_path=None):
+def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     """
-    Load a config file (YAML format) and 
-    return a "Steps list" i.e. a list of StepGnss object 
-    to be launched sequentially
-    
-    epoch_range_inp is a EpochRange object which will override the epoch ranges
-    given in the config file
+    Load a configuration file (YAML format) and return a list of StepGnss objects to be launched sequentially.
+
+    This function takes in a path to a configuration file, an optional EpochRange object, and an optional path to a main configuration file.
+    It reads the configuration file, updates it with the main configuration file if provided, and creates a list of StepGnss objects based on the configuration.
+    The EpochRange object, if provided, will override the epoch ranges given in the configuration file.
 
     Parameters
     ----------
-    configfile_path : TYPE
-        DESCRIPTION.
-    epoch_range_inp : TYPE, optional
-        DESCRIPTION. The default is None.
+    configfile_path : str
+        The path to the configuration file.
+    epoch_range : EpochRange, optional
+        An EpochRange object which will override the epoch ranges given in the configuration file. Default is None.
+    main_cfg_path : str, optional
+        The path to the main configuration file. Default is None.
 
     Returns
     -------
-    steps_lis : list
-        "Steps list" i.e. a list of StepGnss object 
-        to be launched sequentially.
-    y_site : dict
-        site dictionary.
-    y_device : dict
-        device dictionary.
-    y_access : dict
-        station access dictionary.
+    steps_lis_lis : list
+        A list of lists of StepGnss objects to be launched sequentially.
+    steps_dic_dic : dict
+        A dictionary of dictionaries of StepGnss.
+    y_station : dict
+        A dictionary of station information.
     """
     global y_main
-    logger.info('start to read configfile: %s',
-                configfile_path)
+    logger.info('start to read configfile: %s', configfile_path)
 
     y = yaml.safe_load(open(configfile_path))
 
@@ -137,7 +140,7 @@ def read_cfg_sessions(y_sessions_dict,
         #y_workflow_main = y_ses_main['workflow']
 
         for k_stp, y_stp in y_steps.items():
-            logger.debug("k_stp, y_stp AAA %s %s ",k_stp, y_stp )
+            logger.debug("k_stp, y_stp AAA %s %s ", k_stp, y_stp)
 
             #y_step_main = y_workflow_main[k_stp]
             #y_step = update_w_main_dic(y_step, y_step_main)
@@ -259,6 +262,7 @@ def _check_parent_dir_existence(parent_dir):
     else:
         return None
 
+
 def _is_cfg_bloc_active(ywkf):
     """
     Checks if a configuration block is active.
@@ -353,4 +357,3 @@ def update_w_main_dic(d, u=None, specific_value='FROM_MAIN'):
             if d[k] == specific_value:
                 d[k] = v
     return d
-

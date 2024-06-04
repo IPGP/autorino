@@ -10,10 +10,60 @@ import os
 
 import autorino.convert as arocnv
 import autorino.handle as arohdl
-import autorino.common as arocmn
+import autorino.config as arocfg
+import glob
+
+logger = logging.getLogger(__name__)
 
 
-def convert_rnx(raws_inp, out_dir, tmp_dir=None, log_dir=None,
+def autorino_cfgfile_run(cfg_in, main_cfg_in):
+    """
+    Run the Autorino configuration files.
+
+    This function takes in a configuration file or a directory of configuration files,
+    reads the configuration, and runs the steps specified in the configuration.
+
+    Parameters
+    ----------
+    cfg_in : str
+        The input configuration file or directory of configuration files.
+        If a directory is provided, all files ending with '.yml' will be used.
+    main_cfg_in : str
+        The main configuration file to be used.
+
+    Raises
+    ------
+    Exception
+        If the provided cfg_in does not exist as a file or directory, an exception is raised.
+
+    Returns
+    -------
+    None
+    """
+    if os.path.isdir(cfg_in):
+        cfg_use_lis = glob.glob(cfg_in + '/*yml')
+    elif os.path.isfile(cfg_in):
+        cfg_use_lis = [cfg_in]
+    else:
+        logger.error("%s does not exist, check input config file/dir", cfg_in)
+        raise Exception
+
+    for cfg_use in cfg_use_lis:
+        steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(configfile_path=cfg_use,
+                                                                  main_cfg_path=main_cfg_in)
+        for steps_lis in steps_lis_lis:
+            arocfg.run_steps(steps_lis)
+
+    return None
+
+
+def download_raws(raws_inp, out_dir, tmp_dir=None, log_dir=None):
+
+
+
+
+def convert_rnx(raws_inp, out_dir,
+                tmp_dir=None, log_dir=None,
                 out_dir_structure='<SITE_ID4>/%Y/',
                 rinexmod_options=None,
                 metadata=None,
