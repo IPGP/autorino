@@ -9,6 +9,7 @@ Created on Sun Feb 11 18:44:52 2024
 import argparse
 
 import autorino.config as arocfg
+import autorino.common as arocmn
 
 if __name__ == '__main__':
 
@@ -35,6 +36,6 @@ if __name__ == '__main__':
     end = args.end
     list_sites = args.list_sites
 
-    arocfg.autorino_run(cfg_in=config,main_cfg_in=main_config)
+    arocmn.autorino_cfgfile_run(cfg_in=config,main_cfg_in=main_config)
 
     

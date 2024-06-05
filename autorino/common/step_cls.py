@@ -313,7 +313,7 @@ class StepGnss:
 
         This method checks if a 'site_id' is provided in the site dictionary.
         If it is, it sets the 'site_id' attribute of the StepGnss object to the provided 'site_id'.
-        If a 'site_id' is not provided, it sets the 'site_id' attribute to 'XXXX' as a default value.
+        If a 'site_id' is not provided, it sets the 'site_id' attribute to 'XXXX00XX00XXXX' as a default value.
 
         Returns
         -------
@@ -322,7 +322,7 @@ class StepGnss:
         if "site_id" in self.site.keys():
             self.site_id = self.site["site_id"]
         else:
-            self.site_id = "XXXX"
+            self.site_id = "XXXX00XXX"
 
         return None
 
@@ -925,7 +925,7 @@ class StepGnss:
             )
             return []
 
-        ### some epochs are here, this is weirder
+        ### some epochs are here, this is weirder and should not happen, we raise a warning
         if pd.isna(self.table["epoch_srt"]).any():
             logger.debug(
                 "unable to get the epochs to generate local RINEX paths (something went wrong)"
@@ -993,15 +993,15 @@ class StepGnss:
         local_files_list = []
         for irow, row in self.table.iterrows():
             local_file = row["fpath_out"]
-            if not np.isnan(local_file):  ### might be a NaN if it is not initialized
+            if type(local_file) is float:  ### if not initialized, value is NaN (and then a float) 
+                self.table.loc[irow, "ok_out"] = False
+            else:
                 if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
                     self.table.loc[irow, "ok_out"] = True
                     self.table.loc[irow, "size_out"] = os.path.getsize(local_file)
                     local_files_list.append(local_file)
                 else:
                     self.table.loc[irow, "ok_out"] = False
-            else:
-                self.table.loc[irow, "ok_out"] = False
 
         return local_files_list
 
@@ -1497,6 +1497,45 @@ class StepGnss:
         self.table["ok_inp"] = ok_inp_new
 
         return flist_out
+
+    def filter_previous_tables_test_delme(self,
+                                          df_prev_tab):
+        """
+        Filter a list of raw files if they are present in previous
+        conversion tables stored as log
+
+        modify the boolean "ok_inp" of the object's table
+        returns the filtered raw files in a list
+        """
+
+        col_ok_names = ["ok_inp", "ok_out"]
+
+        # previous files when everthing was ok
+        prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce,
+                                                       axis=1)
+
+        prev_files_ok = df_prev_tab[prev_bool_ok].fraw
+
+        # current files which have been already OK and which have already
+        # ok_inp == False
+        # here the boolean value are inverted compared to the table:
+        # True = skip me / False = keep me
+        # a logical not inverts everything at the end
+        curr_files_ok_prev = self.table['fraw'].isin(prev_files_ok)
+        curr_files_off_already = np.logical_not(self.table['ok_inp'])
+
+        curr_files_skip = np.logical_or(curr_files_ok_prev,
+                                        curr_files_off_already)
+
+        self.table['ok_inp'] = np.logical_not(curr_files_skip)
+
+        logger.info("%6i files filtered, were OK during a previous run (table list)",
+                    curr_files_ok_prev.sum())
+
+        flist_out = list(self.table['fraw', self.table['ok_inp']])
+
+        return flist_out
+
 
     def filter_previous_tables(self, df_prev_tab):
         """
