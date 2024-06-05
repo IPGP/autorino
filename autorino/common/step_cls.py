@@ -1133,8 +1133,10 @@ class StepGnss:
         Decompresses the file specified in the 'table_col' entry of a given row in the table.
 
         This method checks if the file specified in the 'table_col' entry of the given row is compressed.
-        If it is, the method decompresses the file and updates the 'table_col' entry with the path of the decompressed file.
-        It also updates the 'ok_inp' entry with the existence of the decompressed file and the 'fname' entry with the basename of the decompressed file.
+        If it is, the method decompresses the file and updates the 'table_col' entry with the path
+        of the decompressed file.
+        It also updates the 'ok_inp' entry with the existence of the decompressed file and the 'fname'
+        entry with the basename of the decompressed file.
         If the file is not compressed or the 'ok_inp' entry is False, the method does nothing.
 
         Parameters
@@ -1142,11 +1144,13 @@ class StepGnss:
         irow : int
             The index of the row in the table.
         out_dir : str, optional
-            The output directory where the decompressed file will be stored. If not provided, the method uses the 'tmp_dir_unzipped' attribute if it exists, otherwise it uses the 'tmp_dir' attribute.
+            The output directory where the decompressed file will be stored. If not provided, the method
+             uses the 'tmp_dir_unzipped' attribute if it exists, otherwise it uses the 'tmp_dir' attribute.
         table_col : str, optional
             The column in the table where the path of the file is stored. Default is 'fpath_inp'.
         table_ok_col : str, optional
-            The column in the table where the boolean indicating the existence of the file is stored. Default is 'ok_inp'.
+            The column in the table where the boolean indicating the existence of the file is stored.
+            Default is 'ok_inp'.
 
         Returns
         -------
@@ -1154,10 +1158,12 @@ class StepGnss:
             The path of the decompressed file and a boolean indicating whether the file was decompressed.
         """
         if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
+            #logger.warning(
+            #    "action on row skipped (input disabled): %s",
+            #    self.table.loc[irow, "fname"],
+            #)
+            # for decompress the warning message is not necessary and spams the log
+            # (most of the files are not compressed in fact)
             file_decomp_out = None
             bool_decomp_out = False
 
