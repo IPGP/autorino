@@ -268,7 +268,7 @@ class DownloadGnss(arocmn.StepGnss):
         frontend method to download files from a GNSS receiver
         """
 
-        logger.info("******** RAW files download")
+        logger.info("⮞⮞⮞⮞⮞⮞ RAW files download")
 
         self.set_tmp_dirs_paths()
 
