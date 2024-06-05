@@ -143,6 +143,8 @@ class ConvertGnss(arocmn.StepGnss):
 
         self.set_tmp_dirs_paths()
         ### other tmps subdirs come also later in the loop
+        self.set_translate_dict()
+        ### others translate dict updates will come in the loop
 
         if self.metadata:
             site4_list = arocnv.site_list_from_metadata(self.metadata)
@@ -157,7 +159,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.guess_local_rnx_files() # generate the potential local files
             self.check_local_files() # tests if the local flies are already there
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
-            if len(prv_tbl_df) > 0:
+            if len(prv_tbl_df) > 0 and False: ### we disable this because it is not robust yet
                 self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
 
@@ -202,8 +204,9 @@ class ConvertGnss(arocmn.StepGnss):
             # create method update_site_table_from_fname
 
             ### we update the table row and the translate dic (necessary for the output dir)
-            self.table.loc[irow, "site"] = site
-            self.site_id = site
+            ## this is a very bad idea, it f*cks the outdir 240605 
+            # self.table.loc[irow, "site"] = site
+            # self.site_id = site
             self.set_translate_dict()
 
             ### do a first converter selection by identifying odd files
