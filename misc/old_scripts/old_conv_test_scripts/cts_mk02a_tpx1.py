@@ -33,7 +33,7 @@ conv_cmd_build_tps2rin=0
 
 verbose = True
 
-sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
+sitelogs = rinexmod_api.metadata_input_manage(psitelogs, force=False)
 sitelog_bim0 = rinexmod_api.sitelog_find_site("bim0", sitelogs,force=False)
 
 #### TRIMBLE
