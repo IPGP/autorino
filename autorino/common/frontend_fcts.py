@@ -6,49 +6,149 @@ Created on 23/04/2024 14:21:56
 @author: psakic
 """
 
+import glob
+import logging
+import os
+
+import autorino.config as arocfg
 import autorino.convert as arocnv
 import autorino.handle as arohdl
 
+logger = logging.getLogger(__name__)
 
-def convert_rnx(raws_inp, out_dir, tmp_dir, log_dir=None,
-                rinexmod_options=None,
-                metadata=None):
+
+def autorino_cfgfile_run(cfg_in, main_cfg_in):
     """
-    Frontend function to perform RAW > RINEX conversion
+    Run the Autorino configuration files.
+
+    This function takes in a configuration file or a directory of configuration files,
+    reads the configuration, and runs the steps specified in the configuration.
 
     Parameters
     ----------
-    raws_inp : list
-        The input RAW files to be converted
-    out_dir : str
-        The output directory where the converted files will be stored
-    tmp_dir : str
-        The temporary directory used during the conversion process
-    log_dir : str, optional
-        The directory where logs will be stored. If not provided, it defaults to tmp_dir
-    rinexmod_options : dict, optional
-        The options for modifying the RINEX files during the conversion
-    metadata : dict, optional
-        The metadata to be included in the converted RINEX files
+    cfg_in : str
+        The input configuration file or directory of configuration files.
+        If a directory is provided, all files ending with '.yml' will be used.
+    main_cfg_in : str
+        The main configuration file to be used.
+
+    Raises
+    ------
+    Exception
+        If the provided cfg_in does not exist as a file or directory, an exception is raised.
 
     Returns
     -------
     None
     """
-    if not log_dir:
-        log_dir = tmp_dir
+    if os.path.isdir(cfg_in):
+        cfg_use_lis = glob.glob(cfg_in + "/*yml")
+    elif os.path.isfile(cfg_in):
+        cfg_use_lis = [cfg_in]
+    else:
+        logger.error("%s does not exist, check input config file/dir", cfg_in)
+        raise Exception
 
-    cnv = arocnv.ConvertGnss(out_dir, tmp_dir, log_dir, metadata=metadata)
-    cnv.load_table_from_filelist(raws_inp)
-    cnv.convert(force=True, rinexmod_options=rinexmod_options)
+    for cfg_use in cfg_use_lis:
+        steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
+            configfile_path=cfg_use, main_cfg_path=main_cfg_in
+        )
+        for steps_lis in steps_lis_lis:
+            arocfg.run_steps(steps_lis)
 
     return None
 
 
-def split_rnx(rnxs_inp, epo_inp, out_dir, tmp_dir, log_dir=None,
-              handle_software='converto',
-              rinexmod_options=None,
-              metadata=None):
+def convert_rnx(
+    raws_inp,
+    out_dir,
+    tmp_dir=None,
+    log_dir=None,
+    out_dir_structure="<SITE_ID4>/%Y/",
+    rinexmod_options=None,
+    metadata=None,
+    force=False,
+    list_file_input=False,
+):
+    """
+    Frontend function that performs RAW > RINEX conversion.
+
+    Parameters
+    ----------
+    raws_inp : list
+        The input RAW files to be converted.
+        The input can be:
+        * a python list
+        * a text file path containing a list of files
+        * a tuple containing several text files path
+        * a directory path.
+    out_dir : str
+        The output directory where the converted files will be stored.
+    tmp_dir : str, optional
+        The temporary directory used during the conversion process.
+        If not provided, it defaults to <out_dir>/tmp_convert_rnx.
+        Defaults to None.
+    log_dir : str, optional
+        The directory where logs will be stored. If not provided, it defaults to tmp_dir.
+         Defaults to None.
+    out_dir_structure : str, optional
+        The structure of the output directory.
+        If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
+        See README.md for more information. Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
+        Default value is '<SITE_ID4>/%Y/'.
+    rinexmod_options : dict, optional
+        The options for modifying the RINEX files during the conversion. Defaults to None.
+    metadata : str or list, optional
+        The metadata to be included in the converted RINEX files. Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object. Defaults to None.
+    force : bool, optional
+        If set to True, the conversion will be forced even if the output files already exist.
+        Defaults to False.
+    list_file_input : bool, optional
+        If set to True, the input is a text list file containing the paths of the RAW files to be converted.
+        Defaults to False.
+
+    Returns
+    -------
+    None
+    """
+    if not tmp_dir:
+        tmp_dir = os.path.join(out_dir, "tmp_convert_rnx")
+
+    if not log_dir:
+        log_dir = tmp_dir
+
+    if out_dir_structure:
+        out_dir_use = os.path.join(out_dir, out_dir_structure)
+    else:
+        out_dir_use = out_dir
+
+    if list_file_input:
+        raws_use = tuple(raws_inp)
+    else:
+        raws_use = raws_inp
+
+    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    cnv.load_table_from_filelist(raws_use)
+    cnv.convert(force=force, rinexmod_options=rinexmod_options)
+
+    return None
+
+
+def split_rnx(
+    rnxs_inp,
+    epo_inp,
+    out_dir,
+    tmp_dir,
+    log_dir=None,
+    handle_software="converto",
+    rinexmod_options=None,
+    metadata=None,
+):
     """
     Frontend function to split RINEX files based on certain criteria
 
@@ -68,8 +168,14 @@ def split_rnx(rnxs_inp, epo_inp, out_dir, tmp_dir, log_dir=None,
         The software to be used for handling the RINEX files during the split operation
     rinexmod_options : dict, optional
         The options for modifying the RINEX files during the split operation
-    metadata : dict, optional
+    metadata : str or list, optional
         The metadata to be included in the split RINEX files
+        Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object
 
     Returns
     -------
@@ -89,16 +195,20 @@ def split_rnx(rnxs_inp, epo_inp, out_dir, tmp_dir, log_dir=None,
     return None
 
 
-def splice_rnx(rnxs_inp,
-               out_dir, tmp_dir, log_dir=None,
-               handle_software='converto',
-               period='1d',
-               rolling_period=False,
-               rolling_ref=-1,
-               round_method='floor',
-               drop_epoch_rnd=False,
-               rinexmod_options=None,
-               metadata=None):
+def splice_rnx(
+    rnxs_inp,
+    out_dir,
+    tmp_dir,
+    log_dir=None,
+    handle_software="converto",
+    period="1d",
+    rolling_period=False,
+    rolling_ref=-1,
+    round_method="floor",
+    drop_epoch_rnd=False,
+    rinexmod_options=None,
+    metadata=None,
+):
     """
     Frontend function to splice RINEX files together based on certain criteria
 
@@ -126,9 +236,14 @@ def splice_rnx(rnxs_inp,
         Whether to drop the rounded epochs during the splice operation
     rinexmod_options : dict, optional
         The options for modifying the RINEX files during the splice operation
-    metadata : dict, optional
+    metadata : str or list, optional
         The metadata to be included in the spliced RINEX files
-
+        Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object
     Returns
     -------
     spc_main_obj : object
@@ -141,12 +256,16 @@ def splice_rnx(rnxs_inp,
     spc_inp.load_table_from_filelist(rnxs_inp)
     spc_inp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-    spc_main_obj, spc_objs_lis = spc_inp.divide_by_epochs(period=period,
-                                                          rolling_period=rolling_period,
-                                                          rolling_ref=rolling_ref,
-                                                          round_method=round_method,
-                                                          drop_epoch_rnd=drop_epoch_rnd)
+    spc_main_obj, spc_objs_lis = spc_inp.divide_by_epochs(
+        period=period,
+        rolling_period=rolling_period,
+        rolling_ref=rolling_ref,
+        round_method=round_method,
+        drop_epoch_rnd=drop_epoch_rnd,
+    )
 
-    spc_main_obj.splice(handle_software=handle_software, rinexmod_options=rinexmod_options)
+    spc_main_obj.splice(
+        handle_software=handle_software, rinexmod_options=rinexmod_options
+    )
 
     return spc_main_obj

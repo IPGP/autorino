@@ -1,5 +1,9 @@
 ## Installation
 
+This memo is about the installation of the TRM2RINEX software in a Docker container.   
+The software is available at: https://github.com/Matioupi/trm2rinex-docker
+
+
 ### Prerequise: install Docker (on your Ubuntu)
 ```
 https://www.simplilearn.com/tutorials/docker-tutorial/how-to-install-docker-on-ubuntu
@@ -41,23 +45,6 @@ cd <...>/trm2rinex-docker
 docker run --rm -v "$(pwd):/data" trm2rinex:cli-light data/MAGC320b.2021.rt27 -p data/out
 ```
 ## Issues
-###
-#### Error 
-```
-klein@zoisite:~/SOFT/trm2rinex-docker$ docker run --rm -v "$(pwd):/data" trm2rinex:cli-light data/MAGC320b.2021.rt27 data/out
-Scanning data/MAGC320b.2021.rt27...Complete!
-Converting MAGC320b.2021.rt27...Error: CrinexFile - System.UnauthorizedAccessException: Access to the path "Z:\data\MAGC320b.2021.21n" is denied.
-  at System.IO.FileStream..ctor (System.String path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, System.Int32 bufferSize, System.Boolean anonymous, System.IO.FileOptions options) [0x0019e] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
-  at System.IO.FileStream..ctor (System.String path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, System.Int32 bufferSize, System.IO.FileOptions options) [0x00000] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
-  at (wrapper remoting-invoke-with-check) System.IO.FileStream..ctor(string,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare,int,System.IO.FileOptions)
-  at System.IO.StreamWriter..ctor (System.String path, System.Boolean append, System.Text.Encoding encoding, System.Int32 bufferSize) [0x00055] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
-  at System.IO.StreamWriter..ctor (System.String path, System.Boolean append) [0x00008] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
-  at (wrapper remoting-invoke-with-check) System.IO.StreamWriter..ctor(string,bool)
-  at System.IO.File.CreateText (System.String path) [0x0000e] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
-  at trimble.rinex.CrinexFile..ctor (System.String inputFilePath, System.IO.FileMode mode) [0x00176] in <6b991ac620904a08a4ad53d3cafee6d1>:0 : Z:\data\MAGC320b.2021.21n using mode: Create
-```
-#### Solution
-
 
 ### Issue about removing folders during Docker compilation
 #### Error
@@ -89,4 +76,21 @@ RUN chmod 755 /home/${USER_NAME}/clean.sh
 #    && /home/${USER_NAME}/clean.sh ${USER_NAME} ${WINE_INSTALL_PREFIX}
 ```
 
-
+### Issue about converting the files
+#### Error 
+```
+klein@zoisite:~/SOFT/trm2rinex-docker$ docker run --rm -v "$(pwd):/data" trm2rinex:cli-light data/MAGC320b.2021.rt27 data/out
+Scanning data/MAGC320b.2021.rt27...Complete!
+Converting MAGC320b.2021.rt27...Error: CrinexFile - System.UnauthorizedAccessException: Access to the path "Z:\data\MAGC320b.2021.21n" is denied.
+  at System.IO.FileStream..ctor (System.String path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, System.Int32 bufferSize, System.Boolean anonymous, System.IO.FileOptions options) [0x0019e] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
+  at System.IO.FileStream..ctor (System.String path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, System.Int32 bufferSize, System.IO.FileOptions options) [0x00000] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
+  at (wrapper remoting-invoke-with-check) System.IO.FileStream..ctor(string,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare,int,System.IO.FileOptions)
+  at System.IO.StreamWriter..ctor (System.String path, System.Boolean append, System.Text.Encoding encoding, System.Int32 bufferSize) [0x00055] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
+  at System.IO.StreamWriter..ctor (System.String path, System.Boolean append) [0x00008] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
+  at (wrapper remoting-invoke-with-check) System.IO.StreamWriter..ctor(string,bool)
+  at System.IO.File.CreateText (System.String path) [0x0000e] in <bee01833bcad4475a5c84b3c3d7e0cd6>:0 
+  at trimble.rinex.CrinexFile..ctor (System.String inputFilePath, System.IO.FileMode mode) [0x00176] in <6b991ac620904a08a4ad53d3cafee6d1>:0 : Z:\data\MAGC320b.2021.21n using mode: Create
+```
+#### Solution
+The problem is that the output file is created in a subfloder `out` the current folder (`$(pwd)`), but this `out` folder 
+does not exists or is not writable.

@@ -37,7 +37,7 @@ flist = [f for f in flist if not "ZIP" in f]
 
 ########### SITELOGS
 psitelogs = "/work/metadata/SITELOGS"
-sitelogs = rinexmod_api.sitelog_input_manage(psitelogs,force=False)
+sitelogs = rinexmod_api.metadata_input_manage(psitelogs, force=False)
 
 
 ########### OUT DIRECTORY

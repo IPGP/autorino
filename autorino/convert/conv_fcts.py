@@ -39,7 +39,7 @@ def site_list_from_metadata(metadata_inp):
      * list of MetaData objects
      * single MetaData object
 
-    see also `rinexmod_api.sitelog_input_manage`
+    see also `rinexmod_api.metadata_input_manage`
 
     Returns
     -------
@@ -53,8 +53,7 @@ def site_list_from_metadata(metadata_inp):
     ###############################################
     ### read metadata
     if not type(metadata_inp) is list and os.path.isdir(metadata_inp):
-        metadata = rinexmod_api.sitelog_input_manage(metadata_inp,
-                                                     force=False)
+        metadata = rinexmod_api.metadata_input_manage(metadata_inp, force=False)
     else:
         metadata = metadata_inp
 
@@ -98,6 +97,7 @@ def site_search_from_list(fraw_inp, site4_list_inp):
         site_out = fraw_inp.name[:4]
     return site_out
 
+
 def select_conv_odd_file(fraw_inp, ext_excluded=None):
     """
     Identifies the right converter for a raw file with an unconventional extension, or excludes the file
@@ -105,6 +105,9 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
 
     This function performs a high-level case matching to determine the appropriate converter for a raw file.
     If the file's extension matches one in the excluded list, the file is skipped.
+
+    See also autorino.conv_cmd_run._convert_select
+    for the regular converter selection
 
     Parameters
     ----------
@@ -124,7 +127,16 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
     The function uses regular expressions to match file extensions.
     """
     if ext_excluded is None:
-        ext_excluded = [".TG!$", ".DAT", ".Z", ".BCK", "^.[0-9]{3}$", ".A$", "Trimble", ".ORIG"]
+        ext_excluded = [
+            ".TG!$",
+            ".DAT",
+            ".Z",
+            ".BCK",
+            "^.[0-9]{3}$",
+            ".A$",
+            "Trimble",
+            ".ORIG",
+        ]
 
     fraw = Path(fraw_inp)
     ext = fraw.suffix.upper()
@@ -138,7 +150,9 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
         for ext_exl in ext_excluded:
             if re.match(ext_exl, ext):
                 conve = None
-                logger.warn("%s will be skipped, excluded extention %s", fraw.name, ext_exl)
+                logger.warn(
+                    "%s will be skipped, excluded extention %s", fraw.name, ext_exl
+                )
                 break
 
     return conve
@@ -172,18 +186,20 @@ def stop_long_running_containers(max_running_time=120):
     try:
         client = docker.from_env()
     except docker.errors.DockerException:
-        logger.warning('Permission denied for Docker')
+        logger.warning("Permission denied for Docker")
         return None
     containers = client.containers.list()
 
     for container in containers:
         # Calculate the time elapsed since the container was started
-        started_at = container.attrs['State']['StartedAt']
+        started_at = container.attrs["State"]["StartedAt"]
         started_at = dateutil.parser.parse(started_at)
         elapsed_time = dt.datetime.now(dt.timezone.utc) - started_at
 
         if elapsed_time > dt.timedelta(seconds=max_running_time):
             container.stop()
-            logger.warning(f'Stopped container {container.name} after {elapsed_time} seconds.')
+            logger.warning(
+                f"Stopped container {container.name} after {elapsed_time} seconds."
+            )
 
     return None

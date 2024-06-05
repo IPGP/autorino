@@ -49,8 +49,8 @@ def converter_batch(input_files,
     ###############################################
     ### read metadata
     if os.path.isdir(sitelogs_inp):
-        sitelogs = rinexmod_api.sitelog_input_manage(sitelogs_inp,
-                                                     force=False)
+        sitelogs = rinexmod_api.metadata_input_manage(sitelogs_inp,
+                                                      force=False)
     
     ### get the site (4chars) as a list 
     site4_list = [s.site4char for s in sitelogs]
