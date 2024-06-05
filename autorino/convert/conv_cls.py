@@ -139,7 +139,7 @@ class ConvertGnss(arocmn.StepGnss):
         if rinexmod_options is None:
             rinexmod_options = {}
 
-        logger.info("⮞⮞⮞⮞⮞⮞ RAW > RINEX files conversion")
+        logger.info("⮞⮞⮞⮞⮞⮞ RAW ⇒ RINEX files conversion")
 
         self.set_tmp_dirs_paths()
         ### other tmps subdirs come also later in the loop
@@ -156,8 +156,8 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         if not force:
-            self.guess_local_rnx_files()
-            self.check_local_files()
+            self.guess_local_rnx_files() # generate the potential local files
+            self.check_local_files() # tests if the local flies are already there
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             if len(prv_tbl_df) > 0 and False: ### we disable this because it is not robust yet
                 self.filter_previous_tables(prv_tbl_df)
@@ -193,8 +193,6 @@ class ConvertGnss(arocmn.StepGnss):
                 continue
 
             logger.info("⮞⮞⮞ input raw file for conversion: %s", fraw.name)
-
-            # _ = self.set_tmp_dirs_paths()
 
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
