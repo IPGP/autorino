@@ -313,7 +313,7 @@ class StepGnss:
 
         This method checks if a 'site_id' is provided in the site dictionary.
         If it is, it sets the 'site_id' attribute of the StepGnss object to the provided 'site_id'.
-        If a 'site_id' is not provided, it sets the 'site_id' attribute to 'XXXX' as a default value.
+        If a 'site_id' is not provided, it sets the 'site_id' attribute to 'XXXX00XX00XXXX' as a default value.
 
         Returns
         -------
@@ -322,7 +322,7 @@ class StepGnss:
         if "site_id" in self.site.keys():
             self.site_id = self.site["site_id"]
         else:
-            self.site_id = "XXXX"
+            self.site_id = "XXXX00XXX"
 
         return None
 
