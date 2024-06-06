@@ -7,7 +7,7 @@ Created on 30/05/2024 16:22:55
 """
 
 import argparse
-
+import json
 import autorino.common as arocmn
 
 if __name__ == "__main__":
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-rnmo",
         "--rinexmod_options",
-        type=dict,
+        type=json.loads,
         help="The options for modifying the RINEX files during the conversion",
     )
     parser.add_argument(

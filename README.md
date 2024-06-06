@@ -134,7 +134,7 @@ arocmn.convert_rnx(l,out_dir,tmp_dir)
 
 #### `autorino_convert_rnx` minimal example
 ``` bash
-python3 autorino_convert_rnx.py  --force  --metadata /home/user/path/of/your/sitelogs  --out_dir_structure '<SITE_ID4>/%Y' --list_file_input  /home/user/where_your/raw_data/are_stored/raw_data.list /home/user/where_your/rinex_data/will_be_saved/```
+python3 autorino_convert_rnx.py  --force  --metadata /home/user/path/of/your/sitelogs  --out_dir_structure '<SITE_ID4>/%Y' --list_file_input  /home/user/where_your/raw_data/are_stored/raw_data_list.txt /home/user/where_your/rinex_data/will_be_saved/```
 ```
 
 #### `autorino_convert_rnx` help
