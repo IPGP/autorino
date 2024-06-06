@@ -56,7 +56,10 @@ if __name__ == "__main__":
         "-rimo",
         "--rinexmod_options",
         type=json.loads,
-        help="The options for modifying the RINEX files during the conversion",
+        help="The options for modifying the RINEX files during the conversion."
+             "The options must be provided in a dictionnary represented as a string"
+             #"\"'{"name": "img.png","voids": "#00ff00ff","0": "#ff00ff00","100%": "#f80654ff"}'"
+             "Defaults to None",
     )
     parser.add_argument(
         "-m",
@@ -77,6 +80,9 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+
+    print("AAAAAAAAAAA",args.rinexmod_options)
 
     arocmn.convert_rnx(
         args.raws_inp,
