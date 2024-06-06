@@ -123,3 +123,41 @@ def load_previous_tables(log_dir):
     else:
         # If files are found, read each file into a DataFrame and concatenate them into a single DataFrame
         return pd.concat([pd.read_csv(t) for t in tables_files])
+
+
+def is_val_defined(val_inp):
+    """
+    Checks if the input value is defined.
+
+    This function takes an input value and checks if it is defined. It considers None, NaN, and an empty string as undefined.
+    If the input value is one of these, the function returns False. Otherwise, it returns True.
+
+    Parameters
+    ----------
+    val_inp : any
+        The input value to be checked.
+        Can handle iterables.
+
+    Returns
+    -------
+    bool
+        True if the input value is defined, False otherwise.
+    """
+
+    # iterable case
+    typ = utils.get_type_smart(val_inp)
+
+    if utils.is_iterable(val_inp):
+        return typ([is_val_defined(v) for v in val_inp])
+
+    # scalar case
+    if val_inp is None:
+        return False
+    elif val_inp is np.nan:
+        return False
+    elif val_inp == "":
+        return False
+    else:
+        return True
+
+
