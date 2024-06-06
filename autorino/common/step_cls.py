@@ -1689,6 +1689,7 @@ class StepGnss:
         if not rinexmod_options["sitelog"] and "station_info" in rinexmod_options.keys():
             rinexmod_options.pop("sitelog",None)
 
+
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
             debug_print = True
