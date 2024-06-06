@@ -53,7 +53,7 @@ if __name__ == "__main__":
         help="The directory where logs will be stored. If not provided, it defaults to tmp_dir",
     )
     parser.add_argument(
-        "-rnmo",
+        "-rimo",
         "--rinexmod_options",
         type=json.loads,
         help="The options for modifying the RINEX files during the conversion",
