@@ -1686,8 +1686,8 @@ class StepGnss:
             "full_history": True,
         }
 
-        if not rinexmod_options_use["sitelog"] and "station_info" in rinexmod_options_use.keys():
-            rinexmod_options_use.pop("sitelog",None)
+        if not rinexmod_options["sitelog"] and "station_info" in rinexmod_options.keys():
+            rinexmod_options.pop("sitelog",None)
 
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
