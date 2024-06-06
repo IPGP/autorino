@@ -1676,8 +1676,8 @@ class StepGnss:
 
         # default options/arguments for rinexmod
         rinexmod_options_use = {
-            # 'marker': 'XXXX',
-            # 'sitelog': metadata,
+            # 'marker': 'XXXX', # forced in .cnovert()
+            # 'sitelog': metadata, # forced in .cnovert()
             "compression": "gz",
             "longname": True,
             "force_rnx_load": True,
@@ -1686,12 +1686,18 @@ class StepGnss:
             "full_history": True,
         }
 
+        if not rinexmod_options_use["sitelog"] and "station_info" in rinexmod_options_use.keys():
+            rinexmod_options_use.pop("sitelog",None)
+
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
-            logger.debug("input options for rinexmod: %s", rinexmod_options)
-            logger.debug("default options for rinexmod: %s", rinexmod_options_use)
+            debug_print = True
+            if debug_print:
+                logger.debug("input options for rinexmod: %s", rinexmod_options)
+                logger.debug("default options for rinexmod: %s", rinexmod_options_use)
             rinexmod_options_use.update(rinexmod_options)
-            logger.debug("final options for rinexmod: %s", rinexmod_options_use)
+            if debug_print:
+                logger.debug("final options for rinexmod: %s", rinexmod_options_use)
 
         frnx = self.table.loc[irow, table_col]
 
