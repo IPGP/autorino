@@ -234,9 +234,13 @@ class ConvertGnss(arocmn.StepGnss):
             #############################################################
             ###### RINEXMOD
             rinexmod_options_use = rinexmod_options.copy()
-            logger.debug("input options for rinexmod: %s", rinexmod_options_use)
+
+            debug_print = True
+            if debug_print:
+                logger.debug("input options for rinexmod: %s", rinexmod_options_use)
             rinexmod_options_use.update({"marker": site, "sitelog": self.metadata})
-            logger.debug("final options for rinexmod: %s", rinexmod_options_use)
+            if debug_print:
+                logger.debug("final options for rinexmod: %s", rinexmod_options_use)
 
             self.on_row_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
