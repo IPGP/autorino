@@ -1688,8 +1688,10 @@ class StepGnss:
 
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
+            logger.debug("input options for rinexmod: %s", rinexmod_options)
+            logger.debug("default options for rinexmod: %s", rinexmod_options_use)
             rinexmod_options_use.update(rinexmod_options)
-            # logger.debug("options used for rinexmod: %s", rinexmod_options_use)
+            logger.debug("final options for rinexmod: %s", rinexmod_options_use)
 
         frnx = self.table.loc[irow, table_col]
 
