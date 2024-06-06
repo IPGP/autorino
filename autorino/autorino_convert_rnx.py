@@ -81,9 +81,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-
-    print("AAAAAAAAAAA",args.rinexmod_options)
-
     arocmn.convert_rnx(
         args.raws_inp,
         args.out_dir,
