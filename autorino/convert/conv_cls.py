@@ -238,7 +238,14 @@ class ConvertGnss(arocmn.StepGnss):
             debug_print = True
             if debug_print:
                 logger.debug("input options for rinexmod: %s", rinexmod_options_use)
-            rinexmod_options_use.update({"marker": site, "sitelog": self.metadata})
+
+            # if "marker" is in rinexmod_options_use keys, use it, else use site
+            if "marker" in rinexmod_options_use.keys():
+                marker_use = rinexmod_options_use["marker"]
+            else:
+                marker_use = site
+
+            rinexmod_options_use.update({"marker": marker_use, "sitelog": self.metadata})
             if debug_print:
                 logger.debug("final options for rinexmod: %s", rinexmod_options_use)
 
