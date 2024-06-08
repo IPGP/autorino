@@ -316,7 +316,7 @@ def converter_run(
     inp_raw_fpath: Union[Path, str, List[Path], List[str]],
     out_dir: Union[Path, str],
     converter="auto",
-    timeout=60,
+    timeout=180,
     bin_options=[],
     bin_kwoptions=dict(),
     bin_path: Union[Path, str] = "",
