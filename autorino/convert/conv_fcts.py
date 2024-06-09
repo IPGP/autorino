@@ -39,7 +39,7 @@ def site_list_from_metadata(metadata_inp):
      * list of MetaData objects
      * single MetaData object
 
-    see also `rinexmod_api.metadata_input_manage`
+    This function is mainly a wrapper of `rinexmod_api.metadata_input_manage`
 
     Returns
     -------
@@ -59,11 +59,13 @@ def site_list_from_metadata(metadata_inp):
 
     ### get the site (4chars) as a list
     site4_list = [s.site4char for s in metadata]
+    ### get the site (9chars) as a list
+    site9_list = [s.site9char for s in metadata]
 
-    return site4_list
+    return site4_list, site9_list
 
 
-def site_search_from_list(fraw_inp, site4_list_inp):
+def site_search_from_list(fraw_inp, site_list_inp):
     """
     Searches for the correct site name of a raw file from a list of correct site names.
 
@@ -73,10 +75,11 @@ def site_search_from_list(fraw_inp, site4_list_inp):
 
     Parameters
     ----------
-    fraw_inp : str
+    fraw_inp : Path
         The name of the raw file with an approximate site name.
-    site4_list_inp : list
-        A list of correct 4-character site names.
+    site_list_inp : list
+        A list of correct 4 or 9-character site names.
+        Only the 4 first characters will be considered.
 
     Returns
     -------
@@ -89,9 +92,10 @@ def site_search_from_list(fraw_inp, site4_list_inp):
     """
 
     site_out = None
-    for s4 in site4_list_inp:
+    for s in site_list_inp:
+        s4 = s[:4]
         if re.search(s4, fraw_inp.name, re.IGNORECASE):
-            site_out = s4
+            site_out = s
             break
     if not site_out:  # last chance, get the 4 1st chars of the raw file
         site_out = fraw_inp.name[:4]
@@ -111,7 +115,7 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
 
     Parameters
     ----------
-    fraw_inp : str
+    fraw_inp : Path
         The name of the raw file with an unconventional extension.
     ext_excluded : list, optional
         A list of file extensions to be excluded. If a file's extension matches one in this list, the file is skipped.

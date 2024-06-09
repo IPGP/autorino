@@ -147,9 +147,9 @@ class ConvertGnss(arocmn.StepGnss):
         ### others translate dict updates will come in the loop
 
         if self.metadata:
-            site4_list = arocnv.site_list_from_metadata(self.metadata)
+            site4_list, site9_list = arocnv.site_list_from_metadata(self.metadata)
         else:
-            site4_list = []
+            site4_list, site9_list = [], []
 
         ### initialize the table as log
         self.set_table_log(out_dir=self.tmp_dir_logs)
@@ -194,20 +194,25 @@ class ConvertGnss(arocmn.StepGnss):
 
             logger.info("⮞⮞⮞ input raw file for conversion: %s", fraw.name)
 
-            ### since the site code from fraw can be poorly formatted
-            # we search it w.r.t. the sites from the metadata
-            site = arocnv.site_search_from_list(fraw, site4_list)
-
+            ###########################################################################
             ##### something better must be done with
             # rinexmod.rinexmod_api.metadata_find_site() !!!!
             # clarify the site4 and the site9 usage
             # create method update_site_table_from_fname
 
+            ### since the site code from fraw can be poorly formatted
+            # we search it w.r.t. the sites from the metadata
+
             ### we update the table row and the translate dic (necessary for the output dir)
-            ## this is a very bad idea, it f*cks the outdir 240605 
-            # self.table.loc[irow, "site"] = site
-            # self.site_id = site
+            ## change the site_id here is a very bad idea, it f*cks the outdir 240605
+            ## infact not, because of the new IGS update it should not be a pb anymore
+            if not arocmn.is_val_defined(self.table.loc[irow, "site"]):
+                site_found = arocnv.site_search_from_list(fraw, site9_list)
+                self.table.loc[irow, "site"] = site_found
+
+            self.site_id = self.table.loc[irow, "site"] ### for the output dir
             self.set_translate_dict()
+            ###########################################################################
 
             ### do a first converter selection by identifying odd files
             converter_name_use = arocnv.select_conv_odd_file(fraw)
@@ -243,7 +248,7 @@ class ConvertGnss(arocmn.StepGnss):
             if "marker" in rinexmod_options_use.keys():
                 marker_use = rinexmod_options_use["marker"]
             else:
-                marker_use = site
+                marker_use = self.table.loc[irow, "site"]
 
             rinexmod_options_use.update({"marker": marker_use, "sitelog": self.metadata})
             if debug_print:
