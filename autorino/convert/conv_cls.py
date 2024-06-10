@@ -206,8 +206,9 @@ class ConvertGnss(arocmn.StepGnss):
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate dic (necessary for the output dir)
-            self.on_row_site_upd(irow,site9_list)
+            self.on_row_site_upd(irow,site4_list)
             self.site_id = self.table.loc[irow, "site"] ### for the output dir
+
             self.set_translate_dict()
             ###########################################################################
 
@@ -237,8 +238,8 @@ class ConvertGnss(arocmn.StepGnss):
             ###### RINEXMOD
             rinexmod_options_use = rinexmod_options.copy()
 
-            debug_print = True
-            if debug_print:
+            debug_print_rinexmod_options = False
+            if debug_print_rinexmod_options:
                 logger.debug("input options for rinexmod: %s", rinexmod_options_use)
 
             # if "marker" is in rinexmod_options_use keys, use it, else use site
@@ -248,7 +249,7 @@ class ConvertGnss(arocmn.StepGnss):
                 marker_use = self.table.loc[irow, "site"]
 
             rinexmod_options_use.update({"marker": marker_use, "sitelog": self.metadata})
-            if debug_print:
+            if debug_print_rinexmod_options:
                 logger.debug("final options for rinexmod: %s", rinexmod_options_use)
 
             self.on_row_rinexmod(

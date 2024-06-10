@@ -40,7 +40,7 @@ if __name__ == "__main__":
              "If provided, the converted files will be stored in a subdirectory of out_dir following this structure."
              "See README.md for more information."
              "Typical values are '<SITE_ID4>/%%Y/' or '%%Y/%%j/",
-        default="<SITE_ID4>/%%Y/",
+        default="<SITE_ID4>/%Y/",
     )
     parser.add_argument(
         "-tmp",
@@ -80,9 +80,6 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-
-
-    print("AAAAAAAAAAA",args.rinexmod_options)
 
     arocmn.convert_rnx(
         args.raws_inp,
