@@ -57,9 +57,9 @@ def site_list_from_metadata(metadata_inp):
     else:
         metadata = metadata_inp
 
-    ### get the site (4chars) as a list
+    # get the site (4chars) as a list
     site4_list = [s.site4char for s in metadata]
-    ### get the site (9chars) as a list
+    # get the site (9chars) as a list
     site9_list = [s.site9char for s in metadata]
 
     return site4_list, site9_list
@@ -84,7 +84,8 @@ def site_search_from_list(fraw_inp, site_list_inp):
     Returns
     -------
     str
-        The correct site name of the raw file. If no match is found in the list, the function returns the first 4 characters of the raw file name.
+        The correct site name of the raw file. If no match is found in the list,
+        the function returns the first 4 characters of the raw file name.
 
     Notes
     -----
@@ -154,7 +155,7 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
         for ext_exl in ext_excluded:
             if re.match(ext_exl, ext):
                 conve = None
-                logger.warn(
+                logger.warning(
                     "%s will be skipped, excluded extention %s", fraw.name, ext_exl
                 )
                 break
@@ -167,12 +168,15 @@ def stop_long_running_containers(max_running_time=120):
     Stops Docker containers that have been running for a specified amount of time.
 
     This function is useful for stopping long-running trm2rinex Docker containers.
-    It iterates over all running Docker containers and stops any that have been running for longer than the specified maximum running time.
+    It iterates over all running Docker containers and stops any that have been
+    running for longer than the specified maximum running time.
 
     Parameters
     ----------
     max_running_time : int, optional
-        The maximum running time (in seconds) for a Docker container. Any container running longer than this will be stopped. Default is 120 seconds.
+        The maximum running time (in seconds) for a Docker container.
+        Any container running longer than this will be stopped.
+        Default is 120 seconds.
 
     Returns
     -------
