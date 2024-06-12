@@ -49,7 +49,7 @@ Note that it is `autorino/autorino` two times, since the CLI programs are inside
 ### External dependencies
 _autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
 ```
-pip install geodezyx
+pip install -r /home/user/path_to/autorino/requirements.txt
 ```
 
 ### Setting up the environment
