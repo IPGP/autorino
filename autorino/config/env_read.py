@@ -12,6 +12,8 @@ import os
 import yaml
 
 logger = logging.getLogger(__name__)
+logger.setLevel("INFO")
+
 
 def read_env(envfile_path=None):
     """
@@ -33,8 +35,9 @@ def read_env(envfile_path=None):
         envfile_path_use = envfile_path_def
 
     if not os.path.isfile(envfile_path_use):
-        logger.warning("environement config file not found, fallback to default values: %s",
-                       envfile_path_use)
+        if not envfile_path_use is None:
+            logger.warning("custom environement config file not found: %s, fallback to default values",
+                           envfile_path_use)
         envfile_path_use = envfile_path_def
 
     logger.debug("load environement config file: %s",envfile_path_use)
