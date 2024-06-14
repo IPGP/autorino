@@ -7,7 +7,7 @@ Created on 30/05/2024 16:22:55
 """
 
 import argparse
-
+import json
 import autorino.common as arocmn
 
 if __name__ == "__main__":
@@ -40,7 +40,7 @@ if __name__ == "__main__":
              "If provided, the converted files will be stored in a subdirectory of out_dir following this structure."
              "See README.md for more information."
              "Typical values are '<SITE_ID4>/%%Y/' or '%%Y/%%j/",
-        default="<SITE_ID4>/%%Y/",
+        default="<SITE_ID4>/%Y/",
     )
     parser.add_argument(
         "-tmp",
@@ -53,10 +53,13 @@ if __name__ == "__main__":
         help="The directory where logs will be stored. If not provided, it defaults to tmp_dir",
     )
     parser.add_argument(
-        "-rnmo",
+        "-rimo",
         "--rinexmod_options",
-        type=dict,
-        help="The options for modifying the RINEX files during the conversion",
+        type=json.loads,
+        help="The options for modifying the RINEX files during the conversion."
+             "The options must be provided in a dictionnary represented as a string"
+             #"\"'{"name": "img.png","voids": "#00ff00ff","0": "#ff00ff00","100%": "#f80654ff"}'"
+             "Defaults to None",
     )
     parser.add_argument(
         "-m",

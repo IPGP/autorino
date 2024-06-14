@@ -39,7 +39,7 @@ def _find_converted_files(directory, pattern_main, pattern_annex, n_sec=10):
 
     Parameters
     ----------
-    directory : str
+    directory : Path
         The directory in which to search for files.
     pattern_main : str
         The regular expression pattern that the main files should match.
@@ -100,7 +100,7 @@ def _ashtech_name_2_date(inp_raw_fpath):
 
     Parameters
     ----------
-    inp_raw_fpath : str
+    inp_raw_fpath : Path
         The path of the input ASHTECH file.
 
     Returns
@@ -154,7 +154,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     converter_inp : str
         name of the converter used.
         see ``converter_run`` help for more details
-    inp_raw_fpath : str, optional
+    inp_raw_fpath : Path, optional
         RAW file path. used for converter research based on the RAW
         file extension. The default is None.
 
@@ -182,7 +182,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         )
         raise Exception
 
-        ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
     ## thus we just keep the 1st elt
     if utils.is_iterable(inp_raw_fpath):
         inp_raw_fpath = inp_raw_fpath[0]
@@ -316,7 +316,7 @@ def converter_run(
     inp_raw_fpath: Union[Path, str, List[Path], List[str]],
     out_dir: Union[Path, str],
     converter="auto",
-    timeout=60,
+    timeout=180,
     bin_options=[],
     bin_kwoptions=dict(),
     bin_path: Union[Path, str] = "",
@@ -396,7 +396,7 @@ def converter_run(
         raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
         raw_fpath_mono = raw_fpath_multi[0]
         raw_fpath = raw_fpath_multi
-    else:  # a single  file, most common case
+    else: # a single file, most common case
         raw_fpath_multi = [Path(inp_raw_fpath)]
         raw_fpath_mono = Path(inp_raw_fpath)
         raw_fpath = raw_fpath_mono
