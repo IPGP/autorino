@@ -341,12 +341,34 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = False
         return frnxtmp
 
-    def on_row_site_upd(self,irow,metadata_or_sites_list_inp,force=False):
-        val_def = arocmn.is_val_defined(self.table.loc[irow, "site"])
-        if not val_def or force:
-            fraw = Path(self.table.loc[irow, "fpath_inp"])
-            site_found = arocnv.site_search_from_list(fraw, metadata_or_sites_list_inp)
-            self.table.loc[irow, "site"] = site_found
-        else:
-            site_found = 'XXXX00XXX'
-        return site_found
+def on_row_site_upd(self, irow, metadata_or_sites_list_inp, force=False):
+    """
+    Updates the 'site' entry for each row of the table.
+
+    This method is applied to each row of the table. It checks if the 'site' entry is defined.
+    If it is not defined or if the 'force' parameter is set to True, it updates the 'site' entry.
+    The update is performed by searching the site from a list of sites or metadata.
+    If the 'site' entry is already defined and 'force' is not set to True, it sets the 'site' entry to 'XXXX00XXX'.
+
+    Parameters
+    ----------
+    irow : int
+        The index of the row in the table to be updated.
+    metadata_or_sites_list_inp : list
+        A list of sites or metadata from which the site should be searched.
+    force : bool, optional
+        If True, forces the update of the 'site' entry even if it is already defined. Default is False.
+
+    Returns
+    -------
+    str
+        The updated 'site' entry.
+    """
+    val_def = arocmn.is_val_defined(self.table.loc[irow, "site"])
+    if not val_def or force:
+        fraw = Path(self.table.loc[irow, "fpath_inp"])
+        site_found = arocnv.site_search_from_list(fraw, metadata_or_sites_list_inp)
+        self.table.loc[irow, "site"] = site_found
+    else:
+        site_found = 'XXXX00XXX'
+    return site_found
