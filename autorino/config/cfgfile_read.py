@@ -209,7 +209,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                 else:
                     sitelogs = None
 
-                spl = arohdl.SplitGnss
+                spl = arohdl.HandleGnss
                 step_obj = spl(
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
@@ -240,7 +240,11 @@ def _check_parent_dir_existence(parent_dir):
     """
     Checks if a parent directory exists and translates it with the environment variable first.
 
-    This function takes a string representing a directory path. It first translates the directory path with the environment variable. Then, it checks if the translated directory exists. If it does not exist, it raises a FileNotFoundError with a custom error message. If it does exist, it returns None.
+    This function takes a string representing a directory path.
+    It first translates the directory path with the environment variable.
+    Then, it checks if the translated directory exists.
+    If it does not exist, it raises a FileNotFoundError with a custom error message.
+    If it does exist, it returns None.
 
     This function is an internal function for the read_cfg function.
 
@@ -292,7 +296,9 @@ def _is_cfg_bloc_active(ywkf):
     Returns
     -------
     bool
-        True if the 'active' key is present and its value is True, or if the 'active' key is not present. False if the 'active' key is present and its value is False.
+        True if the 'active' key is present and its value is True,
+        or if the 'active' key is not present.
+        False if the 'active' key is present and its value is False.
     """
     if "active" in ywkf.keys():
         if ywkf["active"]:
