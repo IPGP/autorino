@@ -935,7 +935,7 @@ class StepGnss:
         for iepoch, epoch in self.table["epoch_srt"].items():
             # guess the potential local files
             local_dir_use = str(self.out_dir)
-            # local_fname_use = str(self.remote_fname)
+            # local_fname_use = str(self.inp_structure)
 
             epo_dt_srt = epoch.to_pydatetime()
             epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()

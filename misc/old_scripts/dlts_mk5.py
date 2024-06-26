@@ -5,25 +5,25 @@ from autorino import download as ardl
 ############################################################
 # protocol = "http"
 # hostname="http://gps-abd.terrain.ovsg.univ-ag.fr/"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # sta_user=""
 # sta_pass=""
 
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://gps-dsd.terrain.ovsg.univ-ag.fr"
 # sta_user=""
 # sta_pass=""
 
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://195.83.190.74"
 # sta_user=""
 # sta_pass=""
 
 # # HOUE
 # protocol = "ftp"
-# remote_dir="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
+# inp_dir_parent="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
 # hostname="gps-houe.terrain.ovsg.univ-ag.fr"
 # sta_user="root"
 # sta_pass="ovsg13;:"
