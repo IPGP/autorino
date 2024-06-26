@@ -28,8 +28,8 @@ class DownloadGnss(arocmn.StepGnss):
         log_dir,
         epoch_range,
         access,
-        remote_dir,
-        remote_fname,
+        inp_dir_parent,
+        inp_structure,
         site=None,
         session=None,
         options=None,
@@ -48,8 +48,8 @@ class DownloadGnss(arocmn.StepGnss):
         )
 
         self.access = access
-        self.remote_dir = remote_dir
-        self.remote_fname = remote_fname
+        self.inp_dir_parent = inp_dir_parent
+        self.inp_structure = inp_structure
 
     def guess_remote_raw_files(self):
         """
@@ -62,7 +62,7 @@ class DownloadGnss(arocmn.StepGnss):
         # see also method guess_local_raw_files(), a general method for all
         # StepGnss objects
 
-        if not self.remote_fname:
+        if not self.inp_structure:
             logger.warning(
                 "generic filename empty for %s, the guessed remote filepaths will be wrong",
                 self.session,
@@ -74,8 +74,8 @@ class DownloadGnss(arocmn.StepGnss):
 
         for epoch in self.epoch_range.epoch_range_list():
             ### guess the potential remote files
-            rmot_dir_use = str(self.remote_dir)
-            rmot_fname_use = str(self.remote_fname)
+            rmot_dir_use = str(self.inp_dir_parent)
+            rmot_fname_use = str(self.inp_structure)
 
             rmot_path_use = arodl.join_url(
                 self.access["protocol"], hostname_use, rmot_dir_use, rmot_fname_use
@@ -102,14 +102,14 @@ class DownloadGnss(arocmn.StepGnss):
     def guess_local_raw_files(self):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `remote_fname` attributes of the DownloadGnss object
+        EpochRange and `inp_structure` attributes of the DownloadGnss object
 
         see also method ``guess_remote_raw_files()``,
         """
         ### wrong but legacy docstring
         # If the object is not a DownloadGnss one,
         # You must provide as ``remote_fname_inp``, which is usually
-        # a ``DownloadGnss.remote_fname`` attribute
+        # a ``DownloadGnss.inp_structure`` attribute
 
         # see also method ``guess_remote_raw_files()``,
         # a specific method for DownloadGnss objects
@@ -119,7 +119,7 @@ class DownloadGnss(arocmn.StepGnss):
         for epoch in self.epoch_range.epoch_range_list():
             # guess the potential local files
             local_dir_use = str(self.out_dir)
-            local_fname_use = str(self.remote_fname)
+            local_fname_use = str(self.inp_structure)
             local_path_use = os.path.join(local_dir_use, local_fname_use)
 
             local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
@@ -147,7 +147,7 @@ class DownloadGnss(arocmn.StepGnss):
         """
         rmot_dir_list = []
         for epoch in self.epoch_range.epoch_range_list():
-            rmot_dir_use = str(self.remote_dir)
+            rmot_dir_use = str(self.inp_dir_parent)
             rmot_dir_use = self.translate_path(rmot_dir_use, epoch, make_dir=False)
             rmot_dir_list.append(rmot_dir_use)
 
@@ -268,7 +268,7 @@ class DownloadGnss(arocmn.StepGnss):
         frontend method to download files from a GNSS receiver
         """
 
-        logger.info("⮞⮞⮞⮞⮞⮞ RAW files download")
+        logger.info(">>>>>> RAW files download")
 
         self.set_tmp_dirs_paths()
 

@@ -108,7 +108,7 @@ def ftp_create_object(url_host_inp, timeout=15, max_try=3, sleep_time=5):
 def list_remote_files_ftp(
     host_name, remote_dir, username, password, timeout=15, max_try=3
 ):
-    # clean hostname & remote_dir
+    # clean hostname & inp_dir_parent
     # MUST BE IMPROVED !!!
     remote_dir = remote_dir.replace(host_name, "")
     host_name = host_name.replace("ftp://", "")

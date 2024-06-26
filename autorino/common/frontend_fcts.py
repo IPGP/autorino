@@ -11,6 +11,7 @@ import logging
 import os
 
 import autorino.config as arocfg
+import autorino.download as arodwl
 import autorino.convert as arocnv
 import autorino.handle as arohdl
 
@@ -57,6 +58,29 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
             arocfg.run_steps(steps_lis)
 
     return None
+
+
+
+def download_raw(epoch_range,
+                 out_dir,
+                 tmp_dir=None,
+                 log_dir=None,):
+
+
+    dwl = arodwl.DownloadGnss(out_dir=out_dir,
+                              tmp_dir=tmp_dir,
+                              log_dir=log_dir,
+                              epoch_range=epoch_range,
+                              access=y_station["access"],
+                              inp_dir_parent=inp_dir_parent,
+                              inp_structure=inp_structure,
+                              site=y_station["site"],
+                              session=y_ses["general"],
+                              options=y_stp["options"])
+
+    dwl.download()
+
+    return dwl
 
 
 def convert_rnx(
@@ -136,7 +160,7 @@ def convert_rnx(
     cnv.load_table_from_filelist(raws_use)
     cnv.convert(force=force, rinexmod_options=rinexmod_options)
 
-    return None
+    return cnv
 
 
 def split_rnx(
@@ -192,7 +216,7 @@ def split_rnx(
     spt_split.find_rnxs_for_handle(spt_store)
     spt_split.split(handle_software=handle_software, rinexmod_options=rinexmod_options)
 
-    return None
+    return spt_split
 
 
 def splice_rnx(
