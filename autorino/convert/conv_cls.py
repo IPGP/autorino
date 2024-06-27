@@ -58,15 +58,15 @@ class ConvertGnss(arocmn.StepGnss):
     """
 
     def __init__(
-        self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        epoch_range=None,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
+            self,
+            out_dir,
+            tmp_dir,
+            log_dir,
+            epoch_range=None,
+            site=None,
+            session=None,
+            options=None,
+            metadata=None,
     ):
         """
         Initializes the ConvertGnss class with the specified parameters.
@@ -156,10 +156,10 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         if not force:
-            self.guess_local_rnx_files() # generate the potential local files
-            self.check_local_files() # tests if the local flies are already there
+            self.guess_local_rnx_files()  # generate the potential local files
+            self.check_local_files()  # tests if the local flies are already there
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
-            if len(prv_tbl_df) > 0 and False: ### we disable this because it is not robust yet
+            if len(prv_tbl_df) > 0 and False:  ### we disable this because it is not robust yet
                 self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
 
@@ -206,8 +206,8 @@ class ConvertGnss(arocmn.StepGnss):
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate dic (necessary for the output dir)
-            self.on_row_site_upd(irow,site4_list)
-            self.site_id = self.table.loc[irow, "site"] ### for the output dir
+            self.on_row_site_upd(irow, site4_list)
+            self.site_id = self.table.loc[irow, "site"]  ### for the output dir
 
             self.set_translate_dict()
             ###########################################################################
@@ -274,7 +274,7 @@ class ConvertGnss(arocmn.StepGnss):
     #
 
     def on_row_convert(
-        self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
+            self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
     ):
         """
         "on row" method
@@ -371,4 +371,5 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "site"] = site_found
         else:
             site_found = 'XXXX00XXX'
+
         return site_found
