@@ -15,7 +15,6 @@ import os
 import socket
 import urllib
 import urllib.request
-from ftplib import error_temp
 import time
 from urllib.parse import urlparse
 
@@ -181,8 +180,6 @@ def size_remote_file_http(url):
 
 
 ############# download remote file
-
-
 def download_file_ftp(
     url, output_dir, username, password, timeout=15, max_try=3, sleep_time=5
 ):
@@ -222,7 +219,7 @@ def download_file_ftp(
                     1024,
                 )
                 break
-        except (error_temp, BrokenPipeError, socket.timeout) as e:
+        except (ftplib.error_temp, ftplib.error_reply, BrokenPipeError, socket.timeout) as e:
             try_count += 1
             if try_count > max_try:
                 raise AutorinoDownloadError
