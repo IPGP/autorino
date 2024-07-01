@@ -58,15 +58,15 @@ class ConvertGnss(arocmn.StepGnss):
     """
 
     def __init__(
-        self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        epoch_range=None,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
+            self,
+            out_dir,
+            tmp_dir,
+            log_dir,
+            epoch_range=None,
+            site=None,
+            session=None,
+            options=None,
+            metadata=None,
     ):
         """
         Initializes the ConvertGnss class with the specified parameters.
@@ -156,10 +156,10 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         if not force:
-            self.guess_local_rnx_files() # generate the potential local files
-            self.check_local_files() # tests if the local flies are already there
+            self.guess_local_rnx_files()  # generate the potential local files
+            self.check_local_files()  # tests if the local flies are already there
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
-            if len(prv_tbl_df) > 0 and False: ### we disable this because it is not robust yet
+            if len(prv_tbl_df) > 0 and False:  ### we disable this because it is not robust yet
                 self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
 
@@ -206,8 +206,8 @@ class ConvertGnss(arocmn.StepGnss):
             ### since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate dic (necessary for the output dir)
-            self.on_row_site_upd(irow,site4_list)
-            self.site_id = self.table.loc[irow, "site"] ### for the output dir
+            self.on_row_site_upd(irow, site4_list)
+            self.site_id = self.table.loc[irow, "site"]  ### for the output dir
 
             self.set_translate_dict()
             ###########################################################################
@@ -274,7 +274,7 @@ class ConvertGnss(arocmn.StepGnss):
     #
 
     def on_row_convert(
-        self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
+            self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
     ):
         """
         "on row" method
@@ -341,7 +341,29 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = False
         return frnxtmp
 
-    def on_row_site_upd(self,irow,metadata_or_sites_list_inp,force=False):
+    def on_row_site_upd(self, irow, metadata_or_sites_list_inp, force=False):
+        """
+        Updates the 'site' entry for each row of the table.
+
+        This method is applied to each row of the table. It checks if the 'site' entry is defined.
+        If it is not defined or if the 'force' parameter is set to True, it updates the 'site' entry.
+        The update is performed by searching the site from a list of sites or metadata.
+        If the 'site' entry is already defined and 'force' is not set to True, it sets the 'site' entry to 'XXXX00XXX'.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to be updated.
+        metadata_or_sites_list_inp : list
+            A list of sites or metadata from which the site should be searched.
+        force : bool, optional
+            If True, forces the update of the 'site' entry even if it is already defined. Default is False.
+
+        Returns
+        -------
+        str
+            The updated 'site' entry.
+        """
         val_def = arocmn.is_val_defined(self.table.loc[irow, "site"])
         if not val_def or force:
             fraw = Path(self.table.loc[irow, "fpath_inp"])
@@ -349,4 +371,5 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "site"] = site_found
         else:
             site_found = 'XXXX00XXX'
+
         return site_found

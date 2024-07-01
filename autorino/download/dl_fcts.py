@@ -15,13 +15,12 @@ import os
 import socket
 import urllib
 import urllib.request
-from ftplib import error_temp
-from time import sleep
+import time
 from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from tqdm import tqdm
+import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -102,13 +101,13 @@ def ftp_create_object(url_host_inp, timeout=15, max_try=3, sleep_time=5):
                 raise e
             else:
                 print(e)
-                sleep(sleep_time)
+                os.sleep(sleep_time)
 
 
 def list_remote_files_ftp(
     host_name, remote_dir, username, password, timeout=15, max_try=3
 ):
-    # clean hostname & remote_dir
+    # clean hostname & inp_dir_parent
     # MUST BE IMPROVED !!!
     remote_dir = remote_dir.replace(host_name, "")
     host_name = host_name.replace("ftp://", "")
@@ -181,8 +180,6 @@ def size_remote_file_http(url):
 
 
 ############# download remote file
-
-
 def download_file_ftp(
     url, output_dir, username, password, timeout=15, max_try=3, sleep_time=5
 ):
@@ -211,7 +208,7 @@ def download_file_ftp(
     try_count = 0
     while True:
         try:
-            with tqdm(
+            with tqdm.tqdm(
                 total=file_size, unit="B", unit_scale=True, desc=filename
             ) as pbar, open(output_path, "wb") as f:
 
@@ -222,36 +219,48 @@ def download_file_ftp(
                     1024,
                 )
                 break
-        except (error_temp, BrokenPipeError, socket.timeout) as e:
+        except (ftplib.error_temp, ftplib.error_reply, BrokenPipeError, socket.timeout) as e:
             try_count += 1
             if try_count > max_try:
-                raise e
+                raise AutorinoDownloadError
             else:
-                print(e)
-                sleep(sleep_time)
+                logger.warning(
+                    "download failed (%s), try %i/%i", str(e), try_count, max_try
+                )
+                time.sleep(sleep_time)
 
     ftp.quit()
     f.close()
     return output_path
 
-
-def download_file_http(url, output_dir):
+def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
     # Get file size
-    response = requests.head(url)
+    response = requests.head(url, timeout=timeout)
     file_size = int(response.headers.get("content-length", 0))
     # Construct output path
     filename = url.split("/")[-1]
     output_path = os.path.join(output_dir, filename)
     # Download file with progress bar
-    response = requests.get(url, stream=True)
+    try_count = 0
+    while True:
+        try:
+            response = requests.get(url, stream=True, timeout=timeout)
+            with open(output_path, "wb") as f:
+                with tqdm.tqdm(
+                    total=file_size, unit="B", unit_scale=True, desc=filename
+                ) as pbar:
+                    for data in response.iter_content(chunk_size=1024):
+                        f.write(data)
+                        pbar.update(len(data))
+            break
+        except requests.exceptions.RequestException as e:
+            try_count += 1
+            if try_count > max_try:
+                raise AutorinoDownloadError
 
-    f = open(output_path, "wb")
+            logger.warning(
+                "download failed (%s), try %i/%i", str(e), try_count, max_try
+            )
+            time.sleep(sleep_time)
 
-    # tqdm_out = TqdmToLogger(logger,level=logging.INFO)
-    with tqdm(total=file_size, unit="B", unit_scale=True, desc=filename) as pbar:
-        for data in response.iter_content(chunk_size=1024):
-            f.write(data)
-            pbar.update(len(data))
-
-    f.close()
     return output_path
