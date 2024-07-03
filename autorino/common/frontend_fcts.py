@@ -234,44 +234,57 @@ def splice_rnx(
     metadata=None,
 ):
     """
-    Frontend function to splice RINEX files together based on certain criteria
+    Splices RINEX files together based on certain criteria.
+
+    This function takes in a list of RINEX files and splices them together based on the provided criteria.
+    The spliced files are stored in the specified output directory.
 
     Parameters
     ----------
     rnxs_inp : list
-        The input RINEX files to be spliced
+        The input RINEX files to be spliced.
     out_dir : str
-        The output directory where the spliced files will be stored
+        The output directory where the spliced files will be stored.
     tmp_dir : str
-        The temporary directory used during the splicing process
+        The temporary directory used during the splicing process.
     log_dir : str, optional
-        The directory where logs will be stored. If not provided, it defaults to tmp_dir
+        The directory where logs will be stored. If not provided, it defaults to tmp_dir.
     handle_software : str, optional
-        The software to be used for handling the RINEX files during the splice operation
+        The software to be used for handling the RINEX files during the splice operation.
+        Defaults to "converto".
     period : str, optional
-        The period for splicing the RINEX files
+        The period for splicing the RINEX files. Defaults to "1d".
     rolling_period : bool, optional
-        Whether to use a rolling period for splicing the RINEX files
-    rolling_ref : int, optional
-        The reference for the rolling period
+        Whether to use a rolling period for splicing the RINEX files.
+        If False, the spliced files will be based only on the "full" period provided,
+        i.e. Day1 00h-24h, Day2 00h-24h, etc.
+        If True, the spliced files will be based on the rolling period.
+        i.e. Day1 00h-Day2 00h, Day1 01h-Day2 01h, Day1 02h-Day2 02h etc.
+        Defaults to False.
+    rolling_ref :  datetime-like or int, optional
+        The reference for the rolling period.
+        If datetime-like object, use this epoch as reference.
+        If integer, use the epoch of the corresponding index
+        Use -1 for the last epoch for instance.
+        The default is -1.
     round_method : str, optional
-        The method for rounding the epochs during the splice operation
+        The method for rounding the epochs during the splice operation. Defaults to "floor".
     drop_epoch_rnd : bool, optional
-        Whether to drop the rounded epochs during the splice operation
+        Whether to drop the rounded epochs during the splice operation. Defaults to False.
     rinexmod_options : dict, optional
-        The options for modifying the RINEX files during the splice operation
+        The options for modifying the RINEX files during the splice operation. Defaults to None.
     metadata : str or list, optional
-        The metadata to be included in the spliced RINEX files
-        Possible inputs are:
+        The metadata to be included in the spliced RINEX files. Possible inputs are:
          * list of string (sitelog file paths),
          * single string (single sitelog file path)
          * single string (directory containing the sitelogs)
          * list of MetaData objects
-         * single MetaData object
+         * single MetaData object. Defaults to None.
+
     Returns
     -------
     spc_main_obj : object
-        The main SpliceGnss object after the splice operation
+        The main SpliceGnss object after the splice operation.
     """
     if not log_dir:
         log_dir = tmp_dir
