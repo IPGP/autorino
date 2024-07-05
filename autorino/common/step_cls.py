@@ -643,7 +643,7 @@ class StepGnss:
             # be sure to keep the 1st one!!!
 
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
-        logger.debug("new period, %s, %s", v_tdelta, period_new)
+        #logger.debug("new period, %s, %s", v_tdelta, period_new)
 
         self.epoch_range = arocmn.EpochRange(
             epoch1,
@@ -653,7 +653,7 @@ class StepGnss:
             tz=self.epoch_range.tz,
         )
 
-        logger.info("new %s", self.epoch_range)
+        logger.info("new %s for %s", self.epoch_range, str(self).split("/")[0])
 
     def translate_path(
         self, path_inp: str, epoch_inp=None, make_dir: bool = False

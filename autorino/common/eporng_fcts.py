@@ -164,7 +164,11 @@ def round_date(date_in, period, round_method="round"):
 
     else:
         date_typ = type(date_in)
-        date_use = pd.Timestamp(date_in)
+        if date_typ in (pd.Timedelta,):
+            date_use = pd.Timedelta(date_in)
+        else:
+            date_use = pd.Timestamp(date_in)
+
 
         if round_method == "ceil":
             date_out = date_use.ceil(period)
@@ -234,7 +238,7 @@ def round_epochs(
         rolling_ref_use = rolling_ref_use + np.timedelta64(1, "s")
 
         roll_diff = epochs_use - rolling_ref_use
-        epochs_rnd = arocmn.round_date(roll_diff, period, round_method)
+        epochs_rnd = arocmn.round_date(roll_diff, period, round_method) + rolling_ref 
 
     return epochs_rnd
 
