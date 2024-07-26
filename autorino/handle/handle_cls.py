@@ -108,7 +108,7 @@ class HandleGnss(arocmn.StepGnss):
             self.on_row_splice(irow,
                                self.tmp_dir_converted,
                                handle_software=handle_software)
-            print("AAAAAAAAAABBBB",self.table.loc[irow, 'fpath_out'], self.table.loc[irow, 'ok_out'])
+
             if not self.table.loc[irow, 'ok_out']:
                 logger.error("unable to splice %s, skip",
                              self.table.loc[irow])
