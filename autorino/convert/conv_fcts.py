@@ -165,7 +165,7 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
     return conve
 
 
-def stop_long_running_containers(max_running_time=120):
+def stop_old_docker(max_running_time=120):
     """
     Stops Docker containers that have been running for a specified amount of time.
 
