@@ -154,12 +154,6 @@ class ConvertGnss(arocmn.StepGnss):
         ### initialize the table as log
         self.set_table_log(out_dir=self.tmp_dir_logs)
 
-        # Filter previous tables stored in log_dir
-        prev_tables_paths = utils.find_recursive(log_dir, "*_table.log")
-        if prev_tables_paths:
-            df_prev_tables = pd.concat([pd.read_csv(ptp) for ptp in prev_tables_paths])
-            cnv.filter_previous_tables(df_prev_tables)
-
         ### guess and deactivate existing local RINEX files
         if not force:
             self.guess_local_rnx_files()  # generate the potential local files
