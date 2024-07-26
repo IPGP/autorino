@@ -261,12 +261,14 @@ def splice_rnx(
         If True, the spliced files will be based on the rolling period.
         i.e. Day1 00h-Day2 00h, Day1 01h-Day2 01h, Day1 02h-Day2 02h etc.
         Defaults to False.
+        see also eporng_fcts.round_epochs function
     rolling_ref :  datetime-like or int, optional
         The reference for the rolling period.
         If datetime-like object, use this epoch as reference.
         If integer, use the epoch of the corresponding index
         Use -1 for the last epoch for instance.
         The default is -1.
+        see also eporng_fcts.round_epochs function
     round_method : str, optional
         The method for rounding the epochs during the splice operation. Defaults to "floor".
     drop_epoch_rnd : bool, optional

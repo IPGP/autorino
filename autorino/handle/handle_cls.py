@@ -47,7 +47,6 @@ class HandleGnss(arocmn.StepGnss):
                                         round_method=round_method)
 
         self.table['epoch_rnd'] = epoch_rnd
-        print("AAAAAAAAAAAAAA", epoch_rnd)
 
         # get the main Handle object which will describe the final spliced RINEXs
         spc_main_obj_epoch_range = arocmn.EpochRange(np.min(epoch_rnd),
