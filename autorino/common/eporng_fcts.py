@@ -202,9 +202,14 @@ def round_epochs(
         Use the pandas' frequency aliases convention (see bellow for details).
         The default is '1d'.
     rolling_period : bool, optional
-        The rounding depends on a reference epoch defined with rolling_ref.
-        The default is False.
-    rolling_ref : datetime-like or int, optional
+        Whether to use a rolling period for splicing the RINEX files.
+        If False, the spliced files will be based only on the "full" period provided,
+        i.e. Day1 00h-24h, Day2 00h-24h, etc.
+        If True, the spliced files will be based on the rolling period.
+        i.e. Day1 00h-Day2 00h, Day1 01h-Day2 01h, Day1 02h-Day2 02h etc.
+        Defaults to False.
+    rolling_ref :  datetime-like or int, optional
+        The reference for the rolling period.
         If datetime-like object, use this epoch as reference.
         If integer, use the epoch of the corresponding index
         Use -1 for the last epoch for instance.
@@ -238,7 +243,8 @@ def round_epochs(
         rolling_ref_use = rolling_ref_use + np.timedelta64(1, "s")
 
         roll_diff = epochs_use - rolling_ref_use
-        epochs_rnd = arocmn.round_date(roll_diff, period, round_method) + rolling_ref 
+
+        epochs_rnd = arocmn.round_date(roll_diff, period, round_method) + rolling_ref_use
 
     return epochs_rnd
 
