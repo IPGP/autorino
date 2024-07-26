@@ -9,6 +9,9 @@ Created on 23/04/2024 14:21:56
 import glob
 import logging
 import os
+import pandas as pd
+
+import geodezyx.utils as utils
 
 import autorino.config as arocfg
 import autorino.download as arodwl
@@ -66,7 +69,6 @@ def download_raw(epoch_range,
                  tmp_dir=None,
                  log_dir=None,):
 
-
     dwl = arodwl.DownloadGnss(out_dir=out_dir,
                               tmp_dir=tmp_dir,
                               log_dir=log_dir,
@@ -92,7 +94,6 @@ def convert_rnx(
     rinexmod_options=None,
     metadata=None,
     force=False,
-    list_file_input=False,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -128,12 +129,10 @@ def convert_rnx(
          * single string (single sitelog file path)
          * single string (directory containing the sitelogs)
          * list of MetaData objects
-         * single MetaData object. Defaults to None.
+         * single MetaData object.
+         Defaults to None.
     force : bool, optional
         If set to True, the conversion will be forced even if the output files already exist.
-        Defaults to False.
-    list_file_input : bool, optional
-        If set to True, the input is a text list file containing the paths of the RAW files to be converted.
         Defaults to False.
 
     Returns
@@ -151,17 +150,20 @@ def convert_rnx(
     else:
         out_dir_use = out_dir
 
-    if list_file_input:
-        raws_use = tuple(raws_inp)
-    else:
-        raws_use = raws_inp
+    raws_use = raws_inp
 
     cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
     cnv.load_table_from_filelist(raws_use)
+
+    # Filter previous tables stored in log_dir
+    prev_tables_paths = utils.find_recursive(log_dir, "*_table.log")
+    if prev_tables_paths:
+        df_prev_tables = pd.concat([pd.read_csv(ptp) for ptp in prev_tables_paths])
+        cnv.filter_previous_tables(df_prev_tables)
+
     cnv.convert(force=force, rinexmod_options=rinexmod_options)
 
     return cnv
-
 
 def split_rnx(
     rnxs_inp,
@@ -180,6 +182,11 @@ def split_rnx(
     ----------
     rnxs_inp : list
         The input RINEX files to be split
+        The input can be:
+        * a python list
+        * a text file path containing a list of files
+        * a tuple containing several text files path
+        * a directory path.
     epo_inp : str
         The input epoch for splitting the RINEX files
     out_dir : str
@@ -243,6 +250,11 @@ def splice_rnx(
     ----------
     rnxs_inp : list
         The input RINEX files to be spliced.
+        The input can be:
+        * a python list
+        * a text file path containing a list of files
+        * a tuple containing several text files path
+        * a directory path.
     out_dir : str
         The output directory where the spliced files will be stored.
     tmp_dir : str
