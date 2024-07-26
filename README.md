@@ -279,3 +279,4 @@ The central attribute of a `StepGnss` object is its table (`step_gnss.table`).
 
 This is a pandas' DataFrame that lists, among other things, the input files, and, 
 where applicable, the output files if the operation has been successful.
+
