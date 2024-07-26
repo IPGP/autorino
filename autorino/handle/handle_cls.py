@@ -108,7 +108,8 @@ class HandleGnss(arocmn.StepGnss):
             self.on_row_splice(irow,
                                self.tmp_dir_converted,
                                handle_software=handle_software)
-            if not self.table.loc[irow, 'fpath_out']:
+            print("AAAAAAAAAABBBB",self.table.loc[irow, 'fpath_out'], self.table.loc[irow, 'ok_out'])
+            if not self.table.loc[irow, 'ok_out']:
                 logger.error("unable to splice %s, skip",
                              self.table.loc[irow])
                 continue
@@ -138,6 +139,7 @@ class HandleGnss(arocmn.StepGnss):
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'epoch_srt'])
+            self.table.loc[irow, 'ok_out'] = False
             return None
 
         # definition of the output directory (after the action)
@@ -215,7 +217,7 @@ class HandleGnss(arocmn.StepGnss):
 
             frnx_splited = self.on_row_split(irow, self.tmp_dir_converted,
                                              handle_software=handle_software)
-            if not self.table.loc[irow, 'fpath_out']:
+            if not self.table.loc[irow, 'ok_out']:
                 logger.error("unable to split %s, skip",
                              self.table.loc[irow])
                 continue
@@ -244,6 +246,7 @@ class HandleGnss(arocmn.StepGnss):
         if not self.table.loc[irow, 'ok_inp']:
             logger.warning("action on row skipped (input disabled): %s",
                            self.table.loc[irow, 'epoch_srt'])
+            self.table.loc[irow, 'ok_out'] = False
             return None
 
         # definition of the output directory (after the action)
