@@ -155,12 +155,6 @@ def convert_rnx(
     cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
     cnv.load_table_from_filelist(raws_use)
 
-    # Filter previous tables stored in log_dir
-    prev_tables_paths = utils.find_recursive(log_dir, "*_table.log")
-    if prev_tables_paths:
-        df_prev_tables = pd.concat([pd.read_csv(ptp) for ptp in prev_tables_paths])
-        cnv.filter_previous_tables(df_prev_tables)
-
     cnv.convert(force=force, rinexmod_options=rinexmod_options)
 
     return cnv
