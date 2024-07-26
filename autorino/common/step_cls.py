@@ -567,7 +567,8 @@ class StepGnss:
             If True, determines the start epoch, the end epoch and the period of the RINEX file based on its name only.
             The RINEX file is not read. This function is much faster but less reliable. Default is False.
         update_epoch_range : bool, optional
-            If True, at the end of the table update, also updates the EpochRange object associated to the StepGnss object.
+            If True, at the end of the table update, also updates the EpochRange object associated to
+            the StepGnss object.
             This is recommended. Default is True.
 
         Returns
@@ -796,8 +797,9 @@ class StepGnss:
             """
             Shrinks a string to a specified maximum length.
 
-            This function shrinks a string to a specified maximum length by keeping the first and last parts of the string
-            and replacing the middle part with '..'. The length of the first and last parts is half of the maximum length.
+            This function shrinks a string to a specified maximum length by keeping the first and last parts
+            of the string and replacing the middle part with '..'.
+            The length of the first and last parts is half of the maximum length.
 
             Parameters
             ----------
@@ -880,14 +882,17 @@ class StepGnss:
         """
         Loads the table from the previous step's table.
 
-        This method takes the table from the previous step in the processing chain and uses it to update the current step's table.
-        It copies the 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns from the input table to the current table.
+        This method takes the table from the previous step in the processing chain and uses it to update the current
+        step's table.
+        It copies the 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp'
+        columns from the input table to the current table.
         If 'reset_table' is True, it resets the current table before loading the new data.
 
         Parameters
         ----------
         input_table : pandas.DataFrame
-            The table from the previous step in the processing chain. It should contain 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
+            The table from the previous step in the processing chain. It should contain 'fpath_out', 'size_out',
+            'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
         reset_table : bool, optional
             If True, the current table is reset before loading the new data. Default is True.
 
@@ -1641,14 +1646,16 @@ class StepGnss:
         If it is, it applies the rinexmod function to the file specified in the 'table_col' column.
         The rinexmod function modifies the RINEX file according to the provided rinexmod_options.
         The modified file is then saved to the specified output directory.
-        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the success of the operation.
+        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the
+        success of the operation.
 
         Parameters
         ----------
         irow : int
             The index of the row in the table on which the method is applied.
         out_dir : str, optional
-            The directory to which the modified file is saved. If not provided, the 'tmp_dir_rinexmoded' attribute of the object is used.
+            The directory to which the modified file is saved. If not provided, the 'tmp_dir_rinexmoded' attribute of
+            the object is used.
         table_col : str, optional
             The column in the table which contains the file path to be modified. Defaults to 'fpath_out'.
         rinexmod_options : dict, optional

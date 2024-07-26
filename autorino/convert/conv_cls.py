@@ -225,7 +225,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
-            arocnv.stop_long_running_containers()
+            arocnv.stop_old_docker()
 
             #############################################################
             ###### CONVERSION
