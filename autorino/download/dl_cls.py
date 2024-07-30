@@ -263,6 +263,18 @@ class DownloadGnss(arocmn.StepGnss):
 
         return download_files_list
 
+    def ping_remote(self):
+        """
+        Ping the remote server to check if it is reachable.
+        """
+        count = 0
+        ping_out = None
+        while count < 3 or not ping_out:
+            ping_out = ping3.ping(self.access["hostname"]))
+            count += 1
+
+        return ping_out
+
     def download(self, verbose=False):
         """
         frontend method to download files from a GNSS receiver
@@ -289,9 +301,17 @@ class DownloadGnss(arocmn.StepGnss):
 
         if verbose:
             self.print_table()
-        #### DOWNLOAD CORE a.k.a FETCH
-        self.fetch_remote_files(force_download=self.options.get("force"))
-        ###############################
+
+        ping_out = self.ping_remote()
+        if not ping_out:
+            logger.error("Remote server %s is not reachable.", self.access["hostname"])
+        else:
+            logger.info("Remote server %s is reachable. (%f sec)", self.access["hostname"], ping_out)
+            ###############################
+            #### DOWNLOAD CORE a.k.a FETCH
+            self.fetch_remote_files(force_download=self.options.get("force"))
+            ###############################
+
         if verbose:
             self.print_table()
 
