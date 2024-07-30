@@ -29,6 +29,6 @@ arocmn.splice_rnx(L,
                   tmp_dir,
                   out_dir,
                   period="48h",
-                  rolling_period=True,
+                  rolling_period=False,
                   rinexmod_options={'sitelog':'/home/psakicki/GFZ_WORK/IPGP_WORK/OVS/GNSS_OVS/0030_sites_manage_n_M3G/0020_sitelogs/030_sitelogs_M3G/2205_automatic_download',
                                     'tolerant_file_period' : True})

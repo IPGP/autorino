@@ -600,6 +600,7 @@ class StepGnss:
         self.table["epoch_end"] = pd.to_datetime(self.table["epoch_end"])
 
         if update_epoch_range:
+            logger.info("update the epoch range from %i RINEX filenames",len(self.table))
             self.update_epoch_range_from_table()
 
         return None
@@ -654,7 +655,7 @@ class StepGnss:
             tz=self.epoch_range.tz,
         )
 
-        logger.info("new %s for %s", self.epoch_range, str(self).split("/")[0])
+        logger.debug("new %s for %s", self.epoch_range, str(self).split("/")[0])
 
     def translate_path(
         self, path_inp: str, epoch_inp=None, make_dir: bool = False
