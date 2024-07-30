@@ -4,6 +4,7 @@
 import ftplib
 import os
 import shutil
+import ping3
 
 import numpy as np
 import pandas as pd
@@ -267,10 +268,11 @@ class DownloadGnss(arocmn.StepGnss):
         """
         Ping the remote server to check if it is reachable.
         """
+
         count = 0
         ping_out = None
         while count < 3 or not ping_out:
-            ping_out = ping3.ping(self.access["hostname"]))
+            ping_out = ping3.ping(self.access["hostname"])
             count += 1
 
         return ping_out
