@@ -23,7 +23,7 @@ L = utils.find_recursive(p,"*gz")
 hdl.load_table_from_filelist(L)
 hdl.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-a = hdl.divide_by_epochs()
+a = hdl.group_by_epochs()
 
 
 

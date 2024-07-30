@@ -33,12 +33,12 @@ class HandleGnss(arocmn.StepGnss):
                          options=options,
                          metadata=metadata)
 
-    def divide_by_epochs(self,
-                         period='1d',
-                         rolling_period=False,
-                         rolling_ref=-1,
-                         round_method='floor',
-                         drop_epoch_rnd=False):
+    def group_by_epochs(self,
+                        period='1d',
+                        rolling_period=False,
+                        rolling_ref=-1,
+                        round_method='floor',
+                        drop_epoch_rnd=False):
 
         epoch_rnd = arocmn.round_epochs(self.table['epoch_srt'],
                                         period=period,
@@ -68,6 +68,8 @@ class HandleGnss(arocmn.StepGnss):
 
         spc_main_obj.table["ok_inp"] = False
 
+        logger.info("%i epoch group(s) found", len(grps))
+
         for i_tabgrp, (t_tabgrp, tabgrp) in enumerate(grps):
             spc_obj = self.copy()
 
@@ -75,6 +77,8 @@ class HandleGnss(arocmn.StepGnss):
                 tabgrp_bis = tabgrp.drop('epoch_rnd', axis=1)
             else:  ### keep the temporary epoch_rnd column
                 tabgrp_bis = pd.DataFrame(tabgrp)
+
+            logger.info("epoch group #%i: from %s for %s", i_tabgrp+1, t_tabgrp, period)
 
             spc_obj.table = tabgrp_bis
             spc_obj.update_epoch_range_from_table()

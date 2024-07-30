@@ -301,7 +301,7 @@ def splice_rnx(
     spc_inp.load_table_from_filelist(rnxs_inp)
     spc_inp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
 
-    spc_main_obj, spc_objs_lis = spc_inp.divide_by_epochs(
+    spc_main_obj, spc_objs_lis = spc_inp.group_by_epochs(
         period=period,
         rolling_period=rolling_period,
         rolling_ref=rolling_ref,

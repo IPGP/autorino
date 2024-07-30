@@ -88,7 +88,8 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
     dates_list_inp : list
         The input list of dates.
     period : str, optional
-        The rounding period. If not provided, the period is determined as the unique difference between consecutive dates in the input list. The default is None.
+        The rounding period. If not provided, the period is determined as the unique difference
+         between consecutive dates in the input list. The default is None.
     round_method : str, optional
         The method used for rounding the epochs. The default is 'floor'.
 
@@ -99,7 +100,9 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
 
     Note
     ----
-    The current method for determining the period when not provided is a simple calculation of the unique difference between consecutive dates. This may not be the most accurate or desired method and should be improved in future iterations of this function.
+    The current method for determining the period when not provided is a simple calculation of
+    the unique difference between consecutive dates.
+    This may not be the most accurate or desired method and should be improved in future iterations of this function.
     """
     epoch1 = np.min(dates_list_inp)
     epoch2 = np.max(dates_list_inp)
