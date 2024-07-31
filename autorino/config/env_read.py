@@ -11,7 +11,7 @@ import os
 
 import yaml
 
-logger = logging.getLogger("autorino")
+logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 
