@@ -159,7 +159,8 @@ class ConvertGnss(arocmn.StepGnss):
             self.guess_local_rnx_files()  # generate the potential local files
             self.check_local_files()  # tests if the local flies are already there
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
-            if len(prv_tbl_df) > 0 and False:  ### we disable this because it is not robust yet
+            # Filter previous tables stored in log_dir
+            if len(prv_tbl_df) > 0:
                 self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
 
@@ -187,6 +188,9 @@ class ConvertGnss(arocmn.StepGnss):
 
             if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
                 logger.info("conversion skipped (output already exists): %s", fraw)
+                continue
+            if self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+                logger.info("conversion skipped (already converted in a previous run): %s", fraw)
                 continue
             if not self.table.loc[irow, "ok_inp"]:
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
@@ -225,7 +229,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             ### a function to stop the docker containers running for too long
             # (for trimble conversion)
-            arocnv.stop_long_running_containers()
+            arocnv.stop_old_docker()
 
             #############################################################
             ###### CONVERSION
