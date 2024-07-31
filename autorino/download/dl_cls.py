@@ -278,7 +278,7 @@ class DownloadGnss(arocmn.StepGnss):
             ping_out = arodl.ping(self.access["hostname"])
             count += 1
             if count > 1:
-                logger.warning("attempt %i/%i to ping remote %s",
+                logger.warning("attempt %i/%i to ping %s",
                                count,
                                count_max,
                                self.access["hostname"])
@@ -286,7 +286,7 @@ class DownloadGnss(arocmn.StepGnss):
         if not ping_out:
             logger.error("Remote server %s is not reachable.", self.access["hostname"])
         else:
-            logger.info("Remote server %s is reachable. (%f sec)", self.access["hostname"], ping_out)
+            logger.info("Remote server %s is reachable. (%f ms)", self.access["hostname"], ping_out*10**3)
 
         return ping_out
 
