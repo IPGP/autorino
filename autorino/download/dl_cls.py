@@ -273,7 +273,11 @@ class DownloadGnss(arocmn.StepGnss):
 
         count = 0
         ping_out = None
-        while count < 3 or not ping_out:
+
+        while count < 4 or not ping_out:
+            if count > 1:
+                logger.warning("attempt #%i to ping remote %s",
+                               self.access["hostname"])
             ping_out = arodl.ping(self.access["hostname"])
             count += 1
 
