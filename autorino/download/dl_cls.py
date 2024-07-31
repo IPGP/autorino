@@ -11,12 +11,12 @@ import pandas as pd
 import autorino.common as arocmn
 import autorino.download as arodl
 
-pd.options.mode.chained_assignment = "warn"
-
 # Create a logger object.
 import logging
 
 logger = logging.getLogger(__name__)
+
+pd.options.mode.chained_assignment = "warn"
 
 
 class DownloadGnss(arocmn.StepGnss):
@@ -222,6 +222,8 @@ class DownloadGnss(arocmn.StepGnss):
                 os.makedirs(outdir_use)
 
             ###### download the file
+            file_dl_tmp = None
+            file_dl_out = None
             if not self.access["protocol"] in ("ftp", "http"):
                 logger.error("wrong protocol")
                 raise Exception
@@ -289,9 +291,21 @@ class DownloadGnss(arocmn.StepGnss):
 
         if verbose:
             self.print_table()
-        #### DOWNLOAD CORE a.k.a FETCH
-        self.fetch_remote_files(force_download=self.options.get("force"))
-        ###############################
+
+        ping_out = self.ping_remote()
+        if not ping_out:
+            logger.error("Remote server %s is not reachable.", self.access["hostname"])
+        else:
+            logger.info(
+                "Remote server %s is reachable. (%f sec)",
+                self.access["hostname"],
+                ping_out,
+            )
+            ###############################
+            #### DOWNLOAD CORE a.k.a FETCH
+            self.fetch_remote_files(force_download=self.options.get("force"))
+            ###############################
+
         if verbose:
             self.print_table()
 
