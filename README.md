@@ -73,7 +73,7 @@ GNSS manufacturers websites.
 You can find the official converters here:
 #### Leica
 converter here: [mdb2rinex](https://myworld-portal.leica-geosystems.com/s/fr/application?c__app=downloads)  
-Go in: _Products & Services > Downloads > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
+Go in: _Products & Services > Downloads > GNSS Products > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
 see IGSMAIL-8341 for more details.
 #### Septentrio
 converter here: [sbf2rin](https://www.septentrio.com/en/products/software/rxtools#resources)
