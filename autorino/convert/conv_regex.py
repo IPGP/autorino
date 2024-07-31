@@ -8,7 +8,7 @@ Created on Tue Mar 14 12:03:40 2023
 #### converted files regular expressions functions
 #### main = the regex for the main file i.e. the Observation RINEX
 #### annex = the regex for the ALL outputed files (Observation RINEX included)
-#### the main with be processed before the annex, 
+#### the main with be processed before the annex,
 #### thus annex regex will finally not include the main
 """
 
