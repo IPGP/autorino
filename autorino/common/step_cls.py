@@ -17,6 +17,8 @@ import numpy as np
 import pandas as pd
 
 import autorino.common as arocmn
+import autorino.logcfg as arologcfg
+
 import rinexmod
 from geodezyx import utils, conv
 from rinexmod import rinexmod_api
@@ -719,7 +721,7 @@ class StepGnss:
         log_name = "_".join((ts, step_suffix, ".log"))
         log_path = os.path.join(log_dir_use, log_name)
 
-        log_cfg_dic = autorino.logconfig.logcfg.log_config_dict
+        log_cfg_dic = arologcfg.log_config_dict
         fmt_dic = log_cfg_dic["formatters"]["fmtgzyx_nocolor"]
 
         logfile_handler = logging.FileHandler(log_path)
