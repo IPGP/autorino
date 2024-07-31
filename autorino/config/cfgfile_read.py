@@ -236,7 +236,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
     return steps_lis_lis, steps_dic_dic
 
 
-def _check_parent_dir_existence(parent_dir):
+def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
     """
     Checks if a parent directory exists and translates it with the environment variable first.
 
@@ -254,6 +254,9 @@ def _check_parent_dir_existence(parent_dir):
     ----------
     parent_dir : str
         A string representing a directory path.
+    parent_dir_key : str, optional
+        The dictionnary key representing the parent directory.
+        Default is None.
 
     Raises
     ------
@@ -267,7 +270,18 @@ def _check_parent_dir_existence(parent_dir):
     """
     parent_dir_out = arocmn.translator(parent_dir)
 
-    if not os.path.isdir(parent_dir_out):
+    if parent_dir_out == "FROM_MAIN": # case when the parent directory is not defined in the main config file
+
+        if not parent_dir_key:
+            parent_dir_key = "a directory"
+
+        logger.error("%s is not correctly defined in the main config file (FROM_MAIN alias remains)",
+                     parent_dir_key)
+        raise FileNotFoundError(
+            None, parent_dir_key + " do not exists, create it first"
+        )
+
+    elif not os.path.isdir(parent_dir_out): # standard case
         logger.error("%s do not exists, create it first", parent_dir_out)
         raise FileNotFoundError(
             None, parent_dir_out + " do not exists, create it first"
@@ -354,7 +368,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
     dir_parent = y_step[dir_type + "_dir_parent"]
     structure = y_step[dir_type + "_structure"]
     if check_parent_dir_existence:
-        _check_parent_dir_existence(dir_parent)
+        _check_parent_dir_existence(dir_parent, dir_type + "_dir_parent")
     dir_path = os.path.join(dir_parent, structure)
 
     return dir_path, dir_parent, structure
