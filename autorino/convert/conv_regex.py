@@ -3,8 +3,12 @@
 """
 Created on Tue Mar 14 12:03:40 2023
 
+<<<<<<< HEAD
 @author: psakicki
 
+=======
+@author: psakic
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
 
 #### converted files regular expressions functions
 #### main = the regex for the main file i.e. the Observation RINEX
@@ -13,6 +17,7 @@ Created on Tue Mar 14 12:03:40 2023
 #### thus annex regex will finally not include the main
 """
 
+<<<<<<< HEAD
 
 from pathlib import Path
 import re
@@ -26,25 +31,50 @@ def conv_regex_void(f):
     
     ** Must be used for test purposes only !**
     
+=======
+import re
+from pathlib import Path
+
+
+###################################################################
+
+
+def conv_regex_void(f):
+    """
+    Generate the regular expressions of the main and annex converted files
+    equivalent to the input filename
+
+    ** Must be used for test purposes only !**
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     It has the same behavior as all the `conv_regex` functions
     See note below
 
     Parameters
     ----------
     f : str or Path
+<<<<<<< HEAD
         the input Raw filename or path 
+=======
+        the input Raw filename or path
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
         (the filename will be extracted in the function).
 
     Returns
     -------
     conv_regex_main & conv_regex_annex : Complied Regex Objects
         The regular expressions.
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     Note
     ----
     general behavior of the `conv_regex` functions:
     main = the regex for the main file i.e. the Observation RINEX
     annex = the regex for the ALL outputed files (Observation RINEX included)
+<<<<<<< HEAD
     the main with be processed before the annex, 
     thus annex regex will finally not include the main one
     """
@@ -59,25 +89,51 @@ def conv_regex_runpkr00(f):
     Generate the regular expressions of the mainand annex converted files 
     outputed by runpkr00 (Trimble)
     
+=======
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+
+    f = Path(Path(f).name)  ### keep the filename only
+    conv_regex_main = re.compile(f.name)
+    conv_regex_annex = re.compile(f.name)
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_runpkr00(f):
+    """
+    Generate the regular expressions of the mainand annex converted files
+    outputed by runpkr00 (Trimble)
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     It has the same behavior as all the `conv_regex` functions
     See note below
 
     Parameters
     ----------
     f : str or Path
+<<<<<<< HEAD
         the input Raw filename or path 
+=======
+        the input Raw filename or path
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
         (the filename will be extracted in the function).
 
     Returns
     -------
     conv_regex_main & conv_regex_annex : Complied Regex Objects
         The regular expressions.
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     Note
     ----
     general behavior of the `conv_regex` functions:
     main = the regex for the main file i.e. the Observation RINEX
     annex = the regex for the ALL outputed files (Observation RINEX included)
+<<<<<<< HEAD
     the main with be processed before the annex, 
     thus annex regex will finally not include the main one
     """
@@ -96,25 +152,122 @@ def conv_regex_teqc(f):
     Generate the regular expressions of the main and annex converted files 
     outputed by teqc (polyvalent)
     
+=======
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+
+    # PSA1______202110270000A.tgd (option -d -g)
+    # PSA1______202110270000A.tg! (opened/working file)
+    # ABD0______202110270000A.dat (when not option -g in runpkr)
+    f = Path(Path(f).name)  ### keep the filename only
+    conv_regex_main = re.compile(f.with_suffix(".tgd").name)
+    conv_regex_annex = re.compile(f.stem)
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_teqc(f):
+    """
+    Generate the regular expressions of the main and annex converted files
+    outputed by teqc (polyvalent)
+
     It has the same behavior as all the `conv_regex` functions
     See note below
 
     Parameters
     ----------
     f : str or Path
-        the input Raw filename or path 
+        the input Raw filename or path
         (the filename will be extracted in the function).
 
     Returns
     -------
     conv_regex_main & conv_regex_annex : Complied Regex Objects
         The regular expressions.
-        
+
     Note
     ----
     general behavior of the `conv_regex` functions:
     main = the regex for the main file i.e. the Observation RINEX
     annex = the regex for the ALL outputed files (Observation RINEX included)
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+    f = Path(Path(f).name)  ### keep the filename only
+    # conv_regex_main = re.compile(f.with_suffix(".rnx_teqc").name)
+    conv_regex_main = re.compile(f.name + ".rnx_teqc")
+    conv_regex_annex = conv_regex_main
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_converto(f):
+    """
+    Generate the regular expressions of the main and annex converted files
+    outputed by converto (polyvalent)
+
+    It has the same behavior as all the `conv_regex` functions
+    See note below
+
+    Parameters
+    ----------
+    f : str or Path
+        the input Raw filename or path
+        (the filename will be extracted in the function).
+
+    Returns
+    -------
+    conv_regex_main & conv_regex_annex : Complied Regex Objects
+        The regular expressions.
+
+    Note
+    ----
+    general behavior of the `conv_regex` functions:
+    main = the regex for the main file i.e. the Observation RINEX
+    annex = the regex for the ALL outputed files (Observation RINEX included)
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+    f = Path(Path(f).name)  ### keep the filename only
+    # conv_regex_main = re.compile(f.with_suffix(".rnx_teqc").name)
+    conv_regex_main = re.compile(f.name + ".rnx_converto")
+    conv_regex_annex = conv_regex_main
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_gfzrnx(f):
+    """
+    Generate the regular expressions of the main and annex converted files
+    outputed by GFZRNX (polyvalent)
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
+    It has the same behavior as all the `conv_regex` functions
+    See note below
+
+    Parameters
+    ----------
+    f : str or Path
+<<<<<<< HEAD
+        the input Raw filename or path 
+=======
+        the input Raw filename or path
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
+        (the filename will be extracted in the function).
+
+    Returns
+    -------
+    conv_regex_main & conv_regex_annex : Complied Regex Objects
+        The regular expressions.
+<<<<<<< HEAD
+        
+=======
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
+    Note
+    ----
+    general behavior of the `conv_regex` functions:
+    main = the regex for the main file i.e. the Observation RINEX
+    annex = the regex for the ALL outputed files (Observation RINEX included)
+<<<<<<< HEAD
     the main with be processed before the annex, 
     thus annex regex will finally not include the main one
     """
@@ -128,33 +281,66 @@ def conv_regex_trm2rinex(f):
     Generate the regular expressions of the mainand annex converted files 
     outputed by trm2rinex (Trimble)
     
+=======
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+    f = Path(Path(f).name)  ### keep the filename only
+    # conv_regex_main = re.compile(f.with_suffix(".rnx_teqc").name)
+    conv_regex_main = re.compile(f.name + ".rnx_gfzrnx")
+    conv_regex_annex = conv_regex_main
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_trm2rinex(f):
+    """
+    Generate the regular expressions of the mainand annex converted files
+    outputed by trm2rinex (Trimble)
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     It has the same behavior as all the `conv_regex` functions
     See note below
 
     Parameters
     ----------
     f : str or Path
+<<<<<<< HEAD
         the input Raw filename or path 
+=======
+        the input Raw filename or path
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
         (the filename will be extracted in the function).
 
     Returns
     -------
     conv_regex_main & conv_regex_annex : Complied Regex Objects
         The regular expressions.
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     Note
     ----
     general behavior of the `conv_regex` functions:
     main = the regex for the main file i.e. the Observation RINEX
     annex = the regex for the ALL outputed files (Observation RINEX included)
+<<<<<<< HEAD
     the main with be processed before the annex, 
     thus annex regex will finally not include the main one
     """
     
+=======
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     # "/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21o",
     # "/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21l",
     # "/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21g",
     # "/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21n"
+<<<<<<< HEAD
     f = Path(Path(f).name) ### keep the filename only
     yyyy = re.search("[0-9]{4}",f.name).group()
     conv_regex_main = re.compile(f.with_suffix("." + yyyy[2:] + "o").name)
@@ -166,46 +352,96 @@ def conv_regex_mdb2rnx(f):
     Generate the regular expressions of the mainand annex converted files 
     outputed by mdb2rnx (Leica)
     
+=======
+    f = Path(Path(f).name)  ### keep the filename only
+    # date_full = re.search("[0-9]{12}[a-zA-Z]",f.name).group() ##too restrictive, sometime there is no final letter
+    date_full = re.search("20[0-9]{10}", f.name).group()
+    yyyy = date_full[:4]
+    conv_regex_main = re.compile(f.with_suffix("." + yyyy[2:] + "o").name)
+    conv_regex_annex = re.compile(f.with_suffix("." + yyyy[2:]).name)
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_mdb2rnx(f):
+    """
+    Generate the regular expressions of the mainand annex converted files
+    outputed by mdb2rnx (Leica)
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     It has the same behavior as all the `conv_regex` functions
     See note below
 
     Parameters
     ----------
     f : str or Path
+<<<<<<< HEAD
         the input Raw filename or path 
+=======
+        the input Raw filename or path
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
         (the filename will be extracted in the function).
 
     Returns
     -------
     conv_regex_main & conv_regex_annex : Complied Regex Objects
         The regular expressions.
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     Note
     ----
     general behavior of the `conv_regex` functions:
     main = the regex for the main file i.e. the Observation RINEX
     annex = the regex for the ALL outputed files (Observation RINEX included)
+<<<<<<< HEAD
     the main with be processed before the annex, 
     thus annex regex will finally not include the main one
     """
     
+=======
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     # souf3000.21o
     # souf3000.21n
     # souf3000.21l
     # souf3000.21g
+<<<<<<< HEAD
     finp = str(f)
     f = Path(Path(f).name) ### keep the filename only    
+=======
+    ### met also for OVSM
+    # fsdc176p11.18o
+    # mlm0236a00.18n
+    # mlm0236a00.18l
+    # mlm0236a00.18g
+    # fsdc176p11.18o
+    # fsdc176p11.18n
+    # fsdc176p11.18g
+    finp = str(f)
+    f = Path(Path(f).name)  ### keep the filename only
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     if finp.lower().endswith("mdb"):
         # used in OVSM e.g.
         # LAJB0a18002.MDB
         # LMLM0-Leicaa18233.MDB
+<<<<<<< HEAD
         regex_doy_site=r".(\w{4})(-Leica)?.([0-9]{2})([0-9]{3})"
         doygroup = 4 
+=======
+        regex_doy_site = r".(\w{4})(-Leica)?.([0-9]{2})([0-9]{3})"
+        doygroup = 4
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
         # alternativelywe can exclude the group 'Leica-' with ?:
         # regex_doy_site=r".(\w{4})(?:-Leica)?.([0-9]{2})([0-9]{3})"
         # doygroup = 3
     elif finp.lower().endswith("m00"):
         # used in OVSG e.g.
+<<<<<<< HEAD
         # PAR1323a.m00 
         regex_doy_site=r"(\w{4})([0-9]{3})"
         doygroup = 2
@@ -224,31 +460,65 @@ def conv_regex_convbin(f):
     Generate the regular expressions of the mainand annex converted files 
     outputed by RTKLIB's convbin (polyvalent)
     
+=======
+        # PAR1323a.m00
+        regex_doy_site = r"(\w{4})([0-9]{3})"
+        doygroup = 2
+    else:
+        regex_doy_site = r"(\w{4})([0-9]{3})"
+        doygroup = 2
+
+    site = re.match(regex_doy_site, f.name).group(1).lower()
+    doy = re.match(regex_doy_site, f.name).group(doygroup).lower()
+    conv_regex_main = re.compile(site + doy + ".([0-9]{2})?\.[0-9]{2}o")
+    conv_regex_annex = re.compile(site + doy + ".([0-9]{2})?\.[0-9]{2}\w")
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_convbin(f):
+    """
+    Generate the regular expressions of the mainand annex converted files
+    outputed by RTKLIB's convbin (polyvalent)
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     It has the same behavior as all the `conv_regex` functions
     See note below
 
     Parameters
     ----------
     f : str or Path
+<<<<<<< HEAD
         the input Raw filename or path 
+=======
+        the input Raw filename or path
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
         (the filename will be extracted in the function).
 
     Returns
     -------
     conv_regex_main & conv_regex_annex : Complied Regex Objects
         The regular expressions.
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     Note
     ----
     general behavior of the `conv_regex` functions:
     main = the regex for the main file i.e. the Observation RINEX
     annex = the regex for the ALL outputed files (Observation RINEX included)
+<<<<<<< HEAD
     the main with be processed before the annex, 
+=======
+    the main with be processed before the annex,
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     thus annex regex will finally not include the main one
     """
     # Input
     # NBIM0a20221226.BNX
     # Output
+<<<<<<< HEAD
     #NBIM0a20221226.obs
     #NBIM0a20221226.nav
     #NBIM0a20221226.sbs
@@ -262,31 +532,63 @@ def conv_regex_tps2rin(f):
     Generate the regular expressions of the mainand annex converted files 
     outputed by tp2rin (Topcon)
     
+=======
+    # NBIM0a20221226.obs
+    # NBIM0a20221226.nav
+    # NBIM0a20221226.sbs
+    f = Path(Path(f).name)  ### keep the filename only
+    conv_regex_main = re.compile(f.with_suffix(".obs").name)
+    conv_regex_annex = re.compile(f.stem)
+    return conv_regex_main, conv_regex_annex
+
+
+def conv_regex_tps2rin(f):
+    """
+    Generate the regular expressions of the mainand annex converted files
+    outputed by tp2rin (Topcon)
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     It has the same behavior as all the `conv_regex` functions
     See note below
 
     Parameters
     ----------
     f : str or Path
+<<<<<<< HEAD
         the input Raw filename or path 
+=======
+        the input Raw filename or path
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
         (the filename will be extracted in the function).
 
     Returns
     -------
     conv_regex_main & conv_regex_annex : Complied Regex Objects
         The regular expressions.
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     Note
     ----
     general behavior of the `conv_regex` functions:
     main = the regex for the main file i.e. the Observation RINEX
     annex = the regex for the ALL outputed files (Observation RINEX included)
+<<<<<<< HEAD
     the main with be processed before the annex, 
+=======
+    the main with be processed before the annex,
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     thus annex regex will finally not include the main one
     """
     # Input
     # DHS030011.TPS
+<<<<<<< HEAD
     # Output 
+=======
+    # Output
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     # an extra character is added if there is already an existing file
     # dhs030002.11p
     # dhs030002.11p
@@ -298,6 +600,7 @@ def conv_regex_tps2rin(f):
     # dhs03000.11p
     # dhs03000.11o
 
+<<<<<<< HEAD
     f = Path(Path(f).name) ### keep the filename only    
     regex_doy_site=r"(\w{4})([0-9]{3})"
     site=re.match(regex_doy_site,f.name).group(1).lower()
@@ -310,3 +613,17 @@ def conv_regex_tps2rin(f):
     conv_regex_main = re.compile(site+"[0-9]{3}.(.|)\.[0-9]{2}o")
     conv_regex_annex  = re.compile(site+"[0-9]{3}.(.|)\.[0-9]{2}\w")
     return conv_regex_main , conv_regex_annex
+=======
+    f = Path(Path(f).name)  ### keep the filename only
+    regex_doy_site = r"(\w{4})([0-9]{3})"
+    site = re.match(regex_doy_site, f.name).group(1).lower()
+    # doy=re.match(regex_doy_site,f.name).group(2).lower()
+    # conv_regex_main = re.compile(site+doy+".(.|)\.[0-9]{2}o")
+    # conv_regex_annex  = re.compile(site+doy+".(.|)\.[0-9]{2}\w")
+    ## the date of the raw file can be actually anything...
+    ## doy/month-day/etc..
+    conv_regex_main = re.compile(site + "[0-9]{3}.(.|)\.[0-9]{2}o")
+    conv_regex_annex = re.compile(site + "[0-9]{3}.(.|)\.[0-9]{2}\w")
+
+    return conv_regex_main, conv_regex_annex
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
