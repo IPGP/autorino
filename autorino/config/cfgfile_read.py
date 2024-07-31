@@ -101,9 +101,10 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     else:
         y_main_sessions = None
 
+    y = update_w_main_dic(y, y_main)
+    print(y)
     y_station = y["station"]
 
-    y = update_w_main_dic(y, y_main)
     steps_lis_lis, steps_dic_dic = read_cfg_sessions(
         y_station["sessions"], y_station=y_station, epoch_range=epoch_range
     )
@@ -170,8 +171,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     log_dir=log_dir,
                     epoch_range=epo_obj_stp,
                     access=y_station["access"],
-                    remote_dir=inp_dir_parent,
-                    remote_fname=inp_structure,
+                    inp_dir_parent=inp_dir_parent,
+                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     options=y_stp["options"],
@@ -381,10 +382,12 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
         if not k in d.keys():
             continue
         if d[k] == specific_value:
+            print("AAAAAAAAAAAAAA", specific_value)
             d[k] = v
         elif isinstance(v, collections.abc.Mapping):
             d[k] = update_w_main_dic(d.get(k, {}), v)
         else:
             if d[k] == specific_value:
+                print("AAAAAAAAAAAAAA", specific_value)
                 d[k] = v
     return d
