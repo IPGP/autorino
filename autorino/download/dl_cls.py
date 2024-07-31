@@ -273,14 +273,21 @@ class DownloadGnss(arocmn.StepGnss):
 
         count = 0
         ping_out = None
-
-        while count < 4 or not ping_out:
+        count_max = 4
+        while count < count_max or not ping_out:
             ping_out = arodl.ping(self.access["hostname"])
             count += 1
             if count > 1:
-                logger.warning("attempt #%i to ping remote %s",
+                logger.warning("attempt %i/%i to ping remote %s",
                                count,
+                               count_max,
                                self.access["hostname"])
+
+        if not ping_out:
+            logger.error("Remote server %s is not reachable.", self.access["hostname"])
+        else:
+            logger.info("Remote server %s is reachable. (%f sec)", self.access["hostname"], ping_out)
+
         return ping_out
 
     def download(self, verbose=False):
@@ -311,11 +318,8 @@ class DownloadGnss(arocmn.StepGnss):
             self.print_table()
 
         ping_out = self.ping_remote()
-        ping_out = True 
-        if not ping_out:
-            logger.error("Remote server %s is not reachable.", self.access["hostname"])
-        else:
-            logger.info("Remote server %s is reachable. (%f sec)", self.access["hostname"], ping_out)
+        ping_out = True
+        if ping_out:
             ###############################
             #### DOWNLOAD CORE a.k.a FETCH
             self.fetch_remote_files(force_download=self.options.get("force"))
