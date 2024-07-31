@@ -12,12 +12,12 @@ import pandas as pd
 import autorino.common as arocmn
 import autorino.download as arodl
 
-pd.options.mode.chained_assignment = "warn"
-
 # Create a logger object.
 import logging
 
 logger = logging.getLogger(__name__)
+
+pd.options.mode.chained_assignment = "warn"
 
 
 class DownloadGnss(arocmn.StepGnss):
@@ -223,6 +223,8 @@ class DownloadGnss(arocmn.StepGnss):
                 os.makedirs(outdir_use)
 
             ###### download the file
+            file_dl_tmp = None
+            file_dl_out = None
             if not self.access["protocol"] in ("ftp", "http"):
                 logger.error("wrong protocol")
                 raise Exception
