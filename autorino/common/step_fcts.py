@@ -114,7 +114,7 @@ def load_previous_tables(log_dir):
         an empty DataFrame is returned.
     """
     # Find all files ending with "*table.log" in the log directory
-    tables_files = utils.find_recursive(log_dir, "*table.log")
+    tables_files = utils.find_recursive(log_dir, "*_table.log")
 
     # If no such files are found, log a warning and return an empty DataFrame
     if not tables_files:
