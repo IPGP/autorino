@@ -274,7 +274,7 @@ class DownloadGnss(arocmn.StepGnss):
         count = 0
         ping_out = None
         count_max = 4
-        while count < count_max or not ping_out:
+        while count < count_max and not ping_out:
             ping_out = arodl.ping(self.access["hostname"])
             count += 1
             if count > 1:
