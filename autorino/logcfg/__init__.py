@@ -2,5 +2,5 @@
 # -*- coding: utf-8 -*-
 
 
-from .logautorino         import * 
+from .logcfg         import *
 
