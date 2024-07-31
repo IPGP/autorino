@@ -1,0 +1,4 @@
+git+https://github.com/IPGP/geodezyx
+git+https://github.com/IPGP/rinexmod
+dateparser
+docker

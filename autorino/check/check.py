@@ -3,6 +3,7 @@
 """
 Created on Fri Jun  2 10:56:52 2023
 
+<<<<<<< HEAD
 @author: psakicki
 """
 
@@ -20,6 +21,25 @@ import pandas
 
 # Create a logger object.
 import logging
+=======
+@author: psakic
+"""
+
+# Create a logger object.
+import logging
+import os
+
+import numpy as np
+import pandas as pd
+import rinexmod_api as rma
+import termcolor
+
+from geodezyx import conv
+#### Import star style
+# geodeZYX modules
+from geodezyx import operational as opera
+
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
 logger = logging.getLogger(__name__)
 
 

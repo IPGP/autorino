@@ -1,0 +1,21 @@
+## minimal exemple
+
+version: 2
+
+models:
+  - name: model_one
+    columns:
+      - name: id
+        tests: # this block
+          - unique
+          - not_null
+      - name: col_a
+      - name: col_b
+  - name: model_two
+    columns:
+      - name: id
+        tests: # is repeated down here
+          - unique
+          - not_null
+      - name: col_c
+      - name: col_d

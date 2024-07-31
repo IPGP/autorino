@@ -12,7 +12,11 @@ def main():
 
     # Creation d'une station BOMG avec un recepteur GB-1000 et un PolaRx5
     bomg_receiver1 = gnss.GB_1000_Receiver("bomg1.ovpf.ipgp.fr", "ftp", 8002)
+<<<<<<< HEAD
     bomg_receiver2 = gnss.Polarx5_Receiver("bomg2.ovpf.ipgp.fr", "ftp", 22, "admin")
+=======
+    bomg_receiver2 = gnss.Polarx5_Receiver("bomg2.ovpf.ipgp.fr", "ftp", 22, "***REMOVED***")
+>>>>>>> afa732e2589f03e3e073da617496f194c770d857
     bomg = gnss.Station("BOMG", (bomg_receiver1, bomg_receiver2))
 
     # Creation du network PF avec les stations SNEG et BOMG

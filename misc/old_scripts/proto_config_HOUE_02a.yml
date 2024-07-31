@@ -1,0 +1,58 @@
+### other structure for the session(s) 
+
+station:
+    site: HOUE00GLP
+    sitelog_path:
+    #geodesyml_path:
+    antenna:
+        device_attributes_from_sitelog: True
+        manufacturer: LEICA
+        model: AS10
+        serial_number: 
+    receiver: 
+        device_attributes_from_sitelog: True
+        manufacturer: AUTO_FROM_SITELOG # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        model: AUTO_FROM_SITELOG
+        serial_number: 123456789
+        access:
+            protocol: "ftp"
+            hostname: "gps-houe.terrain.ovsg.univ-ag.fr"
+            login: "root"
+            password: "ovsg13;:"
+        sessions:
+          - session_name: HOUE_30s_MDB
+            session_content:
+                name_on_receiver: a2 # if differs from session_name
+                remote_dir: "/SD Card/Data/<session_name>/<SITE4>/%Y/%m/%d"
+                remote_fname:  "<SITE4>%j0.m00"
+                file_period: "01D" # seconds or RINEX convention (01D, 01H etc...)
+                data_frequency: 1 # seconds or RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+                download:
+                    active: True
+                    output_dir_parent: /home/gps/tests_pierres/dltest/
+                    output_dir_structure: <SITE4>/%Y/%j
+                    log_parent_dir:
+                    log_dir_structure: <SITE9>/%Y/%j  
+                    timespan:
+                        start_epoch:
+                        end_epoch:    
+                rinex_conversion:
+                    active: True
+                    output_dir_parent: 
+                    output_dir_structure: <SITE9>/%Y/%j
+                    log_dir_parent:
+                    log_dir_structure: <SITE9>/%Y/%j      
+                rinex_splicing:
+                    active: True
+                    output_dir_parent: 
+                    output_dir_structure: <SITE9>/%Y/%j      
+                    log_dir_parent:
+                    log_dir_structure: <SITE9>/%Y/%j  
+                rinex_decimation:
+                rinex_spliting:
+          - session_name: ses2
+            session_content:
+                name_on_receiver: a2 # if differs from session_name
+                path_structure:  <SITE9>/<GPSWEEK>/<DOW>
+                name_structure:  <SITE9><YYYY><HH>.t02
+                session_period: 3600 # seconds or RINEX convention (01D, 01H etc...)
