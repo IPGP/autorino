@@ -21,6 +21,7 @@ import autorino.handle as arohdl
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
 logger = logging.getLogger(__name__)
+logger.setLevel("DEBUG")
 
 def run_steps(steps_lis, step_select=[], print_table=True):
     """
