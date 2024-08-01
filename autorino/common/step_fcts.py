@@ -217,7 +217,7 @@ def check_lock_status(lockfile_path):
     lock = FileLock(lockfile_path)
     try:
         lock.acquire(timeout=0)
-        print(f"Lock available for {lockfile_path}")
+        logger.debug(f"Lock free for {lockfile_path}")
         lock.release()
     except Timeout:
-        print(f"Process is locked for {lockfile_path} by a previous process")
+        logger.warning(f"Process is locked for {lockfile_path} by a previous process")

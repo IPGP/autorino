@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 pd.options.mode.chained_assignment = "warn"
 
-
 class DownloadGnss(arocmn.StepGnss):
 
     def __init__(
