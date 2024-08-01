@@ -458,9 +458,7 @@ class StepGnss:
         """
         # This translation is also done in _init_tmp_dirs_paths
         # but we redo it here, simply to be sure
-        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs,
-                                               make_dir=True
-        )
+        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs, make_dir=True)
         tmp_dir_unzipped_set = self.translate_path(
             self._tmp_dir_unzipped, make_dir=True
         )
@@ -746,7 +744,7 @@ class StepGnss:
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
 
-    def create_lockfile(self, timeout=1800):
+    def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
         Creates a lock file for the specified file path.
 
@@ -766,7 +764,14 @@ class StepGnss:
             The FileLock object representing the lock on the file.
         """
 
-        lockfile_path = os.path.join(self.tmp_dir, "_lock")
+        if not prefix_lockfile:
+            prefix_lockfile = ""
+
+        if hasattr(self, 'access'):
+            if isinstance(self.access, dict) and 'network' in self.access:
+            prefix_lockfile = self.access['network']
+
+        lockfile_path = os.path.join(self.tmp_dir, prefix_lockfile + "_lock")
 
         # a preliminary check to see if a previous lock exists
         arocmn.check_lockfile(lockfile_path)
@@ -777,7 +782,9 @@ class StepGnss:
             lock.acquire(timeout=timeout)
             logger.info(f"Lock acquired for {lockfile_path}")
         except Timeout:
-            logger.error(f"Process still locked after {timeout} s for {lockfile_path}, aborting")
+            logger.error(
+                f"Process still locked after {timeout} s for {lockfile_path}, aborting"
+            )
 
         return lock
 
