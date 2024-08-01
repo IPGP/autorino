@@ -51,5 +51,6 @@ def read_env(envfile_path=None):
 
     return y_dic
 
+aro_env_dict = read_env()
 
 
