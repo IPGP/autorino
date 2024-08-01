@@ -14,6 +14,8 @@ import os
 import re
 import shutil
 import time
+from filelock import FileLock, Timeout
+
 
 import numpy as np
 import pandas as pd
@@ -480,7 +482,7 @@ class StepGnss:
             tmp_dir_downloaded_set,
         )
 
-    def clean_tmp_dirs(self, days=2):
+    def clean_tmp_dirs(self, days=7, keep_table_logs=True):
         """
         Cleans the temporary directories of the StepGnss object than a specified number of days in the temporary
         directories of the StepGnss object.
@@ -488,6 +490,9 @@ class StepGnss:
         This method removes all files in the temporary directories of the StepGnss object that are older than the
         specified number of days.
         The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
+
+        See Also remove_tmp_files(), which clean the files in the temporary directories at the end of the processing
+        based on ad hoc lists.
 
         Parameters
         ----------
@@ -513,6 +518,8 @@ class StepGnss:
             if os.path.isdir(tmp_dir):
                 for root, dirs, files in os.walk(tmp_dir):
                     for file in files:
+                        if keep_table_logs and file.endswith("table.log"):
+                            continue
                         file_path = os.path.join(root, file)
                         file_age = current_time - os.path.getmtime(file_path)
                         if file_age > age_threshold:
@@ -738,6 +745,38 @@ class StepGnss:
             utils.create_dir(trslt_dir)
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
+
+    def create_lock_file(self, timeout=1800):
+        """
+        Creates a lock file for the specified file path.
+
+        This method attempts to acquire a lock on the specified file. If the lock is acquired, it prints a success message.
+        If the lock is not acquired (i.e., the file is already locked), it prints a message indicating that the process is locked.
+
+        Parameters
+        ----------
+        file_path : str
+            The path of the file to lock.
+
+        Returns
+        -------
+        None
+        """
+
+        lockfile_path = os.path.join(self.tmp_dir, "_lock")
+
+        # a preliminary check to see if a previous lock exists
+        arocmn.check_lock_status(lockfile_path)
+
+        lock = FileLock(lockfile_path)
+
+        try:
+            lock.acquire(timeout=timeout)
+            (f"Lock acquired for {lockfile_path}")
+        except Timeout:
+            print(f"Process is locked for {lockfile_path}")
+
+        return lock
 
     #  _                       _
     # | |                     (_)
@@ -1272,6 +1311,8 @@ class StepGnss:
         If a file does not exist or is an original file, its path is kept in the list for future reference.
 
         Note: This method modifies the 'tmp_rnx_files' and 'tmp_decmp_files' attributes of the object.
+
+        See Also clean_tmp_dirs(), which clean all the temporary files based on their creation date
 
         Returns
         -------

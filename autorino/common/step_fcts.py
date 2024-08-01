@@ -14,12 +14,29 @@ import numpy as np
 import pandas as pd
 
 from geodezyx import utils
+from filelock import FileLock, Timeout
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 
 def create_dummy_site_dic():
+    """
+    Creates a dummy site dictionary.
+
+    This function creates and returns a dictionary with dummy site information.
+    The dictionary contains the following keys:
+    - name: The name of the site.
+    - site_id: The site identifier.
+    - domes: The DOMES number of the site.
+    - sitelog_path: The path to the site log.
+    - position_xyz: The XYZ coordinates of the site.
+
+    Returns
+    -------
+    dict
+        A dictionary containing dummy site information.
+    """
     d = dict()
 
     d["name"] = "XXXX"
@@ -32,6 +49,25 @@ def create_dummy_site_dic():
 
 
 def create_dummy_session_dic():
+    """
+    Creates a dummy session dictionary.
+
+    This function creates and returns a dictionary with dummy session information.
+    The dictionary contains the following keys:
+    - name: The name of the session.
+    - data_frequency: The data frequency of the session.
+    - tmp_dir_parent: The parent directory for temporary files.
+    - tmp_dir_structure: The directory structure for temporary files.
+    - log_parent_dir: The parent directory for log files.
+    - log_dir_structure: The directory structure for log files.
+    - out_dir_parent: The parent directory for output files.
+    - out_structure: The directory structure for output files.
+
+    Returns
+    -------
+    dict
+        A dictionary containing dummy session information.
+    """
     d = dict()
 
     d["name"] = "NA"
@@ -161,3 +197,27 @@ def is_val_defined(val_inp):
         return True
 
 
+def check_lock_status(lockfile_path):
+    """
+    Checks the lock status of a specified file.
+
+    This function attempts to acquire a lock on the specified file. If the lock is acquired,
+    it prints a success message and releases the lock. If the lock is not acquired (i.e., the file
+    is already locked by a previous process), it prints a message indicating that the process is locked.
+
+    Parameters
+    ----------
+    lockfile_path : str
+        The path of the lock file to check the lock status for.
+
+    Returns
+    -------
+    None
+    """
+    lock = FileLock(lockfile_path)
+    try:
+        lock.acquire(timeout=0)
+        print(f"Lock available for {lockfile_path}")
+        lock.release()
+    except Timeout:
+        print(f"Process is locked for {lockfile_path} by a previous process")
