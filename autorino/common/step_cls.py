@@ -769,7 +769,7 @@ class StepGnss:
 
         if hasattr(self, 'access'):
             if isinstance(self.access, dict) and 'network' in self.access:
-            prefix_lockfile = self.access['network']
+                prefix_lockfile = self.access['network']
 
         lockfile_path = os.path.join(self.tmp_dir, prefix_lockfile + "_lock")
 
