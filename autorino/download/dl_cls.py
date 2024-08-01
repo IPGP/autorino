@@ -17,7 +17,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-pd.options.mode.chained_assignment = "warn"
+import warnings
+#pd.options.mode.chained_assignment = "warn"
+warnings.simplefilter("ignore", category=RuntimeWarning)
 
 class DownloadGnss(arocmn.StepGnss):
 
