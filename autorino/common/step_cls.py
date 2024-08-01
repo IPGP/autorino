@@ -757,12 +757,13 @@ class StepGnss:
 
         Parameters
         ----------
-        file_path : str
-            The path of the file to lock.
+        timeout : int, optional
+            The timeout period in seconds to wait for acquiring the lock. Default is 1800 seconds.
 
         Returns
         -------
-        None
+        FileLock
+            The FileLock object representing the lock on the file.
         """
 
         lockfile_path = os.path.join(self.tmp_dir, "_lock")
@@ -1003,7 +1004,7 @@ class StepGnss:
 
         return None
 
-    def guess_local_rnx_files(self):
+    def guess_local_rnx(self):
         """
         For a given site name and date in a table, guess the potential local RINEX files
         and write it as 'fpath_out' value in the table

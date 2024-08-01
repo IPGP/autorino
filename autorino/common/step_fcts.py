@@ -220,4 +220,4 @@ def check_lockfile(lockfile_path):
         logger.debug(f"Lock free for {lockfile_path}")
         lock.release()
     except Timeout:
-        logger.warning(f"Process is locked for {lockfile_path} by a previous process")
+        logger.warning(f"Process is locked by a previous process for {lockfile_path}")
