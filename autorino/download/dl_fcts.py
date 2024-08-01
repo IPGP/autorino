@@ -268,7 +268,7 @@ def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
     return output_path
 
 
-def ping(host):
+def ping(host, timeout=5):
     """
     Executes the ping command and captures the output.
 
@@ -286,7 +286,7 @@ def ping(host):
     """
 
     result = subprocess.run(
-        ["ping", "-c", "1", host],
+        ["ping", "-c", "1", "-W", str(timeout), host],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
