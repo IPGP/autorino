@@ -297,7 +297,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         logger.info(">>>>>> RAW files download")
 
-        self.set_tmp_dirs_paths()
+        self.set_tmp_dirs()
 
         self.guess_local_raw_files()
         self.guess_remote_raw_files()
