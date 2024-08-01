@@ -197,7 +197,7 @@ def is_val_defined(val_inp):
         return True
 
 
-def check_lock_status(lockfile_path):
+def check_lockfile(lockfile_path):
     """
     Checks the lock status of a specified file.
 

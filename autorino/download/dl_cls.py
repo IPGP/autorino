@@ -323,7 +323,7 @@ class DownloadGnss(arocmn.StepGnss):
         if not ping_out:
             return None
 
-        lock = self.create_lock_file()
+        lock = self.create_lockfile()
 
         ###############################
         #### DOWNLOAD CORE a.k.a FETCH
