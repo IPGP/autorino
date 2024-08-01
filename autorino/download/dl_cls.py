@@ -327,8 +327,11 @@ class DownloadGnss(arocmn.StepGnss):
 
         ###############################
         #### DOWNLOAD CORE a.k.a FETCH
-        with lock:
+        lock.acquire()
+        try:
             self.fetch_remote_files(force_download=self.options.get("force"))
+        finally:
+            lock.release()
         ###############################
 
         if verbose:
