@@ -163,9 +163,10 @@ def load_previous_tables(log_dir):
 
 def is_ok(val_inp):
     """
-    Checks if the input value is defined.
+    Checks if the input value is OK or not.
 
-    This function takes an input value and checks if it is defined. It considers None, NaN, and an empty string as undefined.
+    This function takes an input value and checks if it is defined.
+    It considers None, NaN, False and an empty string as not OK.
     If the input value is one of these, the function returns False. Otherwise, it returns True.
 
     Parameters
@@ -192,6 +193,8 @@ def is_ok(val_inp):
     elif val_inp is np.nan:
         return False
     elif val_inp == "":
+        return False
+    elif val_inp == False:
         return False
     else:
         return True
