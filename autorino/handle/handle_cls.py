@@ -106,7 +106,7 @@ class HandleGnss(arocmn.StepGnss):
         "total action" method
         """
 
-        self.set_tmp_dirs_paths()
+        self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
             self.on_row_splice(irow,
@@ -213,7 +213,7 @@ class HandleGnss(arocmn.StepGnss):
         "total action" method
         """
 
-        self.set_tmp_dirs_paths()
+        self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
             fdecmptmp, _ = self.on_row_decompress(irow)

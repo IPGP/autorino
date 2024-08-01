@@ -299,7 +299,8 @@ class DownloadGnss(arocmn.StepGnss):
 
         logger.info(">>>>>> RAW files download")
 
-        self.set_tmp_dirs_paths()
+        self.set_tmp_dirs()
+        self.clean_tmp_dirs()
 
         self.guess_local_raw_files()
         self.guess_remote_raw_files()
@@ -320,12 +321,16 @@ class DownloadGnss(arocmn.StepGnss):
             self.print_table()
 
         ping_out = self.ping_remote()
+        if not ping_out:
+            return None
 
-        if ping_out:
-            ###############################
-            #### DOWNLOAD CORE a.k.a FETCH
+        lock = self.create_lock_file()
+
+        ###############################
+        #### DOWNLOAD CORE a.k.a FETCH
+        with lock:
             self.fetch_remote_files(force_download=self.options.get("force"))
-            ###############################
+        ###############################
 
         if verbose:
             self.print_table()

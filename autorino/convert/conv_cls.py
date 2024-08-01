@@ -139,9 +139,10 @@ class ConvertGnss(arocmn.StepGnss):
         if rinexmod_options is None:
             rinexmod_options = {}
 
-        logger.info(">>>>>> RAW ⇒ RINEX files conversion")
+        logger.info(">>>>>> RAW > RINEX files conversion")
 
-        self.set_tmp_dirs_paths()
+        self.set_tmp_dirs()
+        self.clean_tmp_dirs()
         ### other tmps subdirs come also later in the loop
         self.set_translate_dict()
         ### others translate dict updates will come in the loop
