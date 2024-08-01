@@ -161,7 +161,7 @@ def load_previous_tables(log_dir):
         return pd.concat([pd.read_csv(t) for t in tables_files])
 
 
-def is_val_defined(val_inp):
+def is_ok(val_inp):
     """
     Checks if the input value is defined.
 
@@ -184,7 +184,7 @@ def is_val_defined(val_inp):
     typ = utils.get_type_smart(val_inp)
 
     if utils.is_iterable(val_inp):
-        return typ([is_val_defined(v) for v in val_inp])
+        return typ([is_ok(v) for v in val_inp])
 
     # scalar case
     if val_inp is None:

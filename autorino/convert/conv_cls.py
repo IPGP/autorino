@@ -58,15 +58,15 @@ class ConvertGnss(arocmn.StepGnss):
     """
 
     def __init__(
-            self,
-            out_dir,
-            tmp_dir,
-            log_dir,
-            epoch_range=None,
-            site=None,
-            session=None,
-            options=None,
-            metadata=None,
+        self,
+        out_dir,
+        tmp_dir,
+        log_dir,
+        epoch_range=None,
+        site=None,
+        session=None,
+        options=None,
+        metadata=None,
     ):
         """
         Initializes the ConvertGnss class with the specified parameters.
@@ -144,7 +144,6 @@ class ConvertGnss(arocmn.StepGnss):
         else:
             force_use = False
 
-
         logger.info(">>>>>> RAW > RINEX files conversion")
 
         self.set_tmp_dirs()
@@ -193,13 +192,19 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            if not arocmn.is_ok(
+                self.table.loc[irow, "ok_inp"]
+            ) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
-            if self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-                logger.info("conversion skipped (already converted in a previous run): %s", fraw)
+            if arocmn.is_ok(
+                self.table.loc[irow, "ok_inp"]
+            ) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
+                logger.info(
+                    "conversion skipped (already converted in a previous run): %s", fraw
+                )
                 continue
-            if not self.table.loc[irow, "ok_inp"]:
+            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]):
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
 
@@ -259,7 +264,9 @@ class ConvertGnss(arocmn.StepGnss):
             else:
                 marker_use = self.table.loc[irow, "site"]
 
-            rinexmod_options_use.update({"marker": marker_use, "sitelog": self.metadata})
+            rinexmod_options_use.update(
+                {"marker": marker_use, "sitelog": self.metadata}
+            )
             if debug_print_rinexmod_options:
                 logger.debug("final options for rinexmod: %s", rinexmod_options_use)
 
@@ -285,7 +292,7 @@ class ConvertGnss(arocmn.StepGnss):
     #
 
     def on_row_convert(
-            self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
+        self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
     ):
         """
         "on row" method
@@ -375,12 +382,12 @@ class ConvertGnss(arocmn.StepGnss):
         str
             The updated 'site' entry.
         """
-        val_def = arocmn.is_val_defined(self.table.loc[irow, "site"])
+        val_def = arocmn.is_ok(self.table.loc[irow, "site"])
         if not val_def or force:
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             site_found = arocnv.site_search_from_list(fraw, metadata_or_sites_list_inp)
             self.table.loc[irow, "site"] = site_found
         else:
-            site_found = 'XXXX00XXX'
+            site_found = "XXXX00XXX"
 
         return site_found
