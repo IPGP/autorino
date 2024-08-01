@@ -772,9 +772,9 @@ class StepGnss:
 
         try:
             lock.acquire(timeout=timeout)
-            (f"Lock acquired for {lockfile_path}")
+            logger.info(f"Lock acquired for {lockfile_path}")
         except Timeout:
-            print(f"Process is locked for {lockfile_path}")
+            logger.error(f"Process still locked after {timeout} s for {lockfile_path}, aborting")
 
         return lock
 
