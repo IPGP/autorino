@@ -157,7 +157,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         if not force:
-            self.guess_local_rnx_files()  # generate the potential local files
+            self.guess_local_rnx()  # generate the potential local files
             self.check_local_files()  # tests if the local flies are already there
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             # Filter previous tables stored in log_dir

@@ -11,8 +11,8 @@ dwl = workflow_lis[0]
 cnv = workflow_lis[1]
 
 #L = REQ.ask_remote_files()
-L = dwl.guess_local_raw_files()
-L = dwl.guess_remote_raw_files()
+L = dwl.guess_local_raw()
+L = dwl.guess_remote_raw()
 L = dwl.check_local_files()
 L = dwl.invalidate_small_local_files()
 

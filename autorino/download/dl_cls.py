@@ -53,15 +53,15 @@ class DownloadGnss(arocmn.StepGnss):
         self.inp_dir_parent = inp_dir_parent
         self.inp_structure = inp_structure
 
-    def guess_remote_raw_files(self):
+    def guess_remote_raw(self):
         """
         Guess the paths and name of the remote files based on the
         Session and EpochRange attributes of the DownloadGnss
 
-        see also method ``guess_local_raw_files()``
+        see also method ``guess_local_raw()``
         """
         ### wrong but legacy docstring
-        # see also method guess_local_raw_files(), a general method for all
+        # see also method guess_local_raw(), a general method for all
         # StepGnss objects
 
         if not self.inp_structure:
@@ -101,19 +101,19 @@ class DownloadGnss(arocmn.StepGnss):
 
         return rmot_paths_list
 
-    def guess_local_raw_files(self):
+    def guess_local_raw(self):
         """
         Guess the paths and name of the local raw files based on the
         EpochRange and `inp_structure` attributes of the DownloadGnss object
 
-        see also method ``guess_remote_raw_files()``,
+        see also method ``guess_remote_raw()``,
         """
         ### wrong but legacy docstring
         # If the object is not a DownloadGnss one,
         # You must provide as ``remote_fname_inp``, which is usually
         # a ``DownloadGnss.inp_structure`` attribute
 
-        # see also method ``guess_remote_raw_files()``,
+        # see also method ``guess_remote_raw()``,
         # a specific method for DownloadGnss objects
 
         local_paths_list = []
@@ -301,8 +301,8 @@ class DownloadGnss(arocmn.StepGnss):
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
 
-        self.guess_local_raw_files()
-        self.guess_remote_raw_files()
+        self.guess_local_raw()
+        self.guess_remote_raw()
         self.check_local_files()
         self.filter_ok_out()
         self.invalidate_small_local_files()
