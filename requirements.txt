@@ -2,6 +2,7 @@ git+https://github.com/IPGP/geodezyx
 git+https://github.com/IPGP/rinexmod
 dateparser
 docker
+filelock
 ping3
 numpy
 pandas

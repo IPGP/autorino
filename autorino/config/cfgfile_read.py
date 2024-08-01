@@ -21,6 +21,7 @@ import autorino.handle as arohdl
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
 logger = logging.getLogger(__name__)
+logger.setLevel("DEBUG")
 
 def run_steps(steps_lis, step_select=[], print_table=True):
     """
@@ -102,7 +103,8 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         y_main_sessions = None
 
     y = update_w_main_dic(y, y_main)
-    print(y)
+    logger.debug("Used config file (updated with the main):\n %s",y)
+
     y_station = y["station"]
 
     steps_lis_lis, steps_dic_dic = read_cfg_sessions(
@@ -142,8 +144,6 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         # y_workflow_main = y_ses_main['workflow']
 
         for k_stp, y_stp in y_steps.items():
-            logger.debug("k_stp, y_stp AAA %s %s ", k_stp, y_stp)
-
             # y_step_main = y_workflow_main[k_stp]
             # y_step = update_w_main_dic(y_step, y_step_main)
 
@@ -369,7 +369,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
     dir_parent = y_step[dir_type + "_dir_parent"]
     structure = y_step[dir_type + "_structure"]
     if check_parent_dir_existence:
-        _check_parent_dir_existence(dir_parent, dir_type + "_dir_parent")
+        _check_parent_dir_existence(dir_parent, parent_dir_key=dir_type + "_dir_parent")
     dir_path = os.path.join(dir_parent, structure)
 
     return dir_path, dir_parent, structure
@@ -382,12 +382,10 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
         if not k in d.keys():
             continue
         if d[k] == specific_value:
-            print("AAAAAAAAAAAAAA", specific_value)
             d[k] = v
         elif isinstance(v, collections.abc.Mapping):
             d[k] = update_w_main_dic(d.get(k, {}), v)
         else:
             if d[k] == specific_value:
-                print("AAAAAAAAAAAAAA", specific_value)
                 d[k] = v
     return d
