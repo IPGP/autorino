@@ -18,8 +18,8 @@ import pandas as pd
 
 import autorino.common as arocmn
 import autorino.logcfg as arologcfg
-
 import rinexmod
+
 from geodezyx import utils, conv
 from rinexmod import rinexmod_api
 

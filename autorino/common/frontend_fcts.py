@@ -20,7 +20,6 @@ import autorino.handle as arohdl
 
 logger = logging.getLogger(__name__)
 
-
 def autorino_cfgfile_run(cfg_in, main_cfg_in):
     """
     Run the Autorino configuration files.
