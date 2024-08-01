@@ -19,8 +19,9 @@ from typing import Union, List
 import autorino.convert as arcv
 from geodezyx import utils, conv
 
+import autorino.config.env_read as aroenv
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 #############################################################################

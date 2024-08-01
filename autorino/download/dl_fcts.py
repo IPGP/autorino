@@ -17,6 +17,8 @@ import urllib
 import urllib.request
 import time
 from urllib.parse import urlparse
+import subprocess
+import re
 
 import requests
 from bs4 import BeautifulSoup
@@ -264,3 +266,36 @@ def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
             time.sleep(sleep_time)
 
     return output_path
+
+
+def ping(host, timeout=5):
+    """
+    Executes the ping command and captures the output.
+
+    This function sends a single ICMP echo request to the specified host and captures the round-trip time (RTT) from the output.
+
+    Parameters
+    ----------
+    host : str
+        The hostname or IP address to ping.
+
+    Returns
+    -------
+    float or None
+        The round-trip time (RTT) in seconds if the ping is successful, otherwise None.
+    """
+
+    result = subprocess.run(
+        ["ping", "-c", "1", "-W", str(timeout), host],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    match = re.search(r'time=(\d+\.?\d*)\s*ms', result.stdout)
+
+    if match:
+        return float(match.group(1)) * 10 ** -3
+    else:
+        return None
+

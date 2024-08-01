@@ -4,10 +4,7 @@
 import ftplib
 import os
 import shutil
-import ping3
-
 import numpy as np
-import pandas as pd
 
 import autorino.common as arocmn
 import autorino.download as arodl
@@ -17,7 +14,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-pd.options.mode.chained_assignment = "warn"
+import warnings
+
+# pd.options.mode.chained_assignment = "warn"
+warnings.simplefilter("ignore", category=RuntimeWarning)
 
 
 class DownloadGnss(arocmn.StepGnss):
@@ -52,15 +52,15 @@ class DownloadGnss(arocmn.StepGnss):
         self.inp_dir_parent = inp_dir_parent
         self.inp_structure = inp_structure
 
-    def guess_remote_raw_files(self):
+    def guess_remote_raw(self):
         """
         Guess the paths and name of the remote files based on the
         Session and EpochRange attributes of the DownloadGnss
 
-        see also method ``guess_local_raw_files()``
+        see also method ``guess_local_raw()``
         """
         ### wrong but legacy docstring
-        # see also method guess_local_raw_files(), a general method for all
+        # see also method guess_local_raw(), a general method for all
         # StepGnss objects
 
         if not self.inp_structure:
@@ -100,19 +100,19 @@ class DownloadGnss(arocmn.StepGnss):
 
         return rmot_paths_list
 
-    def guess_local_raw_files(self):
+    def guess_local_raw(self):
         """
         Guess the paths and name of the local raw files based on the
         EpochRange and `inp_structure` attributes of the DownloadGnss object
 
-        see also method ``guess_remote_raw_files()``,
+        see also method ``guess_remote_raw()``,
         """
         ### wrong but legacy docstring
         # If the object is not a DownloadGnss one,
         # You must provide as ``remote_fname_inp``, which is usually
         # a ``DownloadGnss.inp_structure`` attribute
 
-        # see also method ``guess_remote_raw_files()``,
+        # see also method ``guess_remote_raw()``,
         # a specific method for DownloadGnss objects
 
         local_paths_list = []
@@ -273,23 +273,46 @@ class DownloadGnss(arocmn.StepGnss):
 
         count = 0
         ping_out = None
-        while count < 3 or not ping_out:
-            ping_out = ping3.ping(self.access["hostname"])
+        count_max = 4
+        while count < count_max and not ping_out:
+            ping_out = arodl.ping(self.access["hostname"])
             count += 1
+            if count > 1:
+                logger.warning(
+                    "attempt %i/%i to ping %s",
+                    count,
+                    count_max,
+                    self.access["hostname"],
+                )
+
+        if not ping_out:
+            logger.error("Remote server %s is not reachable.", self.access["hostname"])
+        else:
+            logger.info(
+                "Remote server %s is reachable. (%f ms)",
+                self.access["hostname"],
+                ping_out * 10**3,
+            )
 
         return ping_out
 
-    def download(self, verbose=False):
+    def download(self, verbose=False, force=False):
         """
         frontend method to download files from a GNSS receiver
         """
 
+        if self.options.get("force") or force:
+            force_use = True
+        else:
+            force_use = False
+
         logger.info(">>>>>> RAW files download")
 
-        self.set_tmp_dirs_paths()
+        self.set_tmp_dirs()
+        self.clean_tmp_dirs()
 
-        self.guess_local_raw_files()
-        self.guess_remote_raw_files()
+        self.guess_local_raw()
+        self.guess_remote_raw()
         self.check_local_files()
         self.filter_ok_out()
         self.invalidate_small_local_files()
@@ -306,16 +329,21 @@ class DownloadGnss(arocmn.StepGnss):
         if verbose:
             self.print_table()
 
-        #ping_out = self.ping_remote()
-        ping_out = True 
+        ping_out = self.ping_remote()
         if not ping_out:
-            logger.error("Remote server %s is not reachable.", self.access["hostname"])
-        else:
-            logger.info("Remote server %s is reachable. (%f sec)", self.access["hostname"], ping_out)
-            ###############################
-            #### DOWNLOAD CORE a.k.a FETCH
-            self.fetch_remote_files(force_download=self.options.get("force"))
-            ###############################
+            return None
+
+        lock = self.create_lockfile()
+
+        ###############################
+        #### DOWNLOAD CORE a.k.a FETCH
+        lock.acquire()
+        try:
+            self.fetch_remote_files(force_download=force_use)
+        finally:
+            lock.release()
+            os.remove(lock.lock_file)
+        ###############################
 
         if verbose:
             self.print_table()

@@ -20,7 +20,6 @@ import autorino.handle as arohdl
 
 logger = logging.getLogger(__name__)
 
-
 def autorino_cfgfile_run(cfg_in, main_cfg_in):
     """
     Run the Autorino configuration files.
@@ -62,35 +61,84 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
 
     return None
 
-
-
 def download_raw(epoch_range,
                  out_dir,
+                 hostname,
+                 inp_dir,
+                 inp_structure,
+                 site_id="XXXX00XXX",
+                 login="",
+                 password="",
                  tmp_dir=None,
-                 log_dir=None,):
+                 log_dir=None,
+                 options=dict(),
+                 session=dict()):
+    """
+    Downloads raw GNSS data files.
+
+    This function downloads raw GNSS data files for a specified epoch range and stores them in the specified output directory.
+
+    Parameters
+    ----------
+    epoch_range : object
+        The epoch range for which the data files are to be downloaded.
+    out_dir : str
+        The output directory where the downloaded files will be stored.
+    hostname : str
+        The hostname of the server from which the data files will be downloaded.
+    inp_dir_parent : str
+        The parent directory on the server where the data files are located.
+    inp_structure : str
+        The structure of the input directory on the server.
+    site_id : str, optional
+        The site identifier for the data files. Default is "XXXX00XXX".
+    login : str, optional
+        The login username for the server. Default is an empty string.
+    password : str, optional
+        The login password for the server. Default is an empty string.
+    tmp_dir : str, optional
+        The temporary directory used during the download process. Default is None.
+    log_dir : str, optional
+        The directory where logs will be stored. If not provided, it defaults to tmp_dir. Default is None.
+    options : dict, optional
+        Additional options for the download process. Default is an empty dictionary.
+    session : dict, optional
+        Session information for the download process. Default is an empty dictionary.
+
+    Returns
+    -------
+    object
+        The DownloadGnss object after the download operation.
+    """
+    access_dic = dict()
+    access_dic["hostname"] = hostname
+    access_dic["login"] = login
+    access_dic["password"] = password
+
+    site_dic = dict()
+    site_dic["site_id"] = site_id
 
     dwl = arodwl.DownloadGnss(out_dir=out_dir,
                               tmp_dir=tmp_dir,
                               log_dir=log_dir,
                               epoch_range=epoch_range,
-                              access=y_station["access"],
-                              inp_dir_parent=inp_dir_parent,
+                              access=access_dic,
+                              inp_dir_parent=inp_dir,
                               inp_structure=inp_structure,
-                              site=y_station["site"],
-                              session=y_ses["general"],
-                              options=y_stp["options"])
+                              site=site_dic,
+                              session=session,
+                              options=options)
 
     dwl.download()
 
     return dwl
-
 
 def convert_rnx(
     raws_inp,
     out_dir,
     tmp_dir=None,
     log_dir=None,
-    out_dir_structure="<SITE_ID4>/%Y/",
+    out_structure="<SITE_ID4>/%Y/",
     rinexmod_options=None,
     metadata=None,
     force=False,
@@ -116,7 +164,7 @@ def convert_rnx(
     log_dir : str, optional
         The directory where logs will be stored. If not provided, it defaults to tmp_dir.
          Defaults to None.
-    out_dir_structure : str, optional
+    out_structure : str, optional
         The structure of the output directory.
         If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
         See README.md for more information. Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
@@ -145,8 +193,8 @@ def convert_rnx(
     if not log_dir:
         log_dir = tmp_dir
 
-    if out_dir_structure:
-        out_dir_use = os.path.join(out_dir, out_dir_structure)
+    if out_structure:
+        out_dir_use = os.path.join(out_dir, out_structure)
     else:
         out_dir_use = out_dir
 
