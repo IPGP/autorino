@@ -750,8 +750,10 @@ class StepGnss:
         """
         Creates a lock file for the specified file path.
 
-        This method attempts to acquire a lock on the specified file. If the lock is acquired, it prints a success message.
-        If the lock is not acquired (i.e., the file is already locked), it prints a message indicating that the process is locked.
+        This method attempts to acquire a lock on the specified file. If the lock is acquired,
+        it prints a success message.
+        If the lock is not acquired (i.e., the file is already locked),
+        it prints a message indicating that the process is locked.
 
         Parameters
         ----------
