@@ -291,10 +291,16 @@ class DownloadGnss(arocmn.StepGnss):
 
         return ping_out
 
-    def download(self, verbose=False):
+    def download(self, verbose=False, force=False):
         """
         frontend method to download files from a GNSS receiver
         """
+
+        if self.options.get("force") or force:
+            force_use = True
+        else:
+            force_use = False
+
 
         logger.info(">>>>>> RAW files download")
 
@@ -329,7 +335,7 @@ class DownloadGnss(arocmn.StepGnss):
         #### DOWNLOAD CORE a.k.a FETCH
         lock.acquire()
         try:
-            self.fetch_remote_files(force_download=self.options.get("force"))
+            self.fetch_remote_files(force_download=force_use)
         finally:
             lock.release()
         ###############################
