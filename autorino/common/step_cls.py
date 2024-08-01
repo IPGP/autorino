@@ -746,7 +746,7 @@ class StepGnss:
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
 
-    def create_lock_file(self, timeout=1800):
+    def create_lockfile(self, timeout=1800):
         """
         Creates a lock file for the specified file path.
 
@@ -766,7 +766,7 @@ class StepGnss:
         lockfile_path = os.path.join(self.tmp_dir, "_lock")
 
         # a preliminary check to see if a previous lock exists
-        arocmn.check_lock_status(lockfile_path)
+        arocmn.check_lockfile(lockfile_path)
 
         lock = FileLock(lockfile_path)
 
