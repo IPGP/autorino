@@ -35,7 +35,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-s",
-        "--out_dir_structure",
+        "--out_structure",
         help="The structure of the output directory."
              "If provided, the converted files will be stored in a subdirectory of out_dir following this structure."
              "See README.md for more information."

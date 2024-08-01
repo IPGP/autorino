@@ -41,7 +41,7 @@ def create_dummy_session_dic():
     d["log_parent_dir"] = "<$HOME>/autorino_workflow_tests/log"
     d["log_dir_structure"] = "<site_id9>/%Y/%j"
     d["out_dir_parent"] = "<$HOME>/autorino_workflow_tests/out"
-    d["out_dir_structure"] = "<site_id9>/%Y/%j"
+    d["out_structure"] = "<site_id9>/%Y/%j"
 
     return d
 
