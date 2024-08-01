@@ -757,6 +757,8 @@ class StepGnss:
         ----------
         timeout : int, optional
             The timeout period in seconds to wait for acquiring the lock. Default is 1800 seconds.
+        prefix_lockfile : str, optional
+            The prefix to use for the lock file name. If not provided, a random integer is used.
 
         Returns
         -------
@@ -765,7 +767,7 @@ class StepGnss:
         """
 
         if not prefix_lockfile:
-            prefix_lockfile = ""
+            prefix_lockfile = str(np.random.randint(100000,999999))
 
         if hasattr(self, 'access'):
             if isinstance(self.access, dict) and 'network' in self.access:

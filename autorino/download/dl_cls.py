@@ -4,10 +4,7 @@
 import ftplib
 import os
 import shutil
-import ping3
-
 import numpy as np
-import pandas as pd
 
 import autorino.common as arocmn
 import autorino.download as arodl
@@ -18,8 +15,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 import warnings
-#pd.options.mode.chained_assignment = "warn"
+
+# pd.options.mode.chained_assignment = "warn"
 warnings.simplefilter("ignore", category=RuntimeWarning)
+
 
 class DownloadGnss(arocmn.StepGnss):
 
@@ -279,15 +278,21 @@ class DownloadGnss(arocmn.StepGnss):
             ping_out = arodl.ping(self.access["hostname"])
             count += 1
             if count > 1:
-                logger.warning("attempt %i/%i to ping %s",
-                               count,
-                               count_max,
-                               self.access["hostname"])
+                logger.warning(
+                    "attempt %i/%i to ping %s",
+                    count,
+                    count_max,
+                    self.access["hostname"],
+                )
 
         if not ping_out:
             logger.error("Remote server %s is not reachable.", self.access["hostname"])
         else:
-            logger.info("Remote server %s is reachable. (%f ms)", self.access["hostname"], ping_out*10**3)
+            logger.info(
+                "Remote server %s is reachable. (%f ms)",
+                self.access["hostname"],
+                ping_out * 10**3,
+            )
 
         return ping_out
 
@@ -300,7 +305,6 @@ class DownloadGnss(arocmn.StepGnss):
             force_use = True
         else:
             force_use = False
-
 
         logger.info(">>>>>> RAW files download")
 
@@ -338,6 +342,7 @@ class DownloadGnss(arocmn.StepGnss):
             self.fetch_remote_files(force_download=force_use)
         finally:
             lock.release()
+            os.remove(lock.lock_file)
         ###############################
 
         if verbose:
