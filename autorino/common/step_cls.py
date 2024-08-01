@@ -1070,6 +1070,7 @@ class StepGnss:
 
             # self.table.loc[iepoch, 'fname'] = local_fname_use
             self.table.loc[iepoch, "fpath_out"] = local_path_use
+            logger.debug("local RINEX file guessed   00000: %s", local_path_use0)
             logger.debug("local RINEX file guessed: %s", local_path_use)
 
         logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))

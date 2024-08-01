@@ -172,6 +172,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.filter_ok_out()
         else:
             self.table["ok_out"] = False
+            self.table["note"] = "force_convert"
 
         self.tmp_decmp_files, _ = self.decompress()
 
