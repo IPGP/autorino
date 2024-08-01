@@ -318,7 +318,7 @@ class DownloadGnss(arocmn.StepGnss):
             self.print_table()
 
         ping_out = self.ping_remote()
-        ping_out = True
+
         if ping_out:
             ###############################
             #### DOWNLOAD CORE a.k.a FETCH
