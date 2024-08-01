@@ -10,4 +10,4 @@ conv_software_paths:
   gfzrnx : "gfzrnx"
   teqc : "teqc"
 general:
-  log_verbosity: "DEBUG"
+  log_level: "DEBUG"

@@ -7,7 +7,6 @@ Created on Fri Apr  7 12:07:18 2023
 """
 
 #### Import the logger
-import logging
 from pathlib import Path
 
 import numpy as np
@@ -16,8 +15,10 @@ import autorino.common as arocmn
 import autorino.convert as arocnv
 from geodezyx import operational
 
+import logging
+import autorino.config.env_read as aroenv
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 class ConvertGnss(arocmn.StepGnss):
