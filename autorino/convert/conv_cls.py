@@ -161,14 +161,17 @@ class ConvertGnss(arocmn.StepGnss):
         self.set_table_log(out_dir=self.tmp_dir_logs)
 
         ### guess and deactivate existing local RINEX files
+        self.guess_local_rnx()  # generate the potential local files
+        self.check_local_files()  # tests if the local flies are already there
+
         if not force_use:
-            self.guess_local_rnx()  # generate the potential local files
-            self.check_local_files()  # tests if the local flies are already there
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
                 self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
+        else:
+            self.table["ok_out"] = False
 
         self.tmp_decmp_files, _ = self.decompress()
 
@@ -192,14 +195,10 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not arocmn.is_ok(
-                self.table.loc[irow, "ok_inp"]
-            ) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
+            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
-            if arocmn.is_ok(
-                self.table.loc[irow, "ok_inp"]
-            ) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
+            if arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
                 logger.info(
                     "conversion skipped (already converted in a previous run): %s", fraw
                 )
