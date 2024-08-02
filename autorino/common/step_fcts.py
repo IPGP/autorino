@@ -192,7 +192,7 @@ def is_ok(val_inp):
     # scalar case
     if val_inp is None:
         return False
-    elif np.isnan(val_inp):
+    elif val_inp == np.nan: # isnan not working if weird type is given
         return False
     elif val_inp == "":
         return False
