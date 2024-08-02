@@ -260,12 +260,12 @@ class DownloadGnss(arocmn.StepGnss):
 
         for irow, row in self.table.iterrows():
 
-            epoch = row["epoch_srt"]
-            rmot_file = row["fpath_inp"]
-            local_file = row["fpath_out"]
+            epoch = self.table.loc[irow,"epoch_srt"]
+            rmot_file = self.table.loc[irow,"fpath_inp"]
+            local_file = self.table.loc[irow,"fpath_out"]
 
             ###### check if the file exists locally
-            if row["ok_out"] and not force_download:
+            if self.table.loc[irow,"ok_out"] and not force_download:
                 logger.info(
                     "%s already exists locally, skip", os.path.basename(local_file)
                 )
