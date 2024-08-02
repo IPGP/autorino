@@ -20,7 +20,7 @@ import dateutil
 import numpy as np
 import rinexmod_api
 
-import autorino.convert.conv_cmd_run as cv
+import autorino.convert.cnv_cmd_run as cv
 from geodezyx import utils
 
 
