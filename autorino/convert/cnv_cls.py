@@ -111,7 +111,7 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert(self, print_table=False, force=False, rinexmod_options=None):
+    def convert(self, verbose=False, force=False, rinexmod_options=None):
         """
         "total action" method
 
@@ -125,7 +125,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         Parameters
         ----------
-        print_table : bool, optional
+        verbose : bool, optional
             If True, prints the conversion table. Default is False.
         force : bool, optional
             If True, forces the conversion even if output files already exist. Default is False.
@@ -166,18 +166,17 @@ class ConvertGnss(arocmn.StepGnss):
         self.guess_local_rnx()  # generate the potential local files
         self.check_local_files()  # tests if the local flies are already there
 
-        if not force_use:
+        if force_use:
+            self.table["ok_out"] = False
+            self.table["note"] = "force_convert"
+        else:
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
                 self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
-        else:
-            self.table["ok_out"] = False
-            self.table["note"] = "force_convert"
 
         self.tmp_decmp_files, _ = self.decompress()
-
 
         # get a table with only the good files (ok_inp == True)
         # table_init_ok must be used only for the following statistics!
@@ -192,9 +191,8 @@ class ConvertGnss(arocmn.StepGnss):
             n_not_ok_inp,
         )
 
-        if print_table:
+        if verbose:
             self.print_table()
-
 
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
