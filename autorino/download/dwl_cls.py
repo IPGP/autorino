@@ -265,7 +265,7 @@ class DownloadGnss(arocmn.StepGnss):
             local_file = row["fpath_out"]
 
             ###### check if the file exists locally
-            if row.ok_out == True and not force_download:
+            if row["ok_out"] and not force_download:
                 logger.info(
                     "%s already exists locally, skip", os.path.basename(local_file)
                 )
@@ -376,6 +376,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.guess_local_raw()
         self.guess_remote_raw()
         self.check_local_files()
+        self.table_ok_cols_bool()
         self.filter_ok_out()
         self.invalidate_small_local_files()
 
