@@ -15,7 +15,7 @@ import subprocess
 from subprocess import PIPE
 import datetime as dt
 
-from autorino.convert import conv_regex, cmd_build
+from autorino.convert import cnv_regex, cmd_build
 
 #### Import the logger
 import logging
