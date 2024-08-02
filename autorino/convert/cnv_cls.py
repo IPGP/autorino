@@ -252,7 +252,7 @@ class ConvertGnss(arocmn.StepGnss):
             frnxtmp = self.on_row_convert(
                 irow, self.tmp_dir_converted, converter_inp=converter_name_use
             )
-            self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
+            self.tmp_rnx_files.append(frnxtmp)  # list for final remove
 
             #############################################################
             # +++++ RINEXMOD

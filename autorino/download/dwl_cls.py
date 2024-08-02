@@ -244,6 +244,36 @@ class DownloadGnss(arocmn.StepGnss):
         logger.info("nbr remote files found on rec: %s", len(rmot_files_list))
         return rmot_files_list
 
+    def ping_remote(self):
+        """
+        Ping the remote server to check if it is reachable.
+        """
+
+        count = 0
+        ping_out = None
+        count_max = 4
+        while count < count_max and not ping_out:
+            ping_out = arodwl.ping(self.access["hostname"])
+            count += 1
+            if count > 1:
+                logger.warning(
+                    "attempt %i/%i to ping %s",
+                    count,
+                    count_max,
+                    self.access["hostname"],
+                )
+
+        if not ping_out:
+            logger.error("Remote server %s is not reachable.", self.access["hostname"])
+        else:
+            logger.info(
+                "Remote server %s is reachable. (%f ms)",
+                self.access["hostname"],
+                ping_out * 10**3,
+            )
+
+        return ping_out
+
     def fetch_remote_files(self, force_download=False):
         """
         will download locally the files which have been identified by
@@ -257,6 +287,9 @@ class DownloadGnss(arocmn.StepGnss):
         preliminary actions.
         """
         download_files_list = []
+
+
+        ##### Switch to an inrow !!!!
 
         for irow, row in self.table.iterrows():
 
@@ -328,35 +361,6 @@ class DownloadGnss(arocmn.StepGnss):
 
         return download_files_list
 
-    def ping_remote(self):
-        """
-        Ping the remote server to check if it is reachable.
-        """
-
-        count = 0
-        ping_out = None
-        count_max = 4
-        while count < count_max and not ping_out:
-            ping_out = arodwl.ping(self.access["hostname"])
-            count += 1
-            if count > 1:
-                logger.warning(
-                    "attempt %i/%i to ping %s",
-                    count,
-                    count_max,
-                    self.access["hostname"],
-                )
-
-        if not ping_out:
-            logger.error("Remote server %s is not reachable.", self.access["hostname"])
-        else:
-            logger.info(
-                "Remote server %s is reachable. (%f ms)",
-                self.access["hostname"],
-                ping_out * 10**3,
-            )
-
-        return ping_out
 
     def download(self, verbose=False, force=False):
         """
@@ -379,6 +383,10 @@ class DownloadGnss(arocmn.StepGnss):
         self.table_ok_cols_bool()
         self.filter_ok_out()
         self.invalidate_small_local_files()
+
+        if force_use:
+            self.table["ok_out"] = False
+            self.table["note"] = "force_download"
 
         n_ok_inp = (self.table["ok_inp"]).sum()
         n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()

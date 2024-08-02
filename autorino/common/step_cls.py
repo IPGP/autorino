@@ -1589,7 +1589,8 @@ class StepGnss:
         Filters the raw files based on the 'ok_out' boolean column of the object's table.
 
         This method checks if the raw files have a positive 'ok_out' boolean (i.e., the converted file already exists).
-        It modifies the 'ok_inp' boolean column of the object's table and returns the filtered raw files in a list.
+        It modifies the 'ok_inp' boolean column of the object's table i.e. the step action must be done (True)
+        or not (False) and returns the filtered raw files in a list.
 
         Returns
         -------
