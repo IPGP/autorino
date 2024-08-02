@@ -923,6 +923,8 @@ class StepGnss:
                 str_out = str_inp[:halflen] + ".." + str_inp[-halflen:]
                 return str_out
 
+        self.table_ok_cols_bool()
+
         form = dict()
         form["fraw"] = _shrink_str
         form["fpath_inp"] = _shrink_str
@@ -941,6 +943,24 @@ class StepGnss:
             return None
         else:
             return str_out
+
+    def table_ok_cols_bool(self):
+        """
+        Converts the column of the table to boolean values.
+
+        This method converts the specified column of the table to boolean values.
+        The column is converted to True if the value is 'OK' and False otherwise.
+
+        Wrapper for arocmn.is_ok()
+
+        Returns
+        -------
+        None
+        """
+        self.table["ok_inp"] = self.table["ok_inp"].apply(arocmn.is_ok)
+        self.table["ok_out"] = self.table["ok_out"].apply(arocmn.is_ok)
+
+        return None
 
     def load_table_from_filelist(self, input_files, inp_regex=".*", reset_table=True):
         """

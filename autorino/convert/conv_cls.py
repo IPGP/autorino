@@ -193,24 +193,20 @@ class ConvertGnss(arocmn.StepGnss):
         if print_table:
             self.print_table()
 
+        self.table_ok_cols_bool()
+
         ######################### START THE LOOP ##############################
         for irow, row in self.table.iterrows():
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(
-                self.table.loc[irow, "ok_out"]
-            ):
+            if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
-            if arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(
-                self.table.loc[irow, "ok_out"]
-            ):
-                logger.info(
-                    "conversion skipped (already converted in a previous run): %s", fraw
-                )
+            if self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+                logger.info("conversion skipped (already converted in a previous run): %s", fraw)
                 continue
-            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]):
+            if not self.table.loc[irow, "ok_inp"]:
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
 
