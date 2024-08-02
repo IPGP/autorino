@@ -8,9 +8,6 @@ Created on 23/04/2024 14:21:56
 
 import glob
 import os
-import pandas as pd
-
-import geodezyx.utils as utils
 
 import autorino.config as arocfg
 import autorino.download as arodwl
@@ -19,7 +16,7 @@ import autorino.handle as arohdl
 
 #### Import the logger
 import logging
-import autorino.config.env_read as aroenv
+import autorino.envcfg.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
