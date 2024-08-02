@@ -7,7 +7,6 @@ Created on 23/04/2024 14:21:56
 """
 
 import glob
-import logging
 import os
 import pandas as pd
 
@@ -18,7 +17,11 @@ import autorino.download as arodwl
 import autorino.convert as arocnv
 import autorino.handle as arohdl
 
+#### Import the logger
+import logging
+import autorino.config.env_read as aroenv
 logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def autorino_cfgfile_run(cfg_in, main_cfg_in):
     """

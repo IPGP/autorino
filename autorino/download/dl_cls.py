@@ -21,6 +21,38 @@ warnings.simplefilter("ignore", category=RuntimeWarning)
 
 
 class DownloadGnss(arocmn.StepGnss):
+    """
+    A class to handle the downloading of GNSS data.
+
+    Inherits from
+    ----------
+    arocmn.StepGnss
+
+    Parameters
+    ----------
+    out_dir : str
+        The output directory where the downloaded files will be stored.
+    tmp_dir : str
+        The temporary directory used during the download process.
+    log_dir : str
+        The directory where log files will be stored.
+    epoch_range : EpochRange
+        The range of epochs for which data will be downloaded.
+    access : dict
+        A dictionary containing access information such as protocol, hostname, login, and password.
+    inp_dir_parent : str
+        The parent directory of the input files.
+    inp_structure : str
+        The structure of the input files.
+    site : str, optional
+        The site identifier. Default is None.
+    session : str, optional
+        The session identifier. Default is None.
+    options : dict, optional
+        Additional options for the download process. Default is None.
+    metadata : dict, optional
+        Metadata associated with the download process. Default is None.
+    """
 
     def __init__(
         self,
@@ -36,7 +68,34 @@ class DownloadGnss(arocmn.StepGnss):
         options=None,
         metadata=None,
     ):
+        """
+        Initialize the DownloadGnss object.
 
+        Parameters
+        ----------
+        out_dir : str
+            The output directory where the downloaded files will be stored.
+        tmp_dir : str
+            The temporary directory used during the download process.
+        log_dir : str
+            The directory where log files will be stored.
+        epoch_range : EpochRange
+            The range of epochs for which data will be downloaded.
+        access : dict
+            A dictionary containing access information such as protocol, hostname, login, and password.
+        inp_dir_parent : str
+            The parent directory of the input files.
+        inp_structure : str
+            The structure of the input files.
+        site : str, optional
+            The site identifier. Default is None.
+        session : str, optional
+            The session identifier. Default is None.
+        options : dict, optional
+            Additional options for the download process. Default is None.
+        metadata : dict, optional
+            Metadata associated with the download process. Default is None.
+        """
         super().__init__(
             out_dir,
             tmp_dir,
