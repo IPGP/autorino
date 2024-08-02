@@ -2,7 +2,7 @@
 # import pandas as pd
 # import numpy as np
 # import os
-# from autorino import download as arodl
+# from autorino import download as arodwl
 # from autorino import convert as arocnv
 # from autorino import general as arocmn
 import yaml

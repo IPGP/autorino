@@ -7,12 +7,15 @@ import shutil
 import numpy as np
 
 import autorino.common as arocmn
-import autorino.download as arodl
+import autorino.download as arodwl
 
-# Create a logger object.
+#### Import the logger
 import logging
+import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 import warnings
 
@@ -137,7 +140,7 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_dir_use = str(self.inp_dir_parent)
             rmot_fname_use = str(self.inp_structure)
 
-            rmot_path_use = arodl.join_url(
+            rmot_path_use = arodwl.join_url(
                 self.access["protocol"], hostname_use, rmot_dir_use, rmot_fname_use
             )
 
@@ -221,12 +224,12 @@ class DownloadGnss(arocmn.StepGnss):
         list_ = []
         for rmot_dir_use in rmot_dir_list:
             if self.access["protocol"] == "http":
-                list_ = arodl.list_remote_files_http(
+                list_ = arodwl.list_remote_files_http(
                     self.access["hostname"], rmot_dir_use
                 )
                 rmot_files_list = rmot_files_list + list_
             elif self.access["protocol"] == "ftp":
-                list_ = arodl.list_remote_files_ftp(
+                list_ = arodwl.list_remote_files_ftp(
                     self.access["hostname"],
                     rmot_dir_use,
                     self.access["login"],
@@ -289,7 +292,7 @@ class DownloadGnss(arocmn.StepGnss):
                 raise Exception
             elif self.access["protocol"] == "http":
                 try:
-                    file_dl_tmp = arodl.download_file_http(rmot_file, tmpdir_use)
+                    file_dl_tmp = arodwl.download_file_http(rmot_file, tmpdir_use)
                     file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
                     dl_ok = True
                 except Exception as e:
@@ -298,7 +301,7 @@ class DownloadGnss(arocmn.StepGnss):
 
             elif self.access["protocol"] == "ftp":
                 try:
-                    file_dl_tmp = arodl.download_file_ftp(
+                    file_dl_tmp = arodwl.download_file_ftp(
                         rmot_file,
                         tmpdir_use,
                         self.access["login"],
@@ -334,7 +337,7 @@ class DownloadGnss(arocmn.StepGnss):
         ping_out = None
         count_max = 4
         while count < count_max and not ping_out:
-            ping_out = arodl.ping(self.access["hostname"])
+            ping_out = arodwl.ping(self.access["hostname"])
             count += 1
             if count > 1:
                 logger.warning(
