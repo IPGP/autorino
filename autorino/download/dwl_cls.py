@@ -8,6 +8,8 @@ import numpy as np
 
 import autorino.common as arocmn
 import autorino.download as arodwl
+import warnings
+
 
 # +++ Import the logger
 import logging
@@ -17,7 +19,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-import warnings
 
 # pd.options.mode.chained_assignment = "warn"
 warnings.simplefilter("ignore", category=RuntimeWarning)
@@ -274,7 +275,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         return ping_out
 
-    def fetch_remote_files(self):
+    def fetch_remote_files(self, force=False):
         """
         will download locally the files which have been identified by
         the guess_remote_files method
@@ -289,7 +290,7 @@ class DownloadGnss(arocmn.StepGnss):
         download_files_list = []
 
         for irow, row in self.table.iterrows():
-            file_dl_out = self.on_row_fetch(irow)
+            file_dl_out = self.on_row_fetch(irow, force=force)
             if file_dl_out:
                 download_files_list.append(file_dl_out)
 
@@ -300,6 +301,7 @@ class DownloadGnss(arocmn.StepGnss):
         frontend method to download files from a GNSS receiver
         """
 
+        # Check if force download is required
         if self.options.get("force") or force:
             force_use = True
         else:
@@ -307,20 +309,26 @@ class DownloadGnss(arocmn.StepGnss):
 
         logger.info(">>>>>> RAW files download")
 
+        # Set up and clean temporary directories
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
 
+        # Guess remote and local raw file paths
         self.guess_remote_raw()
         self.guess_local_raw()
+
+        # Check local files and update table
         self.check_local_files()
         self.table_ok_cols_bool()
         self.filter_ok_out()
         self.invalidate_small_local_files()
 
+        # Force download if required
         if force_use:
             self.table["ok_inp"] = True
             self.table["note"] = "force_download"
 
+        # Log the number of files to be downloaded and excluded
         n_ok_inp = (self.table["ok_inp"]).sum()
         n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()
         n_tot_inp = len(self.table)
@@ -330,31 +338,34 @@ class DownloadGnss(arocmn.StepGnss):
             n_ok_inp,
             n_tot_inp,
             n_not_ok_inp,
-            n_tot_inp
+            n_tot_inp,
         )
 
+        # Print the table if verbose is enabled
         if verbose:
             self.print_table()
 
+        # Ping the remote server to check if it is reachable
         ping_out = self.ping_remote()
         if not ping_out:
             return None
 
+        # Create a lockfile to ensure exclusive access during download
         lock = self.create_lockfile()
 
         ###############################
-        #+++ DOWNLOAD CORE a.k.a FETCH
+        # +++ DOWNLOAD CORE a.k.a FETCH
         lock.acquire()
         try:
-            self.fetch_remote_files()
+            self.fetch_remote_files(force=force_use)
         finally:
             lock.release()
             os.remove(lock.lock_file)
         ###############################
 
+        # Print the table if verbose is enabled
         if verbose:
             self.print_table()
-
         return None
 
     #               _   _
@@ -365,11 +376,13 @@ class DownloadGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_fetch(self, irow):
+    def on_row_fetch(self, irow, force=False):
 
-        if self.table.loc[irow, "ok_out"]:
-            logger.info("%s action on row skiped (output exists)",
-                        self.table.loc[irow, "fpath_out"])
+        if self.table.loc[irow, "ok_out"] and not force:
+            logger.info(
+                "%s action on row skiped (output exists)",
+                self.table.loc[irow, "fpath_out"],
+            )
             return None
 
         if not self.table.loc[irow, "ok_inp"]:
