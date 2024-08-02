@@ -274,7 +274,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         return ping_out
 
-    def fetch_remote_files(self, force_download=False):
+    def fetch_remote_files(self):
         """
         will download locally the files which have been identified by
         the guess_remote_files method
@@ -310,24 +310,27 @@ class DownloadGnss(arocmn.StepGnss):
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
 
-        self.guess_local_raw()
         self.guess_remote_raw()
+        self.guess_local_raw()
         self.check_local_files()
         self.table_ok_cols_bool()
         self.filter_ok_out()
         self.invalidate_small_local_files()
 
         if force_use:
-            self.table["ok_out"] = False
+            self.table["ok_inp"] = True
             self.table["note"] = "force_download"
 
         n_ok_inp = (self.table["ok_inp"]).sum()
         n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()
+        n_tot_inp = len(self.table)
 
         logger.info(
-            "%6i files will be downloaded, %6i files are excluded",
+            "%3i/%3i files will be downloaded, %3i/%3i files are excluded",
             n_ok_inp,
+            n_tot_inp,
             n_not_ok_inp,
+            n_tot_inp
         )
 
         if verbose:
@@ -343,7 +346,7 @@ class DownloadGnss(arocmn.StepGnss):
         #+++ DOWNLOAD CORE a.k.a FETCH
         lock.acquire()
         try:
-            self.fetch_remote_files(force_download=force_use)
+            self.fetch_remote_files()
         finally:
             lock.release()
             os.remove(lock.lock_file)
@@ -362,9 +365,9 @@ class DownloadGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_fetch(self, irow, force_download=False):
+    def on_row_fetch(self, irow):
 
-        if self.table.loc[irow, "ok_out"] and not force_download:
+        if self.table.loc[irow, "ok_out"]:
             logger.info("%s action on row skiped (output exists)",
                         self.table.loc[irow, "fpath_out"])
             return None
