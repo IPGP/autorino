@@ -6,7 +6,6 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakic
 """
 
-#### Import the logger
 from pathlib import Path
 
 import numpy as np
@@ -15,8 +14,10 @@ import autorino.common as arocmn
 import autorino.convert as arocnv
 from geodezyx import operational
 
+#### Import the logger
 import logging
 import autorino.config.env_read as aroenv
+
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
@@ -197,10 +198,14 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
+            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(
+                self.table.loc[irow, "ok_out"]
+            ):
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
-            if arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
+            if arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(
+                self.table.loc[irow, "ok_out"]
+            ):
                 logger.info(
                     "conversion skipped (already converted in a previous run): %s", fraw
                 )

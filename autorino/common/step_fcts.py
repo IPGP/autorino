@@ -16,9 +16,11 @@ import pandas as pd
 from geodezyx import utils
 from filelock import FileLock, Timeout
 
+#### Import the logger
+import logging
+import autorino.config.env_read as aroenv
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
-
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def create_dummy_site_dic():
     """

@@ -8,8 +8,6 @@ Created on Mon Jan  8 16:53:51 2024
 
 import copy
 
-# Import the logger
-import logging
 import os
 import re
 import shutil
@@ -27,8 +25,12 @@ import rinexmod
 from geodezyx import utils, conv
 from rinexmod import rinexmod_api
 
+#### Import the logger
+import logging
+import autorino.config.env_read as aroenv
+
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 class StepGnss:
@@ -767,11 +769,11 @@ class StepGnss:
         """
 
         if not prefix_lockfile:
-            prefix_lockfile = str(np.random.randint(100000,999999))
+            prefix_lockfile = str(np.random.randint(100000, 999999))
 
-        if hasattr(self, 'access'):
-            if isinstance(self.access, dict) and 'network' in self.access:
-                prefix_lockfile = self.access['network']
+        if hasattr(self, "access"):
+            if isinstance(self.access, dict) and "network" in self.access:
+                prefix_lockfile = self.access["network"]
 
         lockfile_path = os.path.join(self.tmp_dir, prefix_lockfile + "_lock")
 

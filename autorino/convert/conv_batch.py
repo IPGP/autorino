@@ -28,8 +28,9 @@ import pandas as pd
 
 #### Import the logger
 import logging
+import autorino.config.env_read as aroenv
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def converter_batch(input_files,
                     outdir,
