@@ -28,7 +28,7 @@ import pandas as pd
 
 #### Import the logger
 import logging
-import autorino.envcfg.env_read as aroenv
+import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 

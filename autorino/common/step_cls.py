@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 import autorino.common as arocmn
-import autorino.logcfg as arologcfg
+import autorino.cfglog as arologcfg
 import rinexmod
 
 from geodezyx import utils, conv
@@ -27,7 +27,7 @@ from rinexmod import rinexmod_api
 
 #### Import the logger
 import logging
-import autorino.envcfg.env_read as aroenv
+import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
