@@ -167,7 +167,7 @@ class ConvertGnss(arocmn.StepGnss):
         self.check_local_files()  # tests if the local flies are already there
 
         if force_use:
-            self.table["ok_out"] = False
+            self.table["ok_inp"] = True
             self.table["note"] = "force_convert"
         else:
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
