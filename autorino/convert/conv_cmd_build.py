@@ -34,7 +34,7 @@ from geodezyx import utils
 
 # IMPORT AUTORINO ENVIRONNEMENT VARABLES
 ##software paths
-import autorino.config.env_read as aroenv
+import autorino.envcfg.env_read as aroenv
 aro_env_soft_path = aroenv.aro_env_dict["conv_software_paths"]
 
 
