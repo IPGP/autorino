@@ -9,7 +9,7 @@ import numpy as np
 import autorino.common as arocmn
 import autorino.download as arodwl
 
-#### Import the logger
+# +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
 
@@ -288,79 +288,12 @@ class DownloadGnss(arocmn.StepGnss):
         """
         download_files_list = []
 
-
-        ##### Switch to an inrow !!!!
-
         for irow, row in self.table.iterrows():
-
-            epoch = self.table.loc[irow,"epoch_srt"]
-            rmot_file = self.table.loc[irow,"fpath_inp"]
-            local_file = self.table.loc[irow,"fpath_out"]
-
-            ###### check if the file exists locally
-            if self.table.loc[irow,"ok_out"] and not force_download:
-                logger.info(
-                    "%s already exists locally, skip", os.path.basename(local_file)
-                )
-                continue
-
-            ###### use the guessed local file as destination or the generic directory
-            if not local_file:  #### the local file has not been guessed
-                outdir_use = str(self.out_dir)
-                outdir_use = self.translate_path(outdir_use, epoch, make_dir=True)
-            else:  #### the local file has been guessed before
-                outdir_use = os.path.dirname(local_file)
-
-            tmpdir_use = self.tmp_dir_downloaded
-
-            ###### create the directory if it does not exists
-            if not os.path.exists(outdir_use):
-                os.makedirs(outdir_use)
-
-            ###### download the file
-            file_dl_tmp = None
-            file_dl_out = None
-            if not self.access["protocol"] in ("ftp", "http"):
-                logger.error("wrong protocol")
-                raise Exception
-            elif self.access["protocol"] == "http":
-                try:
-                    file_dl_tmp = arodwl.download_file_http(rmot_file, tmpdir_use)
-                    file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
-                    dl_ok = True
-                except Exception as e:
-                    logger.error("HTTP download error: %s", str(e))
-                    dl_ok = False
-
-            elif self.access["protocol"] == "ftp":
-                try:
-                    file_dl_tmp = arodwl.download_file_ftp(
-                        rmot_file,
-                        tmpdir_use,
-                        self.access["login"],
-                        self.access["password"],
-                    )
-                    dl_ok = True
-                    file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
-                except ftplib.error_perm as e:
-                    logger.error("FTP download error: %s", str(e))
-                    dl_ok = False
-
-            else:  ### this case should never happen since there is a protocol test at the begining
-                dl_ok = False
-                pass
-
-            ###### store the results in the table
-            if dl_ok:
+            file_dl_out = self.on_row_fetch(irow)
+            if file_dl_out:
                 download_files_list.append(file_dl_out)
-                self.table.loc[irow, "ok_out"] = True
-                self.table.loc[irow, "fpath_out"] = file_dl_out
-                os.remove(file_dl_tmp)
-            else:
-                self.table.loc[irow, "ok_out"] = False
 
         return download_files_list
-
 
     def download(self, verbose=False, force=False):
         """
@@ -407,7 +340,7 @@ class DownloadGnss(arocmn.StepGnss):
         lock = self.create_lockfile()
 
         ###############################
-        #### DOWNLOAD CORE a.k.a FETCH
+        #+++ DOWNLOAD CORE a.k.a FETCH
         lock.acquire()
         try:
             self.fetch_remote_files(force_download=force_use)
@@ -420,3 +353,88 @@ class DownloadGnss(arocmn.StepGnss):
             self.print_table()
 
         return None
+
+    #               _   _
+    #     /\       | | (_)
+    #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
+    #   / /\ \ / __| __| |/ _ \| '_ \/ __|  / _ \| '_ \  | '__/ _ \ \ /\ / / __|
+    #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
+    # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
+    #
+
+    def on_row_fetch(self, irow, force_download=False):
+
+        if self.table.loc[irow, "ok_out"] and not force_download:
+            logger.info("%s action on row skiped (output exists)",
+                        self.table.loc[irow, "fpath_out"])
+            return None
+
+        if not self.table.loc[irow, "ok_inp"]:
+            logger.warning(
+                "action on row skipped (input disabled): %s",
+                self.table.loc[irow, "fname"],
+            )
+            return None
+
+        # ++++++ use the guessed local file as destination or the generic directory
+        if not self.table.loc[
+            irow, "fpath_out"
+        ]:  # +++ the local file has not been guessed
+            outdir_use = str(self.out_dir)
+            outdir_use = self.translate_path(
+                outdir_use, self.table.loc[irow, "epoch_srt"], make_dir=True
+            )
+        else:  # +++ the local file has been guessed before
+            outdir_use = os.path.dirname(self.table.loc[irow, "fpath_out"])
+
+        tmpdir_use = self.tmp_dir_downloaded
+
+        # +++++ create the directory if it does not exists
+        if not os.path.exists(outdir_use):
+            os.makedirs(outdir_use)
+
+        # +++++ download the file
+        file_dl_tmp = None
+        file_dl_out = None
+        if not self.access["protocol"] in ("ftp", "http"):
+            logger.error("wrong protocol")
+            raise Exception
+        elif self.access["protocol"] == "http":
+            try:
+                file_dl_tmp = arodwl.download_file_http(
+                    self.table.loc[irow, "fpath_inp"], tmpdir_use
+                )
+                file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
+                dl_ok = True
+            except Exception as e:
+                logger.error("HTTP download error: %s", str(e))
+                dl_ok = False
+
+        elif self.access["protocol"] == "ftp":
+            try:
+                file_dl_tmp = arodwl.download_file_ftp(
+                    self.table.loc[irow, "fpath_inp"],
+                    tmpdir_use,
+                    self.access["login"],
+                    self.access["password"],
+                )
+                dl_ok = True
+                file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
+            except ftplib.error_perm as e:
+                logger.error("FTP download error: %s", str(e))
+                dl_ok = False
+
+        else:  # ++ this case should never happen since there is a protocol test at the begining
+            dl_ok = False
+
+            pass
+
+        # +++++ store the results in the table
+        if dl_ok:
+            self.table.loc[irow, "ok_out"] = True
+            self.table.loc[irow, "fpath_out"] = file_dl_out
+            os.remove(file_dl_tmp)
+        else:
+            self.table.loc[irow, "ok_out"] = False
+
+        return file_dl_out
