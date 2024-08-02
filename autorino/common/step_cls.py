@@ -1807,8 +1807,8 @@ class StepGnss:
 
         # default options/arguments for rinexmod
         rinexmod_options_use = {
-            # 'marker': 'XXXX', # forced in .cnovert()
-            # 'sitelog': metadata, # forced in .cnovert()
+            # 'marker': 'XXXX', # forced in .convert()
+            # 'sitelog': metadata, # forced in .convert()
             "compression": "gz",
             "longname": True,
             "force_rnx_load": True,
