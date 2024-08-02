@@ -9,8 +9,6 @@ Created on Mon Mar 27 09:16:34 2023
 import ftplib
 import io
 
-# Create a logger object.
-import logging
 import os
 import socket
 import urllib
@@ -24,8 +22,12 @@ import requests
 from bs4 import BeautifulSoup
 import tqdm
 
-logger = logging.getLogger(__name__)
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
 
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 # *****************************************************************************
 # define Python user-defined exceptions
