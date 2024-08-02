@@ -19,6 +19,7 @@ from filelock import FileLock, Timeout
 #### Import the logger
 import logging
 import autorino.config.env_read as aroenv
+
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
@@ -192,11 +193,11 @@ def is_ok(val_inp):
     # scalar case
     if val_inp is None:
         return False
-    elif val_inp is np.nan:
+    elif np.isnan(val_inp):
         return False
     elif val_inp == "":
         return False
-    elif val_inp == False:
+    elif not val_inp: # == False
         return False
     else:
         return True
