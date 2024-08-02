@@ -909,7 +909,7 @@ class StepGnss:
                 The input string to be shrunk.
             maxlen : int, optional
                 The maximum length of the output string. Default is the value of the 'max_colwidth' parameter of the
-                'print_table' method.
+                'verbose' method.
 
             Returns
             -------

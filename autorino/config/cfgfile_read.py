@@ -32,7 +32,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     It iterates over the list of StepGnss objects and executes
     the 'download' or 'convert' method depending on the type of the step.
     If a list of selected steps is provided, only the steps in the list will be executed.
-    If the 'print_table' flag is set to True, the tables will be printed during the execution of the steps.
+    If the 'verbose' flag is set to True, the tables will be printed during the execution of the steps.
 
     Parameters
     ----------
