@@ -7,8 +7,6 @@ Created on Tue Feb 21 16:23:06 2023
 """
 
 import datetime as dt
-#### Import the logger
-import logging
 import os
 import re
 import subprocess
@@ -19,7 +17,9 @@ from typing import Union, List
 import autorino.convert as arcv
 from geodezyx import utils, conv
 
-import autorino.config.env_read as aroenv
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 

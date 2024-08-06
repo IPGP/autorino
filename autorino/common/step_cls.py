@@ -8,8 +8,6 @@ Created on Mon Jan  8 16:53:51 2024
 
 import copy
 
-# Import the logger
-import logging
 import os
 import re
 import shutil
@@ -21,14 +19,18 @@ import numpy as np
 import pandas as pd
 
 import autorino.common as arocmn
-import autorino.logcfg as arologcfg
+import autorino.cfglog as arologcfg
 import rinexmod
 
 from geodezyx import utils, conv
 from rinexmod import rinexmod_api
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 class StepGnss:
@@ -767,11 +769,11 @@ class StepGnss:
         """
 
         if not prefix_lockfile:
-            prefix_lockfile = str(np.random.randint(100000,999999))
+            prefix_lockfile = str(np.random.randint(100000, 999999))
 
-        if hasattr(self, 'access'):
-            if isinstance(self.access, dict) and 'network' in self.access:
-                prefix_lockfile = self.access['network']
+        if hasattr(self, "access"):
+            if isinstance(self.access, dict) and "network" in self.access:
+                prefix_lockfile = self.access["network"]
 
         lockfile_path = os.path.join(self.tmp_dir, prefix_lockfile + "_lock")
 
@@ -907,7 +909,7 @@ class StepGnss:
                 The input string to be shrunk.
             maxlen : int, optional
                 The maximum length of the output string. Default is the value of the 'max_colwidth' parameter of the
-                'print_table' method.
+                'verbose' method.
 
             Returns
             -------
@@ -920,6 +922,8 @@ class StepGnss:
                 halflen = int((maxlen / 2) - 1)
                 str_out = str_inp[:halflen] + ".." + str_inp[-halflen:]
                 return str_out
+
+        self.table_ok_cols_bool()
 
         form = dict()
         form["fraw"] = _shrink_str
@@ -939,6 +943,24 @@ class StepGnss:
             return None
         else:
             return str_out
+
+    def table_ok_cols_bool(self):
+        """
+        Converts the column of the table to boolean values.
+
+        This method converts the specified column of the table to boolean values.
+        The column is converted to True if the value is 'OK' and False otherwise.
+
+        Wrapper for arocmn.is_ok()
+
+        Returns
+        -------
+        None
+        """
+        self.table["ok_inp"] = self.table["ok_inp"].apply(arocmn.is_ok)
+        self.table["ok_out"] = self.table["ok_out"].apply(arocmn.is_ok)
+
+        return None
 
     def load_table_from_filelist(self, input_files, inp_regex=".*", reset_table=True):
         """
@@ -1567,7 +1589,8 @@ class StepGnss:
         Filters the raw files based on the 'ok_out' boolean column of the object's table.
 
         This method checks if the raw files have a positive 'ok_out' boolean (i.e., the converted file already exists).
-        It modifies the 'ok_inp' boolean column of the object's table and returns the filtered raw files in a list.
+        It modifies the 'ok_inp' boolean column of the object's table i.e. the step action must be done (True)
+        or not (False) and returns the filtered raw files in a list.
 
         Returns
         -------
@@ -1785,8 +1808,8 @@ class StepGnss:
 
         # default options/arguments for rinexmod
         rinexmod_options_use = {
-            # 'marker': 'XXXX', # forced in .cnovert()
-            # 'sitelog': metadata, # forced in .cnovert()
+            # 'marker': 'XXXX', # forced in .convert()
+            # 'sitelog': metadata, # forced in .convert()
             "compression": "gz",
             "longname": True,
             "force_rnx_load": True,

@@ -6,7 +6,6 @@ Created on Fri Apr  7 12:07:18 2023
 @author: psakic
 """
 
-#### Import the logger
 from pathlib import Path
 
 import numpy as np
@@ -15,8 +14,10 @@ import autorino.common as arocmn
 import autorino.convert as arocnv
 from geodezyx import operational
 
+#### Import the logger
 import logging
-import autorino.config.env_read as aroenv
+import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
@@ -110,7 +111,7 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert(self, print_table=False, force=False, rinexmod_options=None):
+    def convert(self, verbose=False, force=False, rinexmod_options=None):
         """
         "total action" method
 
@@ -124,7 +125,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         Parameters
         ----------
-        print_table : bool, optional
+        verbose : bool, optional
             If True, prints the conversion table. Default is False.
         force : bool, optional
             If True, forces the conversion even if output files already exist. Default is False.
@@ -136,7 +137,7 @@ class ConvertGnss(arocmn.StepGnss):
         None
         """
 
-        ### here the None to dict is necessary, because we use a defaut rinexmod_options bellow
+        # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
         if rinexmod_options is None:
             rinexmod_options = {}
 
@@ -149,9 +150,9 @@ class ConvertGnss(arocmn.StepGnss):
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
-        ### other tmps subdirs come also later in the loop
+        # other tmps subdirs come also later in the loop
         self.set_translate_dict()
-        ### others translate dict updates will come in the loop
+        # others translate dict updates will come in the loop
 
         if self.metadata:
             site4_list, site9_list = arocnv.site_list_from_metadata(self.metadata)
@@ -165,20 +166,21 @@ class ConvertGnss(arocmn.StepGnss):
         self.guess_local_rnx()  # generate the potential local files
         self.check_local_files()  # tests if the local flies are already there
 
-        if not force_use:
+        if force_use:
+            self.table["ok_inp"] = True
+            self.table["note"] = "force_convert"
+        else:
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
                 self.filter_previous_tables(prv_tbl_df)
             self.filter_ok_out()
-        else:
-            self.table["ok_out"] = False
-            self.table["note"] = "force_convert"
 
         self.tmp_decmp_files, _ = self.decompress()
 
-        ### get a table with only the good files (ok_inp == True)
+        # get a table with only the good files (ok_inp == True)
         # table_init_ok must be used only for the following statistics!
+        self.table_ok_cols_bool()
         table_init_ok = self.filter_purge()
         n_ok_inp = (self.table["ok_inp"]).sum()
         n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()
@@ -189,7 +191,7 @@ class ConvertGnss(arocmn.StepGnss):
             n_not_ok_inp,
         )
 
-        if print_table:
+        if verbose:
             self.print_table()
 
         ######################### START THE LOOP ##############################
@@ -197,39 +199,40 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
+            if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
-            if arocmn.is_ok(self.table.loc[irow, "ok_inp"]) and arocmn.is_ok(self.table.loc[irow, "ok_out"]):
+            if self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
                 logger.info(
                     "conversion skipped (already converted in a previous run): %s", fraw
                 )
                 continue
-            if not arocmn.is_ok(self.table.loc[irow, "ok_inp"]):
+            if not self.table.loc[irow, "ok_inp"]:
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
 
             logger.info(">>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################
-            ##### something better must be done with
+            # ++++ something better must be done with
             # rinexmod.rinexmod_api.metadata_find_site() !!!!
             # clarify the site4 and the site9 usage
             # create method update_site_table_from_fname
 
-            ## change the site_id here is a very bad idea, it f*cks the outdir 240605
-            ## infact not, because of the new IGS update it should not be a pb anymore
+            # change the site_id here is a very bad idea, it f*cks the outdir 240605
+            # in fact not, because of the new IGS update (9 char in sitlog)
+            # it should not be a pb anymore
 
-            ### since the site code from fraw can be poorly formatted
+            # +++ since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
-            # we update the table row and the translate dic (necessary for the output dir)
+            # we update the table row and the translate_dic (necessary for the output dir)
             self.on_row_site_upd(irow, site4_list)
-            self.site_id = self.table.loc[irow, "site"]  ### for the output dir
+            self.site_id = self.table.loc[irow, "site"]  # for the output dir
 
             self.set_translate_dict()
             ###########################################################################
 
-            ### do a first converter selection by identifying odd files
+            # ++ do a first converter selection by identifying odd files
             converter_name_use = arocnv.select_conv_odd_file(fraw)
 
             logger.info("extension/converter: %s/%s", ext, converter_name_use)
@@ -240,19 +243,19 @@ class ConvertGnss(arocmn.StepGnss):
                 self.table.loc[irow, "ok_inp"] = False
                 self.write_in_table_log(self.table.loc[irow])
 
-            ### a function to stop the docker containers running for too long
+            # ++ a function to stop the docker containers running for too long
             # (for trimble conversion)
             arocnv.stop_old_docker()
 
             #############################################################
-            ###### CONVERSION
+            # +++++ CONVERSION
             frnxtmp = self.on_row_convert(
                 irow, self.tmp_dir_converted, converter_inp=converter_name_use
             )
-            self.tmp_rnx_files.append(frnxtmp)  ### list for final remove
+            self.tmp_rnx_files.append(frnxtmp)  # list for final remove
 
             #############################################################
-            ###### RINEXMOD
+            # +++++ RINEXMOD
             rinexmod_options_use = rinexmod_options.copy()
 
             debug_print_rinexmod_options = False
@@ -276,10 +279,10 @@ class ConvertGnss(arocmn.StepGnss):
             )
 
             #############################################################
-            ###### FINAL MOVE
+            # +++++ FINAL MOVE
             self.on_row_mv_final(irow)
 
-        #### remove temporary files
+        # ++++ remove temporary files
         self.remove_tmp_files()
 
         return None

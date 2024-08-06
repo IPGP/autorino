@@ -6,7 +6,6 @@ Created on Mon Jan  8 16:53:51 2024
 @author: psakic
 """
 
-import logging
 import os
 import re
 
@@ -16,9 +15,12 @@ import pandas as pd
 from geodezyx import utils
 from filelock import FileLock, Timeout
 
-logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
 
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def create_dummy_site_dic():
     """
@@ -190,11 +192,11 @@ def is_ok(val_inp):
     # scalar case
     if val_inp is None:
         return False
-    elif val_inp is np.nan:
+    elif val_inp == np.nan: # isnan not working if weird type is given
         return False
     elif val_inp == "":
         return False
-    elif val_inp == False:
+    elif not val_inp: # == False
         return False
     else:
         return True
