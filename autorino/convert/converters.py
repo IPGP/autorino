@@ -12,16 +12,16 @@ from pathlib import Path
 import os
 import re
 import subprocess
-from subprocess import Popen, PIPE
-from geodezyx import utils, operational
+from subprocess import PIPE
 import datetime as dt
 
-from autorino.convert import conv_regex, cmd_build
+from autorino.convert import cnv_regex, cmd_build
 
 #### Import the logger
 import logging
-log = logging.getLogger(__name__)
-log.setLevel("DEBUG")
+import autorino.cfgenv.env_read as aroenv
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 #############################################################################
 ### Low level functions
