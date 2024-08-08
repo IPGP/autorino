@@ -8,7 +8,7 @@ Created on 22/04/2024 16:16:23
 # Create a logger object.
 import logging
 import os
-import collections
+import collections.abc
 import yaml
 
 logger = logging.getLogger(__name__)
@@ -16,8 +16,8 @@ logger.setLevel("DEBUG")
 
 
 def update_recursive(d, u):
-    for k, v in u.iteritems():
-        if isinstance(v, collections.Mapping):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
             d[k] = update_recursive(d.get(k, {}), v)
         else:
             d[k] = v
