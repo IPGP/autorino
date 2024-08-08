@@ -89,8 +89,14 @@ class StepGnss:
             The session information for the step. If not provided, a dummy session is created.
         options : dict, optional
             The options for the step. If not provided, an empty options dictionary is created.
-        metadata : dict, optional
-            The metadata for the step. If not provided, a dummy metadata is created.
+        metadata : str or list, optional
+            The metadata to be included in the converted RINEX files. Possible inputs are:
+             * list of string (sitelog file paths),
+             * single string (single sitelog file path)
+             * single string (directory containing the sitelogs)
+             * list of MetaData objects
+             * single MetaData object.
+             Defaults to None.
         """
         self._init_epoch_range(epoch_range)
         self._init_site(site)
@@ -1157,10 +1163,14 @@ class StepGnss:
         list
             The list of paths of the invalidated files.
         """
-        med = self.table["size_out"].median(skipna=True)
-        valid_bool = threshold * med < self.table["size_out"]
-        self.table.loc[:, "ok_out"] = valid_bool
-        invalid_local_files_list = list(self.table.loc[valid_bool, "fpath_out"])
+
+        if not self.table["size_out"].isna().all():
+            med = self.table["size_out"].median(skipna=True)
+            valid_bool = threshold * med < self.table["size_out"]
+            self.table.loc[:, "ok_out"] = valid_bool
+            invalid_local_files_list = list(self.table.loc[valid_bool, "fpath_out"])
+        else:
+            invalid_local_files_list = []
 
         return invalid_local_files_list
 
