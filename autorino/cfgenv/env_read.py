@@ -56,7 +56,7 @@ def read_env(envfile_path=None):
         envfile_path_use = envfile_path_def
 
     # Log the path of the environment file being loaded
-    logger.debug("load environment config file: %s", envfile_path_use)
+    logger.info("load environment config file: %s", envfile_path_use)
 
     # Load the default and specified environment files and merge their contents
     env_dic_def = yaml.safe_load(open(envfile_path_def))
@@ -64,6 +64,9 @@ def read_env(envfile_path=None):
 
     env_dic_fin = env_dic_def.copy()
     env_dic_fin.update(env_dic_use)
+
+    logger.debug("environment values: %s", env_dic_fin)
+
 
     # Return the merged dictionary
     return env_dic_fin
