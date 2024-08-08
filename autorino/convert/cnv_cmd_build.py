@@ -373,10 +373,8 @@ def cmd_build_t0xconvert(
     out_dir = Path(out_dir)
 
     inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.name)
-    #shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
-
-    # Copy the input file to the output directory
-    inp_raw_fpath.rename(inp_raw_fpath_tmp)
+    # Copy the input file to the output directory (this is done silentely)
+    shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
 
     cmd_opt_list, _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
@@ -391,7 +389,8 @@ def cmd_build_t0xconvert(
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
 
-    #os.remove(inp_raw_fpath_tmp)
+    # Remove the temporary file (this is done silentely)
+    os.remove(inp_raw_fpath_tmp)
 
     return cmd_use, cmd_list, cmd_str
 

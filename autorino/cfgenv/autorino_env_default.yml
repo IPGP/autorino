@@ -13,5 +13,5 @@ conv_software_paths:
   teqc : "teqc"
 general:
   log_level: "DEBUG"
-  trimble_default_software: "t0xconvert"
+  trimble_default_software: "t0xconvert" # name of the Trimble converter key in the conv_software_paths above
 
