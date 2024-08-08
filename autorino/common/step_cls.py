@@ -1365,7 +1365,7 @@ class StepGnss:
         # TEMP RINEX Files
         tmp_rnx_files_new = []
         for f in self.tmp_rnx_files:
-            if os.path.isfile(f):
+            if f and os.path.isfile(f):
                 logger.debug("remove tmp converted RINEX file: %s", f)
                 os.remove(f)
             else:
