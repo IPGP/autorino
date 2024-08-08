@@ -26,6 +26,7 @@ cmd_str : string
 """
 import os
 import shutil
+
 # Import star style
 from pathlib import Path
 
@@ -377,11 +378,8 @@ def cmd_build_t0xconvert(
     # Copy the input file to the output directory
     inp_raw_fpath.rename(inp_raw_fpath_tmp)
 
-
     cmd_opt_list, _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
-
-
 
     cmd_list = (
         [bin_path, "-o", "-v304"]
