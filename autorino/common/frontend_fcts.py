@@ -91,7 +91,7 @@ def download_raw(
         The output directory where the downloaded files will be stored.
     hostname : str
         The hostname of the server from which the data files will be downloaded.
-    inp_dir_parent : str
+    inp_dir : str
         The parent directory on the server where the data files are located.
     inp_structure : str
         The structure of the input directory on the server.
