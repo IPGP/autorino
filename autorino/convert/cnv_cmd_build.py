@@ -384,17 +384,14 @@ def cmd_build_t0xconvert(
 
 
     cmd_list = (
-        bin_path
+        [bin_path, "-o", "-v304"]
         + cmd_opt_list
         + cmd_kwopt_list
-        + [inp_raw_fpath_tmp]
+        + [str(inp_raw_fpath_tmp)]
     )
     cmd_list = [str(e) for e in cmd_list]
-
-
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
-
 
     os.remove(inp_raw_fpath_tmp)
 
