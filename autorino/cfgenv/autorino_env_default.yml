@@ -3,7 +3,7 @@ conv_software_paths:
   leica : "mdb2rinex"
   septentrio : "sbf2rin"
   topcon : "tps2rin.exe"
-  trimble_t0xconvert : "trm2rinex:cli-light"
+  trimble_t0xconvert : "t0xConvert"
   trimble_trm2rinex : "trm2rinex:cli-light"
   trimble_runpkr00 : "runpkr00"
 
