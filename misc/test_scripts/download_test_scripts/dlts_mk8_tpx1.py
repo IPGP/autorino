@@ -2,7 +2,7 @@
 # import pandas as pd
 # import numpy as np
 # import os
-# from autorino import download as arodl
+# from autorino import download as arodwl
 # from autorino import convert as arocnv
 # from autorino import general as arocmn
 import yaml
@@ -35,7 +35,7 @@ dwl.print_table()
 
 
 # dwl.download_remote_files()
-# dwl.print_table()
+# dwl.verbose()
 
 # out = "/home/sysop/workflow_tests/convert_tests"
 # sitelog_dir = '/home/sysop/metadata/OVPF'
@@ -43,6 +43,6 @@ dwl.print_table()
 # conv = arocnv.ConvertGnss(ses,dwl.epoch_range,out,sitelog_dir)
 
 # conv.load_table_from_prev_step_table(dwl.table)
-# conv.print_table()
+# conv.verbose()
 # conv.conv_rnxmod_files()
-# conv.print_table()
+# conv.verbose()

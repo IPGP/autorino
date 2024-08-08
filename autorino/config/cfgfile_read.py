@@ -21,6 +21,7 @@ import autorino.handle as arohdl
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
 logger = logging.getLogger(__name__)
+logger.setLevel("DEBUG")
 
 def run_steps(steps_lis, step_select=[], print_table=True):
     """
@@ -31,7 +32,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     It iterates over the list of StepGnss objects and executes
     the 'download' or 'convert' method depending on the type of the step.
     If a list of selected steps is provided, only the steps in the list will be executed.
-    If the 'print_table' flag is set to True, the tables will be printed during the execution of the steps.
+    If the 'verbose' flag is set to True, the tables will be printed during the execution of the steps.
 
     Parameters
     ----------
@@ -101,9 +102,11 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     else:
         y_main_sessions = None
 
+    y = update_w_main_dic(y, y_main)
+    logger.debug("Used config file (updated with the main):\n %s",y)
+
     y_station = y["station"]
 
-    y = update_w_main_dic(y, y_main)
     steps_lis_lis, steps_dic_dic = read_cfg_sessions(
         y_station["sessions"], y_station=y_station, epoch_range=epoch_range
     )
@@ -141,8 +144,6 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         # y_workflow_main = y_ses_main['workflow']
 
         for k_stp, y_stp in y_steps.items():
-            logger.debug("k_stp, y_stp AAA %s %s ", k_stp, y_stp)
-
             # y_step_main = y_workflow_main[k_stp]
             # y_step = update_w_main_dic(y_step, y_step_main)
 
@@ -170,8 +171,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     log_dir=log_dir,
                     epoch_range=epo_obj_stp,
                     access=y_station["access"],
-                    remote_dir=inp_dir_parent,
-                    remote_fname=inp_structure,
+                    inp_dir_parent=inp_dir_parent,
+                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     options=y_stp["options"],
@@ -209,7 +210,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                 else:
                     sitelogs = None
 
-                spl = arohdl.SplitGnss
+                spl = arohdl.HandleGnss
                 step_obj = spl(
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
@@ -236,11 +237,15 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
     return steps_lis_lis, steps_dic_dic
 
 
-def _check_parent_dir_existence(parent_dir):
+def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
     """
     Checks if a parent directory exists and translates it with the environment variable first.
 
-    This function takes a string representing a directory path. It first translates the directory path with the environment variable. Then, it checks if the translated directory exists. If it does not exist, it raises a FileNotFoundError with a custom error message. If it does exist, it returns None.
+    This function takes a string representing a directory path.
+    It first translates the directory path with the environment variable.
+    Then, it checks if the translated directory exists.
+    If it does not exist, it raises a FileNotFoundError with a custom error message.
+    If it does exist, it returns None.
 
     This function is an internal function for the read_cfg function.
 
@@ -250,6 +255,9 @@ def _check_parent_dir_existence(parent_dir):
     ----------
     parent_dir : str
         A string representing a directory path.
+    parent_dir_key : str, optional
+        The dictionnary key representing the parent directory.
+        Default is None.
 
     Raises
     ------
@@ -263,7 +271,18 @@ def _check_parent_dir_existence(parent_dir):
     """
     parent_dir_out = arocmn.translator(parent_dir)
 
-    if not os.path.isdir(parent_dir_out):
+    if parent_dir_out == "FROM_MAIN": # case when the parent directory is not defined in the main config file
+
+        if not parent_dir_key:
+            parent_dir_key = "a directory"
+
+        logger.error("%s is not correctly defined in the main config file (FROM_MAIN alias remains)",
+                     parent_dir_key)
+        raise FileNotFoundError(
+            None, parent_dir_key + " do not exists, create it first"
+        )
+
+    elif not os.path.isdir(parent_dir_out): # standard case
         logger.error("%s do not exists, create it first", parent_dir_out)
         raise FileNotFoundError(
             None, parent_dir_out + " do not exists, create it first"
@@ -292,7 +311,9 @@ def _is_cfg_bloc_active(ywkf):
     Returns
     -------
     bool
-        True if the 'active' key is present and its value is True, or if the 'active' key is not present. False if the 'active' key is present and its value is False.
+        True if the 'active' key is present and its value is True,
+        or if the 'active' key is not present.
+        False if the 'active' key is present and its value is False.
     """
     if "active" in ywkf.keys():
         if ywkf["active"]:
@@ -348,7 +369,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
     dir_parent = y_step[dir_type + "_dir_parent"]
     structure = y_step[dir_type + "_structure"]
     if check_parent_dir_existence:
-        _check_parent_dir_existence(dir_parent)
+        _check_parent_dir_existence(dir_parent, parent_dir_key=dir_type + "_dir_parent")
     dir_path = os.path.join(dir_parent, structure)
 
     return dir_path, dir_parent, structure

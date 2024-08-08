@@ -28,14 +28,15 @@ cmd_str : string
 # Import star style
 from pathlib import Path
 
-import autorino.config.env_read as aroenv
+
 # from pathlib3x import Path
 from geodezyx import utils
 
 # IMPORT AUTORINO ENVIRONNEMENT VARABLES
 ##software paths
-aro_env = aroenv.read_env()
-aro_env_soft_path = aro_env["conv_software_paths"]
+import autorino.cfgenv.env_read as aroenv
+aro_env_soft_path = aroenv.aro_env_dict["conv_software_paths"]
+
 
 def _kw_options_dict2str(kw_options):
     """

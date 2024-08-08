@@ -6,7 +6,6 @@ Created on Mon Jan  8 16:53:51 2024
 @author: psakic
 """
 
-import logging
 import os
 import re
 
@@ -14,12 +13,32 @@ import numpy as np
 import pandas as pd
 
 from geodezyx import utils
+from filelock import FileLock, Timeout
+
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
-
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def create_dummy_site_dic():
+    """
+    Creates a dummy site dictionary.
+
+    This function creates and returns a dictionary with dummy site information.
+    The dictionary contains the following keys:
+    - name: The name of the site.
+    - site_id: The site identifier.
+    - domes: The DOMES number of the site.
+    - sitelog_path: The path to the site log.
+    - position_xyz: The XYZ coordinates of the site.
+
+    Returns
+    -------
+    dict
+        A dictionary containing dummy site information.
+    """
     d = dict()
 
     d["name"] = "XXXX"
@@ -32,6 +51,25 @@ def create_dummy_site_dic():
 
 
 def create_dummy_session_dic():
+    """
+    Creates a dummy session dictionary.
+
+    This function creates and returns a dictionary with dummy session information.
+    The dictionary contains the following keys:
+    - name: The name of the session.
+    - data_frequency: The data frequency of the session.
+    - tmp_dir_parent: The parent directory for temporary files.
+    - tmp_dir_structure: The directory structure for temporary files.
+    - log_parent_dir: The parent directory for log files.
+    - log_dir_structure: The directory structure for log files.
+    - out_dir_parent: The parent directory for output files.
+    - out_structure: The directory structure for output files.
+
+    Returns
+    -------
+    dict
+        A dictionary containing dummy session information.
+    """
     d = dict()
 
     d["name"] = "NA"
@@ -41,7 +79,7 @@ def create_dummy_session_dic():
     d["log_parent_dir"] = "<$HOME>/autorino_workflow_tests/log"
     d["log_dir_structure"] = "<site_id9>/%Y/%j"
     d["out_dir_parent"] = "<$HOME>/autorino_workflow_tests/out"
-    d["out_dir_structure"] = "<site_id9>/%Y/%j"
+    d["out_structure"] = "<site_id9>/%Y/%j"
 
     return d
 
@@ -114,7 +152,7 @@ def load_previous_tables(log_dir):
         an empty DataFrame is returned.
     """
     # Find all files ending with "*table.log" in the log directory
-    tables_files = utils.find_recursive(log_dir, "*table.log")
+    tables_files = utils.find_recursive(log_dir, "*_table.log")
 
     # If no such files are found, log a warning and return an empty DataFrame
     if not tables_files:
@@ -125,11 +163,12 @@ def load_previous_tables(log_dir):
         return pd.concat([pd.read_csv(t) for t in tables_files])
 
 
-def is_val_defined(val_inp):
+def is_ok(val_inp):
     """
-    Checks if the input value is defined.
+    Checks if the input value is OK or not.
 
-    This function takes an input value and checks if it is defined. It considers None, NaN, and an empty string as undefined.
+    This function takes an input value and checks if it is defined.
+    It considers None, NaN, False and an empty string as not OK.
     If the input value is one of these, the function returns False. Otherwise, it returns True.
 
     Parameters
@@ -148,16 +187,42 @@ def is_val_defined(val_inp):
     typ = utils.get_type_smart(val_inp)
 
     if utils.is_iterable(val_inp):
-        return typ([is_val_defined(v) for v in val_inp])
+        return typ([is_ok(v) for v in val_inp])
 
     # scalar case
     if val_inp is None:
         return False
-    elif val_inp is np.nan:
+    elif val_inp == np.nan: # isnan not working if weird type is given
         return False
     elif val_inp == "":
+        return False
+    elif not val_inp: # == False
         return False
     else:
         return True
 
 
+def check_lockfile(lockfile_path):
+    """
+    Checks the lock status of a specified file.
+
+    This function attempts to acquire a lock on the specified file. If the lock is acquired,
+    it prints a success message and releases the lock. If the lock is not acquired (i.e., the file
+    is already locked by a previous process), it prints a message indicating that the process is locked.
+
+    Parameters
+    ----------
+    lockfile_path : str
+        The path of the lock file to check the lock status for.
+
+    Returns
+    -------
+    None
+    """
+    lock = FileLock(lockfile_path)
+    try:
+        lock.acquire(timeout=0)
+        logger.debug(f"Lock free for {lockfile_path}")
+        lock.release()
+    except Timeout:
+        logger.warning(f"Process is locked by a previous process for {lockfile_path}")

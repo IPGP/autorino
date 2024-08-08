@@ -6,7 +6,7 @@ Created on Fri Apr  7 14:27:21 2023
 @author: psakicki
 """
 
-import autorino.convert.conv_batch as cvb
+import autorino.convert.cnv_batch as cvb
 
 #### Import star style
 from geodezyx import *  # Import the GeodeZYX modules
