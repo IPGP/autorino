@@ -385,6 +385,8 @@ def cmd_build_t0xconvert(
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
 
+    print("AAAAAAAAAAAA", cmd_list, cmd_str, cmd_use)
+
     os.remove(inp_raw_fpath_tmp)
 
     return cmd_use, cmd_list, cmd_str
