@@ -8,7 +8,7 @@ Created on 22/04/2024 16:16:23
 # Create a logger object.
 import logging
 import os
-
+import collections
 import yaml
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def read_env(envfile_path=None):
     env_dic_use = yaml.safe_load(open(envfile_path_use))
 
     env_dic_fin = env_dic_def.copy()
-    env_dic_fin.update(env_dic_use)
+    env_dic_fin = update_recursive(env_dic_fin, env_dic_use)
     logger.debug("default environment values (%s): %s", envfile_path_def, env_dic_def)
     logger.debug("used environment values (%s): %s", envfile_path_use, env_dic_use)
     logger.debug("final environment values: %s", env_dic_fin)
@@ -73,3 +73,12 @@ def read_env(envfile_path=None):
 
 
 aro_env_dict = read_env()
+
+
+def update_recursive(d, u):
+    for k, v in u.iteritems():
+        if isinstance(v, collections.Mapping):
+            d[k] = update(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
