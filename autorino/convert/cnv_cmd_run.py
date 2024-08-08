@@ -97,7 +97,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         converter_inp = aroenv.aro_env_dict["general"]["trimble_default_software"]
 
     # main test for Trimble : choose the right converter
-    if ext in (".T00", ".T00", ".T02", ".T04") or converter_inp == "t0xconvert":
+    if ext in (".T00", ".T00", ".T02", ".T04") and converter_inp == "t0xconvert":
         converter_name = "t0xconvert"
         brand = "Trimble (official converter)"
         cmd_build_fct = arcv.cmd_build_t0xconvert
@@ -105,7 +105,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-    elif ext in (".T00", ".T00", ".T02", ".T04") or converter_inp == "trm2rinex":
+    elif ext in (".T00", ".T00", ".T02", ".T04") and converter_inp == "trm2rinex":
         converter_name = "trm2rinex"
         brand = "Trimble (unofficial converter)"
         cmd_build_fct = arcv.cmd_build_trm2rinex
@@ -113,7 +113,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-    elif ext == (".T00", ".T00", ".T02", ".T04") or converter_inp == "runpkr00":
+    elif ext == (".T00", ".T00", ".T02", ".T04") and converter_inp == "runpkr00":
         converter_name = "runpkr00"
         brand = "Trimble (legacy converter)"
         cmd_build_fct = arcv.cmd_build_runpkr00
