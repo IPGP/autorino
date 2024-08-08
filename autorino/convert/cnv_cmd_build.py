@@ -373,7 +373,7 @@ def cmd_build_t0xconvert(
     out_dir = Path(out_dir)
 
     inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.name)
-    shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
+    #shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
 
     # Copy the input file to the output directory
     inp_raw_fpath.rename(inp_raw_fpath_tmp)
