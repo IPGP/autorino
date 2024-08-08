@@ -25,6 +25,7 @@ cmd_str : string
 
 """
 import os
+import shutil
 # Import star style
 from pathlib import Path
 
@@ -371,9 +372,16 @@ def cmd_build_t0xconvert(
     out_dir = Path(out_dir)
 
     inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.name)
+    shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
+
+    # Copy the input file to the output directory
+    inp_raw_fpath.rename(inp_raw_fpath_tmp)
+
 
     cmd_opt_list, _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    print("AAAAAAAAAAAAAAABBBBBBBBBBBBBB")
 
     cmd_list = (
         bin_path
@@ -382,7 +390,6 @@ def cmd_build_t0xconvert(
         + str(inp_raw_fpath_tmp)
     )
     cmd_list = [str(e) for e in cmd_list]
-    print("AAAAAAAAAAAA", cmd_list)
 
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
