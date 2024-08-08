@@ -8,7 +8,6 @@ Created on Fri Apr  7 12:07:18 2023
 
 import datetime as dt
 #### Import the logger
-import logging
 import os
 import re
 from pathlib import Path
@@ -18,8 +17,11 @@ import docker
 
 from rinexmod import rinexmod_api
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def site_list_from_metadata(metadata_inp):
@@ -39,7 +41,7 @@ def site_list_from_metadata(metadata_inp):
      * list of MetaData objects
      * single MetaData object
 
-    see also `rinexmod_api.metadata_input_manage`
+    This function is mainly a wrapper of `rinexmod_api.metadata_input_manage`
 
     Returns
     -------
@@ -57,13 +59,17 @@ def site_list_from_metadata(metadata_inp):
     else:
         metadata = metadata_inp
 
-    ### get the site (4chars) as a list
+    # get the site (4chars) as a list
     site4_list = [s.site4char for s in metadata]
+    # get the site (9chars) as a list
+    # site9_list = [s.site9char for s in metadata]
 
-    return site4_list
+    site9_list = []
+
+    return site4_list, site9_list
 
 
-def site_search_from_list(fraw_inp, site4_list_inp):
+def site_search_from_list(fraw_inp, site_list_inp):
     """
     Searches for the correct site name of a raw file from a list of correct site names.
 
@@ -73,15 +79,17 @@ def site_search_from_list(fraw_inp, site4_list_inp):
 
     Parameters
     ----------
-    fraw_inp : str
+    fraw_inp : Path
         The name of the raw file with an approximate site name.
-    site4_list_inp : list
-        A list of correct 4-character site names.
+    site_list_inp : list
+        A list of correct 4 or 9-character site names.
+        Only the 4 first characters will be considered.
 
     Returns
     -------
     str
-        The correct site name of the raw file. If no match is found in the list, the function returns the first 4 characters of the raw file name.
+        The correct site name of the raw file. If no match is found in the list,
+        the function returns the first 4 characters of the raw file name.
 
     Notes
     -----
@@ -89,9 +97,10 @@ def site_search_from_list(fraw_inp, site4_list_inp):
     """
 
     site_out = None
-    for s4 in site4_list_inp:
+    for s in site_list_inp:
+        s4 = s[:4]
         if re.search(s4, fraw_inp.name, re.IGNORECASE):
-            site_out = s4
+            site_out = s
             break
     if not site_out:  # last chance, get the 4 1st chars of the raw file
         site_out = fraw_inp.name[:4]
@@ -111,7 +120,7 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
 
     Parameters
     ----------
-    fraw_inp : str
+    fraw_inp : Path
         The name of the raw file with an unconventional extension.
     ext_excluded : list, optional
         A list of file extensions to be excluded. If a file's extension matches one in this list, the file is skipped.
@@ -150,7 +159,7 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
         for ext_exl in ext_excluded:
             if re.match(ext_exl, ext):
                 conve = None
-                logger.warn(
+                logger.warning(
                     "%s will be skipped, excluded extention %s", fraw.name, ext_exl
                 )
                 break
@@ -158,17 +167,20 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
     return conve
 
 
-def stop_long_running_containers(max_running_time=120):
+def stop_old_docker(max_running_time=120):
     """
     Stops Docker containers that have been running for a specified amount of time.
 
     This function is useful for stopping long-running trm2rinex Docker containers.
-    It iterates over all running Docker containers and stops any that have been running for longer than the specified maximum running time.
+    It iterates over all running Docker containers and stops any that have been
+    running for longer than the specified maximum running time.
 
     Parameters
     ----------
     max_running_time : int, optional
-        The maximum running time (in seconds) for a Docker container. Any container running longer than this will be stopped. Default is 120 seconds.
+        The maximum running time (in seconds) for a Docker container.
+        Any container running longer than this will be stopped.
+        Default is 120 seconds.
 
     Returns
     -------

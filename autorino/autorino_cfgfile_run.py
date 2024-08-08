@@ -7,8 +7,6 @@ Created on Sun Feb 11 18:44:52 2024
 """
 
 import argparse
-
-import autorino.config as arocfg
 import autorino.common as arocmn
 
 if __name__ == '__main__':

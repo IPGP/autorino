@@ -33,13 +33,23 @@ based on _autorino_'s spinoff tool [_rinexmod_](https://github.com/IPGP/rinexmod
 
 ## Installation
 
+
 For the time being, the package is not available on PyPi, so you need to install it by adding the path of the _autorino_
-package to your Python path.
+package to your `$PYTHONPATH` in your _.bashrc_.
+```bash
+PYTHONPATH=$PYTHONPATH:/home/user/path_to/autorino
+```
+
+If you want to use _autorino_ in CLI mode, you must also add the path to the _autorino_ script to your `$PATH` in your _.bashrc_.
+```bash
+$PATH=$PATH:/home/user/path_to/autorino/autorino
+``` 
+Note that it is `autorino/autorino` two times, since the CLI programs are inside the _autorino_'s module.
 
 ### External dependencies
 _autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
 ```
-pip install geodezyx
+pip install -r /home/user/path_to/autorino/requirements.txt
 ```
 
 ### Setting up the environment
@@ -63,7 +73,7 @@ GNSS manufacturers websites.
 You can find the official converters here:
 #### Leica
 converter here: [mdb2rinex](https://myworld-portal.leica-geosystems.com/s/fr/application?c__app=downloads)  
-Go in: _Products & Services > Downloads > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
+Go in: _Products & Services > Downloads > GNSS Products > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
 see IGSMAIL-8341 for more details.
 #### Septentrio
 converter here: [sbf2rin](https://www.septentrio.com/en/products/software/rxtools#resources)
@@ -134,7 +144,7 @@ arocmn.convert_rnx(l,out_dir,tmp_dir)
 
 #### `autorino_convert_rnx` minimal example
 ``` bash
-python3 autorino_convert_rnx.py  --force  --metadata /home/user/path/of/your/sitelogs  --out_dir_structure '<SITE_ID4>/%Y' --list_file_input  /home/user/where_your/raw_data/are_stored/raw_data.list /home/user/where_your/rinex_data/will_be_saved/```
+python3 autorino_convert_rnx.py  --force  --metadata /home/user/path/of/your/sitelogs  --out_dir_structure '<SITE_ID4>/%Y' --list_file_input  /home/user/where_your/raw_data/are_stored/raw_data_list.txt /home/user/where_your/rinex_data/will_be_saved/```
 ```
 
 #### `autorino_convert_rnx` help
@@ -269,3 +279,4 @@ The central attribute of a `StepGnss` object is its table (`step_gnss.table`).
 
 This is a pandas' DataFrame that lists, among other things, the input files, and, 
 where applicable, the output files if the operation has been successful.
+

@@ -71,18 +71,18 @@ class RequestGnss():
     ########### methods        
     def guess_remote_files(self,set_req_remote_files=True):
         
-        if not self.session.remote_fname:
+        if not self.session.inp_structure:
             logger.warning("generic filename empty for %s, the guessed remote filepaths will be wrong",self.session)
         
         rmot_paths_list = []
         for date in self.date_range.date_range_list():
             ### guess the potential directories
-            rmot_dir_use = str(self.session.remote_dir)
+            rmot_dir_use = str(self.session.inp_dir_parent)
             rmot_dir_use = _dir_translator_date(rmot_dir_use,date)
             rmot_dir_use = _dir_translator_keywords(rmot_dir_use,
                                                     self.session.translate_dict)
             ### guess the potential filenames
-            rmot_fname_use = str(self.session.remote_fname)
+            rmot_fname_use = str(self.session.inp_structure)
             rmot_fname_use = _dir_translator_date(rmot_fname_use,
                                                   date)
             rmot_fname_use = _dir_translator_keywords(rmot_fname_use,
@@ -110,7 +110,7 @@ class RequestGnss():
         
         rmot_dir_list = []
         for date in self.date_range.date_range_list():
-            rmot_dir_use = str(self.session.remote_dir)
+            rmot_dir_use = str(self.session.inp_dir_parent)
             rmot_dir_use = _dir_translator_date(rmot_dir_use,date)
             rmot_dir_use = _dir_translator_keywords(rmot_dir_use,
                                                     self.session.translate_dict)
@@ -213,25 +213,25 @@ class SessionGnss:
 ############################################################
 # protocol = "http"
 # hostname="http://gps-abd.terrain.ovsg.univ-ag.fr/"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # sta_user=""
 # sta_pass=""
 
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://gps-dsd.terrain.ovsg.univ-ag.fr"
 # sta_user=""
 # sta_pass=""
 
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://195.83.190.74"
 # sta_user=""
 # sta_pass=""
 
 # # HOUE
 # protocol = "ftp"
-# remote_dir="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
+# inp_dir_parent="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
 # hostname="gps-houe.terrain.ovsg.univ-ag.fr"
 # sta_user="root"
 # sta_pass="ovsg13;:"

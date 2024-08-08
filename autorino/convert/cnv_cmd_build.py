@@ -25,29 +25,32 @@ cmd_str : string
 
 """
 
-#### Import star style
+# Import star style
 from pathlib import Path
 
-import autorino.config.env_read as aroenv
+
 # from pathlib3x import Path
 from geodezyx import utils
 
-#### IMPORT AUTORINO ENVIRONNEMENT VARABLES
-## software paths
-aro_env = aroenv.read_env()
-aro_env_soft_path = aro_env["conv_software_paths"]
+# IMPORT AUTORINO ENVIRONNEMENT VARABLES
+##software paths
+import autorino.cfgenv.env_read as aroenv
+aro_env_soft_path = aroenv.aro_env_dict["conv_software_paths"]
 
 
 def _kw_options_dict2str(kw_options):
     """
     Converts a dictionary of keyword options into a command line string.
 
-    This function takes a dictionary where the keys are command line option flags (e.g., "-a", "-b") and the values are the corresponding values for these flags. It returns a string that represents these options in a format that can be used in a command line interface.
+    This function takes a dictionary where the keys are command line option flags (e.g., "-a", "-b")
+    and the values are the corresponding values for these flags.
+    It returns a string that represents these options in a format that can be used in a command line interface.
 
     Parameters
     ----------
     kw_options : dict
-        A dictionary where the keys are command line option flags and the values are the corresponding values for these flags.
+        A dictionary where the keys are command line option flags and the values
+        are the corresponding values for these flags.
 
     Returns
     -------
@@ -127,7 +130,9 @@ def cmd_build_generic(
     """
     Builds a command to launch a generic converter.
 
-    This function is primarily used for development purposes. It constructs a command by concatenating the provided parameters in a specific order. The command can then be used to launch a generic converter.
+    This function is primarily used for development purposes.
+    It constructs a command by concatenating the provided parameters in a specific order.
+    The command can then be used to launch a generic converter.
 
     Parameters
     ----------
@@ -215,7 +220,8 @@ def cmd_build_trm2rinex(
     ----
     Usage of `trm2rinex`
 
-    docker run --rm -v ${DIR_INP}:/inp -v ${DIR_OUT}:/out trm2rinex:cli-light inp/${FNAME_RAW} -p out/${SUBDIR_OUT} -n -d -s -v 3.04
+    docker run --rm -v ${DIR_INP}:/inp -v ${DIR_OUT}:/out trm2rinex:cli-light
+    inp/${FNAME_RAW} -p out/${SUBDIR_OUT} -n -d -s -v 3.04
 
     data/MAGC320b.2021.rt27 defines the input file (relative to container filesystem root)
     -p data/out defines the path for the conversion output (relative to container filesystem root)
@@ -232,7 +238,7 @@ def cmd_build_trm2rinex(
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
-    ### out_dir must be writable by root => 777
+    # out_dir must be writable by root => 777
     out_dir_access_rights = out_dir.stat().st_mode
     out_dir.chmod(0o777)
 
@@ -318,7 +324,7 @@ def cmd_build_mdb2rinex(
 
     """
 
-    #### Convert the paths as Path objects
+    # Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
@@ -488,7 +494,7 @@ def cmd_build_sbf2rin(
     -V              Display the sbf2rin version.
     """
 
-    #### Convert the paths as Path objects
+    # Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
@@ -576,7 +582,7 @@ def cmd_build_runpkr00(
               runpkr00 -demv @r00.lst comb2330
     """
 
-    #### Convert the paths as Path objects
+    # Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
@@ -925,7 +931,7 @@ def cmd_build_tps2rin(
     ```
     """
 
-    #### Convert the paths as Path objects
+    # Convert the paths as Path objects
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
@@ -983,9 +989,9 @@ def cmd_build_teqc(
         the command as a concatenated string.
     """
 
-    #### Convert the paths as Path objects
+    # Convert the paths as Path objects
     out_dir = Path(out_dir)
-    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    # for RINEX handeling, inp_raw_fpath can ben an iterable (list)
     if utils.is_iterable(inp_raw_fpath):
         raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
         raw_fpath_mono = raw_fpath_multi[0]
@@ -1167,11 +1173,13 @@ def cmd_build_converto(
         -l5                      Inclut les observables issus de la bande L5 en GPS (RINEX v2.11)
         -std                     Joue le role de -l2c et -l5 (RINEX v2.11)
         -l1c                     Inclut les observables Civilian sur L1 (L1C) en GPS (RINEX v2.12)
-        -v212                    Joue le role de -l1c, -std et inclut les observables BDS/Compass, QZSS et IRNSS (RINEX v2.12)
+        -v212                    Joue le role de -l1c, -std et inclut les observables BDS/Compass, QZSS et IRNSS
+                                 (RINEX v2.12)
         -rep[ort]                Ecrit un fichier de rapport de la conversion
 
      # Options en mode -qc :
-        -set_mask|masks #        Positionner le masque a # degres (defaut : 10.00 ; separer par une virgule si plusieurs valeurs)
+        -set_mask|masks #        Positionner le masque a # degres
+                                 (defaut : 10.00 ; separer par une virgule si plusieurs valeurs)
         -sym[bol_codes]          dump symbol codes and hierarchy for short report qc ASCII timeplot
         -w[idth] #               set time width of qc ASCII timeplot to # (default = 72)
         -lli                     Desactiver l'affichage des indicateurs de Loss Of Lock (symbole L)
@@ -1316,7 +1324,8 @@ def cmd_build_gfzrnx(
          [-vosc <2|3|4>]           - output RINEX version (fully standard conform)
 
          [-vnum m.nn]              - change header VERSION number and set output RINEX version
-                                     (only the version number is changed / output RINEX version is the highest supported one)
+                                     (only the version number is changed / output RINEX version is the highest supported
+                                     one)
 
          [-pr3rx2 <list>]          - komma separated list of list of signal priorities used for rinex 3 -> 2 conversion
                                      to overwrite the standard settings, see documentation for details.
