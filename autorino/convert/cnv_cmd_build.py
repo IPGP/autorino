@@ -381,15 +381,16 @@ def cmd_build_t0xconvert(
     cmd_opt_list, _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
 
-    print("AAAAAAAAAAAAAAABBBBBBBBBBBBBB")
+
 
     cmd_list = (
         bin_path
         + cmd_opt_list
         + cmd_kwopt_list
-        + str(inp_raw_fpath_tmp)
+        + [inp_raw_fpath_tmp]
     )
     cmd_list = [str(e) for e in cmd_list]
+
 
     cmd_str = " ".join(cmd_list)
     cmd_use = [cmd_str]
