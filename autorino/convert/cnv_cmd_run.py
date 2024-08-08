@@ -94,8 +94,9 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     # +++++ TRIMBLE
     # preliminary tests: Trimble default converter must be extracted from the environment values
     if ext == (".T00", ".T00", ".T02", ".T04") and converter_inp == "auto":
-        converter_inp = aroenv.aro_env_dict["general"]["log_level"]
+        converter_inp = aroenv.aro_env_dict["general"]["trimble_default_software"]
 
+    # main test for Trimble : choose the right converter
     if ext in (".T00", ".T00", ".T02", ".T04") or converter_inp == "t0xconvert":
         converter_name = "t0xconvert"
         brand = "Trimble (official converter)"
