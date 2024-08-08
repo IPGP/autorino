@@ -15,6 +15,15 @@ logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
 
 
+def update_recursive(d, u):
+    for k, v in u.iteritems():
+        if isinstance(v, collections.Mapping):
+            d[k] = update_recursive(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
+
+
 def read_env(envfile_path=None):
     """
     read a environement config file path (YAML format) and return
@@ -75,10 +84,3 @@ def read_env(envfile_path=None):
 aro_env_dict = read_env()
 
 
-def update_recursive(d, u):
-    for k, v in u.iteritems():
-        if isinstance(v, collections.Mapping):
-            d[k] = update(d.get(k, {}), v)
-        else:
-            d[k] = v
-    return d
