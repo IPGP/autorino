@@ -107,7 +107,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
 
     elif ext in (".T00", ".T00", ".T02", ".T04") and converter_inp == "trm2rinex":
         converter_name = "trm2rinex"
-        brand = "Trimble (unofficial converter)"
+        brand = "Trimble (unofficial Docker converter)"
         cmd_build_fct = arcv.cmd_build_trm2rinex
         conv_regex_fct = arcv.conv_regex_trm2rinex
         bin_options = []
