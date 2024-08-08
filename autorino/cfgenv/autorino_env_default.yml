@@ -13,5 +13,5 @@ conv_software_paths:
   teqc : "teqc"
 general:
   log_level: "DEBUG"
-  trimble_default_software: "trimble_trm2rinex"
+  trimble_default_software: "trm2rinex"
 
