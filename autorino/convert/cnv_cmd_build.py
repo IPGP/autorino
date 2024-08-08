@@ -188,7 +188,7 @@ def cmd_build_trm2rinex(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["trimble_trm2rinex"],
+    bin_path=aro_env_soft_path["trm2rinex"],
 ):
     """
     Build a command to launch trm2rinex, the Trimble converter
@@ -282,7 +282,7 @@ def cmd_build_t0xconvert(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["trimble_t0xconvert"],
+    bin_path=aro_env_soft_path["t0xconvert"],
 ):
     """
     Build a command to launch t0xConvert, the Trimble converter
@@ -401,7 +401,7 @@ def cmd_build_mdb2rinex(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["leica"],
+    bin_path=aro_env_soft_path["mdb2rinex"],
 ):
     """
     Build a command to launch mdb2rinex, the Leica converter
@@ -470,7 +470,7 @@ def cmd_build_sbf2rin(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["septentrio"],
+    bin_path=aro_env_soft_path["sbf2rin"],
 ):
     """
      Build a command to launch sbf2rin, the Septentrio converter
@@ -640,7 +640,7 @@ def cmd_build_runpkr00(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["trimble_runpkr00"],
+    bin_path=aro_env_soft_path["runpkr00"],
 ):
     """
     Build a command to launch runpkr00, the Trimble > teqc converter
@@ -897,7 +897,7 @@ def cmd_build_tps2rin(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["topcon"],
+    bin_path=aro_env_soft_path["tps2rin"],
 ):
     """
     Build a command to launch tps2rin, for Topcon

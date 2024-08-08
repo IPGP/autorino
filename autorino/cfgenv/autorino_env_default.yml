@@ -1,17 +1,17 @@
 conv_software_paths:
-  convbin : "convbin"
-  leica : "mdb2rinex"
-  septentrio : "sbf2rin"
-  topcon : "tps2rin.exe"
-  trimble_t0xconvert : "t0xConvert"
-  trimble_trm2rinex : "trm2rinex:cli-light"
-  trimble_runpkr00 : "runpkr00"
-
+  convbin : "convbin" #RTKLIB converter
+  mdb2rinex : "mdb2rinex" # Leica
+  sbf2rin : "sbf2rin" # Septentrio
+  tps2rin : "tps2rin.exe" # Topcon
+  ### Trimble
+  t0xconvert : "t0xConvert" # Trimble official
+  trm2rinex : "trm2rinex:cli-light" # Trimble unofficial docker
+  runpkr00 : "runpkr00" # Trimble legacy
   ### RINEX handeling
   converto : "ConvertoCPP"
   gfzrnx : "gfzrnx"
   teqc : "teqc"
 general:
   log_level: "DEBUG"
-  trimble_default_software: "trm2rinex"
+  trimble_default_software: "t0xconvert"
 
