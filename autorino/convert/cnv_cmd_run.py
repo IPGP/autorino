@@ -20,123 +20,12 @@ from geodezyx import utils, conv
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
-
-#############################################################################
-### Low level functions
-
-
-def _find_converted_files(directory, pattern_main, pattern_annex, n_sec=10):
-    """
-    Searches for the files in a directory that were recently created (within the last n_sec seconds)
-    and match the main and annex patterns.
-
-    This function iterates over all files in the specified directory and checks
-    if they were created within the last n_sec seconds
-    and if their names match the main or annex patterns.
-    It returns two lists of files that match the main and annex patterns, respectively.
-
-    Parameters
-    ----------
-    directory : Path
-        The directory in which to search for files.
-    pattern_main : str
-        The regular expression pattern that the main files should match.
-    pattern_annex : str
-        The regular expression pattern that the annex files should match.
-    n_sec : int, optional
-        The number of seconds in the past to consider for file creation. Default is 10.
-
-    Returns
-    -------
-    list
-        The list of main files that were found.
-    list
-        The list of annex files that were found.
-    """
-    now = dt.datetime.now()
-    delta = dt.timedelta(seconds=n_sec)
-    files_main = []
-    files_annex = []
-    files_main_time = []
-    files_annex_time = []
-    for file in os.listdir(directory):
-        filepath = os.path.join(directory, file)
-        if os.path.isfile(filepath):
-            created_time = dt.datetime.fromtimestamp(os.path.getctime(filepath))
-            if now - created_time < delta and re.match(pattern_main, file):
-                files_main.append(filepath)
-                files_main_time.append(created_time)
-            elif now - created_time < delta and re.match(pattern_annex, file):
-                files_annex.append(filepath)
-                files_annex_time.append(created_time)
-            else:
-                pass
-
-    # Sort the files found
-    files_main = [x for _, x in sorted(zip(files_main_time, files_main))]
-    files_annex = [x for _, x in sorted(zip(files_annex_time, files_annex))]
-
-    if len(files_main) > 1:
-        logger.warning("Several converted main files found %s", files_main)
-        files_main = [files_main[-1]]
-        logger.warning("Keeping most recent only: %s", files_main[0])
-
-    return files_main, files_annex
-
-
-## https://stackoverflow.com/questions/36495669/difference-between-terms-option-argument-and-parameter
-## https://tinf2.vub.ac.be/~dvermeir/mirrors/www-wks.acs.ohio-state.edu/unix_course/intro-14.html
-## https://discourse.ubuntu.com/t/command-structure/18556
-
-
-def _ashtech_name_2_date(inp_raw_fpath):
-    """
-    Extracts the record date from an ASHTECH file name.
-
-    This function extracts the year, day of year, GPS week, and day of week from the name of an ASHTECH file.
-    It also returns the date as a Python datetime object.
-
-    Parameters
-    ----------
-    inp_raw_fpath : Path
-        The path of the input ASHTECH file.
-
-    Returns
-    -------
-    int
-        The year extracted from the file name.
-    int
-        The day of the year extracted from the file name.
-    int
-        The GPS week extracted from the file name.
-    int
-        The day of the week extracted from the file name.
-    datetime
-        The date extracted from the file name as a Python datetime object.
-    """
-
-    inp_raw_fpath = Path(inp_raw_fpath)
-    doy = int(inp_raw_fpath.suffix[1:])
-    yy = int(inp_raw_fpath.stem[-2:])
-
-    if yy < 80:
-        y2k = 2000
-    else:
-        y2k = 1900
-
-    yyyy = y2k + yy
-
-    date = conv.doy2dt(yyyy, doy)
-    week, dow = conv.dt2gpstime(date)
-
-    return yyyy, doy, week, dow, date
-
-
 ###################################################################
-#### conversion function
+# +++++ conversion function
 
 
 def _convert_select(converter_inp, inp_raw_fpath=None):
@@ -183,8 +72,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         )
         raise Exception
 
-    ## for RINEX handeling, inp_raw_fpath can ben an iterable (list)
-    ## thus we just keep the 1st elt
+    # + for RINEX handeling, inp_raw_fpath can ben an iterable (list)
+    # + thus we just keep the 1st elt
     if utils.is_iterable(inp_raw_fpath):
         inp_raw_fpath = inp_raw_fpath[0]
 
@@ -202,10 +91,18 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         ext = ""
         fname = inp_raw_fpath.name.upper()
 
-    ##### TRIMBLE
-    if ext in (".T00", ".T02") or converter_inp == "trm2rinex":
+    # +++++ TRIMBLE
+    if ext in (".T00", ".T02", ".T04") or converter_inp == "t0xconvert":
         converter_name = "trm2rinex"
-        brand = "Trimble"
+        brand = "Trimble (official converter)"
+        cmd_build_fct = arcv.cmd_build_t0xconvert
+        conv_regex_fct = arcv.conv_regex_t0xconvert
+        bin_options = []
+        bin_kwoptions = dict()
+
+    elif ext in (".T00", ".T02", ".T04") or converter_inp == "trm2rinex":
+        converter_name = "trm2rinex"
+        brand = "Trimble (unofficial converter)"
         cmd_build_fct = arcv.cmd_build_trm2rinex
         conv_regex_fct = arcv.conv_regex_trm2rinex
         bin_options = []
@@ -213,7 +110,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
 
     elif ext == ".T02" or converter_inp == "runpkr00":
         converter_name = "runpkr00"
-        brand = "Trimble"
+        brand = "Trimble (legacy converter)"
         cmd_build_fct = arcv.cmd_build_runpkr00
         conv_regex_fct = arcv.conv_regex_runpkr00
         bin_options = []
@@ -227,7 +124,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-        ##### ASHTECH
+    # +++++ ASHTECH
     elif re.match(".([0-9]{3})", ext) and fname[0] in ("U", "R", "B"):
         converter_name = "teqc"
         brand = "Ashtech"
@@ -241,7 +138,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         # bin_kwoptions = {"-week": str(week)}
         bin_kwoptions = dict()
 
-        ##### LEICA
+    # +++++ LEICA
     elif re.match(".(M[0-9]{2}|MDB)", ext) or converter_inp == "mdb2rinex":
         converter_name = "mdb2rinex"
         brand = "Leica"
@@ -250,7 +147,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-        ##### SEPTENTRIO
+    # +++++ SEPTENTRIO
     elif re.match(".[0-9]{2}_", ext) or converter_inp == "sbf2rin":
         converter_name = "sbf2rin"
         brand = "Septentrio"
@@ -259,7 +156,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-        ##### GENERIC BINEX
+    # +++++ GENERIC BINEX
     elif ext == ".BNX" or converter_inp == "convbin":
         converter_name = "convbin"
         brand = "Generic BINEX"
@@ -268,7 +165,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-        ##### TOPCON
+    # +++++ TOPCON
     elif ext == ".TPS" or converter_inp == "tps2rin":
         converter_name = "tps2rin"
         brand = "Topcon"
@@ -277,7 +174,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-        ##### GFZRNX
+    # +++++ GFZRNX
     elif converter_inp == "gfzrnx":
         converter_name = "gfzrnx"
         brand = "RINEX Handeling (GFZ)"
@@ -286,7 +183,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-        ##### CONVERTO
+    # +++++ CONVERTO
     elif converter_inp == "converto":
         converter_name = "converto"
         brand = "RINEX Handeling (IGN)"
@@ -342,7 +239,8 @@ def converter_run(
         name of the converter used.
         Supports :
             * 'auto' (automatic choice based on the extension),
-            * 'trm2rnx' (Trimble),
+            * 'trm2rnx' (Trimble unofficial),
+            * 't0xconvert' (Trimble official),
             * 'runpkr00' (Trimble legacy),
             * 'teqc' (legacy conversion & RINEX Handeling),
             * 'mdb2rinex' (Leica),
@@ -397,7 +295,7 @@ def converter_run(
         raw_fpath_multi = [Path(e) for e in inp_raw_fpath]
         raw_fpath_mono = raw_fpath_multi[0]
         raw_fpath = raw_fpath_multi
-    else: # a single file, most common case
+    else:  # a single file, most common case
         raw_fpath_multi = [Path(inp_raw_fpath)]
         raw_fpath_mono = Path(inp_raw_fpath)
         raw_fpath = raw_fpath_mono
@@ -519,3 +417,114 @@ def converter_run(
             logger.info("converted annex file removed: %s", f)
 
     return str(out_fpath), process_converter
+
+
+#############################################################################
+### Low level functions
+
+
+def _find_converted_files(directory, pattern_main, pattern_annex, n_sec=10):
+    """
+    Searches for the files in a directory that were recently created (within the last n_sec seconds)
+    and match the main and annex patterns.
+
+    This function iterates over all files in the specified directory and checks
+    if they were created within the last n_sec seconds
+    and if their names match the main or annex patterns.
+    It returns two lists of files that match the main and annex patterns, respectively.
+
+    Parameters
+    ----------
+    directory : Path
+        The directory in which to search for files.
+    pattern_main : str
+        The regular expression pattern that the main files should match.
+    pattern_annex : str
+        The regular expression pattern that the annex files should match.
+    n_sec : int, optional
+        The number of seconds in the past to consider for file creation. Default is 10.
+
+    Returns
+    -------
+    list
+        The list of main files that were found.
+    list
+        The list of annex files that were found.
+    """
+    now = dt.datetime.now()
+    delta = dt.timedelta(seconds=n_sec)
+    files_main = []
+    files_annex = []
+    files_main_time = []
+    files_annex_time = []
+    for file in os.listdir(directory):
+        filepath = os.path.join(directory, file)
+        if os.path.isfile(filepath):
+            created_time = dt.datetime.fromtimestamp(os.path.getctime(filepath))
+            if now - created_time < delta and re.match(pattern_main, file):
+                files_main.append(filepath)
+                files_main_time.append(created_time)
+            elif now - created_time < delta and re.match(pattern_annex, file):
+                files_annex.append(filepath)
+                files_annex_time.append(created_time)
+            else:
+                pass
+
+    # Sort the files found
+    files_main = [x for _, x in sorted(zip(files_main_time, files_main))]
+    files_annex = [x for _, x in sorted(zip(files_annex_time, files_annex))]
+
+    if len(files_main) > 1:
+        logger.warning("Several converted main files found %s", files_main)
+        files_main = [files_main[-1]]
+        logger.warning("Keeping most recent only: %s", files_main[0])
+
+    return files_main, files_annex
+
+
+## https://stackoverflow.com/questions/36495669/difference-between-terms-option-argument-and-parameter
+## https://tinf2.vub.ac.be/~dvermeir/mirrors/www-wks.acs.ohio-state.edu/unix_course/intro-14.html
+## https://discourse.ubuntu.com/t/command-structure/18556
+
+
+def _ashtech_name_2_date(inp_raw_fpath):
+    """
+    Extracts the record date from an ASHTECH file name.
+
+    This function extracts the year, day of year, GPS week, and day of week from the name of an ASHTECH file.
+    It also returns the date as a Python datetime object.
+
+    Parameters
+    ----------
+    inp_raw_fpath : Path
+        The path of the input ASHTECH file.
+
+    Returns
+    -------
+    int
+        The year extracted from the file name.
+    int
+        The day of the year extracted from the file name.
+    int
+        The GPS week extracted from the file name.
+    int
+        The day of the week extracted from the file name.
+    datetime
+        The date extracted from the file name as a Python datetime object.
+    """
+
+    inp_raw_fpath = Path(inp_raw_fpath)
+    doy = int(inp_raw_fpath.suffix[1:])
+    yy = int(inp_raw_fpath.stem[-2:])
+
+    if yy < 80:
+        y2k = 2000
+    else:
+        y2k = 1900
+
+    yyyy = y2k + yy
+
+    date = conv.doy2dt(yyyy, doy)
+    week, dow = conv.dt2gpstime(date)
+
+    return yyyy, doy, week, dow, date

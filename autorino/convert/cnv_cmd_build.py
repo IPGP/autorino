@@ -24,7 +24,7 @@ cmd_str : string
 
 
 """
-
+import os
 # Import star style
 from pathlib import Path
 
@@ -186,7 +186,7 @@ def cmd_build_trm2rinex(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["trimble"],
+    bin_path=aro_env_soft_path["trimble_trm2rinex"],
 ):
     """
     Build a command to launch trm2rinex, the Trimble converter
@@ -280,7 +280,7 @@ def cmd_build_t0xconvert(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path="t0xConvert",
+    bin_path=aro_env_soft_path["trimble_t0xconvert"],
 ):
     """
     Build a command to launch t0xConvert, the Trimble converter
@@ -366,7 +366,28 @@ def cmd_build_t0xconvert(
                        -ap=-2689320.68662,-4302891.91205,3851423.71881
     """
 
-    return None
+    # Convert the paths as Path objects
+    inp_raw_fpath = Path(inp_raw_fpath)
+    out_dir = Path(out_dir)
+
+    inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.fname)
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = (
+        bin_path
+        + cmd_opt_list
+        + cmd_kwopt_list
+        + str(inp_raw_fpath_tmp)
+    )
+    cmd_list = [str(e) for e in cmd_list]
+    cmd_str = " ".join(cmd_list)
+    cmd_use = [cmd_str]
+
+    os.remove(inp_raw_fpath_tmp)
+
+    return cmd_use, cmd_list, cmd_str
 
 
 def cmd_build_mdb2rinex(
