@@ -1386,14 +1386,14 @@ class StepGnss:
 
             is_original = self.table["fpath_ori"].isin([f]).any()
 
-            if os.path.isfile(f) and is_original:
+            if f and os.path.isfile(f) and is_original:
                 logger.warning(
                     "uncompressed file is also an original one, we keep it for security: %s",
                     f,
                 )
                 tmp_decmp_files_new.append(f)
                 continue
-            elif os.path.isfile(f) and not is_original:
+            elif f and os.path.isfile(f) and not is_original:
                 logger.debug("remove tmp decompress RINEX file: %s", f)
                 os.remove(f)
             else:
