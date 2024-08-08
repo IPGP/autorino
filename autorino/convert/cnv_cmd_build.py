@@ -370,7 +370,7 @@ def cmd_build_t0xconvert(
     inp_raw_fpath = Path(inp_raw_fpath)
     out_dir = Path(out_dir)
 
-    inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.fname)
+    inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.name)
 
     cmd_opt_list, _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
