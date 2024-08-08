@@ -93,7 +93,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
 
     # +++++ TRIMBLE
     if ext in (".T00", ".T02", ".T04") or converter_inp == "t0xconvert":
-        converter_name = "trm2rinex"
+        converter_name = "t0xconvert"
         brand = "Trimble (official converter)"
         cmd_build_fct = arcv.cmd_build_t0xconvert
         conv_regex_fct = arcv.conv_regex_t0xconvert
