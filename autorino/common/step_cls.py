@@ -1872,7 +1872,7 @@ class StepGnss:
 
             self.write_in_table_log(self.table.loc[irow])
         else:
-            ### update table if things go wrong
+            # ++ update table if things go wrong
             self.table.loc[irow, "ok_out"] = False
             self.write_in_table_log(self.table.loc[irow])
             # raise e
