@@ -7,23 +7,30 @@ Created on Mon Jan  8 16:53:51 2024
 """
 
 import copy
-# Import the logger
-import logging
+
 import os
 import re
 import shutil
+import time
+from filelock import FileLock, Timeout
+
 
 import numpy as np
 import pandas as pd
 
 import autorino.common as arocmn
-import autorino.config as arocfg
+import autorino.cfglog as arologcfg
 import rinexmod
+
 from geodezyx import utils, conv
 from rinexmod import rinexmod_api
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 class StepGnss:
@@ -432,7 +439,7 @@ class StepGnss:
 
         return None
 
-    def set_tmp_dirs_paths(self):
+    def set_tmp_dirs(self):
         """
         Translates and creates temporary directories.
 
@@ -474,6 +481,52 @@ class StepGnss:
             tmp_dir_rinexmoded_set,
             tmp_dir_downloaded_set,
         )
+
+    def clean_tmp_dirs(self, days=7, keep_table_logs=True):
+        """
+        Cleans the temporary directories of the StepGnss object than a specified number of days in the temporary
+        directories of the StepGnss object.
+
+        This method removes all files in the temporary directories of the StepGnss object that are older than the
+        specified number of days.
+        The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
+
+        See Also remove_tmp_files(), which clean the files in the temporary directories at the end of the processing
+        based on ad hoc lists.
+
+        Parameters
+        ----------
+        days : int, optional
+            The number of days to use as the threshold for deleting old files. Default is 2 days.
+
+        Returns
+        -------
+        None
+        """
+
+        current_time = time.time()
+        age_threshold = days * 86400  # Convert days to seconds
+
+        # Iterate through the temporary directories
+        for tmp_dir in [
+            self.tmp_dir_logs,
+            self.tmp_dir_unzipped,
+            self.tmp_dir_converted,
+            self.tmp_dir_rinexmoded,
+            self.tmp_dir_downloaded,
+        ]:
+            if os.path.isdir(tmp_dir):
+                for root, dirs, files in os.walk(tmp_dir):
+                    for file in files:
+                        if keep_table_logs and file.endswith("table.log"):
+                            continue
+                        file_path = os.path.join(root, file)
+                        file_age = current_time - os.path.getmtime(file_path)
+                        if file_age > age_threshold:
+                            os.remove(file_path)
+                            logger.debug("Deleted old file: %s", file_path)
+
+        return None
 
     def _init_metadata(self, metadata):
         """
@@ -567,7 +620,8 @@ class StepGnss:
             If True, determines the start epoch, the end epoch and the period of the RINEX file based on its name only.
             The RINEX file is not read. This function is much faster but less reliable. Default is False.
         update_epoch_range : bool, optional
-            If True, at the end of the table update, also updates the EpochRange object associated to the StepGnss object.
+            If True, at the end of the table update, also updates the EpochRange object associated to
+            the StepGnss object.
             This is recommended. Default is True.
 
         Returns
@@ -599,6 +653,9 @@ class StepGnss:
         self.table["epoch_end"] = pd.to_datetime(self.table["epoch_end"])
 
         if update_epoch_range:
+            logger.info(
+                "update the epoch range from %i RINEX filenames", len(self.table)
+            )
             self.update_epoch_range_from_table()
 
         return None
@@ -643,7 +700,7 @@ class StepGnss:
             # be sure to keep the 1st one!!!
 
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
-        logger.debug("new period, %s, %s", v_tdelta, period_new)
+        # logger.debug("new period, %s, %s", v_tdelta, period_new)
 
         self.epoch_range = arocmn.EpochRange(
             epoch1,
@@ -653,7 +710,7 @@ class StepGnss:
             tz=self.epoch_range.tz,
         )
 
-        logger.info("new %s", self.epoch_range)
+        logger.debug("new %s for %s", self.epoch_range, str(self).split("/")[0])
 
     def translate_path(
         self, path_inp: str, epoch_inp=None, make_dir: bool = False
@@ -689,6 +746,52 @@ class StepGnss:
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
 
+    def create_lockfile(self, timeout=1800, prefix_lockfile=None):
+        """
+        Creates a lock file for the specified file path.
+
+        This method attempts to acquire a lock on the specified file. If the lock is acquired,
+        it prints a success message.
+        If the lock is not acquired (i.e., the file is already locked),
+        it prints a message indicating that the process is locked.
+
+        Parameters
+        ----------
+        timeout : int, optional
+            The timeout period in seconds to wait for acquiring the lock. Default is 1800 seconds.
+        prefix_lockfile : str, optional
+            The prefix to use for the lock file name. If not provided, a random integer is used.
+
+        Returns
+        -------
+        FileLock
+            The FileLock object representing the lock on the file.
+        """
+
+        if not prefix_lockfile:
+            prefix_lockfile = str(np.random.randint(100000, 999999))
+
+        if hasattr(self, "access"):
+            if isinstance(self.access, dict) and "network" in self.access:
+                prefix_lockfile = self.access["network"]
+
+        lockfile_path = os.path.join(self.tmp_dir, prefix_lockfile + "_lock")
+
+        # a preliminary check to see if a previous lock exists
+        arocmn.check_lockfile(lockfile_path)
+
+        lock = FileLock(lockfile_path)
+
+        try:
+            lock.acquire(timeout=timeout)
+            logger.info(f"Lock acquired for {lockfile_path}")
+        except Timeout:
+            logger.error(
+                f"Process still locked after {timeout} s for {lockfile_path}, aborting"
+            )
+
+        return lock
+
     #  _                       _
     # | |                     (_)
     # | |     ___   __ _  __ _ _ _ __   __ _
@@ -706,7 +809,7 @@ class StepGnss:
         if not log_dir_inp:
             log_dir = self.log_dir
             if not os.path.isdir(log_dir):
-                self.set_tmp_dirs_paths()
+                self.set_tmp_dirs()
         else:
             log_dir = log_dir_inp
 
@@ -718,7 +821,7 @@ class StepGnss:
         log_name = "_".join((ts, step_suffix, ".log"))
         log_path = os.path.join(log_dir_use, log_name)
 
-        log_cfg_dic = arocfg.logcfg.log_config_dict
+        log_cfg_dic = arologcfg.log_config_dict
         fmt_dic = log_cfg_dic["formatters"]["fmtgzyx_nocolor"]
 
         logfile_handler = logging.FileHandler(log_path)
@@ -796,8 +899,9 @@ class StepGnss:
             """
             Shrinks a string to a specified maximum length.
 
-            This function shrinks a string to a specified maximum length by keeping the first and last parts of the string
-            and replacing the middle part with '..'. The length of the first and last parts is half of the maximum length.
+            This function shrinks a string to a specified maximum length by keeping the first and last parts
+            of the string and replacing the middle part with '..'.
+            The length of the first and last parts is half of the maximum length.
 
             Parameters
             ----------
@@ -805,7 +909,7 @@ class StepGnss:
                 The input string to be shrunk.
             maxlen : int, optional
                 The maximum length of the output string. Default is the value of the 'max_colwidth' parameter of the
-                'print_table' method.
+                'verbose' method.
 
             Returns
             -------
@@ -818,6 +922,8 @@ class StepGnss:
                 halflen = int((maxlen / 2) - 1)
                 str_out = str_inp[:halflen] + ".." + str_inp[-halflen:]
                 return str_out
+
+        self.table_ok_cols_bool()
 
         form = dict()
         form["fraw"] = _shrink_str
@@ -837,6 +943,24 @@ class StepGnss:
             return None
         else:
             return str_out
+
+    def table_ok_cols_bool(self):
+        """
+        Converts the column of the table to boolean values.
+
+        This method converts the specified column of the table to boolean values.
+        The column is converted to True if the value is 'OK' and False otherwise.
+
+        Wrapper for arocmn.is_ok()
+
+        Returns
+        -------
+        None
+        """
+        self.table["ok_inp"] = self.table["ok_inp"].apply(arocmn.is_ok)
+        self.table["ok_out"] = self.table["ok_out"].apply(arocmn.is_ok)
+
+        return None
 
     def load_table_from_filelist(self, input_files, inp_regex=".*", reset_table=True):
         """
@@ -880,14 +1004,17 @@ class StepGnss:
         """
         Loads the table from the previous step's table.
 
-        This method takes the table from the previous step in the processing chain and uses it to update the current step's table.
-        It copies the 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns from the input table to the current table.
+        This method takes the table from the previous step in the processing chain and uses it to update the current
+        step's table.
+        It copies the 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp'
+        columns from the input table to the current table.
         If 'reset_table' is True, it resets the current table before loading the new data.
 
         Parameters
         ----------
         input_table : pandas.DataFrame
-            The table from the previous step in the processing chain. It should contain 'fpath_out', 'size_out', 'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
+            The table from the previous step in the processing chain. It should contain 'fpath_out', 'size_out',
+            'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
         reset_table : bool, optional
             If True, the current table is reset before loading the new data. Default is True.
 
@@ -908,7 +1035,7 @@ class StepGnss:
 
         return None
 
-    def guess_local_rnx_files(self):
+    def guess_local_rnx(self):
         """
         For a given site name and date in a table, guess the potential local RINEX files
         and write it as 'fpath_out' value in the table
@@ -935,7 +1062,7 @@ class StepGnss:
         for iepoch, epoch in self.table["epoch_srt"].items():
             # guess the potential local files
             local_dir_use = str(self.out_dir)
-            # local_fname_use = str(self.remote_fname)
+            # local_fname_use = str(self.inp_structure)
 
             epo_dt_srt = epoch.to_pydatetime()
             epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
@@ -993,7 +1120,9 @@ class StepGnss:
         local_files_list = []
         for irow, row in self.table.iterrows():
             local_file = row["fpath_out"]
-            if type(local_file) is float:  ### if not initialized, value is NaN (and then a float) 
+            if (
+                type(local_file) is float
+            ):  ### if not initialized, value is NaN (and then a float)
                 self.table.loc[irow, "ok_out"] = False
             else:
                 if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
@@ -1133,8 +1262,10 @@ class StepGnss:
         Decompresses the file specified in the 'table_col' entry of a given row in the table.
 
         This method checks if the file specified in the 'table_col' entry of the given row is compressed.
-        If it is, the method decompresses the file and updates the 'table_col' entry with the path of the decompressed file.
-        It also updates the 'ok_inp' entry with the existence of the decompressed file and the 'fname' entry with the basename of the decompressed file.
+        If it is, the method decompresses the file and updates the 'table_col' entry with the path
+        of the decompressed file.
+        It also updates the 'ok_inp' entry with the existence of the decompressed file and the 'fname'
+        entry with the basename of the decompressed file.
         If the file is not compressed or the 'ok_inp' entry is False, the method does nothing.
 
         Parameters
@@ -1142,11 +1273,13 @@ class StepGnss:
         irow : int
             The index of the row in the table.
         out_dir : str, optional
-            The output directory where the decompressed file will be stored. If not provided, the method uses the 'tmp_dir_unzipped' attribute if it exists, otherwise it uses the 'tmp_dir' attribute.
+            The output directory where the decompressed file will be stored. If not provided, the method
+             uses the 'tmp_dir_unzipped' attribute if it exists, otherwise it uses the 'tmp_dir' attribute.
         table_col : str, optional
             The column in the table where the path of the file is stored. Default is 'fpath_inp'.
         table_ok_col : str, optional
-            The column in the table where the boolean indicating the existence of the file is stored. Default is 'ok_inp'.
+            The column in the table where the boolean indicating the existence of the file is stored.
+            Default is 'ok_inp'.
 
         Returns
         -------
@@ -1154,10 +1287,12 @@ class StepGnss:
             The path of the decompressed file and a boolean indicating whether the file was decompressed.
         """
         if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
+            # logger.warning(
+            #    "action on row skipped (input disabled): %s",
+            #    self.table.loc[irow, "fname"],
+            # )
+            # for decompress the warning message is not necessary and spams the log
+            # (most of the files are not compressed in fact)
             file_decomp_out = None
             bool_decomp_out = False
 
@@ -1210,6 +1345,8 @@ class StepGnss:
         If a file does not exist or is an original file, its path is kept in the list for future reference.
 
         Note: This method modifies the 'tmp_rnx_files' and 'tmp_decmp_files' attributes of the object.
+
+        See Also clean_tmp_dirs(), which clean all the temporary files based on their creation date
 
         Returns
         -------
@@ -1452,7 +1589,8 @@ class StepGnss:
         Filters the raw files based on the 'ok_out' boolean column of the object's table.
 
         This method checks if the raw files have a positive 'ok_out' boolean (i.e., the converted file already exists).
-        It modifies the 'ok_inp' boolean column of the object's table and returns the filtered raw files in a list.
+        It modifies the 'ok_inp' boolean column of the object's table i.e. the step action must be done (True)
+        or not (False) and returns the filtered raw files in a list.
 
         Returns
         -------
@@ -1498,8 +1636,7 @@ class StepGnss:
 
         return flist_out
 
-    def filter_previous_tables_test_delme(self,
-                                          df_prev_tab):
+    def filter_previous_tables_test_delme(self, df_prev_tab):
         """
         Filter a list of raw files if they are present in previous
         conversion tables stored as log
@@ -1511,8 +1648,7 @@ class StepGnss:
         col_ok_names = ["ok_inp", "ok_out"]
 
         # previous files when everthing was ok
-        prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce,
-                                                       axis=1)
+        prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce, axis=1)
 
         prev_files_ok = df_prev_tab[prev_bool_ok].fraw
 
@@ -1521,21 +1657,21 @@ class StepGnss:
         # here the boolean value are inverted compared to the table:
         # True = skip me / False = keep me
         # a logical not inverts everything at the end
-        curr_files_ok_prev = self.table['fraw'].isin(prev_files_ok)
-        curr_files_off_already = np.logical_not(self.table['ok_inp'])
+        curr_files_ok_prev = self.table["fraw"].isin(prev_files_ok)
+        curr_files_off_already = np.logical_not(self.table["ok_inp"])
 
-        curr_files_skip = np.logical_or(curr_files_ok_prev,
-                                        curr_files_off_already)
+        curr_files_skip = np.logical_or(curr_files_ok_prev, curr_files_off_already)
 
-        self.table['ok_inp'] = np.logical_not(curr_files_skip)
+        self.table["ok_inp"] = np.logical_not(curr_files_skip)
 
-        logger.info("%6i files filtered, were OK during a previous run (table list)",
-                    curr_files_ok_prev.sum())
+        logger.info(
+            "%6i files filtered, were OK during a previous run (table list)",
+            curr_files_ok_prev.sum(),
+        )
 
-        flist_out = list(self.table['fraw', self.table['ok_inp']])
+        flist_out = list(self.table["fraw", self.table["ok_inp"]])
 
         return flist_out
-
 
     def filter_previous_tables(self, df_prev_tab):
         """
@@ -1635,14 +1771,16 @@ class StepGnss:
         If it is, it applies the rinexmod function to the file specified in the 'table_col' column.
         The rinexmod function modifies the RINEX file according to the provided rinexmod_options.
         The modified file is then saved to the specified output directory.
-        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the success of the operation.
+        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the
+        success of the operation.
 
         Parameters
         ----------
         irow : int
             The index of the row in the table on which the method is applied.
         out_dir : str, optional
-            The directory to which the modified file is saved. If not provided, the 'tmp_dir_rinexmoded' attribute of the object is used.
+            The directory to which the modified file is saved. If not provided, the 'tmp_dir_rinexmoded' attribute of
+            the object is used.
         table_col : str, optional
             The column in the table which contains the file path to be modified. Defaults to 'fpath_out'.
         rinexmod_options : dict, optional
@@ -1670,8 +1808,8 @@ class StepGnss:
 
         # default options/arguments for rinexmod
         rinexmod_options_use = {
-            # 'marker': 'XXXX',
-            # 'sitelog': metadata,
+            # 'marker': 'XXXX', # forced in .convert()
+            # 'sitelog': metadata, # forced in .convert()
             "compression": "gz",
             "longname": True,
             "force_rnx_load": True,
@@ -1680,10 +1818,21 @@ class StepGnss:
             "full_history": True,
         }
 
+        if (
+            not rinexmod_options["sitelog"]
+            and "station_info" in rinexmod_options.keys()
+        ):
+            rinexmod_options.pop("sitelog", None)
+
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
+            debug_print_rinexmod_options = False
+            if debug_print_rinexmod_options:
+                logger.debug("input options for rinexmod: %s", rinexmod_options)
+                logger.debug("default options for rinexmod: %s", rinexmod_options_use)
             rinexmod_options_use.update(rinexmod_options)
-            # logger.debug("options used for rinexmod: %s", rinexmod_options_use)
+            if debug_print_rinexmod_options:
+                logger.debug("final options for rinexmod: %s", rinexmod_options_use)
 
         frnx = self.table.loc[irow, table_col]
 

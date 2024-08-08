@@ -58,7 +58,7 @@ class StationTest:
                  sta_user,sta_pass,site4,session_period):
         # self.protocol = self.set_protocol(protocol)
         # self.set_hostname(hostname)
-        # self.set_remote_dir(remote_dir)
+        # self.set_remote_dir(inp_dir_parent)
         # self.set_sta_user(sta_user)
         # self.set_sta_pass(sta_pass)
         
@@ -115,8 +115,8 @@ class StationTest:
     # def set_hostname(self,hostname):
         # self.hostname = hostname   
              
-    # def set_remote_dir(self,remote_dir):
-        # self.remote_dir = remote_dir
+    # def set_remote_dir(self,inp_dir_parent):
+        # self.inp_dir_parent = inp_dir_parent
     
     # def set_sta_user(self,sta_user):
         # self.set_sta_user = sta_user
@@ -130,37 +130,37 @@ class StationTest:
 ############################################################
 # protocol = "http"
 # hostname="http://gps-abd.terrain.ovsg.univ-ag.fr/"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # sta_user=""
 # sta_pass=""
 
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://gps-dsd.terrain.ovsg.univ-ag.fr"
 # sta_user=""
 # sta_pass=""
 
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://195.83.190.74"
 # sta_user=""
 # sta_pass=""
 
 # #AGAL
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://10.0.76.158"
 # sta_user=""
 # sta_pass=""
 
 # # PSA1
 # protocol = "http"
-# remote_dir="download/Internal/%Y%m/"
+# inp_dir_parent="download/Internal/%Y%m/"
 # hostname="http://gps-psa.terrain.ovsg.univ-ag.fr"
 
 # # HOUE
 # protocol = "ftp"
-# remote_dir="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
+# inp_dir_parent="/SD Card/Data/HOUE_30s_MDB/<SITE4>/%Y/%m/%d"
 # hostname="gps-houe.terrain.ovsg.univ-ag.fr"
 # sta_user="root"
 # sta_pass="ovsg13;:"
@@ -179,7 +179,7 @@ session_period="1D")
 
 now = dt.datetime.now() - dt.timedelta(days=10)
 date_interest = now - dt.timedelta(days=30)
-# remote_dir_use = now.strftime(remote_dir)
+# remote_dir_use = now.strftime(inp_dir_parent)
 
 DR = DateRange(date_interest,now)
 
