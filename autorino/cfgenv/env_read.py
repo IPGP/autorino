@@ -62,11 +62,10 @@ def read_env(envfile_path=None):
     env_dic_def = yaml.safe_load(open(envfile_path_def))
     env_dic_use = yaml.safe_load(open(envfile_path_use))
 
-    env_dic_fin = env_dic_def.copy()
-    env_dic_fin.update(env_dic_use)
+    env_dic_fin = env_dic_use.copy()
+    env_dic_fin.update(env_dic_def)
 
     logger.debug("environment values: %s", env_dic_fin)
-
 
     # Return the merged dictionary
     return env_dic_fin
