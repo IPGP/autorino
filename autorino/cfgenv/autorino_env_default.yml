@@ -9,3 +9,5 @@ conv_software_paths:
   converto : "ConvertoCPP"
   gfzrnx : "gfzrnx"
   teqc : "teqc"
+general:
+  log_level: "DEBUG"

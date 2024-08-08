@@ -49,7 +49,7 @@ Note that it is `autorino/autorino` two times, since the CLI programs are inside
 ### External dependencies
 _autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
 ```
-pip install geodezyx
+pip install -r /home/user/path_to/autorino/requirements.txt
 ```
 
 ### Setting up the environment
@@ -73,7 +73,7 @@ GNSS manufacturers websites.
 You can find the official converters here:
 #### Leica
 converter here: [mdb2rinex](https://myworld-portal.leica-geosystems.com/s/fr/application?c__app=downloads)  
-Go in: _Products & Services > Downloads > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
+Go in: _Products & Services > Downloads > GNSS Products > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
 see IGSMAIL-8341 for more details.
 #### Septentrio
 converter here: [sbf2rin](https://www.septentrio.com/en/products/software/rxtools#resources)
@@ -279,3 +279,4 @@ The central attribute of a `StepGnss` object is its table (`step_gnss.table`).
 
 This is a pandas' DataFrame that lists, among other things, the input files, and, 
 where applicable, the output files if the operation has been successful.
+
