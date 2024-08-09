@@ -13,9 +13,6 @@ log_file_path = os.path.join(path.dirname(path.abspath(__file__)),
 from . import cfglog
 
 if os.path.isfile(log_file_path):
-    # Define a custom log level (lower than DEBUG)
-    VERBOSE = 5
-    logging.addLevelName(VERBOSE, 'VERBOSE')
     logging.config.dictConfig(cfglog.log_config_dict)
 
 else:
