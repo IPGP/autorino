@@ -25,7 +25,7 @@ import autorino.handle as arohdl
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger(__main__)
+logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def run_steps(steps_lis, step_select=[], print_table=True):
