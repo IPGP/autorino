@@ -54,7 +54,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     None
     """
 
-    logger.verbose("TOTOTOTOTO")
+    logger.debug("TOTOTOTOTO")
 
     wkf_prev = None
     for istp, stp in enumerate(steps_lis):
