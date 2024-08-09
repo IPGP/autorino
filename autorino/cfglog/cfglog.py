@@ -18,7 +18,7 @@ log_config_dict = {
     'loggers': {
         "autorino" : { # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
             "handlers" : ["console_gyxz"],
-            "level": "DEBUG",
+            "level": "VERBOSE",
             "propagate": False
 
         }
@@ -28,12 +28,12 @@ log_config_dict = {
         "console_root":{
 #            "formatter":"fmtgzyx1",
             "class":"logging.StreamHandler",
-            "level":"DEBUG",
+            "level":"VERBOSE",
         },
         "console_gyxz":{
             "formatter":"fmtgzyx1",
             "class":"logging.StreamHandler",
-            "level":"DEBUG",
+            "level":"VERBOSE",
         }
     },
     "formatters":{
@@ -42,6 +42,7 @@ log_config_dict = {
 			'()': 'colorlog.ColoredFormatter',
             "datefmt":"%y%m%dT%H:%M:%S",
             "log_colors":{
+                'VERBOSE':  'pink',
 	        	'DEBUG':    'cyan',
         		'INFO':     'green',
         		'WARNING':  'yellow',
