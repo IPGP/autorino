@@ -163,7 +163,7 @@ def load_previous_tables(log_dir):
         tab_df_stk = []
         for t in tables_files:
             tab_df = pd.read_csv(t)
-            if not (len(tab_df) == 0 or tab_df.isna().all()):
+            if not len(tab_df) == 0:
                 tab_df_stk.append(tab_df)
 
         return pd.concat(tab_df_stk)
