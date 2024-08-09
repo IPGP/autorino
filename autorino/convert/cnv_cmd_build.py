@@ -24,6 +24,8 @@ cmd_str : string
 
 
 """
+import os
+import shutil
 
 # Import star style
 from pathlib import Path
@@ -35,6 +37,7 @@ from geodezyx import utils
 # IMPORT AUTORINO ENVIRONNEMENT VARABLES
 ##software paths
 import autorino.cfgenv.env_read as aroenv
+
 aro_env_soft_path = aroenv.aro_env_dict["conv_software_paths"]
 
 
@@ -185,7 +188,7 @@ def cmd_build_trm2rinex(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["trimble"],
+    bin_path=aro_env_soft_path["trm2rinex"],
 ):
     """
     Build a command to launch trm2rinex, the Trimble converter
@@ -274,12 +277,130 @@ def cmd_build_trm2rinex(
     return cmd_use, cmd_list, cmd_str
 
 
+def cmd_build_t0xconvert(
+    inp_raw_fpath,
+    out_dir,
+    bin_options_custom=[],
+    bin_kwoptions_custom=dict(),
+    bin_path=aro_env_soft_path["t0xconvert"],
+):
+    """
+    Build a command to launch t0xConvert, the Trimble converter
+
+    It has the same behavior as all the `cmd_build` functions
+
+    Parameters
+    ----------
+    inp_raw_fpath : str or Path
+        the path of the input Raw GNSS file.
+    out_dir : str or Path
+        the path of the output directory.
+    bin_options_custom : list, optional
+        a list for custom option arguments. The default is [].
+    bin_kwoptions_custom : dict, optional
+        a dictionary for custom keywords arguments. The default is dict().
+    bin_path : str, optional
+        the path the executed binary.
+        The default is "t0xConvert".
+
+    Returns
+    -------
+    cmd_use : list of string
+        the command as a mono-string in list (singleton).
+        Ready to be used by subprocess.run
+    cmd_list : list of strings
+        the command as a list of strings, splited for each element.
+    cmd_str : string
+        the command as a concatenated string.
+
+    Note
+    ----
+
+    Usage of `t0xConvert`
+
+    t0xConvert - Utility to convert Trimble T02/T04 files to RINEX
+    Version 2.38.0. Copyright (c) Trimble Inc. 2008-2023.  All rights reserved
+
+
+    Usage: t0xConvert {file_options} [field_options] <input_file>
+
+    <input_file>       Trimble T02/T04 format file
+
+    File_options:
+    -o                 Specifying "-o" creates a RINEX observation file
+    -ofixed            Use fixed # of observation fields with -o
+    -h                 Specifying "-h" creates a Hatanaka compressed observation file
+    -nNAV              File Type
+                        -ngps      - GPS NAV file
+                        -nglonass  - GLONASS NAV file
+                        -ngalileo  - GALILEO NAV file
+                        -nqzss     - QZSS NAV file
+                        -ncombined - Combined NAV file
+    -m                 Create MET file
+    -vVER              RINEX Version x100 (default 211)
+                        Supported Formats
+                        211 = RINEX 2.11
+                        212 = RINEX 2.12 with QZSS extensions
+                        300 = RINEX 3.00
+                        302 = RINEX 3.02
+                        303 = RINEX 3.03
+                        304 = RINEX 3.04
+                        e.g. -v304 will generate output files in RINEX 3.04 format
+    -z                 Zip up all generated files into one zip file
+
+    Field_options:
+      The form for field options is <specifier>=<value>, so to override the
+      AGENCY field to be "Trimble", you would use -ag="Trimble". Here are the
+      supported <specifier> types:
+
+    -ob                Observer,          e.g. -ob="BILL SMITH"
+    -ag                Agency,            e.g. -ag="ABC INSTITUTE"
+    -rb                Run By,            e.g. -rb="BILL SMITH"
+    -mo                Marker Name,       e.g. -mo="A 9080"
+    -mn                Marker Number      e.g. -mn="9080.1.34"
+    -at                Antenna Type       e.g. -at="ROVER"
+    -an                Antenna Number     e.g. -an="G1234"
+    -ah                Antenna Height     e.g. -ah="0.01"
+    -rt                Receiver Type      e.g. -rt="GEODETIC"
+    -rn                Receiver Number    e.g. -rn="X1234A1234"
+    -ap                Approx. XYZ Position. Use ',' to separate X, Y, and Z
+                       values as in the following example:
+                       -ap=-2689320.68662,-4302891.91205,3851423.71881
+    """
+
+    # Convert the paths as Path objects
+    inp_raw_fpath = Path(inp_raw_fpath)
+    out_dir = Path(out_dir)
+
+    inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.name)
+    # Copy the input file to the output directory (this is done silentely)
+    shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
+
+    cmd_opt_list, _ = _options_list2str(bin_options_custom)
+    cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+    cmd_list = (
+        [bin_path, "-o", "-v304"]
+        + cmd_opt_list
+        + cmd_kwopt_list
+        + [str(inp_raw_fpath_tmp)]
+    )
+    cmd_list = [str(e) for e in cmd_list]
+    cmd_str = " ".join(cmd_list)
+    cmd_use = [cmd_str]
+
+    # Remove the temporary file (this is done silentely)
+    os.remove(inp_raw_fpath_tmp)
+
+    return cmd_use, cmd_list, cmd_str
+
+
 def cmd_build_mdb2rinex(
     inp_raw_fpath,
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["leica"],
+    bin_path=aro_env_soft_path["mdb2rinex"],
 ):
     """
     Build a command to launch mdb2rinex, the Leica converter
@@ -348,7 +469,7 @@ def cmd_build_sbf2rin(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["septentrio"],
+    bin_path=aro_env_soft_path["sbf2rin"],
 ):
     """
      Build a command to launch sbf2rin, the Septentrio converter
@@ -518,7 +639,7 @@ def cmd_build_runpkr00(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["trimble_runpkr00"],
+    bin_path=aro_env_soft_path["runpkr00"],
 ):
     """
     Build a command to launch runpkr00, the Trimble > teqc converter
@@ -775,7 +896,7 @@ def cmd_build_tps2rin(
     out_dir,
     bin_options_custom=[],
     bin_kwoptions_custom=dict(),
-    bin_path=aro_env_soft_path["topcon"],
+    bin_path=aro_env_soft_path["tps2rin"],
 ):
     """
     Build a command to launch tps2rin, for Topcon
