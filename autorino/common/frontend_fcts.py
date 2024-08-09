@@ -17,8 +17,10 @@ import autorino.handle as arohdl
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 def autorino_cfgfile_run(cfg_in, main_cfg_in):
     """
@@ -61,18 +63,21 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
 
     return None
 
-def download_raw(epoch_range,
-                 out_dir,
-                 hostname,
-                 inp_dir,
-                 inp_structure,
-                 site_id="XXXX00XXX",
-                 login="",
-                 password="",
-                 tmp_dir=None,
-                 log_dir=None,
-                 options=dict(),
-                 session=dict()):
+
+def download_raw(
+    epoch_range,
+    out_dir,
+    hostname,
+    inp_dir,
+    inp_structure,
+    site_id="XXXX00XXX",
+    login="",
+    password="",
+    tmp_dir=None,
+    log_dir=None,
+    options=dict(),
+    session=dict(),
+):
     """
     Downloads raw GNSS data files.
 
@@ -86,7 +91,7 @@ def download_raw(epoch_range,
         The output directory where the downloaded files will be stored.
     hostname : str
         The hostname of the server from which the data files will be downloaded.
-    inp_dir_parent : str
+    inp_dir : str
         The parent directory on the server where the data files are located.
     inp_structure : str
         The structure of the input directory on the server.
@@ -118,20 +123,23 @@ def download_raw(epoch_range,
     site_dic = dict()
     site_dic["site_id"] = site_id
 
-    dwl = arodwl.DownloadGnss(out_dir=out_dir,
-                              tmp_dir=tmp_dir,
-                              log_dir=log_dir,
-                              epoch_range=epoch_range,
-                              access=access_dic,
-                              inp_dir_parent=inp_dir,
-                              inp_structure=inp_structure,
-                              site=site_dic,
-                              session=session,
-                              options=options)
+    dwl = arodwl.DownloadGnss(
+        out_dir=out_dir,
+        tmp_dir=tmp_dir,
+        log_dir=log_dir,
+        epoch_range=epoch_range,
+        access=access_dic,
+        inp_dir_parent=inp_dir,
+        inp_structure=inp_structure,
+        site=site_dic,
+        session=session,
+        options=options,
+    )
 
     dwl.download()
 
     return dwl
+
 
 def convert_rnx(
     raws_inp,
@@ -206,6 +214,7 @@ def convert_rnx(
     cnv.convert(force=force, rinexmod_options=rinexmod_options)
 
     return cnv
+
 
 def split_rnx(
     rnxs_inp,

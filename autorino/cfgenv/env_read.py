@@ -8,11 +8,20 @@ Created on 22/04/2024 16:16:23
 # Create a logger object.
 import logging
 import os
-
+import collections.abc
 import yaml
 
 logger = logging.getLogger(__name__)
 logger.setLevel("DEBUG")
+
+
+def update_recursive(d, u):
+    for k, v in u.items():
+        if isinstance(v, collections.abc.Mapping):
+            d[k] = update_recursive(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
 
 
 def read_env(envfile_path=None):
@@ -56,17 +65,22 @@ def read_env(envfile_path=None):
         envfile_path_use = envfile_path_def
 
     # Log the path of the environment file being loaded
-    logger.debug("load environment config file: %s", envfile_path_use)
+    logger.info("load environment config file: %s", envfile_path_use)
 
     # Load the default and specified environment files and merge their contents
     env_dic_def = yaml.safe_load(open(envfile_path_def))
     env_dic_use = yaml.safe_load(open(envfile_path_use))
 
     env_dic_fin = env_dic_def.copy()
-    env_dic_fin.update(env_dic_use)
+    env_dic_fin = update_recursive(env_dic_fin, env_dic_use)
+    #logger.debug("default environment values (%s): %s", envfile_path_def, env_dic_def)
+    #logger.debug("used environment values (%s): %s", envfile_path_use, env_dic_use)
+    #logger.debug("final environment values: %s", env_dic_fin)
 
     # Return the merged dictionary
     return env_dic_fin
 
 
 aro_env_dict = read_env()
+
+
