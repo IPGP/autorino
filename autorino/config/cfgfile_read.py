@@ -53,6 +53,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     -------
     None
     """
+
     wkf_prev = None
     for istp, stp in enumerate(steps_lis):
         if istp > 0:
@@ -98,6 +99,8 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     """
     global y_main
     logger.info("start to read configfile: %s", configfile_path)
+    logger.verbose("TOTOTOTOTO")
+
 
     y = yaml.safe_load(open(configfile_path))
 
