@@ -29,6 +29,7 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+
 # *****************************************************************************
 # define Python user-defined exceptions
 class AutorinoError(Exception):
@@ -223,7 +224,12 @@ def download_file_ftp(
                     1024,
                 )
                 break
-        except (ftplib.error_temp, ftplib.error_reply, BrokenPipeError, socket.timeout) as e:
+        except (
+            ftplib.error_temp,
+            ftplib.error_reply,
+            BrokenPipeError,
+            socket.timeout,
+        ) as e:
             try_count += 1
             if try_count > max_try:
                 raise AutorinoDownloadError
@@ -236,6 +242,7 @@ def download_file_ftp(
     ftp.quit()
     f.close()
     return output_path
+
 
 def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
     # Get file size
@@ -291,13 +298,12 @@ def ping(host, timeout=5):
         ["ping", "-c", "1", "-W", str(timeout), host],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
     )
 
-    match = re.search(r'time=(\d+\.?\d*)\s*ms', result.stdout)
+    match = re.search(r"time=(\d+\.?\d*)\s*ms", result.stdout)
 
     if match:
-        return float(match.group(1)) * 10 ** -3
+        return float(match.group(1)) * 10**-3
     else:
         return None
-

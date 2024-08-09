@@ -214,11 +214,6 @@ class ConvertGnss(arocmn.StepGnss):
             logger.info(">>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################
-            # ++++ something better must be done with
-            # rinexmod.rinexmod_api.metadata_find_site() !!!!
-            # clarify the site4 and the site9 usage
-            # create method update_site_table_from_fname
-
             # change the site_id here is a very bad idea, it f*cks the outdir 240605
             # in fact not, because of the new IGS update (9 char in sitlog)
             # it should not be a pb anymore
