@@ -25,7 +25,7 @@ import autorino.handle as arohdl
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger(__main__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def run_steps(steps_lis, step_select=[], print_table=True):
@@ -99,8 +99,6 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     """
     global y_main
     logger.info("start to read configfile: %s", configfile_path)
-    logger.verbose("TOTOTOTOTO")
-
 
     y = yaml.safe_load(open(configfile_path))
 
