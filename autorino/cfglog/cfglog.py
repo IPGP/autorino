@@ -42,7 +42,7 @@ log_config_dict = {
 			'()': 'colorlog.ColoredFormatter',
             "datefmt":"%y%m%dT%H:%M:%S",
             "log_colors":{
-                'VERBOSE':  'pink',
+                'VERBOSE':  'orange',
 	        	'DEBUG':    'cyan',
         		'INFO':     'green',
         		'WARNING':  'yellow',
