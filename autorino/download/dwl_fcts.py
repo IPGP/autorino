@@ -277,7 +277,7 @@ def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
     return output_path
 
 
-def ping(host, timeout=5):
+def ping(host, timeout=10):
     """
     Executes the ping command and captures the output.
 
