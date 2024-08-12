@@ -244,7 +244,7 @@ def download_file_ftp(
     return output_path
 
 
-def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
+def download_file_http(url, output_dir, timeout=10, max_try=3, sleep_time=5):
     # Get file size
     response = requests.head(url, timeout=timeout)
     file_size = int(response.headers.get("content-length", 0))
