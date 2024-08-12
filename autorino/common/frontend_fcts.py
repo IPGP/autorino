@@ -81,7 +81,8 @@ def download_raw(
     """
     Downloads raw GNSS data files.
 
-    This function downloads raw GNSS data files for a specified epoch range and stores them in the specified output directory.
+    This function downloads raw GNSS data files for a specified epoch range and stores them
+    in the specified output directory.
 
     Parameters
     ----------
