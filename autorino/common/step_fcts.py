@@ -160,7 +160,13 @@ def load_previous_tables(log_dir):
         return pd.DataFrame([])
     else:
         # If files are found, read each file into a DataFrame and concatenate them into a single DataFrame
-        return pd.concat([pd.read_csv(t) for t in tables_files])
+        tab_df_stk = []
+        for t in tables_files:
+            tab_df = pd.read_csv(t)
+            #if not len(tab_df) == 0:
+            tab_df_stk.append(tab_df)
+
+        return pd.concat(tab_df_stk)
 
 
 def is_ok(val_inp):
