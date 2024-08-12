@@ -55,8 +55,14 @@ class StepGnss:
         The session information for the step.
     options : dict
         The options for the step.
-    metadata : dict
-        The metadata for the step.
+    metadata : str or list, optional
+        The metadata to be included in the converted RINEX files. Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object.
+         Defaults to None.
     """
 
     def __init__(

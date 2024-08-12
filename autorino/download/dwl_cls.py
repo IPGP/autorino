@@ -54,8 +54,14 @@ class DownloadGnss(arocmn.StepGnss):
         The session identifier. Default is None.
     options : dict, optional
         Additional options for the download process. Default is None.
-    metadata : dict, optional
-        Metadata associated with the download process. Default is None.
+    metadata : str or list, optional
+        The metadata to be included in the converted RINEX files. Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object.
+         Defaults to None.
     """
 
     def __init__(
@@ -97,8 +103,14 @@ class DownloadGnss(arocmn.StepGnss):
             The session identifier. Default is None.
         options : dict, optional
             Additional options for the download process. Default is None.
-        metadata : dict, optional
-            Metadata associated with the download process. Default is None.
+        metadata : str or list, optional
+            The metadata to be included in the converted RINEX files. Possible inputs are:
+             * list of string (sitelog file paths),
+             * single string (single sitelog file path)
+             * single string (directory containing the sitelogs)
+             * list of MetaData objects
+             * single MetaData object.
+             Defaults to None.
         """
         super().__init__(
             out_dir,
@@ -115,7 +127,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.inp_dir_parent = inp_dir_parent
         self.inp_structure = inp_structure
 
-    def guess_remote_raw(self):
+    def guess_remot_raw(self):
         """
         Guess the paths and name of the remote files based on the
         Session and EpochRange attributes of the DownloadGnss
@@ -168,14 +180,14 @@ class DownloadGnss(arocmn.StepGnss):
         Guess the paths and name of the local raw files based on the
         EpochRange and `inp_structure` attributes of the DownloadGnss object
 
-        see also method ``guess_remote_raw()``,
+        see also method ``guess_remot_raw()``,
         """
         ### wrong but legacy docstring
         # If the object is not a DownloadGnss one,
         # You must provide as ``remote_fname_inp``, which is usually
         # a ``DownloadGnss.inp_structure`` attribute
 
-        # see also method ``guess_remote_raw()``,
+        # see also method ``guess_remot_raw()``,
         # a specific method for DownloadGnss objects
 
         local_paths_list = []
@@ -314,7 +326,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.clean_tmp_dirs()
 
         # Guess remote and local raw file paths
-        self.guess_remote_raw()
+        self.guess_remot_raw()
         self.guess_local_raw()
 
         # Check local files and update table
