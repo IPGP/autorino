@@ -374,13 +374,16 @@ def cmd_build_t0xconvert(
 
     inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.name)
     # Copy the input file to the output directory (this is done silentely)
-    shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
+    #shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
+    # this is actually done with a shell cp command prior to the conversion
+    # see the cmd_list below
 
     cmd_opt_list, _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
 
     cmd_list = (
-        [bin_path, "-o", "-v304"]
+        ["cp", str(inp_raw_fpath), str(out_dir), "&&"]
+        + [bin_path, "-o", "-v304"]
         + cmd_opt_list
         + cmd_kwopt_list
         + [str(inp_raw_fpath_tmp)]
