@@ -8,7 +8,7 @@ Created on Fri Apr  7 14:27:01 2023
 
 #### Import star style
 
-import autorino.convert.conv_batch as cvb
+import autorino.convert.cnv_batch as cvb
 
 
 
