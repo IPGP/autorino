@@ -54,8 +54,14 @@ class DownloadGnss(arocmn.StepGnss):
         The session identifier. Default is None.
     options : dict, optional
         Additional options for the download process. Default is None.
-    metadata : dict, optional
-        Metadata associated with the download process. Default is None.
+    metadata : str or list, optional
+        The metadata to be included in the converted RINEX files. Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object.
+         Defaults to None.
     """
 
     def __init__(
@@ -97,8 +103,14 @@ class DownloadGnss(arocmn.StepGnss):
             The session identifier. Default is None.
         options : dict, optional
             Additional options for the download process. Default is None.
-        metadata : dict, optional
-            Metadata associated with the download process. Default is None.
+        metadata : str or list, optional
+            The metadata to be included in the converted RINEX files. Possible inputs are:
+             * list of string (sitelog file paths),
+             * single string (single sitelog file path)
+             * single string (directory containing the sitelogs)
+             * list of MetaData objects
+             * single MetaData object.
+             Defaults to None.
         """
         super().__init__(
             out_dir,
