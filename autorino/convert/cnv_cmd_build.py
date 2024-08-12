@@ -57,7 +57,9 @@ def _kw_options_dict2str(kw_options):
 
     Returns
     -------
-    str
+    cmd_list : list
+        A list where the elements are command line options and their values.
+    cmd_str : str
         A string that represents the command line options and their values.
 
     Examples
@@ -97,8 +99,10 @@ def _options_list2str(options):
 
     Returns
     -------
-    tuple
-        A tuple containing the command list and the command string.
+    cmd_list : list
+        A list where the elements are command line options and their values.
+    cmd_str : str
+        A string that represents the command line options and their values.
 
     Examples
     --------
