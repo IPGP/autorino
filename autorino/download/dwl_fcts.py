@@ -79,7 +79,7 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     ### safty warning to check a stupid cpoy/paste
     if fname_inp in dirr:
         logger.warning(
-            "%s file's name also appears in dir name, check your config file", fname_inp
+            "%s file's name also appears in dir name, check your cfgfiles file", fname_inp
         )
 
     url_out = os.path.join(prot_n_host, dirr, fname_inp)

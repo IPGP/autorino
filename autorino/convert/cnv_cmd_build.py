@@ -1191,7 +1191,7 @@ def cmd_build_converto(
 
      ## Autres parametres :
         -o[ut] fichier           Nom(s) de fichier(s) en sortie (separes par une virgule si plusieurs)
-        -config fichier          Nom(s) de fichier(s) de configuration (separes par une virgule si plusieurs)
+        -cfgfiles fichier          Nom(s) de fichier(s) de configuration (separes par une virgule si plusieurs)
         -h[elp]                  Affiche ces lignes d'aide
         -ver                     Affiche le numero de version de Converto
         -a[lerte]                Active l'affichage des alertes concernant le traitement dans la console

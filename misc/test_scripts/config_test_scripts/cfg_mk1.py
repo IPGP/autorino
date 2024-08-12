@@ -10,7 +10,7 @@ Created on Thu Dec  1 15:47:05 2022
 import pandas as pd
 
 import autorino.common as arocmn
-import autorino.config as arocfg
+import autorino.cfgfiles as arocfg
 
 
 
