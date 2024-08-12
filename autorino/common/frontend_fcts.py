@@ -9,7 +9,7 @@ Created on 23/04/2024 14:21:56
 import glob
 import os
 
-import autorino.config as arocfg
+import autorino.cfgfiles as arocfg
 import autorino.download as arodwl
 import autorino.convert as arocnv
 import autorino.handle as arohdl
@@ -51,7 +51,7 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
     elif os.path.isfile(cfg_in):
         cfg_use_lis = [cfg_in]
     else:
-        logger.error("%s does not exist, check input config file/dir", cfg_in)
+        logger.error("%s does not exist, check input cfgfiles file/dir", cfg_in)
         raise Exception
 
     for cfg_use in cfg_use_lis:
