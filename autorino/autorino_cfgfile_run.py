@@ -14,7 +14,7 @@ if __name__ == '__main__':
     ##### Parsing Args
     parser = argparse.ArgumentParser(description='Assisted Unloading, Treatment and Organization of RINEX observations')
     
-    parser.add_argument('-c', '--cfgfiles', type=str,
+    parser.add_argument('-c', '--config', type=str,
                         help='cfgfiles file path or directory path containing the cfgfiles file', default='')
     parser.add_argument('-m', '--main_config', type=str,
                         help='main cfgfiles file path', default='')
