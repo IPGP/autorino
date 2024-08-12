@@ -7,6 +7,7 @@ Created on Thu Dec  1 15:47:05 2022
 """
 
 import collections.abc
+
 # Create a logger object.
 import logging
 import os
@@ -20,8 +21,12 @@ import autorino.handle as arohdl
 
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def run_steps(steps_lis, step_select=[], print_table=True):
     """
@@ -48,6 +53,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     -------
     None
     """
+
     wkf_prev = None
     for istp, stp in enumerate(steps_lis):
         if istp > 0:
@@ -103,7 +109,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         y_main_sessions = None
 
     y = update_w_main_dic(y, y_main)
-    logger.debug("Used config file (updated with the main):\n %s",y)
+    logger.debug("Used config file (updated with the main):\n %s", y)
 
     y_station = y["station"]
 
@@ -124,13 +130,13 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         # y_gen_main = y_ses_main['general']
         # y_gen = update_w_main_dic(y_gen, y_gen_main)
 
-        ##### TMP DIRECTORY
+        # ++++ TMP DIRECTORY
         tmp_dir, _, _ = _get_dir_path(y_gen, "tmp")
 
-        ##### LOG DIRECTORY
+        # ++++ LOG DIRECTORY
         log_dir, _, _ = _get_dir_path(y_gen, "log")
 
-        ##### EPOCH RANGE AT THE SESSION LEVEL
+        # ++++ EPOCH RANGE AT THE SESSION LEVEL
         if not epoch_range:
             epo_obj_ses = _epoch_range_from_cfg_bloc(y_ses["epoch_range"])
         else:
@@ -139,7 +145,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         steps_lis = []
         steps_dic = {}
 
-        #### manage steps
+        # ++++ manage steps
         y_steps = y_ses["steps"]
         # y_workflow_main = y_ses_main['workflow']
 
@@ -147,7 +153,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
             # y_step_main = y_workflow_main[k_stp]
             # y_step = update_w_main_dic(y_step, y_step_main)
 
-            ##### EPOCH RANGE AT THE STEP LEVEL
+            # ++++ EPOCH RANGE AT THE STEP LEVEL
 
             if y_stp["epoch_range"] == "FROM_SESSION":
                 epo_obj_stp = epo_obj_ses
@@ -271,18 +277,22 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
     """
     parent_dir_out = arocmn.translator(parent_dir)
 
-    if parent_dir_out == "FROM_MAIN": # case when the parent directory is not defined in the main config file
+    if (
+        parent_dir_out == "FROM_MAIN"
+    ):  # case when the parent directory is not defined in the main config file
 
         if not parent_dir_key:
             parent_dir_key = "a directory"
 
-        logger.error("%s is not correctly defined in the main config file (FROM_MAIN alias remains)",
-                     parent_dir_key)
+        logger.error(
+            "%s is not correctly defined in the main config file (FROM_MAIN alias remains)",
+            parent_dir_key,
+        )
         raise FileNotFoundError(
             None, parent_dir_key + " do not exists, create it first"
         )
 
-    elif not os.path.isdir(parent_dir_out): # standard case
+    elif not os.path.isdir(parent_dir_out):  # standard case
         logger.error("%s do not exists, create it first", parent_dir_out)
         raise FileNotFoundError(
             None, parent_dir_out + " do not exists, create it first"
@@ -320,7 +330,7 @@ def _is_cfg_bloc_active(ywkf):
             return True
         else:
             return False
-    else:  ### if no 'active' key, we assume the bloc active
+    else:  # ++++ if no 'active' key, we assume the bloc active
         return True
 
 
@@ -379,7 +389,7 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     if u is None:
         return d
     for k, v in u.items():
-        if not k in d.keys():
+        if k not in d.keys():
             continue
         if d[k] == specific_value:
             d[k] = v
