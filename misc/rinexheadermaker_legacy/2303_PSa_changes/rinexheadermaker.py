@@ -37,7 +37,7 @@ import sys
 
 
 def usage():
-	print ("rinexheadermaker.py -f SITELOGFILE -d yyyy/mm/jj [-o output.config]")
+	print ("rinexheadermaker.py -f SITELOGFILE -d yyyy/mm/jj [-o output.cfgfiles]")
 
 def parseArgs(arguments):
 	try:
