@@ -244,7 +244,7 @@ def download_file_ftp(
     return output_path
 
 
-def download_file_http(url, output_dir, timeout=10, max_try=3, sleep_time=5):
+def download_file_http(url, output_dir, timeout=15, max_try=3, sleep_time=5):
     # Get file size
     response = requests.head(url, timeout=timeout)
     file_size = int(response.headers.get("content-length", 0))
@@ -287,6 +287,8 @@ def ping(host, timeout=10):
     ----------
     host : str
         The hostname or IP address to ping.
+    timeout : int, optional
+        The timeout for the ping command in seconds. Default is 10 seconds.
 
     Returns
     -------
