@@ -1,4 +1,4 @@
-from autorino import config as arocfg
+from autorino import cfgfiles as arocfg
 
 ###########################################################################################
 ## dummy comment2

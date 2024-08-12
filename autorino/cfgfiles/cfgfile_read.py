@@ -109,7 +109,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         y_main_sessions = None
 
     y = update_w_main_dic(y, y_main)
-    logger.debug("Used config file (updated with the main):\n %s", y)
+    logger.debug("Used cfgfiles file (updated with the main):\n %s", y)
 
     y_station = y["station"]
 
@@ -231,7 +231,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                 # appended in lis and dic at the end of the k_stp tests
 
             else:
-                logger.warning("unknown step %s in config file, skipped...", k_stp)
+                logger.warning("unknown step %s in cfgfiles file, skipped...", k_stp)
                 continue
 
             steps_lis.append(step_obj)
@@ -279,13 +279,13 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
 
     if (
         parent_dir_out == "FROM_MAIN"
-    ):  # case when the parent directory is not defined in the main config file
+    ):  # case when the parent directory is not defined in the main cfgfiles file
 
         if not parent_dir_key:
             parent_dir_key = "a directory"
 
         logger.error(
-            "%s is not correctly defined in the main config file (FROM_MAIN alias remains)",
+            "%s is not correctly defined in the main cfgfiles file (FROM_MAIN alias remains)",
             parent_dir_key,
         )
         raise FileNotFoundError(

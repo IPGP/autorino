@@ -14,10 +14,10 @@ if __name__ == '__main__':
     ##### Parsing Args
     parser = argparse.ArgumentParser(description='Assisted Unloading, Treatment and Organization of RINEX observations')
     
-    parser.add_argument('-c', '--config', type=str,
-                        help='config file path or directory path containing the config file', default='')
+    parser.add_argument('-c', '--cfgfiles', type=str,
+                        help='cfgfiles file path or directory path containing the cfgfiles file', default='')
     parser.add_argument('-m', '--main_config', type=str,
-                        help='main config file path', default='')
+                        help='main cfgfiles file path', default='')
     parser.add_argument('-s', '--start', type=str,
                         help='', default='')
     parser.add_argument('-e', '--end', type=str,

@@ -7,7 +7,7 @@
 # from autorino import general as arocmn
 import yaml
 
-from autorino import config as arocfg
+from autorino import cfgfiles as arocfg
 
 ###########################################################################################
 
