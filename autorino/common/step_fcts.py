@@ -6,7 +6,6 @@ Created on Mon Jan  8 16:53:51 2024
 @author: psakic
 """
 
-import logging
 import os
 import re
 
@@ -16,9 +15,12 @@ import pandas as pd
 from geodezyx import utils
 from filelock import FileLock, Timeout
 
-logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
 
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def create_dummy_site_dic():
     """
@@ -158,14 +160,21 @@ def load_previous_tables(log_dir):
         return pd.DataFrame([])
     else:
         # If files are found, read each file into a DataFrame and concatenate them into a single DataFrame
-        return pd.concat([pd.read_csv(t) for t in tables_files])
+        tab_df_stk = []
+        for t in tables_files:
+            tab_df = pd.read_csv(t)
+            #if not len(tab_df) == 0:
+            tab_df_stk.append(tab_df)
+
+        return pd.concat(tab_df_stk)
 
 
-def is_val_defined(val_inp):
+def is_ok(val_inp):
     """
-    Checks if the input value is defined.
+    Checks if the input value is OK or not.
 
-    This function takes an input value and checks if it is defined. It considers None, NaN, and an empty string as undefined.
+    This function takes an input value and checks if it is defined.
+    It considers None, NaN, False and an empty string as not OK.
     If the input value is one of these, the function returns False. Otherwise, it returns True.
 
     Parameters
@@ -184,20 +193,22 @@ def is_val_defined(val_inp):
     typ = utils.get_type_smart(val_inp)
 
     if utils.is_iterable(val_inp):
-        return typ([is_val_defined(v) for v in val_inp])
+        return typ([is_ok(v) for v in val_inp])
 
     # scalar case
     if val_inp is None:
         return False
-    elif val_inp is np.nan:
+    elif val_inp == np.nan: # isnan not working if weird type is given
         return False
     elif val_inp == "":
+        return False
+    elif not val_inp: # == False
         return False
     else:
         return True
 
 
-def check_lock_status(lockfile_path):
+def check_lockfile(lockfile_path):
     """
     Checks the lock status of a specified file.
 
@@ -217,7 +228,7 @@ def check_lock_status(lockfile_path):
     lock = FileLock(lockfile_path)
     try:
         lock.acquire(timeout=0)
-        print(f"Lock available for {lockfile_path}")
+        logger.debug(f"Lock free for {lockfile_path}")
         lock.release()
     except Timeout:
-        print(f"Process is locked for {lockfile_path} by a previous process")
+        logger.warning(f"Process is locked by a previous process for {lockfile_path}")

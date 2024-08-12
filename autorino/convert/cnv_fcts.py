@@ -8,7 +8,6 @@ Created on Fri Apr  7 12:07:18 2023
 
 import datetime as dt
 #### Import the logger
-import logging
 import os
 import re
 from pathlib import Path
@@ -18,8 +17,11 @@ import docker
 
 from rinexmod import rinexmod_api
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def site_list_from_metadata(metadata_inp):

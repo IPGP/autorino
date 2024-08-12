@@ -9,8 +9,6 @@ Created on Mon Mar 27 09:16:34 2023
 import ftplib
 import io
 
-# Create a logger object.
-import logging
 import os
 import socket
 import urllib
@@ -24,7 +22,12 @@ import requests
 from bs4 import BeautifulSoup
 import tqdm
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 # *****************************************************************************
@@ -221,7 +224,12 @@ def download_file_ftp(
                     1024,
                 )
                 break
-        except (ftplib.error_temp, ftplib.error_reply, BrokenPipeError, socket.timeout) as e:
+        except (
+            ftplib.error_temp,
+            ftplib.error_reply,
+            BrokenPipeError,
+            socket.timeout,
+        ) as e:
             try_count += 1
             if try_count > max_try:
                 raise AutorinoDownloadError
@@ -234,6 +242,7 @@ def download_file_ftp(
     ftp.quit()
     f.close()
     return output_path
+
 
 def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
     # Get file size
@@ -268,7 +277,7 @@ def download_file_http(url, output_dir, timeout=5, max_try=3, sleep_time=5):
     return output_path
 
 
-def ping(host):
+def ping(host, timeout=5):
     """
     Executes the ping command and captures the output.
 
@@ -286,16 +295,15 @@ def ping(host):
     """
 
     result = subprocess.run(
-        ["ping", "-c", "1", host],
+        ["ping", "-c", "1", "-W", str(timeout), host],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
     )
 
-    match = re.search(r'time=(\d+\.?\d*)\s*ms', result.stdout)
+    match = re.search(r"time=(\d+\.?\d*)\s*ms", result.stdout)
 
     if match:
-        return float(match.group(1)) * 10 ** -3
+        return float(match.group(1)) * 10**-3
     else:
         return None
-

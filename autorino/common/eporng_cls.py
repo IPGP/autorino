@@ -49,9 +49,9 @@ class EpochRange:
 
         Parameters
         ----------
-            epoch1 : datetime
+            epoch1 : datetime, pd.Timestamp, pd.NaT
                 the start of the epoch range.
-            epoch2 : datetime
+            epoch2 : datetime, pd.Timestamp, pd.NaT
                 the end of the epoch range.
             period : str, optional
                 the rounding period. Use the pandas' frequency aliases convention.
