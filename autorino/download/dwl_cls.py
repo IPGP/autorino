@@ -23,6 +23,8 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 # pd.options.mode.chained_assignment = "warn"
 warnings.simplefilter("ignore", category=RuntimeWarning)
 
+BOLD_SRT = '\033[1m'
+BOLD_END = '\033[0m'
 
 class DownloadGnss(arocmn.StepGnss):
     """
@@ -319,7 +321,9 @@ class DownloadGnss(arocmn.StepGnss):
         else:
             force_use = False
 
-        logger.info(">>>>>> RAW files download")
+        list = ['kumar', 'satheesh', 'rajan']
+
+        logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()

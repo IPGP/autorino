@@ -12,6 +12,7 @@ import numpy as np
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
+from autorino.download import BOLD_END
 from geodezyx import operational
 
 #### Import the logger
@@ -21,6 +22,8 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+BOLD_SRT = '\033[1m'
+BOLD_END = '\033[0m'
 
 class ConvertGnss(arocmn.StepGnss):
     """
@@ -146,7 +149,7 @@ class ConvertGnss(arocmn.StepGnss):
         else:
             force_use = False
 
-        logger.info(">>>>>> RAW > RINEX files conversion")
+        logger.info(BOLD_SRT  + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -164,7 +167,8 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx()  # generate the potential local files
-        self.check_local_files()  # tests if the local files are already there
+        self.check_local_files('out')  # tests if the output local files are already there
+        self.check_local_files('inp')  # tests if the input local files are already there
 
         if force_use:
             self.table["ok_inp"] = True
@@ -182,13 +186,17 @@ class ConvertGnss(arocmn.StepGnss):
         # table_init_ok must be used only for the following statistics!
         self.table_ok_cols_bool()
         table_init_ok = self.filter_purge()
+
+        n_tot_inp = len(self.table["ok_inp"])
         n_ok_inp = (self.table["ok_inp"]).sum()
         n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()
 
         logger.info(
-            "%6i files will be converted, %6i files are excluded",
+            "%5i/%5i files will be converted, %5i/%5i files are excluded",
             n_ok_inp,
+            n_tot_inp,
             n_not_ok_inp,
+            n_tot_inp
         )
 
         if verbose:
