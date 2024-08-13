@@ -429,7 +429,7 @@ class DownloadGnss(arocmn.StepGnss):
             raise Exception
         elif self.access["protocol"] == "http":
             try:
-                file_dl_tmp = arodwl.download_file_http(
+                file_dl_tmp = arodwl.download_http(
                     self.table.loc[irow, "fpath_inp"], tmpdir_use
                 )
                 file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
@@ -440,7 +440,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         elif self.access["protocol"] == "ftp":
             try:
-                file_dl_tmp = arodwl.download_file_ftp(
+                file_dl_tmp = arodwl.download_ftp(
                     self.table.loc[irow, "fpath_inp"],
                     tmpdir_use,
                     self.access["login"],

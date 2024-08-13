@@ -150,14 +150,14 @@ class RequestGnss():
                 
         for rmot_file in rmot_files_list:
             if self.session.protocol == "http":
-                file_dl = ardl.download_file_http(rmot_file,
-                                                  self.out_dir)
+                file_dl = ardl.download_http(rmot_file,
+                                             self.out_dir)
                 download_files_list.append(file_dl)
             elif self.session.protocol == "ftp":
-                file_dl = ardl.download_file_ftp(rmot_file,
-                                               self.out_dir,
-                                               self.session.sta_user,
-                                               self.session.sta_pass)
+                file_dl = ardl.download_ftp(rmot_file,
+                                            self.out_dir,
+                                            self.session.sta_user,
+                                            self.session.sta_pass)
                 download_files_list.append(file_dl)
 
             else:
