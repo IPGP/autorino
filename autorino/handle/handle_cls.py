@@ -6,7 +6,6 @@ Created on Wed Jan 10 15:00:40 2024
 @author: psakic
 """
 # Create a logger object.
-import logging
 import os
 
 import numpy as np
@@ -15,7 +14,12 @@ import pandas as pd
 import autorino.common as arocmn
 import autorino.convert as arocnv
 
+# +++ Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+
 logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 class HandleGnss(arocmn.StepGnss):
