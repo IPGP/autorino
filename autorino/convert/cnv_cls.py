@@ -210,14 +210,17 @@ class ConvertGnss(arocmn.StepGnss):
             if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
-            if self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-                logger.info(
-                    "conversion skipped (already converted in a previous run): %s", fraw
-                )
-                continue
-            if not self.table.loc[irow, "ok_inp"]:
+            # +++ the test bellow conflicts the Force option
+            #elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            #    logger.info(
+            #        "conversion skipped (already converted in a previous run): %s", fraw
+            #    )
+            #    continue
+            elif not self.table.loc[irow, "ok_inp"]:
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
+            else:
+                pass
 
             logger.info(">>> input raw file for conversion: %s", fraw.name)
 
