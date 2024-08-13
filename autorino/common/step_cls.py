@@ -1112,37 +1112,53 @@ class StepGnss:
 
         return local_paths_list
 
-    def check_local_files(self):
+    def check_local_files(self, io='out'):
         """
-        Checks the existence of the local files and updates the corresponding
-        booleans in the 'ok_out' column of the table.
+        Checks the existence of the output ('out') or input ('inp') local files (for non download cases)
+        and updates the corresponding booleans in the 'ok_out' or 'ok_inp' column of the table.
 
-        This method iterates over each row in the table. For each row, it checks if the local file specified in
+        This method iterates over each row in the table. For each row,
+        it checks if the local file specified in
         the 'fpath_out' entry exists and is not empty.
-        If the file exists and is not empty, the method sets the 'ok_out' entry for the file in the table to True and
-        updates the 'size_out' entry with the size of the file.
-        If the file does not exist or is empty, the method sets the 'ok_out' entry for the file in the table to False.
+        If the file exists and is not empty,
+        the method sets the 'ok_out' entry for the file in the table to True
+        and updates the 'size_out' entry with the size of the file.
+        If the file does not exist or is empty, the method sets
+        the 'ok_out' entry for the file in the table to False.
+
         The method returns a list of the paths of the existing and non-empty local files.
+
+        Parameters
+        ----------
+        io : str, optional
+            The input/output direction to check. Default is 'out'.
 
         Returns
         -------
         list
             The list of paths of the existing and non-empty local files.
         """
+
         local_files_list = []
+
+        if io not in ['inp', 'out']:
+            logger.error("io must be 'inp' or 'out'")
+            return local_files_list
+
         for irow, row in self.table.iterrows():
-            local_file = row["fpath_out"]
+            local_file = row["fpath_" + io]
             if (
                 type(local_file) is float
             ):  ### if not initialized, value is NaN (and then a float)
-                self.table.loc[irow, "ok_out"] = False
+                self.table.loc[irow, "ok_" + io] = False
             else:
                 if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
-                    self.table.loc[irow, "ok_out"] = True
-                    self.table.loc[irow, "size_out"] = os.path.getsize(local_file)
+                    self.table.loc[irow, "ok_" + io] = True
+                    self.table.loc[irow, "size_" + io] = os.path.getsize(local_file)
                     local_files_list.append(local_file)
                 else:
-                    self.table.loc[irow, "ok_out"] = False
+                    self.table.loc[irow, "ok_" + io] = False
+                    self.table.loc[irow, "size_" + io] = np.nan
 
         return local_files_list
 

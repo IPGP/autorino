@@ -164,7 +164,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx()  # generate the potential local files
-        self.check_local_files()  # tests if the local flies are already there
+        self.check_local_files()  # tests if the local files are already there
 
         if force_use:
             self.table["ok_inp"] = True
