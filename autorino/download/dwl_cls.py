@@ -18,8 +18,6 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
-
-
 # pd.options.mode.chained_assignment = "warn"
 warnings.simplefilter("ignore", category=RuntimeWarning)
 
@@ -318,10 +316,9 @@ class DownloadGnss(arocmn.StepGnss):
         # Check if force download is required
         if self.options.get("force") or force:
             force_use = True
+            logger.info("Force download is enabled.")
         else:
             force_use = False
-
-        list = ['kumar', 'satheesh', 'rajan']
 
         logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 

@@ -12,7 +12,6 @@ import numpy as np
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
-from autorino.download import BOLD_END
 from geodezyx import operational
 
 #### Import the logger
@@ -146,6 +145,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         if self.options.get("force") or force:
             force_use = True
+            logger.info("Force conversion is enabled.")
         else:
             force_use = False
 
