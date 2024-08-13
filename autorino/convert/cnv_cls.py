@@ -139,6 +139,8 @@ class ConvertGnss(arocmn.StepGnss):
         None
         """
 
+        logger.info(BOLD_SRT  + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
+
         # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
         if rinexmod_options is None:
             rinexmod_options = {}
@@ -148,8 +150,6 @@ class ConvertGnss(arocmn.StepGnss):
             logger.info("Force conversion is enabled.")
         else:
             force_use = False
-
-        logger.info(BOLD_SRT  + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -286,7 +286,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.on_row_mv_final(irow)
 
         # ++++ remove temporary files
-        self.remove_tmp_files()
+        self.remov_tmp_files()
 
         return None
 

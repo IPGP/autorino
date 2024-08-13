@@ -312,6 +312,7 @@ class DownloadGnss(arocmn.StepGnss):
         """
         frontend method to download files from a GNSS receiver
         """
+        logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
         # Check if force download is required
         if self.options.get("force") or force:
@@ -319,8 +320,6 @@ class DownloadGnss(arocmn.StepGnss):
             logger.info("Force download is enabled.")
         else:
             force_use = False
-
-        logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()

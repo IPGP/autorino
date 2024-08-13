@@ -148,7 +148,7 @@ class HandleGnss(arocmn.StepGnss):
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.on_row_mv_final(irow, self.out_dir)
 
-        self.remove_tmp_files()
+        self.remov_tmp_files()
 
         return None
 
@@ -225,7 +225,7 @@ class HandleGnss(arocmn.StepGnss):
             # raise e
 
         ### it is not the current object temps which are removed, but the row sub object's ones
-        spc_row.remove_tmp_files()
+        spc_row.remov_tmp_files()
 
         return frnx_spliced
 
@@ -265,7 +265,7 @@ class HandleGnss(arocmn.StepGnss):
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.on_row_mv_final(irow)
 
-        self.remove_tmp_files()
+        self.remov_tmp_files()
 
         return None
 
