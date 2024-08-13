@@ -503,7 +503,7 @@ class StepGnss:
         specified number of days.
         The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
 
-        See Also remove_tmp_files(), which clean the files in the temporary directories at the end of the processing
+        See Also remov_tmp_files(), which clean the files in the temporary directories at the end of the processing
         based on ad hoc lists.
 
         Parameters
@@ -1367,7 +1367,7 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
-    def remove_tmp_files(self):
+    def remov_tmp_files(self):
         """
         Removes the temporary files which have been stored in the two lists
         self.tmp_rnx_files and self.tmp_decmp_files.
@@ -1620,9 +1620,11 @@ class StepGnss:
         """
         Filters the raw files based on the 'ok_out' boolean column of the object's table.
 
-        This method checks if the raw files have a positive 'ok_out' boolean (i.e., the converted file already exists).
-        It modifies the 'ok_inp' boolean column of the object's table i.e. the step action must be done (True)
-        or not (False) and returns the filtered raw files in a list.
+        This method checks if the raw files have a positive 'ok_out' boolean
+        i.e., the converted file already exists.
+        It modifies the 'ok_inp' boolean column of the object's table
+        i.e. the step action must be done (True) or not (False)
+        and returns the filtered raw files in a list.
 
         Returns
         -------
@@ -1756,21 +1758,26 @@ class StepGnss:
         """
         Filters the table based on the values in a specified column.
 
-        This method removes all rows in the table where the value in the specified column is False.
-        The method can either return a new DataFrame with the filtered data or modify the existing DataFrame in place.
+        This method removes all rows in the table where
+        the value in the specified column is False.
+        The method can either return a new DataFrame with
+        the filtered data or modify the existing DataFrame in place.
 
         Parameters
         ----------
         col : str, optional
-            The name of the column to use for filtering. The column should contain boolean values. Defaults to 'ok_inp'.
+            The name of the column to use for filtering.
+            The column should contain boolean values. Defaults to 'ok_inp'.
         inplace : bool, optional
-            If True, the method will modify the existing DataFrame in place. If False, the method will return a new
+            If True, the method will modify the existing DataFrame in place.
+            If False, the method will return a new
             DataFrame with the filtered data. Defaults to False.
 
         Returns
         -------
         pandas.DataFrame or list
-            If inplace is False, returns a new DataFrame with the filtered data. If inplace is True, returns a list of
+            If inplace is False, returns a new DataFrame with the filtered data.
+            If inplace is True, returns a list of
             values in the specified column after filtering.
         """
         if len(self.table) == 0:
