@@ -152,14 +152,14 @@ class StationTest:
                 
         for  rmot_file  in rmot_files_list:
             if self.protocol == "http":
-                file_dl = ardl.download_file_http(rmot_file,
-                                                  out_dir)
+                file_dl = ardl.download_http(rmot_file,
+                                             out_dir)
                 download_files_list.append(file_dl)
             elif self.protocol == "ftp":
-                file_dl = ardl.download_file_ftp(rmot_file,
-                                               out_dir,
-                                               self.sta_user,
-                                               self.sta_pass)
+                file_dl = ardl.download_ftp(rmot_file,
+                                            out_dir,
+                                            self.sta_user,
+                                            self.sta_pass)
                 download_files_list.append(file_dl)
 
             else:

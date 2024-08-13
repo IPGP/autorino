@@ -62,13 +62,13 @@ if protocol == "http":
     list_ = ardl.list_remote_files_http(hostname,remote_dir_use)
     print(list_)
     print(size_remote_file_http([list_[0]]))
-    ardl.download_file_http(list_[0], output_path)
+    ardl.download_http(list_[0], output_path)
     #download(list_[0], output_path)
 
 elif protocol == "ftp":    
     list_ = ardl.list_remote_files_ftp(hostname,remote_dir_use,sta_user,sta_pass)
     print(list_)
-    ardl.download_file_ftp(list_[0], output_path, sta_user, sta_pass)
+    ardl.download_ftp(list_[0], output_path, sta_user, sta_pass)
     
     
 #print("downloaded list",list_,sta_user,sta_pass)
