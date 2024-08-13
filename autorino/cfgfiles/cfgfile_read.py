@@ -109,7 +109,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         y_main_sessions = None
 
     y = update_w_main_dic(y, y_main)
-    logger.debug("Used cfgfiles file (updated with the main):\n %s", y)
+    logger.debug("Used configuration (updated with the main):\n %s", y)
 
     y_station = y["station"]
 
