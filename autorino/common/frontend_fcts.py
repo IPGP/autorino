@@ -23,7 +23,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None, start=None, end=None, period="1D"):
+def autorino_cfgfile_run(
+    cfg_in, main_cfg_in, sites_list=None, start=None, end=None, period="1D"
+):
     """
     Run the Autorino configuration files.
 
@@ -40,7 +42,7 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None, start=None, end=N
     sites_list : list, optional
         A list of site identifiers to filter the configuration files.
          If provided, only configurations for sites in this list will be processed. Default is None.
-        start : str, optional
+    start : str, optional
         The start date for the epoch range. Default is None.
     end : str, optional
         The end date for the epoch range. Default is None.
@@ -64,7 +66,6 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None, start=None, end=N
         logger.error("%s does not exist, check input cfgfiles file/dir", cfg_in)
         raise Exception
 
-
     if start and end:
         epoch_range = arocmn.EpochRange(start, end, period)
     else:
@@ -74,24 +75,20 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None, start=None, end=N
         if sites_list:
             # quick load to check if the site is in the list or not
             y_quick = arocfg.load_cfg(configfile_path=cfg_use)
-            site_quick = y_quick['station']['site']['site_id']
+            site_quick = y_quick["station"]["site"]["site_id"]
             if site_quick not in sites_list:
-                logger.info("Skipping site %s (not in sites list)",
-                            site_quick)
+                logger.info("Skipping site %s (not in sites list)", site_quick)
                 continue
 
         steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
-            configfile_path=cfg_use,
-            main_cfg_path=main_cfg_in,
-            epoch_range=epoch_range
+            configfile_path=cfg_use, main_cfg_path=main_cfg_in, epoch_range=epoch_range
         )
-
-
 
         for steps_lis in steps_lis_lis:
             arocfg.run_steps(steps_lis)
 
     return None
+
 
 def download_raw(
     epoch_range,

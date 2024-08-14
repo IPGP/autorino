@@ -50,9 +50,9 @@ class TqdmToLogger(io.StringIO):
     level = None
     buf = ""
 
-    def __init__(self, logger, level=None):
+    def __init__(self, logger_inp, level=None):
         super(TqdmToLogger, self).__init__()
-        self.logger = logger
+        self.logger = logger_inp
         self.level = level or logging.INFO
 
     def write(self, buf):
@@ -156,11 +156,11 @@ def list_remote_files_http(host_name, remote_dir):
         """
         Internal function to parse the raw response of the remote file list
         """
-        file_list = []
+        fillis = []
         for f in file_list_in:
-            file_list.append(f.split("?")[0])
-        file_list = list(sorted(set(file_list)))
-        return file_list
+            fillis.append(f.split("?")[0])
+        fillis = list(sorted(set(fillis)))
+        return fillis
 
     file_list = [
         link.get("href") for link in soup.find_all("a") if link.get("href") != "../"
