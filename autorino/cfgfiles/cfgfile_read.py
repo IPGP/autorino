@@ -69,9 +69,31 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             stp.convert(print_table)
 
 
+
+def load_cfg(configfile_path):
+    """
+    Loads quickly a configuration file (YAML format) without interpretation.
+
+    This function reads a YAML configuration file from the specified path and returns the parsed content.
+
+    Parameters
+    ----------
+    configfile_path : str
+        The path to the configuration file.
+
+    Returns
+    -------
+    dict
+        The parsed content of the configuration file.
+    """
+    logger.info("start to read configfile: %s", configfile_path)
+    y = yaml.safe_load(open(configfile_path))
+    return y
+
+
 def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     """
-    Load a configuration file (YAML format) and return a list of StepGnss objects to be launched sequentially.
+    Read and interpret a configuration file (YAML format) and return a list of StepGnss objects to be launched sequentially.
 
     This function takes in a path to a configuration file, an optional EpochRange object, and an optional path
     to a main configuration file.
@@ -97,10 +119,9 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     y_station : dict
         A dictionary of station information.
     """
-    global y_main
-    logger.info("start to read configfile: %s", configfile_path)
+    #global y_main
 
-    y = yaml.safe_load(open(configfile_path))
+    y = load_cfg(configfile_path)
 
     if main_cfg_path:
         y_main = yaml.safe_load(open(main_cfg_path))
@@ -118,6 +139,9 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
+
+
+
 
 
 def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):

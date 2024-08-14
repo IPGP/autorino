@@ -58,14 +58,19 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None):
         raise Exception
 
     for cfg_use in cfg_use_lis:
+        if sites_list:
+            # quick load to check if the site is in the list or not
+            y_quick = arocfg.load_cfg(configfile_path=cfg_use)
+            if y_quick['site']['site_id'] not in sites_list:
+                logger.info("Skipping site %s (not in sites list)",
+                            y_quick['site']['site_id'])
+                continue
+
         steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
             configfile_path=cfg_use, main_cfg_path=main_cfg_in
         )
 
-        if sites_list:
-            if y_station['site']['site_id'] not in sites_list:
-                logger.info("Skipping site %s (not in sites list)", y_station['site'])
-                continue
+
 
         for steps_lis in steps_lis_lis:
             arocfg.run_steps(steps_lis)
