@@ -9,7 +9,6 @@ Created on Thu Dec  1 15:47:05 2022
 import collections.abc
 
 # Create a logger object.
-import logging
 import os
 
 import yaml
@@ -28,6 +27,7 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+
 def run_steps(steps_lis, step_select=[], print_table=True):
     """
     Executes the steps in the provided list.
@@ -41,7 +41,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
 
     Parameters
     ----------
-    steps_lis : list
+    steps_lis : Iterable
         A list of StepGnss objects to be executed.
     step_select : list, optional
         A list of selected steps to be executed. If not provided, all steps in 'steps_lis' will be executed.
@@ -67,7 +67,6 @@ def run_steps(steps_lis, step_select=[], print_table=True):
         elif stp.get_step_type() == "convert":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.convert(print_table)
-
 
 
 def load_cfg(configfile_path):
@@ -119,7 +118,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     y_station : dict
         A dictionary of station information.
     """
-    #global y_main
+    # global y_main
 
     y = load_cfg(configfile_path)
 
@@ -127,6 +126,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         y_main = yaml.safe_load(open(main_cfg_path))
         y_main_sessions = y_main["station"]["sessions"]
     else:
+        y_main = None
         y_main_sessions = None
 
     y = update_w_main_dic(y, y_main)
@@ -139,9 +139,6 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
-
-
-
 
 
 def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
