@@ -63,7 +63,7 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None):
         )
 
         if sites_list:
-            if y_station['site_id'] not in sites_list:
+            if y_station['site']['site_id'] not in sites_list:
                 logger.info("Skipping site %s (not in sites list)", y_station['site'])
                 continue
 
