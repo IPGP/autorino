@@ -1162,7 +1162,7 @@ class StepGnss:
 
         return local_files_list
 
-    def invalidate_small_local_files(self, threshold=0.80):
+    def invalidate_small_local_files(self, threshold=0.80, abs_min = 1000):
         """
         Invalidates local files that are smaller than a certain threshold.
 
@@ -1179,6 +1179,8 @@ class StepGnss:
         ----------
         threshold : float, optional
             The threshold for the file size, as a fraction of the median file size. Default is 0.80.
+        abs_min : int, optional
+           The absolute minimum file size in bytes. Default is 1000 bytes.
 
         Returns
         -------
@@ -1187,8 +1189,13 @@ class StepGnss:
         """
 
         if not self.table["size_out"].isna().all():
+            # +++ test 1: above the median
             med = self.table["size_out"].median(skipna=True)
-            valid_bool = threshold * med < self.table["size_out"]
+            valid_bool1 = threshold * med < self.table["size_out"]
+            # +++ test 2: above an absolute minimum
+            valid_bool2 = abs_min < self.table["size_out"]
+            # +++ test 3: both tests
+            valid_bool = np.logical_and(valid_bool1,valid_bool2)
             self.table.loc[:, "ok_out"] = valid_bool
             invalid_local_files_list = list(self.table.loc[valid_bool, "fpath_out"])
         else:
