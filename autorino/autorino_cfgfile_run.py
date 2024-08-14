@@ -18,9 +18,11 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--main_config', type=str,
                         help='main cfgfiles file path', default='')
     parser.add_argument('-s', '--start', type=str,
-                        help='', default='')
+                        help='', default=None)
     parser.add_argument('-e', '--end', type=str,
-                        help='', default='')
+                        help='', default=None)
+    parser.add_argument('-p', '--period', type=str,
+                        help='', default='1D')
     parser.add_argument('-l', '--list_sites', type=str,
                         help='Comma-separated list of site identifiers', default='')
 
@@ -30,6 +32,12 @@ if __name__ == '__main__':
     main_config = args.main_config
     start = args.start
     end = args.end
+    period = args.period
     list_sites = args.list_sites.split(',') if args.list_sites else None
 
-    arocmn.autorino_cfgfile_run(cfg_in=config, main_cfg_in=main_config, sites_list=list_sites)
+    arocmn.autorino_cfgfile_run(cfg_in=config,
+                                main_cfg_in=main_config,
+                                sites_list=list_sites,
+                                start=start,
+                                end=end,
+                                period=period)
