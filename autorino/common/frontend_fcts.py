@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def autorino_cfgfile_run(cfg_in, main_cfg_in):
+def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None):
     """
     Run the Autorino configuration files.
 
@@ -36,6 +36,9 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
         If a directory is provided, all files ending with '.yml' will be used.
     main_cfg_in : str
         The main configuration file to be used.
+    sites_list : list, optional
+        A list of site identifiers to filter the configuration files.
+         If provided, only configurations for sites in this list will be processed. Default is None.
 
     Raises
     ------
@@ -58,11 +61,16 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
         steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
             configfile_path=cfg_use, main_cfg_path=main_cfg_in
         )
+
+        if sites_list:
+            if y_station['site'] not in sites_list:
+                logger.info("Skipping site %s (not in sites list)", y_station['site'])
+                continue
+
         for steps_lis in steps_lis_lis:
             arocfg.run_steps(steps_lis)
 
     return None
-
 
 def download_raw(
     epoch_range,

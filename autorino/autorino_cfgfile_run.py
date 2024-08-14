@@ -10,30 +10,26 @@ import argparse
 import autorino.common as arocmn
 
 if __name__ == '__main__':
+##### Parsing Args
+parser = argparse.ArgumentParser(description='Assisted Unloading, Treatment and Organization of RINEX observations')
 
-    ##### Parsing Args
-    parser = argparse.ArgumentParser(description='Assisted Unloading, Treatment and Organization of RINEX observations')
-    
-    parser.add_argument('-c', '--config', type=str,
-                        help='cfgfiles file path or directory path containing the cfgfiles file', default='')
-    parser.add_argument('-m', '--main_config', type=str,
-                        help='main cfgfiles file path', default='')
-    parser.add_argument('-s', '--start', type=str,
-                        help='', default='')
-    parser.add_argument('-e', '--end', type=str,
-                        help='', default='')
-    parser.add_argument('-l', '--list_sites', type=str,
-                        help='', default='')
-    
-    
-    args = parser.parse_args()
+parser.add_argument('-c', '--config', type=str,
+                    help='cfgfiles file path or directory path containing the cfgfiles file', default='')
+parser.add_argument('-m', '--main_config', type=str,
+                    help='main cfgfiles file path', default='')
+parser.add_argument('-s', '--start', type=str,
+                    help='', default='')
+parser.add_argument('-e', '--end', type=str,
+                    help='', default='')
+parser.add_argument('-l', '--list_sites', type=str,
+                    help='Comma-separated list of site identifiers', default='')
 
-    config = args.config
-    main_config = args.main_config
-    start = args.start
-    end = args.end
-    list_sites = args.list_sites
+args = parser.parse_args()
 
-    arocmn.autorino_cfgfile_run(cfg_in=config,main_cfg_in=main_config)
+config = args.config
+main_config = args.main_config
+start = args.start
+end = args.end
+list_sites = args.list_sites.split(',') if args.list_sites else None
 
-    
+arocmn.autorino_cfgfile_run(cfg_in=config, main_cfg_in=main_config, sites_list=list_sites)
