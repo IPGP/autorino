@@ -332,8 +332,8 @@ class DownloadGnss(arocmn.StepGnss):
         # Check local files and update table
         self.check_local_files()
         self.table_ok_cols_bool()
-        self.filter_ok_out()
         self.invalidate_small_local_files()
+        self.filter_ok_out()
 
         # Force download if required
         if force_use:
