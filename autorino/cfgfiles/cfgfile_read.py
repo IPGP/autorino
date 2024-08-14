@@ -163,7 +163,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         else:
             epo_obj_ses = epoch_range
 
-        logging.warning("epo_obj_ses", epo_obj_ses)
+        logging.warning("epo_obj_ses %s", epo_obj_ses)
 
         steps_lis = []
         steps_dic = {}
