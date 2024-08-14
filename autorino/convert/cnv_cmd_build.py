@@ -397,7 +397,7 @@ def cmd_build_t0xconvert(
     cmd_use = [cmd_str]
 
     # Remove the temporary file (this is done silentely)
-    os.remove(inp_raw_fpath_tmp)
+    # os.remove(inp_raw_fpath_tmp)
 
     return cmd_use, cmd_list, cmd_str
 
