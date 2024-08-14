@@ -13,6 +13,7 @@ import autorino.cfgfiles as arocfg
 import autorino.download as arodwl
 import autorino.convert as arocnv
 import autorino.handle as arohdl
+import autorino.common as arocmn
 
 #### Import the logger
 import logging
@@ -22,7 +23,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None):
+def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None, start=None, end=None, period="1D"):
     """
     Run the Autorino configuration files.
 
@@ -39,6 +40,12 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None):
     sites_list : list, optional
         A list of site identifiers to filter the configuration files.
          If provided, only configurations for sites in this list will be processed. Default is None.
+        start : str, optional
+        The start date for the epoch range. Default is None.
+    end : str, optional
+        The end date for the epoch range. Default is None.
+    period : str, optional
+        The period for the epoch range. Default is "1D".
 
     Raises
     ------
@@ -57,6 +64,12 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None):
         logger.error("%s does not exist, check input cfgfiles file/dir", cfg_in)
         raise Exception
 
+
+    if start and end:
+        epoch_range = arocmn.EpochRange(start, end, period)
+    else:
+        epoch_range = None
+
     for cfg_use in cfg_use_lis:
         if sites_list:
             # quick load to check if the site is in the list or not
@@ -68,7 +81,9 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in, sites_list=None):
                 continue
 
         steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
-            configfile_path=cfg_use, main_cfg_path=main_cfg_in
+            configfile_path=cfg_use,
+            main_cfg_path=main_cfg_in,
+            epoch_range=epoch_range
         )
 
 
