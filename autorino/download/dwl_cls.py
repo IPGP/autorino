@@ -417,7 +417,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         tmpdir_use = self.tmp_dir_downloaded
 
-        # +++++ create the directory if it does not exists
+        # +++++ create the directory if it does not exist
         if not os.path.exists(outdir_use):
             os.makedirs(outdir_use)
 
