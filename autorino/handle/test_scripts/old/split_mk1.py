@@ -33,7 +33,7 @@ epo = arocmn.EpochRange(dt.datetime(2024,2,28,1),
 
 hdl_split = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo)
 
-hdl_split.find_rnxs_for_handle(hdl_store)
+hdl_split.feed_by_epochs(hdl_store)
 
 handle_software = 'converto'
 
