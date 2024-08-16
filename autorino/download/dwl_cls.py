@@ -272,8 +272,8 @@ class DownloadGnss(arocmn.StepGnss):
 
             ## update the table
             new_rows_stk = []
-            for i, rmot_fil in enumerate(rmot_fil_epo_lis):
-                iepoch = self.table[self.table["epoch_srt"] == epoch].index[i]
+            for rmot_fil in rmot_fil_epo_lis:
+                iepoch = self.table.iloc[self.table["epoch_srt"] == epoch,0]
                 new_row = self.table.loc[iepoch].copy()
                 new_row["fname"] = os.path.basename(rmot_fil)
                 new_row["fpath_inp"] = rmot_fil
