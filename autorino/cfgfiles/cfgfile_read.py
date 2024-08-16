@@ -55,6 +55,9 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     """
 
     wkf_prev = None
+
+    logger.info("%i steps will be run %s", len(steps_lis), steps_lis)
+
     for istp, stp in enumerate(steps_lis):
         if istp > 0:
             wkf_prev = steps_lis[istp - 1]
