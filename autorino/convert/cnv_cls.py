@@ -142,7 +142,7 @@ class ConvertGnss(arocmn.StepGnss):
         logger.info(BOLD_SRT  + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
-        if rinexmod_options is None and self.options.get("rinexmod_options"):
+        if self.options.get("rinexmod_options") and rinexmod_options is None:
             rinexmod_options = self.options.get("rinexmod_options")
         if rinexmod_options is None:
             rinexmod_options = {}
@@ -224,7 +224,7 @@ class ConvertGnss(arocmn.StepGnss):
             else:
                 pass
 
-            logger.info(">>> input raw file for conversion: %s", fraw.name)
+            logger.info(">>>>>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################
             # change the site_id here is a very bad idea, it f*cks the outdir 240605

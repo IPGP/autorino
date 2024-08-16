@@ -397,6 +397,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Guess remote and local raw file paths
         remote_find_method = "ask"
+
         if remote_find_method == "guess":
             self.guess_remot_raw()
             self.guess_local_raw()
@@ -478,6 +479,8 @@ class DownloadGnss(arocmn.StepGnss):
                 self.table.loc[irow, "fname"],
             )
             return None
+
+        logger.info(">>>>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])
 
         # ++++++ use the guessed local file as destination or the generic directory
         if not arocmn.is_ok(self.table.loc[irow, "fpath_out"]):
