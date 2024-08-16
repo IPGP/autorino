@@ -285,6 +285,7 @@ class DownloadGnss(arocmn.StepGnss):
                 new_row["fname"] = os.path.basename(rmot_fil)
                 new_row["fpath_inp"] = rmot_fil
                 new_row["note"] = ""
+                new_row["ok_inp"] = True
                 new_rows_stk.append(new_row)
 
             self.table = pd.concat([self.table, pd.DataFrame(new_rows_stk)], ignore_index=True)
