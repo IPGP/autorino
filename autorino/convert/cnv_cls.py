@@ -271,7 +271,7 @@ class ConvertGnss(arocmn.StepGnss):
             # +++++ RINEXMOD
             rinexmod_options_use = rinexmod_options.copy()
 
-            debug_print_rinexmod_options = True
+            debug_print_rinexmod_options = False
             if debug_print_rinexmod_options:
                 logger.debug("input options for rinexmod: %s", rinexmod_options_use)
 
