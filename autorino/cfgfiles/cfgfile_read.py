@@ -71,7 +71,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
         elif stp.get_step_type() == "convert":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.convert(print_table)
-        elif stp.get_step_type() == "splice":
+        elif stp.get_step_type() == "handle":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.splice(print_table)
         elif stp.get_step_type() == "split":

@@ -616,7 +616,7 @@ class StepGnss:
         if full_object_name:
             return type(self).__name__
         else:
-            return type(self).__name__[:-4].lower()
+            return type(self).__name__[:-4].lower() # without Gnss suffix
 
     def update_epoch_table_from_rnx_fname(
         self, use_rnx_filename_only=False, update_epoch_range=True
