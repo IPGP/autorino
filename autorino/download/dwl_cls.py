@@ -394,7 +394,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.clean_tmp_dirs()
 
         # Guess remote and local raw file paths
-        remote_find_method = "ask"
+        remote_find_method = "guess"
         if remote_find_method == "guess":
             self.guess_remot_raw()
             self.guess_local_raw()
