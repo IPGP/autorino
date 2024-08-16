@@ -67,6 +67,12 @@ def run_steps(steps_lis, step_select=[], print_table=True):
         elif stp.get_step_type() == "convert":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.convert(print_table)
+        elif stp.get_step_type() == "splice":
+            stp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.splice(print_table)
+        elif stp.get_step_type() == "split":
+            stp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.split(print_table)
 
 
 def load_cfg(configfile_path):
@@ -228,7 +234,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     options=y_stp["options"],
                 )
 
-            elif k_stp == "split":
+            elif k_stp in ("split", "splice"):
                 if not _is_cfg_bloc_active(y_stp):
                     continue
 
@@ -249,12 +255,11 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     options=y_stp["options"],
                 )
 
-                # appended in lis and dic at the end of the k_stp tests
-
             else:
                 logger.warning("unknown step %s in cfgfiles file, skipped...", k_stp)
                 continue
 
+            # appended in lis and dic at the end of the k_stp tests
             steps_lis.append(step_obj)
             steps_dic[k_stp] = step_obj
 

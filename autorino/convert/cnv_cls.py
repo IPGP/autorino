@@ -21,8 +21,9 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
-BOLD_SRT = '\033[1m'
-BOLD_END = '\033[0m'
+BOLD_SRT = "\033[1m"
+BOLD_END = "\033[0m"
+
 
 class ConvertGnss(arocmn.StepGnss):
     """
@@ -139,7 +140,7 @@ class ConvertGnss(arocmn.StepGnss):
         None
         """
 
-        logger.info(BOLD_SRT  + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
         if self.options.get("rinexmod_options") and rinexmod_options is None:
@@ -169,8 +170,12 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx()  # generate the potential local files
-        self.check_local_files('out')  # tests if the output local files are already there
-        self.check_local_files('inp')  # tests if the input local files are already there
+        self.check_local_files(
+            "out"
+        )  # tests if the output local files are already there
+        self.check_local_files(
+            "inp"
+        )  # tests if the input local files are already there
 
         if force_use:
             self.table["ok_inp"] = True
@@ -198,7 +203,7 @@ class ConvertGnss(arocmn.StepGnss):
             n_ok_inp,
             n_tot_inp,
             n_not_ok_inp,
-            n_tot_inp
+            n_tot_inp,
         )
 
         if verbose:
@@ -213,7 +218,7 @@ class ConvertGnss(arocmn.StepGnss):
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
             # +++ the test bellow conflicts the Force option
-            #elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            # elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
             #    logger.info(
             #        "conversion skipped (already converted in a previous run): %s", fraw
             #    )
