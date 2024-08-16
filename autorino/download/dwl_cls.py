@@ -399,7 +399,7 @@ class DownloadGnss(arocmn.StepGnss):
             self.guess_local_raw()
         elif remote_find_method == "ask":
             self.ask_remote_raw()
-
+            self.ask_local_raw()
 
         # Check local files and update table
         self.check_local_files()
