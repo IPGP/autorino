@@ -60,6 +60,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             wkf_prev = steps_lis[istp - 1]
 
         if step_select and stp.get_step_type() not in step_select:
+            logger.warning("step %s skipped, not selected in %s", stp.get_step_type(), step_select)
             continue
 
         if stp.get_step_type() == "download":
