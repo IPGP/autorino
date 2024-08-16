@@ -496,20 +496,24 @@ class StepGnss:
 
     def clean_tmp_dirs(self, days=7, keep_table_logs=True):
         """
-        Cleans the temporary directories of the StepGnss object than a specified number of days in the temporary
-        directories of the StepGnss object.
+        Cleans the temporary directories of the StepGnss object.
 
-        This method removes all files in the temporary directories of the StepGnss object that are older than the
-        specified number of days.
+        This method removes all files older than a specified number of days in the temporary
+        directories of the StepGnss object.
         The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
 
-        See Also remov_tmp_files(), which clean the files in the temporary directories at the end of the processing
-        based on ad hoc lists.
+        See Also
+        --------
+        remov_tmp_files : Cleans the files in the temporary directories at the end of the processing
+                          based on ad hoc lists.
 
         Parameters
         ----------
         days : int, optional
-            The number of days to use as the threshold for deleting old files. Default is 2 days.
+            The number of days to use as the threshold for deleting old files. Default is 7 days.
+        keep_table_logs : bool, optional
+            If True, keeps the table logs sotored in the tmp directories.
+            Default is True.
 
         Returns
         -------

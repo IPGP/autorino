@@ -179,7 +179,7 @@ def is_ok(val_inp):
 
     Parameters
     ----------
-    val_inp : any
+    val_inp : any or iterable of any
         The input value to be checked.
         Can handle iterables.
 
