@@ -149,7 +149,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         rmot_paths_list = []
 
-        for epoch in self.epoch_range.epoch_range_list():
+        for epoch in self.epoch_range.epoch_range_list():  ### go for irow !
             ### guess the potential remote files
             rmot_dir_use = str(self.inp_dir_parent)
             rmot_fname_use = str(self.inp_structure)
@@ -193,7 +193,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         local_paths_list = []
 
-        for epoch in self.epoch_range.epoch_range_list():
+        for epoch in self.epoch_range.epoch_range_list(): # go for irow !
             # guess the potential local files
             local_dir_use = str(self.out_dir)
             local_fname_use = str(self.inp_structure)
@@ -294,6 +294,35 @@ class DownloadGnss(arocmn.StepGnss):
 
         logger.info("nbr remote files found on rec: %s", len(rmot_fil_all_lis))
         return rmot_fil_all_lis
+
+    def ask_local_raw(self):
+        """
+        Guess the paths and name of the local raw files based on the
+        EpochRange and `inp_structure` attributes of the DownloadGnss object
+
+        see also method ``guess_remot_raw()``,
+        """
+
+        local_paths_list = []
+
+        for irow, row in self.table.iterrows():
+            epoch = row["epoch_srt"]
+
+            # guess the potential local files
+            local_dir_use = str(self.out_dir)
+            local_fname_use = os.path.basename(row["fpath_inp"])
+            local_path_use = os.path.join(local_dir_use, local_fname_use)
+            local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
+
+            local_paths_list.append(local_path_use)
+
+            self.table.loc[irow, "fname"] = local_fname_use
+            self.table.loc[irow, "fpath_out"] = local_path_use
+            logger.debug("local file asked: %s", local_path_use)
+
+        logger.info("nbr local raw files asked: %s", len(local_paths_list))
+
+        return local_paths_list
 
 
     def ping_remote(self):
