@@ -278,6 +278,8 @@ class DownloadGnss(arocmn.StepGnss):
 
             logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
 
+            # re add protocol:
+            rmot_fil_epo_lis = [self.access["protocol"] + '://' + f for f in rmot_fil_epo_lis]
             ## update the table
             new_rows_stk = []
             for rmot_fil in rmot_fil_epo_lis:
@@ -394,7 +396,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.clean_tmp_dirs()
 
         # Guess remote and local raw file paths
-        remote_find_method = "guess"
+        remote_find_method = "ask"
         if remote_find_method == "guess":
             self.guess_remot_raw()
             self.guess_local_raw()
