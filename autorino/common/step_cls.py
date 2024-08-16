@@ -1197,8 +1197,8 @@ class StepGnss:
             # +++ test 3: both tests
             valid_bool = np.logical_and(valid_bool1,valid_bool2)
             self.table.loc[:, "ok_out"] = valid_bool
-            self.table.loc[valid_bool1, "note"] = "invalid_med"
-            self.table.loc[valid_bool2, "note"] = "invalid_abs"
+            self.table.loc[np.logical_not(valid_bool1), "note"] = "invalid_med"
+            self.table.loc[np.logical_not(valid_bool2), "note"] = "invalid_abs"
 
             invalid_local_files_list = list(self.table.loc[valid_bool, "fpath_out"])
         else:
