@@ -439,10 +439,10 @@ class DownloadGnss(arocmn.StepGnss):
         remote_find_method = "ask"
         if remote_find_method == "guess":
             self.guess_remot_raw()
-            self.guess_local_raw()
         elif remote_find_method == "ask":
-            rmt_fil = self.ask_remote_raw()
+            self.ask_remote_raw()
 
+        self.guess_local_raw()
 
         # Check local files and update table
         self.check_local_files()
@@ -520,7 +520,6 @@ class DownloadGnss(arocmn.StepGnss):
             return None
 
         # ++++++ use the guessed local file as destination or the generic directory
-        print("AAAAAAAAAAA",arocmn.is_ok(self.table.loc[irow, "fpath_out"]))
         if not arocmn.is_ok(self.table.loc[irow, "fpath_out"]):
             # +++ the local file has not been guessed
             outdir_use = str(self.out_dir)
