@@ -278,7 +278,8 @@ class DownloadGnss(arocmn.StepGnss):
                 new_row["fname"] = os.path.basename(rmot_fil)
                 new_row["fpath_inp"] = rmot_fil
                 new_rows_stk.append(new_row)
-            self.table = pd.concat([self.table, pd.DataFrame(new_rows_stk)], ignore_index=True)
+
+        self.table = pd.concat([self.table, pd.DataFrame(new_rows_stk)], ignore_index=True)
 
         logger.info("nbr remote files found on rec: %s", len(rmot_fil_all_lis))
         return rmot_fil_all_lis
