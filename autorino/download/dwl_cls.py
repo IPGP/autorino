@@ -520,9 +520,8 @@ class DownloadGnss(arocmn.StepGnss):
             return None
 
         # ++++++ use the guessed local file as destination or the generic directory
-        if not self.table.loc[
-            irow, "fpath_out"
-        ]:  # +++ the local file has not been guessed
+        if not arocmn.is_ok(self.table.loc[irow, "fpath_out"]):
+            # +++ the local file has not been guessed
             outdir_use = str(self.out_dir)
             outdir_use = self.translate_path(
                 outdir_use, self.table.loc[irow, "epoch_srt"], make_dir=True
