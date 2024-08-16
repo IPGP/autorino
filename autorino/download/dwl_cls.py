@@ -5,6 +5,7 @@ import ftplib
 import os
 import shutil
 import numpy as np
+import pandas as pd
 
 import autorino.common as arocmn
 import autorino.download as arodwl
@@ -245,29 +246,42 @@ class DownloadGnss(arocmn.StepGnss):
             A list of remote file paths.
         """
         rmot_dir_list = self._guess_remote_directories()
-        rmot_files_list = []
-        list_ = []
-        for rmot_dir_use in rmot_dir_list:
+        rmot_fil_all_lis = []
+        rmot_fil_epo_lis = []
+        epo_lis = []
+
+        for epoch, rmot_dir_use in zip(self.epoch_range.epoch_range_list(),rmot_dir_list):
             if self.access["protocol"] == "http":
-                list_ = arodwl.list_remote_files_http(
+                rmot_fil_epo_lis = arodwl.list_remote_files_http(
                     self.access["hostname"], rmot_dir_use
                 )
-                rmot_files_list = rmot_files_list + list_
+                rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
             elif self.access["protocol"] == "ftp":
-                list_ = arodwl.list_remote_files_ftp(
+                rmot_fil_epo_lis = arodwl.list_remote_files_ftp(
                     self.access["hostname"],
                     rmot_dir_use,
                     self.access["login"],
                     self.access["password"],
                 )
-                rmot_files_list = rmot_files_list + list_
+                rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
+                epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
             else:
                 logger.error("wrong protocol")
 
-            logger.debug("remote files found on rec: %s", list_)
+            logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
 
-        logger.info("nbr remote files found on rec: %s", len(rmot_files_list))
-        return rmot_files_list
+            ## update the table
+            new_rows_stk = []
+            for i, rmot_fil in enumerate(rmot_fil_epo_lis):
+                iepoch = self.table[self.table["epoch_srt"] == epoch].index[i]
+                new_row = self.table.loc[iepoch].copy()
+                new_row["fname"] = os.path.basename(rmot_fil)
+                new_row["fpath_inp"] = rmot_fil
+                new_rows_stk.append(new_row)
+            self.table = pd.concat([self.table, pd.DataFrame(new_rows_stk)], ignore_index=True)
+
+        logger.info("nbr remote files found on rec: %s", len(rmot_fil_all_lis))
+        return rmot_fil_all_lis
 
     def ping_remote(self):
         """
@@ -337,11 +351,11 @@ class DownloadGnss(arocmn.StepGnss):
         self.clean_tmp_dirs()
 
         # Guess remote and local raw file paths
-        remote_method = "ask"
-        if remote_method == "guess":
+        remote_find_method = "ask"
+        if remote_find_method == "guess":
             self.guess_remot_raw()
             self.guess_local_raw()
-        elif remote_method == "ask":
+        elif remote_find_method == "ask":
             rmt_fil = self.ask_remote_raw()
 
 
