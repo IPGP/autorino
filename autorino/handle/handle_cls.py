@@ -54,6 +54,33 @@ class HandleGnss(arocmn.StepGnss):
         round_method="floor",
         drop_epoch_rnd=False,
     ):
+        """
+        Group the data by epochs.
+
+        This method groups the data in the table by epochs, rounding the epochs according
+        to the specified period and method.
+        It creates a main HandleGnss object and individual
+        HandleGnss objects for each epoch group.
+
+        Parameters
+        ----------
+        period : str, optional
+            The period for rounding the epochs. Default is "1d".
+        rolling_period : bool, optional
+            Whether to use a rolling period for rounding. Default is False.
+        rolling_ref : int, optional
+            The reference for the rolling period. Default is -1.
+        round_method : str, optional
+            The method for rounding the epochs. Default is "floor".
+        drop_epoch_rnd : bool, optional
+            Whether to drop the temporary epoch_rnd column after grouping. Default is False.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the main HandleGnss object and a list of individual
+            HandleGnss objects for each epoch group.
+        """
 
         epoch_rnd = arocmn.round_epochs(
             self.table["epoch_srt"],
@@ -117,6 +144,75 @@ class HandleGnss(arocmn.StepGnss):
 
         return spc_main_obj, spc_obj_lis_out
 
+    def feed_by_epochs(self, step_obj_store, mode="split"):
+        """
+        For a HandleGnss object, with a predefined epoch range
+        find the corresponding RINEX for splice/split in the step_obj_store StepGnss,
+        which a list of possible RINEXs candidates for the splice/split operation
+
+        Parameters
+        ----------
+        step_obj_store
+            StepGnss object, which a list of possible RINEXs candidates
+            for the splice/split operation
+
+        mode
+            split or splice
+            if split: for fpath_inp, only one RINEX is returned
+            if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
+        """
+
+        if not (self.get_step_type() in ("HandleGnss","SplitGnss","SpliceGnss")):
+            logger.warning(
+                "feed_by_epochs recommended for SplitGnss or SpliceGnss objects only (%s here)",
+                self.get_step_type(),
+            )
+
+
+        self.table["ok_inp"] = False
+
+        for irow, row in self.table.iterrows():
+            epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
+            epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
+
+            epoch_srt_bol = step_obj_store.table["epoch_srt"] <= epo_srt
+            epoch_end_bol = step_obj_store.table["epoch_end"] >= epo_end
+
+            epoch_bol = epoch_srt_bol & epoch_end_bol
+
+            if np.sum(epoch_bol) == 0:
+                self.table.loc[irow, "ok_inp"] = False
+                self.table.loc[irow, "fpath_inp"] = None
+
+            elif np.sum(epoch_bol) == 1:
+                rnxinp_row = step_obj_store.table.loc[epoch_bol].squeeze()
+                self.table.loc[irow, "ok_inp"] = True
+                self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
+
+            elif np.sum(epoch_bol) > 1 and mode == "split":
+                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
+                self.table.loc[irow, "ok_inp"] = True
+                self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
+
+            elif np.sum(epoch_bol) > 1 and mode == "splice":
+                spc_obj = HandleGnss(
+                    out_dir=self.out_dir,
+                    tmp_dir=self.tmp_dir,
+                    log_dir=self.log_dir,
+                    epoch_range=step_obj_store.epoch_range,
+                    site=step_obj_store.site,
+                    session=step_obj_store.session,
+                )
+
+                spc_obj.table = step_obj_store.table.loc[epoch_bol]
+                spc_obj.update_epoch_range_from_table()
+
+                self.table.loc[irow, "ok_inp"] = True
+                self.table.loc[irow, "fpath_inp"] = spc_obj
+
+        return None
+
+
     #   _____       _ _
     #  / ____|     | (_)
     # | (___  _ __ | |_  ___ ___
@@ -126,9 +222,30 @@ class HandleGnss(arocmn.StepGnss):
     #        | |
     #        |_|
 
+class SpliceGnss(HandleGnss):
+    def __init__(
+        self,
+        out_dir,
+        tmp_dir,
+        log_dir,
+        epoch_range=None,
+        site=None,
+        session=None,
+        options=None,
+        metadata=None,
+    ):
+            super().__init__(
+                out_dir,
+                tmp_dir,
+                log_dir,
+                epoch_range=epoch_range,
+                site=site,
+                session=session,
+                options=options,
+                metadata=metadata,
+            )
 
-    def splice_above(self):
-
+    # def splice_above(self):
 
     def splice(self, handle_software="converto", rinexmod_options=None):
         """
@@ -242,6 +359,30 @@ class HandleGnss(arocmn.StepGnss):
     #        | |
     #        |_|
 
+class SplitGnss(HandleGnss):
+    def __init__(
+        self,
+        out_dir,
+        tmp_dir,
+        log_dir,
+        epoch_range=None,
+        site=None,
+        session=None,
+        options=None,
+        metadata=None,
+    ):
+            super().__init__(
+                out_dir,
+                tmp_dir,
+                log_dir,
+                epoch_range=epoch_range,
+                site=site,
+                session=session,
+                options=options,
+                metadata=metadata,
+            )
+
+
     def split(self, handle_software="converto", rinexmod_options=None):
         """
         "total action" method
@@ -345,69 +486,3 @@ class HandleGnss(arocmn.StepGnss):
 
         return frnxtmp
 
-    def find_rnxs_for_handle(self, step_obj_store, mode="split"):
-        """
-        For a HandleGnss object, with a predefined epoch range
-        find the corresponding RINEX for splice/split in the step_obj_store StepGnss,
-        which a list of possible RINEXs candidates for the splice/split operation
-
-        Parameters
-        ----------
-        step_obj_store
-            StepGnss object, which a list of possible RINEXs candidates
-            for the splice/split operation
-
-        mode
-            split or splice
-            if split: for fpath_inp, only one RINEX is returned
-            if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
-        """
-
-        if not (self.get_step_type() in ("HandleGnss",)):
-            logger.warning(
-                "find_rnxs_for_handle recommended for SplitGnss or SpliceGnss objects only (%s here)",
-                self.get_step_type(),
-            )
-
-        self.table["ok_inp"] = False
-
-        for irow, row in self.table.iterrows():
-            epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
-            epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
-
-            epoch_srt_bol = step_obj_store.table["epoch_srt"] <= epo_srt
-            epoch_end_bol = step_obj_store.table["epoch_end"] >= epo_end
-
-            epoch_bol = epoch_srt_bol & epoch_end_bol
-
-            if np.sum(epoch_bol) == 0:
-                self.table.loc[irow, "ok_inp"] = False
-                self.table.loc[irow, "fpath_inp"] = None
-
-            elif np.sum(epoch_bol) == 1:
-                rnxinp_row = step_obj_store.table.loc[epoch_bol].squeeze()
-                self.table.loc[irow, "ok_inp"] = True
-                self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
-
-            elif np.sum(epoch_bol) > 1 and mode == "split":
-                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
-                self.table.loc[irow, "ok_inp"] = True
-                self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
-
-            elif np.sum(epoch_bol) > 1 and mode == "splice":
-                spc_obj = HandleGnss(
-                    out_dir=self.out_dir,
-                    tmp_dir=self.tmp_dir,
-                    log_dir=self.log_dir,
-                    epoch_range=step_obj_store.epoch_range,
-                    site=step_obj_store.site,
-                    session=step_obj_store.session,
-                )
-
-                spc_obj.table = step_obj_store.table.loc[epoch_bol]
-                spc_obj.update_epoch_range_from_table()
-
-                self.table.loc[irow, "ok_inp"] = True
-                self.table.loc[irow, "fpath_inp"] = spc_obj
-
-        return None
