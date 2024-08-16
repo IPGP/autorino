@@ -240,7 +240,7 @@ class DownloadGnss(arocmn.StepGnss):
         * no filename (obviously)
         """
         rmot_dir_list = []
-        for irow, row in self.table.iterrows:
+        for irow, row in self.table.iterrows():
             epoch = self.table.loc[irow, "epoch_srt"]
             rmot_dir_use = str(self.inp_dir_parent)
             rmot_dir_use = self.translate_path(rmot_dir_use, epoch, make_dir=False)
