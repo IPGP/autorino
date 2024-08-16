@@ -142,6 +142,8 @@ class ConvertGnss(arocmn.StepGnss):
         logger.info(BOLD_SRT  + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
+        if rinexmod_options is None and self.options.get("rinexmod_options"):
+            rinexmod_options = self.options.get("rinexmod_options")
         if rinexmod_options is None:
             rinexmod_options = {}
 
