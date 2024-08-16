@@ -299,7 +299,7 @@ DR = DateRange(date_interest,now)
 REQ = RequestGnss(SESS,DR,output_path)
 
 #L = STAT.list_remote_files(DR)
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = REQ.guess_remote_files()
 
 print("AAAAAA",REQ.req_remote_files)

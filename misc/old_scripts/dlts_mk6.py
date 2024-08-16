@@ -14,7 +14,7 @@ SESlist, REQlist = arcfg.session_request_from_configfile(pconfig)
 REQ = REQlist[1]
 #REQ = REQlist
 
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = REQ.guess_remote_local_files(guess_local=1)
 L = REQ.check_local_files()
 L = REQ.invalidate_small_local_files()

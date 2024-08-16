@@ -216,7 +216,7 @@ class DownloadGnss(arocmn.StepGnss):
 
     def _guess_remote_directories(self):
         """
-        this method is specific for ask_remote_files
+        this method is specific for ask_remote_raw
         guessing the directories is different than guessing the files:
         * no hostname
         * no filename (obviously)
@@ -231,7 +231,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         return rmot_dir_list
 
-    def ask_remote_files(self):
+    def ask_remote_raw(self):
         """
         Retrieve the list of remote files from the server.
 
@@ -337,17 +337,19 @@ class DownloadGnss(arocmn.StepGnss):
         self.clean_tmp_dirs()
 
         # Guess remote and local raw file paths
-        self.guess_remot_raw()
-        self.guess_local_raw()
+        remote_method = "ask"
+        if remote_method == "guess":
+            self.guess_remot_raw()
+            self.guess_local_raw()
+        elif remote_method == "ask":
+            rmt_fil = self.ask_remote_raw()
+
 
         # Check local files and update table
         self.check_local_files()
         self.table_ok_cols_bool()
         self.invalidate_small_local_files()
         self.filter_ok_out()
-
-        rmt_fil = self.ask_remote_files()
-        logger.info("remote files found %s",rmt_fil)
 
         # Force download if required
         if force_use:
