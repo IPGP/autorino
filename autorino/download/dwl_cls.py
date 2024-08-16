@@ -215,7 +215,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         return local_paths_list
 
-    def _guess_remote_directories(self):
+    def guess_remote_dirs_old_delme(self):
         """
         this method is specific for ask_remote_raw
         guessing the directories is different than guessing the files:
@@ -232,7 +232,28 @@ class DownloadGnss(arocmn.StepGnss):
 
         return rmot_dir_list
 
-    def ask_remote_raw(self):
+    def guess_remote_dirs(self):
+        """
+        this method is specific for ask_remote_raw
+        guessing the directories is different than guessing the files:
+        * no hostname
+        * no filename (obviously)
+        """
+        rmot_dir_list = []
+        for irow, row in self.table.iterrows:
+            epoch = self.table.loc[irow, "epoch_srt"]
+            rmot_dir_use = str(self.inp_dir_parent)
+            rmot_dir_use = self.translate_path(rmot_dir_use, epoch, make_dir=False)
+            row["fpath_inp"] = rmot_dir_use
+            row["note"] = "dir_guessed"
+            self.table.iloc[irow] = row
+
+            rmot_dir_list.append(rmot_dir_use)
+
+        rmot_dir_list = sorted(list(set(rmot_dir_list)))
+        return rmot_dir_list
+
+    def ask_remote_raw_old_delme(self):
         """
         Retrieve the list of remote files from the server.
 
@@ -245,7 +266,7 @@ class DownloadGnss(arocmn.StepGnss):
         list
             A list of remote file paths.
         """
-        rmot_dir_list = self._guess_remote_directories()
+        rmot_dir_list = self.guess_remote_dirs()
         rmot_fil_all_lis = []
         rmot_fil_epo_lis = []
         epo_lis = []
@@ -275,6 +296,60 @@ class DownloadGnss(arocmn.StepGnss):
             for rmot_fil in rmot_fil_epo_lis:
                 iepoch = self.table.loc[self.table["epoch_srt"] == epoch,0]
                 new_row = self.table.iloc[iepoch].copy()
+                new_row["fname"] = os.path.basename(rmot_fil)
+                new_row["fpath_inp"] = rmot_fil
+                new_rows_stk.append(new_row)
+
+        self.table = pd.concat([self.table, pd.DataFrame(new_rows_stk)], ignore_index=True)
+
+        logger.info("nbr remote files found on rec: %s", len(rmot_fil_all_lis))
+        return rmot_fil_all_lis
+
+    def ask_remote_raw(self):
+        """
+        Retrieve the list of remote files from the server.
+
+        This method guesses the remote directories and then lists the files
+        in those directories based on the protocol specified in the access
+        information.
+
+        Returns
+        -------
+        list
+            A list of remote file paths.
+        """
+        rmot_dir_list = self.guess_remote_dirs()
+        rmot_fil_all_lis = []
+        rmot_fil_epo_lis = []
+        epo_lis = []
+
+        for irow, row in self.table.iterrows():
+            epoch = row["epoch_srt"]
+            rmot_dir_use = row["fpath_inp"]
+
+            if self.access["protocol"] == "http":
+                rmot_fil_epo_lis = arodwl.list_remote_files_http(
+                    self.access["hostname"], rmot_dir_use
+                )
+                rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
+            elif self.access["protocol"] == "ftp":
+                rmot_fil_epo_lis = arodwl.list_remote_files_ftp(
+                    self.access["hostname"],
+                    rmot_dir_use,
+                    self.access["login"],
+                    self.access["password"],
+                )
+                rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
+                epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
+            else:
+                logger.error("wrong protocol")
+
+            logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
+
+            ## update the table
+            new_rows_stk = []
+            for rmot_fil in rmot_fil_epo_lis:
+                new_row = row.copy()
                 new_row["fname"] = os.path.basename(rmot_fil)
                 new_row["fpath_inp"] = rmot_fil
                 new_rows_stk.append(new_row)
@@ -497,3 +572,4 @@ class DownloadGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = False
 
         return file_dl_out
+
