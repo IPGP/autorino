@@ -126,6 +126,10 @@ class HandleGnss(arocmn.StepGnss):
     #        | |
     #        |_|
 
+
+    def splice_above(self):
+
+
     def splice(self, handle_software="converto", rinexmod_options=None):
         """
         "total action" method
