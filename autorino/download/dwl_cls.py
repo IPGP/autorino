@@ -232,6 +232,18 @@ class DownloadGnss(arocmn.StepGnss):
         return rmot_dir_list
 
     def ask_remote_files(self):
+        """
+        Retrieve the list of remote files from the server.
+
+        This method guesses the remote directories and then lists the files
+        in those directories based on the protocol specified in the access
+        information.
+
+        Returns
+        -------
+        list
+            A list of remote file paths.
+        """
         rmot_dir_list = self._guess_remote_directories()
         rmot_files_list = []
         list_ = []
@@ -261,7 +273,6 @@ class DownloadGnss(arocmn.StepGnss):
         """
         Ping the remote server to check if it is reachable.
         """
-
         count = 0
         ping_out = None
         count_max = 4
@@ -334,6 +345,9 @@ class DownloadGnss(arocmn.StepGnss):
         self.table_ok_cols_bool()
         self.invalidate_small_local_files()
         self.filter_ok_out()
+
+        rmt_fil = self.ask_remote_files()
+        logger.info("remote files found %s",rmt_fil)
 
         # Force download if required
         if force_use:
