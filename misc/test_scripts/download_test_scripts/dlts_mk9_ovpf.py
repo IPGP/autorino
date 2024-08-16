@@ -10,7 +10,7 @@ workflow_lis, y_site, y_device, y_access = tupout
 dwl = workflow_lis[0]
 cnv = workflow_lis[1]
 
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = dwl.guess_local_raw()
 L = dwl.guess_remot_raw()
 L = dwl.check_local_files()

@@ -23,7 +23,7 @@ dwl = dwl_lst[0]
 ses = ses_lst[0]
 #req = req_lst
 
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = dwl.guess_remote_files()
 L = dwl.guess_local_files()
 L = dwl.check_local_files()
