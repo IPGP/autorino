@@ -28,58 +28,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def run_steps(steps_lis, step_select=[], print_table=True):
-    """
-    Executes the steps in the provided list.
-
-    This function takes a list of StepGnss objects, an optional list of selected steps,
-     and an optional boolean flag for printing tables.
-    It iterates over the list of StepGnss objects and executes
-    the 'download' or 'convert' method depending on the type of the step.
-    If a list of selected steps is provided, only the steps in the list will be executed.
-    If the 'verbose' flag is set to True, the tables will be printed during the execution of the steps.
-
-    Parameters
-    ----------
-    steps_lis : Iterable
-        A list of StepGnss objects to be executed.
-    step_select : list, optional
-        A list of selected steps to be executed. If not provided, all steps in 'steps_lis' will be executed.
-        Default is an empty list.
-    print_table : bool, optional
-        A flag indicating whether to print the tables during the execution of the steps. Default is True.
-
-    Returns
-    -------
-    None
-    """
-
-    wkf_prev = None
-
-    logger.info("%i steps will be run %s", len(steps_lis), steps_lis)
-
-    for istp, stp in enumerate(steps_lis):
-        if istp > 0:
-            wkf_prev = steps_lis[istp - 1]
-
-        if step_select and stp.get_step_type() not in step_select:
-            logger.warning("step %s skipped, not selected in %s", stp.get_step_type(), step_select)
-            continue
-
-        if stp.get_step_type() == "download":
-            stp.download(print_table)
-        elif stp.get_step_type() == "convert":
-            stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.convert(print_table)
-        elif stp.get_step_type() == "handle":
-            stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
-            spc_main_obj, spc_objs_lis = stp.group_by_epochs()
-            spc_main_obj.splice_core()
-        elif stp.get_step_type() == "split":
-            stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.split(print_table)
-
 
 def load_cfg(configfile_path):
     """
@@ -234,6 +182,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     tmp_dir=tmp_dir,
                     log_dir=log_dir,
                     epoch_range=epo_obj_stp,
+                    inp_dir_parent=inp_dir_parent,
+                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     metadata=sitelogs,
@@ -255,6 +205,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     tmp_dir=tmp_dir,
                     log_dir=log_dir,
                     epoch_range=epo_obj_stp,
+                    inp_dir_parent=inp_dir_parent,
+                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     metadata=sitelogs,
@@ -431,3 +383,56 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
             if d[k] == specific_value:
                 d[k] = v
     return d
+
+
+def run_steps(steps_lis, step_select=[], print_table=True):
+    """
+    Executes the steps in the provided list.
+
+    This function takes a list of StepGnss objects, an optional list of selected steps,
+     and an optional boolean flag for printing tables.
+    It iterates over the list of StepGnss objects and executes
+    the 'download' or 'convert' method depending on the type of the step.
+    If a list of selected steps is provided, only the steps in the list will be executed.
+    If the 'verbose' flag is set to True, the tables will be printed during the execution of the steps.
+
+    Parameters
+    ----------
+    steps_lis : Iterable
+        A list of StepGnss objects to be executed.
+    step_select : list, optional
+        A list of selected steps to be executed. If not provided, all steps in 'steps_lis' will be executed.
+        Default is an empty list.
+    print_table : bool, optional
+        A flag indicating whether to print the tables during the execution of the steps. Default is True.
+
+    Returns
+    -------
+    None
+    """
+
+    wkf_prev = None
+
+    logger.info("%i steps will be run %s", len(steps_lis), steps_lis)
+
+    for istp, stp in enumerate(steps_lis):
+        if istp > 0:
+            wkf_prev = steps_lis[istp - 1]
+
+        if step_select and stp.get_step_type() not in step_select:
+            logger.warning("step %s skipped, not selected in %s", stp.get_step_type(), step_select)
+            continue
+
+        if stp.get_step_type() == "download":
+            stp.download(print_table)
+        elif stp.get_step_type() == "convert":
+            stp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.convert(print_table)
+        elif stp.get_step_type() == "splice":
+            stp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+            spc_main_obj, spc_objs_lis = stp.group_by_epochs()
+            spc_main_obj.splice_core()
+        elif stp.get_step_type() == "split":
+            stp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.split(print_table)

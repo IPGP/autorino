@@ -118,7 +118,7 @@ class DownloadGnss(arocmn.StepGnss):
             tmp_dir,
             log_dir,
             epoch_range,
-            inp_dir=inp_dir_parent,
+            inp_dir_parent=inp_dir_parent,
             inp_structure=inp_structure,
             site=site,
             session=session,
