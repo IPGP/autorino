@@ -71,7 +71,7 @@ class StepGnss:
         tmp_dir,
         log_dir,
         epoch_range=None,
-        inp_dir=None,
+        inp_dir_parent=None,
         inp_structure=None,
         site=None,
         session=None,
@@ -122,7 +122,7 @@ class StepGnss:
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
 
-        self.inp_dir = inp_dir
+        self.inp_dir = inp_dir_parent
         self.inp_structure = inp_structure
 
         ### temp dirs init
