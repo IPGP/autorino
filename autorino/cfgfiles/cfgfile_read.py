@@ -75,7 +75,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
             spc_main_obj, spc_objs_lis = stp.group_by_epochs()
-            spc_main_obj.splice()
+            spc_main_obj.splice_core()
         elif stp.get_step_type() == "split":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.split(print_table)

@@ -213,6 +213,33 @@ class HandleGnss(arocmn.StepGnss):
         return None
 
 
+    def seek_local_rnxs(self):
+        """
+        Guess the paths and name of the local raw files based on the
+        EpochRange and `inp_structure` attributes of the DownloadGnss object
+        """
+
+        local_paths_list = []
+
+        for irow, row in self.table.iterrows():
+            epoch = row["epoch_srt"]
+
+            # guess the potential local files
+            local_dir_use = str(self.out_dir)
+            local_fname_use = os.path.basename(row["fpath_inp"])
+            local_path_use = os.path.join(local_dir_use, local_fname_use)
+            local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
+
+            local_paths_list.append(local_path_use)
+
+            self.table.loc[irow, "fname"] = local_fname_use
+            self.table.loc[irow, "fpath_out"] = local_path_use
+            logger.debug("local file asked: %s", local_path_use)
+
+        logger.info("nbr local raw files asked: %s", len(local_paths_list))
+
+        return local_paths_list
+
     #   _____       _ _
     #  / ____|     | (_)
     # | (___  _ __ | |_  ___ ___
@@ -245,9 +272,33 @@ class SpliceGnss(HandleGnss):
                 metadata=metadata,
             )
 
-    # def splice_above(self):
+    def splice(self,input_rinexs="seek"):
 
-    def splice(self, handle_software="converto", rinexmod_options=None):
+        if utils.is_isterable(input_rinexs):
+            step_obj_store = HandleGnss(self.out_dir, self.tmp_dir, self.log_dir, metadata=metadata)
+            spc_inp.load_table_from_filelist(input_rinexs)
+            spc_inp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+        elif input_rinexs == "seek":
+            self.seek_local_rnxs()
+
+        self.feed_by_epochs(spc_inp)
+
+        #spc_main_obj, spc_objs_lis = spc_inp.group_by_epochs(
+        #    period=period,
+        #    rolling_period=rolling_period,
+        #    rolling_ref=rolling_ref,
+        #    round_method=round_method,
+        #    drop_epoch_rnd=drop_epoch_rnd,
+        #)
+
+        self.splice_core(
+            handle_software=handle_software, rinexmod_options=rinexmod_options
+        )
+
+        return None
+
+
+    def splice_core(self, handle_software="converto", rinexmod_options=None):
         """
         "total action" method
         """

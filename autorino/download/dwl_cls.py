@@ -118,6 +118,8 @@ class DownloadGnss(arocmn.StepGnss):
             tmp_dir,
             log_dir,
             epoch_range,
+            inp_dir=inp_dir_parent,
+            inp_structure=inp_structure,
             site=site,
             session=session,
             options=options,
@@ -125,8 +127,6 @@ class DownloadGnss(arocmn.StepGnss):
         )
 
         self.access = access
-        self.inp_dir_parent = inp_dir_parent
-        self.inp_structure = inp_structure
 
     def guess_remot_raw(self):
         """
@@ -135,9 +135,6 @@ class DownloadGnss(arocmn.StepGnss):
 
         see also method ``guess_local_raw()``
         """
-        ### wrong but legacy docstring
-        # see also method guess_local_raw(), a general method for all
-        # StepGnss objects
 
         if not self.inp_structure:
             logger.warning(
@@ -183,13 +180,6 @@ class DownloadGnss(arocmn.StepGnss):
 
         see also method ``guess_remot_raw()``,
         """
-        ### wrong but legacy docstring
-        # If the object is not a DownloadGnss one,
-        # You must provide as ``remote_fname_inp``, which is usually
-        # a ``DownloadGnss.inp_structure`` attribute
-
-        # see also method ``guess_remot_raw()``,
-        # a specific method for DownloadGnss objects
 
         local_paths_list = []
 
