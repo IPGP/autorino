@@ -393,7 +393,7 @@ def splice_rnx(
         drop_epoch_rnd=drop_epoch_rnd,
     )
 
-    spc_main_obj.splice(
+    spc_main_obj.splice_core(
         handle_software=handle_software, rinexmod_options=rinexmod_options
     )
 
