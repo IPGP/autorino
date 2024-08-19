@@ -10,6 +10,7 @@ import os
 
 import numpy as np
 import pandas as pd
+from geodezyx import utils
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -166,12 +167,11 @@ class HandleGnss(arocmn.StepGnss):
             if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
         """
 
-        if not (self.get_step_type() in ("HandleGnss","SplitGnss","SpliceGnss")):
+        if not (self.get_step_type() in ("HandleGnss", "SplitGnss", "SpliceGnss")):
             logger.warning(
                 "feed_by_epochs recommended for SplitGnss or SpliceGnss objects only (%s here)",
                 self.get_step_type(),
             )
-
 
         self.table["ok_inp"] = False
 
@@ -216,31 +216,22 @@ class HandleGnss(arocmn.StepGnss):
 
         return None
 
-
-    def seek_local_rnxs(self):
+    def find_local_inp(self):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_structure` attributes of the DownloadGnss object
+        EpochRange and `inp_structure`attributes of the DownloadGnss object
         """
 
         local_paths_list = []
 
-        for irow, row in self.table.iterrows():
-            epoch = row["epoch_srt"]
-
+        for epoch in self.epoch_range.epoch_range_list(end_bound=True):
             # guess the potential local files
-            local_dir_use = str(self.out_dir)
-            local_fname_use = os.path.basename(row["fpath_inp"])
-            local_path_use = os.path.join(local_dir_use, local_fname_use)
-            local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
+            local_dir_use = self.translate_path(
+                str(self.inp_dir_parent), epoch, make_dir=False
+            )
+            local_paths_list = utils.find_recursive(local_dir_use, "*")
 
-            local_paths_list.append(local_path_use)
-
-            self.table.loc[irow, "fname"] = local_fname_use
-            self.table.loc[irow, "fpath_out"] = local_path_use
-            logger.debug("local file asked: %s", local_path_use)
-
-        logger.info("nbr local raw files asked: %s", len(local_paths_list))
+        logger.info("nbr local files found: %s", len(local_paths_list))
 
         return local_paths_list
 
@@ -253,6 +244,7 @@ class HandleGnss(arocmn.StepGnss):
     #        | |
     #        |_|
 
+
 class SpliceGnss(HandleGnss):
     def __init__(
         self,
@@ -260,47 +252,61 @@ class SpliceGnss(HandleGnss):
         tmp_dir,
         log_dir,
         epoch_range=None,
+        inp_dir_parent=None,
+        inp_structure=None,
         site=None,
         session=None,
         options=None,
         metadata=None,
     ):
-            super().__init__(
-                out_dir,
-                tmp_dir,
-                log_dir,
-                epoch_range=epoch_range,
-                site=site,
-                session=session,
-                options=options,
-                metadata=metadata,
+        super().__init__(
+            out_dir,
+            tmp_dir,
+            log_dir,
+            epoch_range=epoch_range,
+            inp_dir_parent=inp_dir_parent,
+            inp_structure=inp_structure,
+            site=site,
+            session=session,
+            options=options,
+            metadata=metadata,
+        )
+
+    def splice(
+        self, input_rinexs="find", handle_software="converto", rinexmod_options=None
+    ):
+
+        if utils.is_iterable(input_rinexs):
+            step_obj_store = HandleGnss(
+                self.out_dir, self.tmp_dir, self.log_dir, metadata=self.metadata
             )
+            step_obj_store.load_table_from_filelist(input_rinexs)
+            step_obj_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+        elif input_rinexs == "find":
+            local_paths_list = self.find_local_inp()
+            step_obj_store = HandleGnss(
+                self.out_dir, self.tmp_dir, self.log_dir, metadata=self.metadata
+            )
+            step_obj_store.load_table_from_filelist(local_paths_list)
+            step_obj_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+        elif isinstance(input_rinexs, HandleGnss):
+            step_obj_store = input_rinexs
 
-    def splice(self,input_rinexs="seek"):
+        self.feed_by_epochs(step_obj_store)
 
-        if utils.is_isterable(input_rinexs):
-            step_obj_store = HandleGnss(self.out_dir, self.tmp_dir, self.log_dir, metadata=metadata)
-            spc_inp.load_table_from_filelist(input_rinexs)
-            spc_inp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
-        elif input_rinexs == "seek":
-            self.seek_local_rnxs()
-
-        self.feed_by_epochs(spc_inp)
-
-        #spc_main_obj, spc_objs_lis = spc_inp.group_by_epochs(
+        # spc_main_obj, spc_objs_lis = spc_inp.group_by_epochs(
         #    period=period,
         #    rolling_period=rolling_period,
         #    rolling_ref=rolling_ref,
         #    round_method=round_method,
         #    drop_epoch_rnd=drop_epoch_rnd,
-        #)
+        # )
 
         self.splice_core(
             handle_software=handle_software, rinexmod_options=rinexmod_options
         )
 
         return None
-
 
     def splice_core(self, handle_software="converto", rinexmod_options=None):
         """
@@ -414,6 +420,7 @@ class SpliceGnss(HandleGnss):
     #        | |
     #        |_|
 
+
 class SplitGnss(HandleGnss):
     def __init__(
         self,
@@ -421,22 +428,25 @@ class SplitGnss(HandleGnss):
         tmp_dir,
         log_dir,
         epoch_range=None,
+        inp_dir_parent=None,
+        inp_structure=None,
         site=None,
         session=None,
         options=None,
         metadata=None,
     ):
-            super().__init__(
-                out_dir,
-                tmp_dir,
-                log_dir,
-                epoch_range=epoch_range,
-                site=site,
-                session=session,
-                options=options,
-                metadata=metadata,
-            )
-
+        super().__init__(
+            out_dir,
+            tmp_dir,
+            log_dir,
+            epoch_range=epoch_range,
+            inp_dir_parent=inp_dir_parent,
+            inp_structure=inp_structure,
+            site=site,
+            session=session,
+            options=options,
+            metadata=metadata,
+        )
 
     def split(self, handle_software="converto", rinexmod_options=None):
         """
@@ -540,4 +550,3 @@ class SplitGnss(HandleGnss):
             # raise e
 
         return frnxtmp
-

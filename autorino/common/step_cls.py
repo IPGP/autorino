@@ -122,7 +122,7 @@ class StepGnss:
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
 
-        self.inp_dir = inp_dir_parent
+        self.inp_dir_parent = inp_dir_parent
         self.inp_structure = inp_structure
 
         ### temp dirs init
@@ -1690,43 +1690,6 @@ class StepGnss:
         flist_out = list(self.table["fpath_inp"][ok_inp_new])
 
         self.table["ok_inp"] = ok_inp_new
-
-        return flist_out
-
-    def filter_previous_tables_test_delme(self, df_prev_tab):
-        """
-        Filter a list of raw files if they are present in previous
-        conversion tables stored as log
-
-        modify the boolean "ok_inp" of the object's table
-        returns the filtered raw files in a list
-        """
-
-        col_ok_names = ["ok_inp", "ok_out"]
-
-        # previous files when everthing was ok
-        prev_bool_ok = df_prev_tab[col_ok_names].apply(np.logical_and.reduce, axis=1)
-
-        prev_files_ok = df_prev_tab[prev_bool_ok].fraw
-
-        # current files which have been already OK and which have already
-        # ok_inp == False
-        # here the boolean value are inverted compared to the table:
-        # True = skip me / False = keep me
-        # a logical not inverts everything at the end
-        curr_files_ok_prev = self.table["fraw"].isin(prev_files_ok)
-        curr_files_off_already = np.logical_not(self.table["ok_inp"])
-
-        curr_files_skip = np.logical_or(curr_files_ok_prev, curr_files_off_already)
-
-        self.table["ok_inp"] = np.logical_not(curr_files_skip)
-
-        logger.info(
-            "%6i files filtered, were OK during a previous run (table list)",
-            curr_files_ok_prev.sum(),
-        )
-
-        flist_out = list(self.table["fraw", self.table["ok_inp"]])
 
         return flist_out
 
