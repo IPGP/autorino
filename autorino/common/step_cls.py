@@ -149,6 +149,11 @@ class StepGnss:
     # getter and setter
     # site_id
 
+    def __repr__(self):
+        name = type(self).__name__
+        out = "{} {}/{}/{} elts".format(name, self.site_id, self.epoch_range,len(self.table))
+        return out
+
     @property
     def out_dir(self):
         return self.translate_path(self._out_dir)
