@@ -164,10 +164,12 @@ class HandleGnss(arocmn.StepGnss):
         mode
             split or splice
             if split: for fpath_inp, only one RINEX is returned
+            (the need one for the split)
             if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
+            (all the needed ones for the splice)
         """
 
-        if not (self.get_step_type() in ("HandleGnss", "SplitGnss", "SpliceGnss")):
+        if not (self.get_step_type(full_object_name=True) in ("HandleGnss", "SplitGnss", "SpliceGnss")):
             logger.warning(
                 "feed_by_epochs recommended for SplitGnss or SpliceGnss objects only (%s here)",
                 self.get_step_type(),
@@ -179,26 +181,22 @@ class HandleGnss(arocmn.StepGnss):
             epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
             epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
 
-            epoch_srt_bol = step_obj_store.table["epoch_srt"] <= epo_srt
-            epoch_end_bol = step_obj_store.table["epoch_end"] >= epo_end
+            epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
+            epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
 
             epoch_bol = epoch_srt_bol & epoch_end_bol
 
             if np.sum(epoch_bol) == 0:
                 self.table.loc[irow, "ok_inp"] = False
                 self.table.loc[irow, "fpath_inp"] = None
+                logger.warning("no valid input RINEX for epoch %s %s", epo_srt, epo_end)
 
-            elif np.sum(epoch_bol) == 1:
-                rnxinp_row = step_obj_store.table.loc[epoch_bol].squeeze()
+            elif np.sum(epoch_bol) >= 1 and mode == "split":
+                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0] ###### can be improved !
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
 
-            elif np.sum(epoch_bol) > 1 and mode == "split":
-                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
-                self.table.loc[irow, "ok_inp"] = True
-                self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
-
-            elif np.sum(epoch_bol) > 1 and mode == "splice":
+            elif np.sum(epoch_bol) >= 1 and mode == "splice":
                 spc_obj = HandleGnss(
                     out_dir=self.out_dir,
                     tmp_dir=self.tmp_dir,
@@ -216,7 +214,7 @@ class HandleGnss(arocmn.StepGnss):
 
         return None
 
-    def find_local_inp(self):
+    def find_local_inp(self,return_as_step_obj=True):
         """
         Guess the paths and name of the local raw files based on the
         EpochRange and `inp_structure`attributes of the DownloadGnss object
@@ -232,8 +230,10 @@ class HandleGnss(arocmn.StepGnss):
             local_paths_list = utils.find_recursive(local_dir_use, "*")
 
         logger.info("nbr local files found: %s", len(local_paths_list))
-
-        return local_paths_list
+        if return_as_step_obj:
+            return arocmn.rnxs2step_obj(rnxs_lis_inp=local_paths_list)
+        else:
+            return local_paths_list
 
     #   _____       _ _
     #  / ____|     | (_)
@@ -275,32 +275,45 @@ class SpliceGnss(HandleGnss):
     def splice(
         self, input_rinexs="find", handle_software="converto", rinexmod_options=None
     ):
+        """
+        "total action" method
 
+        Splice RINEX files.
+
+        This method splices RINEX files based on the provided input. It can find local input files,
+        convert a list of RINEX files to a StepGnss object, or use an existing StepGnss object.
+        The splicing operation is performed using the specified software and options.
+
+        Parameters
+        ----------
+        input_rinexs : str or list or StepGnss, optional
+            The input RINEX files. It can be:
+            - "find": to find local input files.
+            - A list of RINEX file paths.
+            - An existing StepGnss object.
+            Default is "find".
+        handle_software : str, optional
+            The software to use for handling the RINEX files. Default is "converto".
+        rinexmod_options : dict, optional
+            Additional options for the RINEX modification. Default is None.
+
+        Returns
+        -------
+        None
+        """
+
+        if input_rinexs == "find":
+            stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
         if utils.is_iterable(input_rinexs):
-            step_obj_store = HandleGnss(
-                self.out_dir, self.tmp_dir, self.log_dir, metadata=self.metadata
-            )
-            step_obj_store.load_table_from_filelist(input_rinexs)
-            step_obj_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
-        elif input_rinexs == "find":
-            local_paths_list = self.find_local_inp()
-            step_obj_store = HandleGnss(
-                self.out_dir, self.tmp_dir, self.log_dir, metadata=self.metadata
-            )
-            step_obj_store.load_table_from_filelist(local_paths_list)
-            step_obj_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
-        elif isinstance(input_rinexs, HandleGnss):
-            step_obj_store = input_rinexs
+            stp_obj_rnxs_inp = arocmn.rnxs2step_obj(rnxs_lis_inp=input_rinexs)
+        elif isinstance(input_rinexs, arocmn.StepGnss):
+            stp_obj_rnxs_inp = input_rinexs
+        else:
+            logger.error("wrong input_rinexs value for the creation of a StepGnss object: %s",
+                         input_rinexs)
+            return None
 
-        self.feed_by_epochs(step_obj_store)
-
-        # spc_main_obj, spc_objs_lis = spc_inp.group_by_epochs(
-        #    period=period,
-        #    rolling_period=rolling_period,
-        #    rolling_ref=rolling_ref,
-        #    round_method=round_method,
-        #    drop_epoch_rnd=drop_epoch_rnd,
-        # )
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice")
 
         self.splice_core(
             handle_software=handle_software, rinexmod_options=rinexmod_options
@@ -310,7 +323,22 @@ class SpliceGnss(HandleGnss):
 
     def splice_core(self, handle_software="converto", rinexmod_options=None):
         """
-        "total action" method
+        Perform the core splicing operation.
+
+        This method handles the core splicing operation for RINEX files. It iterates over each row
+        in the table, performs the splicing operation using the specified software, and applies
+        RINEX modifications if necessary. Temporary files are removed after the operation.
+
+        Parameters
+        ----------
+        handle_software : str, optional
+            The software to use for handling the RINEX files. Default is "converto".
+        rinexmod_options : dict, optional
+            Additional options for the RINEX modification. Default is None.
+
+        Returns
+        -------
+        None
         """
 
         self.set_tmp_dirs()

@@ -12,17 +12,18 @@ import re
 import numpy as np
 import pandas as pd
 
+
 from geodezyx import utils
 from filelock import FileLock, Timeout
 
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-
+import autorino.common as arocmn
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
-def create_dummy_site_dic():
+def dummy_site_dic():
     """
     Creates a dummy site dictionary.
 
@@ -50,7 +51,7 @@ def create_dummy_site_dic():
     return d
 
 
-def create_dummy_session_dic():
+def dummy_sess_dic():
     """
     Creates a dummy session dictionary.
 
@@ -232,3 +233,32 @@ def check_lockfile(lockfile_path):
         lock.release()
     except Timeout:
         logger.warning(f"Process is locked by a previous process for {lockfile_path}")
+
+
+def rnxs2step_obj(rnxs_lis_inp):
+    """
+    Convert a list of RINEX files to a StepGnss object.
+
+    This function creates a StepGnss object and populates it with data from the provided list of RINEX files.
+    It loads the table from the file list, updates the site information from the RINEX filenames, and updates
+    the epoch table from the RINEX filenames.
+
+    Parameters
+    ----------
+    rnxs_lis_inp : list
+        A list of RINEX file paths to be converted into a StepGnss object.
+
+    Returns
+    -------
+    StepGnss
+        A StepGnss object populated with data from the provided RINEX files.
+    """
+    stp_obj = arocmn.StepGnss(out_dir="",
+                              tmp_dir="",
+                              log_dir="")
+
+    stp_obj.load_table_from_filelist(rnxs_lis_inp)
+    stp_obj.update_site_from_rnx_fname()
+    stp_obj.update_epoch_table_from_rnx_fname(use_rnx_filename_only=False, update_epoch_range=True)
+
+    return stp_obj
