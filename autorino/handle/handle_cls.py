@@ -213,7 +213,7 @@ class HandleGnss(arocmn.StepGnss):
                     session=step_obj_store.session,
                 )
 
-                spc_obj.table = step_obj_store.table.loc[epoch_bol]
+                spc_obj.table = step_obj_store.table.loc[epoch_bol].copy()
                 spc_obj.updt_eporng_w_tab()
 
                 self.table.loc[irow, "ok_inp"] = True
