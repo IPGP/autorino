@@ -594,7 +594,10 @@ class StepGnss:
         StepGnss
             A new instance of the StepGnss class that is a copy of the current instance.
         """
-        return copy.deepcopy(self)
+        out_copy = copy.deepcopy(self)
+        out_copy.table = self.table.copy()
+
+        return out_copy
 
     def get_step_type(self, full_object_name=False):
         """
