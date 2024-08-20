@@ -23,8 +23,9 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
-BOLD_SRT = '\033[1m'
-BOLD_END = '\033[0m'
+BOLD_SRT = "\033[1m"
+BOLD_END = "\033[0m"
+
 
 class HandleGnss(arocmn.StepGnss):
     def __init__(
@@ -188,7 +189,9 @@ class HandleGnss(arocmn.StepGnss):
             epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
             epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
 
-            logger.info(">>>>>> Feeding RINEXs for %s between %s & %s",site, epo_srt, epo_end)
+            logger.info(
+                ">>>>>> Feeding RINEXs for %s between %s & %s", site, epo_srt, epo_end
+            )
             epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
             epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
 
@@ -211,16 +214,13 @@ class HandleGnss(arocmn.StepGnss):
                     tmp_dir=self.tmp_dir,
                     log_dir=self.log_dir,
                     epoch_range=None,
-                    site=step_obj_store.site,
-                    session=step_obj_store.session,
+                    site={"site_id": site},
                 )
-
 
                 spc_obj.table = step_obj_store.table.loc[epoch_bol].copy()
                 spc_obj.updt_eporng_w_tab()
 
                 logger.info("%s", str(spc_obj))
-
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
@@ -244,7 +244,7 @@ class HandleGnss(arocmn.StepGnss):
             )
 
             if rnx3_regex:
-                patrn = conv.rinex_regex_long_name()
+                patrn = self.site_id9 + conv.rinex_regex_long_name()[9:]
             else:
                 patrn = "*"
 
@@ -328,7 +328,10 @@ class SpliceGnss(HandleGnss):
 
         method_msg = "input method for splicing: "
         if input_rinexs == "find":
-            logger.debug(method_msg + "find local RINEX files and convert them to a StepGnss object")
+            logger.debug(
+                method_msg
+                + "find local RINEX files and convert them to a StepGnss object"
+            )
             stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
 
         elif utils.is_iterable(input_rinexs):
@@ -344,8 +347,6 @@ class SpliceGnss(HandleGnss):
                 input_rinexs,
             )
             return None
-
-
 
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice")
 
@@ -379,11 +380,12 @@ class SpliceGnss(HandleGnss):
 
         for irow, row in self.table.iterrows():
 
-            logger.info(">>>>>> Splicing %s between %s and %s",
-                        self.table.loc[irow, "site"],
-                        self.table.loc[irow, "epoch_srt"],
-                        self.table.loc[irow, "epoch_end"])
-
+            logger.info(
+                ">>>>>> Splicing %s between %s and %s",
+                self.table.loc[irow, "site"],
+                self.table.loc[irow, "epoch_srt"],
+                self.table.loc[irow, "epoch_end"],
+            )
 
             self.on_row_splice(
                 irow, self.tmp_dir_converted, handle_software=handle_software
@@ -446,7 +448,9 @@ class SpliceGnss(HandleGnss):
             spc_row.tmp_decmp_files, _ = spc_row.decompress()
 
             #### add a test here to be sure that only one epoch is inside
-            out_dir_use = self.translate_path(self.out_dir, self.table.loc[irow, "epoch_srt"])
+            out_dir_use = self.translate_path(
+                self.out_dir, self.table.loc[irow, "epoch_srt"]
+            )
 
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
@@ -576,7 +580,9 @@ class SplitGnss(HandleGnss):
         else:
             out_dir_use = self.tmp_dir
 
-        out_dir_use = self.translate_path(self.out_dir, self.table.loc[irow, "epoch_srt"])
+        out_dir_use = self.translate_path(
+            self.out_dir, self.table.loc[irow, "epoch_srt"]
+        )
 
         frnx_inp = self.table.loc[irow, table_col]
 
