@@ -621,7 +621,7 @@ class StepGnss:
         if full_object_name:
             return type(self).__name__
         else:
-            return type(self).__name__[:-4].lower() # without Gnss suffix
+            return type(self).__name__[:-4].lower()  # without Gnss suffix
 
     def update_site_from_rnx_fname(self):
         for irow, row in self.table.iterrows():
@@ -630,7 +630,6 @@ class StepGnss:
         self.site_id = list(set(self.table["site"]))[0]
 
         return None
-
 
     def update_epoch_table_from_rnx_fname(
         self, use_rnx_filename_only=False, update_epoch_range=True
@@ -724,9 +723,10 @@ class StepGnss:
 
         if len(n_tdelta) > 1:
             logger.warning(
-                "the period spacing of %s is not uniform, keep the most common", self
+                "the period spacing of %s is not uniform, keep the most common: %s",
+                self,
+                n_tdelta.iloc[0],
             )
-            logger.warning("%s", n_tdelta)
             # be sure to keep the 1st one!!!
 
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
@@ -821,10 +821,6 @@ class StepGnss:
             )
 
         return lock
-
-
-
-
 
     #  _                       _
     # | |                     (_)
@@ -1134,7 +1130,7 @@ class StepGnss:
 
         return local_paths_list
 
-    def check_local_files(self, io='out'):
+    def check_local_files(self, io="out"):
         """
         Checks the existence of the output ('out') or input ('inp') local files (for non download cases)
         and updates the corresponding booleans in the 'ok_out' or 'ok_inp' column of the table.
@@ -1163,7 +1159,7 @@ class StepGnss:
 
         local_files_list = []
 
-        if io not in ['inp', 'out']:
+        if io not in ["inp", "out"]:
             logger.error("io must be 'inp' or 'out'")
             return local_files_list
 
@@ -1184,7 +1180,7 @@ class StepGnss:
 
         return local_files_list
 
-    def invalidate_small_local_files(self, threshold=0.80, abs_min = 1000):
+    def invalidate_small_local_files(self, threshold=0.80, abs_min=1000):
         """
         Invalidates local files that are smaller than a certain threshold.
 
@@ -1217,7 +1213,7 @@ class StepGnss:
             # +++ test 2: above an absolute minimum
             valid_bool2 = abs_min < self.table["size_out"]
             # +++ test 3: both tests
-            valid_bool = np.logical_and(valid_bool1,valid_bool2)
+            valid_bool = np.logical_and(valid_bool1, valid_bool2)
             self.table.loc[:, "ok_out"] = valid_bool
             self.table.loc[np.logical_not(valid_bool1), "note"] = "invalid_med"
             self.table.loc[np.logical_not(valid_bool2), "note"] = "invalid_abs"
@@ -1853,7 +1849,10 @@ class StepGnss:
         }
 
         if rinexmod_options:
-            if (not rinexmod_options["sitelog"] and "station_info" in rinexmod_options.keys()):
+            if (
+                not rinexmod_options["sitelog"]
+                and "station_info" in rinexmod_options.keys()
+            ):
                 rinexmod_options.pop("sitelog", None)
 
         # update options/arguments for rinexmod with inputs
