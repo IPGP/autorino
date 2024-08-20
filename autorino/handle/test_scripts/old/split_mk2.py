@@ -25,7 +25,7 @@ L = utils.find_recursive(p,"*BORG*crx*gz")
 epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
 hdl_store = arocmn.StepGnss(out_dir, tmp_dir, log_dir, epoch_range=None) #, site_id='CFNG')
 hdl_store.load_table_from_filelist(L)
-hdl_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+hdl_store.updt_epotab_w_rnx(use_rnx_filename_only=True)
 
 epo = arocmn.EpochRange(dt.datetime(2023,6,4),
                         dt.datetime(2023,7,31),

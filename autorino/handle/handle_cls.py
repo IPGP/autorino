@@ -139,7 +139,7 @@ class HandleGnss(arocmn.StepGnss):
             )
 
             spc_obj.table = tabgrp_bis
-            spc_obj.update_epoch_range_from_table()
+            spc_obj.updt_eporng_w_tab()
             spc_obj_lis_out.append(spc_obj)
 
             # fill the main object with the individuals
@@ -214,7 +214,7 @@ class HandleGnss(arocmn.StepGnss):
                 )
 
                 spc_obj.table = step_obj_store.table.loc[epoch_bol]
-                spc_obj.update_epoch_range_from_table()
+                spc_obj.updt_eporng_w_tab()
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
