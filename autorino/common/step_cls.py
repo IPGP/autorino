@@ -725,7 +725,7 @@ class StepGnss:
             logger.warning(
                 "the period spacing of %s is not uniform, keep the most common: %s",
                 self,
-                n_tdelta.iloc[0],
+                tdelta.mode()[0],
             )
             # be sure to keep the 1st one!!!
 
