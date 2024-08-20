@@ -277,7 +277,7 @@ class StepGnss:
         """
         if not site:
             logger.warning("no site dict given, a dummy one will be created")
-            self.site = arocmn.create_dummy_site_dic()
+            self.site = arocmn.dummy_site_dic()
         else:
             self.site = site
 
@@ -302,7 +302,7 @@ class StepGnss:
         """
         if not session:
             logger.warning("no session dict given, a dummy one will be created")
-            self.session = arocmn.create_dummy_session_dic()
+            self.session = arocmn.dummy_sess_dic()
         else:
             self.session = session
 
@@ -622,6 +622,15 @@ class StepGnss:
             return type(self).__name__
         else:
             return type(self).__name__[:-4].lower() # without Gnss suffix
+
+    def update_site_from_rnx_fname(self):
+        for irow, row in self.table.iterrows():
+            self.table.loc[irow, "site"] = self.table.loc[irow, "fname"][:9]
+
+        self.site_id = list(set(self.table["site"]))[0]
+
+        return None
+
 
     def update_epoch_table_from_rnx_fname(
         self, use_rnx_filename_only=False, update_epoch_range=True
@@ -1843,11 +1852,9 @@ class StepGnss:
             "full_history": True,
         }
 
-        if (
-            not rinexmod_options["sitelog"]
-            and "station_info" in rinexmod_options.keys()
-        ):
-            rinexmod_options.pop("sitelog", None)
+        if rinexmod_options:
+            if (not rinexmod_options["sitelog"] and "station_info" in rinexmod_options.keys()):
+                rinexmod_options.pop("sitelog", None)
 
         # update options/arguments for rinexmod with inputs
         if rinexmod_options:
