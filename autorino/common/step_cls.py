@@ -32,6 +32,8 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+import warnings
+warnings.simplefilter('always', UserWarning)
 
 class StepGnss:
     """
@@ -1378,7 +1380,6 @@ class StepGnss:
                 "fpath_ori" not in self.table.columns
             ):  ## a 'fpath_ori' column must be created first
                 self.table["fpath_ori"] = None
-                print("AAAAAAAAAAA NEW COL")
 
             self.table.loc[irow, "fpath_ori"] = self.table.loc[irow, table_col]
 
