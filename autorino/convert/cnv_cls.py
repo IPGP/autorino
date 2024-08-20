@@ -181,13 +181,14 @@ class ConvertGnss(arocmn.StepGnss):
             "inp"
         )  # tests if the input local files are already there
 
-        print("AAAAAAAAAAAAAAAAAA")
         self.print_table()
 
         if force_use:
             self.table["ok_inp"] = True
             self.table["note"] = "force_convert"
-        else:
+
+        filter_prev_tables = False
+        if filter_prev_tables:
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
