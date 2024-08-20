@@ -372,6 +372,7 @@ class SpliceGnss(HandleGnss):
             self.on_row_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
+
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.on_row_mv_final(irow, self.out_dir)
 
@@ -420,7 +421,7 @@ class SpliceGnss(HandleGnss):
             spc_row.tmp_decmp_files, _ = spc_row.decompress()
 
             #### add a test here to be sure that only one epoch is inside
-            out_dir_use = self.translate_path(self.out_dir)
+            out_dir_use = self.translate_path(self.out_dir, self.table.loc[irow, "epoch_srt"])
 
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
@@ -549,6 +550,8 @@ class SplitGnss(HandleGnss):
             out_dir_use = self.tmp_dir_converted
         else:
             out_dir_use = self.tmp_dir
+
+        out_dir_use = self.translate_path(self.out_dir, self.table.loc[irow, "epoch_srt"])
 
         frnx_inp = self.table.loc[irow, table_col]
 
