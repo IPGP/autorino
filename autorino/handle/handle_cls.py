@@ -370,6 +370,7 @@ class SpliceGnss(HandleGnss):
                         self.table.loc[irow, "epoch_srt"],
                         self.table.loc[irow, "epoch_end"])
 
+
             self.on_row_splice(
                 irow, self.tmp_dir_converted, handle_software=handle_software
             )
