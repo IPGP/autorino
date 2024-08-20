@@ -726,16 +726,16 @@ class StepGnss:
         n_tdelta = tdelta.value_counts().to_frame()
         v_tdelta = tdelta.mode()[0]
 
-        if len(n_tdelta) > 1:
-            logger.warning(
-                "the period spacing of %s is not uniform, keep the most common: %s",
-                self,
-                tdelta.mode()[0],
-            )
-            # be sure to keep the 1st one!!!
-
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
         # logger.debug("new period, %s, %s", v_tdelta, period_new)
+
+        if len(n_tdelta) > 1:
+            logger.warning(
+                "not uniform period spacing of %s (%i values), keep the most common: %s",
+                str(self).split("/")[0],
+                len(n_tdelta),
+                v_tdelta,
+            )
 
         self.epoch_range = arocmn.EpochRange(
             epoch1,
