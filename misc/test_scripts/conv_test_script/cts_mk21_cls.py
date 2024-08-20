@@ -73,7 +73,7 @@ CONV.print_table()
 #CONV.filter_year_min_max(2019,2020)
 
 # if prev_table_logs:
-#     CONV.filter_previous_tables(DF_prev_tbl)
+#     CONV.filter_prev_tab(DF_prev_tbl)
 
 CONV.convert()
 

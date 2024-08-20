@@ -1725,7 +1725,7 @@ class StepGnss:
 
         return flist_out
 
-    def filter_previous_tables(self, df_prev_tab):
+    def filter_prev_tab(self, df_prev_tab):
         """
         Filters the raw files based on their presence in previous conversion tables.
 
