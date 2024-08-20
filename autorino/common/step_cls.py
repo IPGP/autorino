@@ -739,7 +739,7 @@ class StepGnss:
         If the period spacing in the table is not uniform, the function will keep the most common period.
         """
         epomin = self.table[column_srt].min()
-        epomax = self.table[column_srt].max()
+        epomax = self.table[column_end].max()
 
         epoch1 = epomin
         epoch2 = epomax

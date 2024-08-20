@@ -184,13 +184,13 @@ class HandleGnss(arocmn.StepGnss):
             in ("HandleGnss", "SplitGnss", "SpliceGnss")
         ):
             logger.warning(
-                "feed_by_epochs recommended for SplitGnss or SpliceGnss objects only (%s here)",
+                "feed_by_epochs works with HandleGnss, SplitGnss, SpliceGnss objects only (%s here)",
                 self.get_step_type(),
             )
 
         if print_table:
-            logger.info("feeding table:\n%s", str(step_obj_store.table))
-            logger.info("table to be feeded:\n%s", str(self.table))
+            logger.info("Feeding table:\n%s", str(step_obj_store.table))
+            logger.info("Table to be feeded:\n%s", str(self.table))
 
         self.table["ok_inp"] = False
 
