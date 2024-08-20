@@ -10,7 +10,9 @@ import os
 
 import numpy as np
 import pandas as pd
-from geodezyx import utils
+
+from exemples.pride_pppar_frontend.pride_pppar_frontend_mk2 import pattern
+from geodezyx import utils, conv
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -169,7 +171,10 @@ class HandleGnss(arocmn.StepGnss):
             (all the needed ones for the splice)
         """
 
-        if not (self.get_step_type(full_object_name=True) in ("HandleGnss", "SplitGnss", "SpliceGnss")):
+        if not (
+            self.get_step_type(full_object_name=True)
+            in ("HandleGnss", "SplitGnss", "SpliceGnss")
+        ):
             logger.warning(
                 "feed_by_epochs recommended for SplitGnss or SpliceGnss objects only (%s here)",
                 self.get_step_type(),
@@ -192,7 +197,9 @@ class HandleGnss(arocmn.StepGnss):
                 logger.warning("no valid input RINEX for epoch %s %s", epo_srt, epo_end)
 
             elif np.sum(epoch_bol) >= 1 and mode == "split":
-                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0] ###### can be improved !
+                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[
+                    0
+                ]  ###### can be improved !
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
 
@@ -214,10 +221,10 @@ class HandleGnss(arocmn.StepGnss):
 
         return None
 
-    def find_local_inp(self,return_as_step_obj=True):
+    def find_local_inp(self, return_as_step_obj=True, rnx3_regex=False):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_structure`attributes of the DownloadGnss object
+        EpochRange and `inp_structure` attributes of the DownloadGnss object
         """
 
         local_paths_list = []
@@ -225,9 +232,18 @@ class HandleGnss(arocmn.StepGnss):
         for epoch in self.epoch_range.epoch_range_list(end_bound=True):
             # guess the potential local files
             local_dir_use = self.translate_path(
-                str(self.inp_dir_parent), epoch, make_dir=False
+                os.path.join(str(self.inp_dir_parent), str(self.inp_structure)),
+                epoch,
+                make_dir=False,
             )
-            local_paths_list = utils.find_recursive(local_dir_use, "*")
+
+            if rnx3_regex:
+                patrn = conv.rinex_regex_long_name()
+            else:
+                patrn = "*"
+
+            local_paths_list_epo = utils.find_recursive(local_dir_use, pattern=patrn)
+            local_paths_list.extend(local_paths_list_epo)
 
         logger.info("nbr local files found: %s", len(local_paths_list))
         if return_as_step_obj:
@@ -309,8 +325,10 @@ class SpliceGnss(HandleGnss):
         elif isinstance(input_rinexs, arocmn.StepGnss):
             stp_obj_rnxs_inp = input_rinexs
         else:
-            logger.error("wrong input_rinexs value for the creation of a StepGnss object: %s",
-                         input_rinexs)
+            logger.error(
+                "wrong input_rinexs value for the creation of a StepGnss object: %s",
+                input_rinexs,
+            )
             return None
 
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice")
