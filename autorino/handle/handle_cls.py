@@ -161,18 +161,24 @@ class HandleGnss(arocmn.StepGnss):
 
         Parameters
         ----------
-        step_obj_store
+        step_obj_store : StepGnss
             StepGnss object, which a list of possible RINEXs candidates
             for the splice/split operation
 
-        mode
+        mode : str
             split or splice
             if split: for fpath_inp, only one RINEX is returned
             (the need one for the split)
             if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
             (all the needed ones for the splice)
-        """
 
+        print_table : bool, optional
+            If True, prints the tables for debugging purposes. Default is False.
+
+        Returns
+        -------
+        None
+        """
         if not (
             self.get_step_type(full_object_name=True)
             in ("HandleGnss", "SplitGnss", "SpliceGnss")
@@ -318,7 +324,7 @@ class SpliceGnss(HandleGnss):
         input_rinexs="find",
         handle_software="converto",
         rinexmod_options=None,
-        print_table=False,
+        verbose=False,
     ):
         """
         "total action" method
@@ -371,7 +377,7 @@ class SpliceGnss(HandleGnss):
             )
             return None
 
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=print_table)
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
 
         self.splice_core(
             handle_software=handle_software, rinexmod_options=rinexmod_options
