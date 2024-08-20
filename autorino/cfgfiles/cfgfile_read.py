@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-
 def load_cfg(configfile_path):
     """
     Loads quickly a configuration file (YAML format) without interpretation.
@@ -190,7 +189,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     options=y_stp["options"],
                 )
 
-            elif k_stp in ("split", "splice"):
+            elif k_stp == "split":
                 if not _is_cfg_bloc_active(y_stp):
                     continue
 
@@ -199,7 +198,30 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                 else:
                     sitelogs = None
 
-                spl = arohdl.HandleGnss
+                spl = arohdl.SplitGnss
+                step_obj = spl(
+                    out_dir=out_dir,
+                    tmp_dir=tmp_dir,
+                    log_dir=log_dir,
+                    epoch_range=epo_obj_stp,
+                    inp_dir_parent=inp_dir_parent,
+                    inp_structure=inp_structure,
+                    site=y_station["site"],
+                    session=y_ses["general"],
+                    metadata=sitelogs,
+                    options=y_stp["options"],
+                )
+
+            elif k_stp == "splice":
+                if not _is_cfg_bloc_active(y_stp):
+                    continue
+
+                if y_station["site"]["sitelog_path"]:
+                    sitelogs = y_station["site"]["sitelog_path"]
+                else:
+                    sitelogs = None
+
+                spl = arohdl.SpliceGnss
                 step_obj = spl(
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
@@ -420,7 +442,9 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             wkf_prev = steps_lis[istp - 1]
 
         if step_select and stp.get_step_type() not in step_select:
-            logger.warning("step %s skipped, not selected in %s", stp.get_step_type(), step_select)
+            logger.warning(
+                "step %s skipped, not selected in %s", stp.get_step_type(), step_select
+            )
             continue
 
         if stp.get_step_type() == "download":
@@ -430,9 +454,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             stp.convert(print_table)
         elif stp.get_step_type() == "splice":
             stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
-            spc_main_obj, spc_objs_lis = stp.group_by_epochs()
-            spc_main_obj.splice_core()
+            stp.splice()
         elif stp.get_step_type() == "split":
             stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.split(print_table)
+            stp.split()
