@@ -1378,6 +1378,7 @@ class StepGnss:
                 "fpath_ori" not in self.table.columns
             ):  ## a 'fpath_ori' column must be created first
                 self.table["fpath_ori"] = None
+                print("AAAAAAAAAAA NEW COL")
 
             self.table.loc[irow, "fpath_ori"] = self.table.loc[irow, table_col]
 
