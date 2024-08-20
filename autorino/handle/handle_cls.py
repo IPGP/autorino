@@ -322,15 +322,15 @@ class SpliceGnss(HandleGnss):
 
         method_msg = "input method for splicing: "
         if input_rinexs == "find":
-            logger.info(method_msg + "find local RINEX files and convert them to a StepGnss object")
+            logger.debug(method_msg + "find local RINEX files and convert them to a StepGnss object")
             stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
 
         elif utils.is_iterable(input_rinexs):
-            logger.info(method_msg + "convert a RINEX files list to a StepGnss object")
+            logger.debug(method_msg + "convert a RINEX files list to a StepGnss object")
             stp_obj_rnxs_inp = arocmn.rnxs2step_obj(rnxs_lis_inp=input_rinexs)
 
         elif isinstance(input_rinexs, arocmn.StepGnss):
-            logger.info(method_msg + "a StepGnss object containing the RINEX files")
+            logger.debug(method_msg + "a StepGnss object containing the RINEX files")
             stp_obj_rnxs_inp = input_rinexs
         else:
             logger.error(
