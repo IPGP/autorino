@@ -636,9 +636,16 @@ class StepGnss:
 
     def updt_site_w_rnx_fname(self):
         for irow, row in self.table.iterrows():
-            self.table.loc[irow, "site"] = self.table.loc[irow, "fname"][:9]
+            if conv.rinex_regex_search_tester(row["fname"]):
+                self.table.loc[irow, "site"] = self.table.loc[irow, "fname"][:9]
 
-        self.site_id = list(set(self.table["site"]))[0]
+        sites_uniq = self.table["site"].unique()
+        if len(sites_uniq) == 1:
+            self.site_id = sites_uniq
+        elif len(sites_uniq) > 1:
+            logger.warning("unable to update site_id, multiple sites %s in %s", sites_uniq, self)
+        else:
+            logger.warning("unable to update site_id, no site found in %s", self)
 
         return None
 
