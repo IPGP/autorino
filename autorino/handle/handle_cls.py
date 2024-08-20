@@ -366,7 +366,7 @@ class SpliceGnss(HandleGnss):
         for irow, row in self.table.iterrows():
 
             logger.info(">>>>>> Splicing %s between %s and %s",
-                        self.table.iloc[irow,"site"],
+                        self.table.loc[irow, "site"],
                         self.table.loc[irow, "epoch_srt"],
                         self.table.loc[irow, "epoch_end"])
 
