@@ -455,6 +455,8 @@ def run_steps(steps_lis, step_select=[], print_table=True):
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
             stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            print("AAAAAAAAAAAAAAAAAA", stp_rnx_inp.print_table())
+            print("AAAAAAAABBBBBBBBBB", stp.print_table())
             stp.splice(stp_rnx_inp)
         elif stp.get_step_type() == "split":
             stp.load_table_from_prev_step_table(wkf_prev.table)
