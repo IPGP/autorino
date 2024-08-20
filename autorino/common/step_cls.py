@@ -144,7 +144,7 @@ class StepGnss:
 
     def __repr__(self):
         name = type(self).__name__
-        out = "{} {}/{}".format(name, self.site_id, self.epoch_range)
+        out = "{} {}/{}/{} elts".format(name, self.site_id, self.epoch_range,len(self.table))
         return out
 
     # getter and setter
@@ -747,7 +747,7 @@ class StepGnss:
             tz=self.epoch_range.tz,
         )
 
-        logger.debug("new %s for %s", self.epoch_range, str(self).split("/")[0])
+        logger.debug("new epoch range %s for %s", self.epoch_range, str(self).split("/")[0])
 
     def translate_path(
         self, path_inp: str, epoch_inp=None, make_dir: bool = False

@@ -197,7 +197,7 @@ class HandleGnss(arocmn.StepGnss):
             if np.sum(epoch_bol) == 0:
                 self.table.loc[irow, "ok_inp"] = False
                 self.table.loc[irow, "fpath_inp"] = None
-                logger.warning("no valid input RINEX for epoch %s %s", epo_srt, epo_end)
+                logger.warning("no valid input RINEX between %s & %s", epo_srt, epo_end)
 
             elif np.sum(epoch_bol) >= 1 and mode == "split":
                 rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
@@ -219,7 +219,7 @@ class HandleGnss(arocmn.StepGnss):
                 spc_obj.table = step_obj_store.table.loc[epoch_bol].copy()
                 spc_obj.updt_eporng_w_tab()
 
-                logger.info("%s found with %i RINEXs:", str(spc_obj), len(spc_obj.table))
+                logger.info("%s", str(spc_obj))
 
 
                 self.table.loc[irow, "ok_inp"] = True
