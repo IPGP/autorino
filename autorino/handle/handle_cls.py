@@ -11,7 +11,6 @@ import os
 import numpy as np
 import pandas as pd
 
-from exemples.pride_pppar_frontend.pride_pppar_frontend_mk2 import pattern
 from geodezyx import utils, conv
 
 import autorino.common as arocmn
