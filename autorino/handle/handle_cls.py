@@ -153,7 +153,7 @@ class HandleGnss(arocmn.StepGnss):
 
         return spc_main_obj, spc_obj_lis_out
 
-    def feed_by_epochs(self, step_obj_store, mode="split"):
+    def feed_by_epochs(self, step_obj_store, mode="split", print_table=False):
         """
         For a HandleGnss object, with a predefined epoch range
         find the corresponding RINEX for splice/split in the step_obj_store StepGnss,
@@ -181,6 +181,10 @@ class HandleGnss(arocmn.StepGnss):
                 "feed_by_epochs recommended for SplitGnss or SpliceGnss objects only (%s here)",
                 self.get_step_type(),
             )
+
+        if print_table:
+            logger.info("feeding table:\n%s", str(step_obj_store.table))
+            logger.info("table to be feeded:\n%s", str(self.table))
 
         self.table["ok_inp"] = False
 
@@ -309,7 +313,11 @@ class SpliceGnss(HandleGnss):
         )
 
     def splice(
-        self, input_rinexs="find", handle_software="converto", rinexmod_options=None
+        self,
+        input_rinexs="find",
+        handle_software="converto",
+        rinexmod_options=None,
+        print_table=False,
     ):
         """
         "total action" method
@@ -362,7 +370,7 @@ class SpliceGnss(HandleGnss):
             )
             return None
 
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice")
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=print_table)
 
         self.splice_core(
             handle_software=handle_software, rinexmod_options=rinexmod_options
