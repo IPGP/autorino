@@ -259,6 +259,6 @@ def rnxs2step_obj(rnxs_lis_inp):
 
     stp_obj.load_table_from_filelist(rnxs_lis_inp)
     stp_obj.update_site_from_rnx_fname()
-    stp_obj.update_epoch_table_from_rnx_fname(use_rnx_filename_only=False, update_epoch_range=True)
+    stp_obj.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True, update_epoch_range=True)
 
     return stp_obj
