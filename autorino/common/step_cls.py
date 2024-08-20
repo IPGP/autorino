@@ -33,7 +33,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 import warnings
-warnings.simplefilter('always', UserWarning)
+
+warnings.simplefilter("always", UserWarning)
+
 
 class StepGnss:
     """
@@ -628,7 +630,7 @@ class StepGnss:
         else:
             return type(self).__name__[:-4].lower()  # without Gnss suffix
 
-    def update_site_from_rnx_fname(self):
+    def updt_site_w_rnx_fname(self):
         for irow, row in self.table.iterrows():
             self.table.loc[irow, "site"] = self.table.loc[irow, "fname"][:9]
 
@@ -636,7 +638,7 @@ class StepGnss:
 
         return None
 
-    def update_epoch_table_from_rnx_fname(
+    def updt_epotab_w_rnx(
         self, use_rnx_filename_only=False, update_epoch_range=True
     ):
         """
@@ -690,11 +692,11 @@ class StepGnss:
             logger.info(
                 "update the epoch range from %i RINEX filenames", len(self.table)
             )
-            self.update_epoch_range_from_table()
+            self.updt_eporng_w_tab()
 
         return None
 
-    def update_epoch_range_from_table(
+    def updt_eporng_w_tab(
         self, column_srt="epoch_srt", column_end="epoch_end"
     ):
         """
@@ -1376,9 +1378,8 @@ class StepGnss:
         bool_wrk = np.logical_and(bool_comp, bool_ok)
 
         if bool_wrk:
-            if (
-                "fpath_ori" not in self.table.columns
-            ):  ## a 'fpath_ori' column must be created first
+            if "fpath_ori" not in self.table.columns:
+                ## a 'fpath_ori' column must be created first
                 self.table["fpath_ori"] = None
 
             self.table.loc[irow, "fpath_ori"] = self.table.loc[irow, table_col]
