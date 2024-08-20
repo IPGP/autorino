@@ -8,7 +8,7 @@ Created on 19/08/2024 18:26:29
 
 
 prnx = "/home/psakicki/aaa_FOURBI/RINEXexemple/SOUF00GLP/%Y/%j"
-rnxstruct = "SOUF00GLP_R_20242260000_06H_30S_MO.crx.gz"
+rnxstruct = ""
 dir = "/home/psakicki/aaa_FOURBI/test_splice_SOUF"
 
 import autorino.handle as arohdl

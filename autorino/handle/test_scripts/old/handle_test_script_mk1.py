@@ -25,7 +25,7 @@ H.guess_local_files()
 wrkflw_grp_lis = H.group_epochs() 
 
 W = wrkflw_grp_lis[0]
-W.updt_eporng_w_tab()
+W.updt_eporng_tab()
 
 # for t in H.table.groupby('epoch_rnd'):
 #     print(t)

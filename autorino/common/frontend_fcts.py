@@ -295,7 +295,7 @@ def split_rnx(
 
     spt_store = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, metadata=metadata)
     spt_store.load_table_from_filelist(rnxs_inp)
-    spt_store.updt_epotab_w_rnx(use_rnx_filename_only=True)
+    spt_store.updt_epotab_rnx(use_rnx_filename_only=True)
 
     spt_split = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_inp, metadata=metadata)
     spt_split.feed_by_epochs(spt_store)
@@ -383,7 +383,7 @@ def splice_rnx(
 
     spc_inp = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, metadata=metadata)
     spc_inp.load_table_from_filelist(rnxs_inp)
-    spc_inp.updt_epotab_w_rnx(use_rnx_filename_only=True)
+    spc_inp.updt_epotab_rnx(use_rnx_filename_only=True)
 
     spc_main_obj, spc_objs_lis = spc_inp.group_by_epochs(
         period=period,

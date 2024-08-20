@@ -140,7 +140,7 @@ class HandleGnss(arocmn.StepGnss):
             )
 
             spc_obj.table = tabgrp_bis
-            spc_obj.updt_eporng_w_tab()
+            spc_obj.updt_eporng_tab()
             spc_obj_lis_out.append(spc_obj)
 
             # fill the main object with the individuals
@@ -223,9 +223,10 @@ class HandleGnss(arocmn.StepGnss):
                 )
 
                 spc_obj.table = step_obj_store.table.loc[epoch_bol].copy()
-                spc_obj.updt_eporng_w_tab()
+                spc_obj.updt_eporng_tab()
+                spc_obj.updt_site_w_rnx_fname()
 
-                logger.info("%s", str(spc_obj))
+                logger.info("found for feed: %s", str(spc_obj))
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
