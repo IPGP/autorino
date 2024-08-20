@@ -77,7 +77,7 @@ class EpochRange:
         self.epoch_end = _epoch_max_tmp  ### setter bellow
 
     def __repr__(self):
-        return "epoch range from {} to {}, period {}".format(
+        return "from {} to {}, period {}".format(
             self.epoch_start, self.epoch_end, self.period
         )
 
