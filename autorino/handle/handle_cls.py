@@ -215,6 +215,7 @@ class HandleGnss(arocmn.StepGnss):
                     log_dir=self.log_dir,
                     epoch_range=None,
                     site={"site_id": site},
+                    session=self.session,
                 )
 
                 spc_obj.table = step_obj_store.table.loc[epoch_bol].copy()
@@ -230,7 +231,20 @@ class HandleGnss(arocmn.StepGnss):
     def find_local_inp(self, return_as_step_obj=True, rnx3_regex=False):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_structure` attributes of the DownloadGnss object
+        EpochRange and `inp_structure` attributes of the DownloadGnss object.
+
+        Parameters
+        ----------
+        return_as_step_obj : bool, optional
+            If True, returns the result as a StepGnss object. If False, returns a list of file paths. Default is True.
+        rnx3_regex : bool, optional
+            If True, uses a regex pattern for RINEX 3 filenames. If False, uses a wildcard pattern. Default is False.
+
+        Returns
+        -------
+        StepGnss or list
+            If return_as_step_obj is True, returns a StepGnss object populated with the found RINEX files.
+            If return_as_step_obj is False, returns a list of found file paths.
         """
 
         local_paths_list = []

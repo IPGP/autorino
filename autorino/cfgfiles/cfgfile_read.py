@@ -453,7 +453,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.convert(print_table)
         elif stp.get_step_type() == "splice":
-            opt = False
+            opt = True
             if opt:
                 stp_rnx_inp = stp.copy()
                 stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)

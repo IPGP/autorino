@@ -110,13 +110,17 @@ class StepGnss:
              * single MetaData object.
              Defaults to None.
         """
+        # initialized in the next line = these attributes use both a setter and an _init method
+        self.epoch_range = None # initialized in the next line
         self._init_epoch_range(epoch_range)
         self._init_site(site)
         self._init_session(session)
         self._init_options(options)
+        self.site_id = None # initialized in the next line
         self._init_site_id()
+        self.table = None # initialized in the next line
         self._init_table()
-
+        self.translate_dict = None # initialized in the next line
         self.set_translate_dict()
 
         ### sitelog init (needs translate dict)
@@ -141,11 +145,6 @@ class StepGnss:
         #### list to stack temporarily the temporary files before their delete
         self.tmp_rnx_files = []
         self.tmp_decmp_files = []
-
-    def __repr__(self):
-        name = type(self).__name__
-        out = "{} {}/{}/{} elts".format(name, self.site_id, self.epoch_range,len(self.table))
-        return out
 
     # getter and setter
     # site_id
@@ -957,8 +956,8 @@ class StepGnss:
                 return str_inp
             else:
                 halflen = int((maxlen / 2) - 1)
-                str_out = str_inp[:halflen] + ".." + str_inp[-halflen:]
-                return str_out
+                str_out_shrink = str_inp[:halflen] + ".." + str_inp[-halflen:]
+                return str_out_shrink
 
         self.table_ok_cols_bool()
 
@@ -1535,7 +1534,7 @@ class StepGnss:
             The list of filtered raw files.
         """
 
-        def _year_detect(fpath_inp, year_in_inp_path=None):
+        def _year_detect(fpath_inp, year_in_inp_path0=None):
             """
             Detects the year in the file path.
 
@@ -1548,7 +1547,7 @@ class StepGnss:
             ----------
             fpath_inp : str
                 The input file path.
-            year_in_inp_path : int, optional
+            year_in_inp_path0 : int, optional
                 The position of the year in the absolute path.
 
             Returns
@@ -1557,8 +1556,8 @@ class StepGnss:
                 The detected year or NaN if the year cannot be found.
             """
             try:
-                if year_in_inp_path:
-                    year_folder = int(fpath_inp.split("/")[year_in_inp_path])
+                if year_in_inp_path0:
+                    year_folder = int(fpath_inp.split("/")[year_in_inp_path0])
                 else:
                     rgx = re.search(r"/(19|20)[0-9]{2}/", fpath_inp)
                     year_folder = int(rgx.group()[1:-1])
