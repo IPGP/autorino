@@ -184,9 +184,11 @@ class HandleGnss(arocmn.StepGnss):
         self.table["ok_inp"] = False
 
         for irow, row in self.table.iterrows():
+            site = self.table.loc[irow, "site"]
             epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
             epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
 
+            logger.info(">>>>>> Feeding RINEXs for %s between %s & %s",site, epo_srt, epo_end)
             epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
             epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
 
@@ -213,8 +215,12 @@ class HandleGnss(arocmn.StepGnss):
                     session=step_obj_store.session,
                 )
 
+
                 spc_obj.table = step_obj_store.table.loc[epoch_bol].copy()
                 spc_obj.updt_eporng_w_tab()
+
+                logger.info("%s found with %i RINEXs:", str(spc_obj), len(spc_obj.table))
+
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
