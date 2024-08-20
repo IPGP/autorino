@@ -635,21 +635,31 @@ class StepGnss:
             return type(self).__name__[:-4].lower()  # without Gnss suffix
 
     def updt_site_w_rnx_fname(self):
+        """
+        Updates the site information in the table and in the 'site_id' object based on the RINEX filenames.
+
+        This method iterates over each row in the table and updates the 'site' column with the first 9 characters
+        of the 'fname' column if the filename matches the RINEX regex pattern. It then updates the 'site_id' attribute
+        of the StepGnss object based on the unique site values in the table.
+
+        Returns
+        -------
+        None
+        """
         for irow, row in self.table.iterrows():
             if conv.rinex_regex_search_tester(row["fname"]):
                 self.table.loc[irow, "site"] = self.table.loc[irow, "fname"][:9]
 
         sites_uniq = self.table["site"].unique()
         if len(sites_uniq) == 1:
-            self.site_id = sites_uniq
+            self.site_id = sites_uniq[0]
         elif len(sites_uniq) > 1:
             logger.warning("unable to update site_id, multiple sites %s in %s", sites_uniq, self)
         else:
             logger.warning("unable to update site_id, no site found in %s", self)
 
         return None
-
-    def updt_epotab_w_rnx(
+    def updt_epotab_rnx(
         self, use_rnx_filename_only=False, update_epoch_range=True
     ):
         """
@@ -703,11 +713,11 @@ class StepGnss:
             logger.info(
                 "update the epoch range from %i RINEX filenames", len(self.table)
             )
-            self.updt_eporng_w_tab()
+            self.updt_eporng_tab()
 
         return None
 
-    def updt_eporng_w_tab(
+    def updt_eporng_tab(
         self, column_srt="epoch_srt", column_end="epoch_end"
     ):
         """
