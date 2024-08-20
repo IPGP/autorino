@@ -23,6 +23,8 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+BOLD_SRT = '\033[1m'
+BOLD_END = '\033[0m'
 
 class HandleGnss(arocmn.StepGnss):
     def __init__(
@@ -196,9 +198,8 @@ class HandleGnss(arocmn.StepGnss):
                 logger.warning("no valid input RINEX for epoch %s %s", epo_srt, epo_end)
 
             elif np.sum(epoch_bol) >= 1 and mode == "split":
-                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[
-                    0
-                ]  ###### can be improved !
+                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
+                ###### can be improved !
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
 
@@ -207,7 +208,7 @@ class HandleGnss(arocmn.StepGnss):
                     out_dir=self.out_dir,
                     tmp_dir=self.tmp_dir,
                     log_dir=self.log_dir,
-                    epoch_range=step_obj_store.epoch_range,
+                    epoch_range=None,
                     site=step_obj_store.site,
                     session=step_obj_store.session,
                 )
@@ -316,6 +317,8 @@ class SpliceGnss(HandleGnss):
         -------
         None
         """
+
+        logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
         if input_rinexs == "find":
             stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
