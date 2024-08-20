@@ -1378,9 +1378,9 @@ class StepGnss:
         bool_wrk = np.logical_and(bool_comp, bool_ok)
 
         if bool_wrk:
-            #if "fpath_ori" not in self.table.columns:
-            #    ## a 'fpath_ori' column must be created first
-            #    self.table["fpath_ori"] = None
+            if "fpath_ori" not in self.table.columns:
+                # a 'fpath_ori' column must be created first
+                self.table["fpath_ori"] = None
 
             self.table.loc[irow, "fpath_ori"] = self.table.loc[irow, table_col]
 
