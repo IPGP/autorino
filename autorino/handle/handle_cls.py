@@ -324,7 +324,7 @@ class SpliceGnss(HandleGnss):
         None
         """
 
-        logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END, method)
+        logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
         method_msg = "input method for splicing: "
         if input_rinexs == "find":
