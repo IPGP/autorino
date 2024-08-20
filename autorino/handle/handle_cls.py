@@ -304,7 +304,7 @@ class SpliceGnss(HandleGnss):
 
         if input_rinexs == "find":
             stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
-        if utils.is_iterable(input_rinexs):
+        elif utils.is_iterable(input_rinexs):
             stp_obj_rnxs_inp = arocmn.rnxs2step_obj(rnxs_lis_inp=input_rinexs)
         elif isinstance(input_rinexs, arocmn.StepGnss):
             stp_obj_rnxs_inp = input_rinexs
