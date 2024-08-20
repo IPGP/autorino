@@ -364,11 +364,18 @@ class SpliceGnss(HandleGnss):
         self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
+
+            logger.info(">>>>>> Splicing %s between %s and %s",
+                        self.table.iloc[irow,"site"],
+                        self.table.loc[irow, "epoch_srt"],
+                        self.table.loc[irow, "epoch_end"])
+
             self.on_row_splice(
                 irow, self.tmp_dir_converted, handle_software=handle_software
             )
 
-            if not self.table.loc[irow, "ok_out"]:
+            if not self.table.loc[irow, "ok_out"] and self.table.loc[irow, "ok_inp"]:
+                # print this only if input is ok
                 logger.error("unable to splice %s, skip", self.table.loc[irow])
                 continue
 
