@@ -192,7 +192,7 @@ class ConvertGnss(arocmn.StepGnss):
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
-                self.filter_previous_tables(prv_tbl_df)
+                self.filter_prev_tab(prv_tbl_df)
             self.filter_ok_out()
 
         self.tmp_decmp_files, _ = self.decompress()
