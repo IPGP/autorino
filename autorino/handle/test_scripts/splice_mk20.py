@@ -23,8 +23,7 @@ spc = arohdl.SpliceGnss(dir,
                         epoch_range=(conv.doy2dt(2024,226),
                                      conv.doy2dt(2024,227),
                                      "1d"),
-                                     inp_dir_parent=prnx,
-                                     inp_structure=rnxstruct)
+                                     inp_dir=prnx)
 
 
 
