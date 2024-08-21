@@ -67,6 +67,7 @@ class ConvertGnss(arocmn.StepGnss):
         out_dir,
         tmp_dir,
         log_dir,
+        inp_dir=None,
         epoch_range=None,
         inp_dir_parent=None,
         inp_structure=None,
@@ -104,12 +105,11 @@ class ConvertGnss(arocmn.StepGnss):
             * single MetaData object
         """
         super().__init__(
-            out_dir,
-            tmp_dir,
-            log_dir,
+            out_dir=out_dir,
+            tmp_dir=tmp_dir,
+            log_dir=log_dir,
+            inp_dir=inp_dir,
             epoch_range=epoch_range,
-            inp_dir_parent=inp_dir_parent,
-            inp_structure=inp_structure,
             site=site,
             session=session,
             options=options,

@@ -22,8 +22,9 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 # pd.options.mode.chained_assignment = "warn"
 warnings.simplefilter("ignore", category=RuntimeWarning)
 
-BOLD_SRT = '\033[1m'
-BOLD_END = '\033[0m'
+BOLD_SRT = "\033[1m"
+BOLD_END = "\033[0m"
+
 
 class DownloadGnss(arocmn.StepGnss):
     """
@@ -70,10 +71,9 @@ class DownloadGnss(arocmn.StepGnss):
         out_dir,
         tmp_dir,
         log_dir,
+        inp_dir,
         epoch_range,
         access,
-        inp_dir_parent,
-        inp_structure,
         site=None,
         session=None,
         options=None,
@@ -114,12 +114,11 @@ class DownloadGnss(arocmn.StepGnss):
              Defaults to None.
         """
         super().__init__(
-            out_dir,
-            tmp_dir,
-            log_dir,
-            epoch_range,
-            inp_dir_parent=inp_dir_parent,
-            inp_structure=inp_structure,
+            out_dir=out_dir,
+            tmp_dir=tmp_dir,
+            log_dir=log_dir,
+            inp_dir=inp_dir,
+            epoch_range=epoch_range,
             site=site,
             session=session,
             options=options,
@@ -127,6 +126,14 @@ class DownloadGnss(arocmn.StepGnss):
         )
 
         self.access = access
+
+    @property
+    def inp_dir_parent(self):
+        return os.path.dirname(self.inp_dir)
+
+    @property
+    def inp_structure(self):
+        return os.path.basename(self.inp_dir)
 
     def guess_remot_raw(self):
         """
@@ -183,7 +190,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         local_paths_list = []
 
-        for epoch in self.epoch_range.epoch_range_list(): # go for irow !
+        for epoch in self.epoch_range.epoch_range_list():  # go for irow !
             # guess the potential local files
             local_dir_use = str(self.out_dir)
             local_fname_use = str(self.inp_structure)
@@ -204,7 +211,6 @@ class DownloadGnss(arocmn.StepGnss):
         logger.info("nbr local raw files guessed: %s", len(local_paths_list))
 
         return local_paths_list
-
 
     def guess_remote_dirs(self):
         """
@@ -269,7 +275,9 @@ class DownloadGnss(arocmn.StepGnss):
             logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
 
             # re add protocol:
-            rmot_fil_epo_lis = [self.access["protocol"] + '://' + f for f in rmot_fil_epo_lis]
+            rmot_fil_epo_lis = [
+                self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
+            ]
             ## update the table
             new_rows_stk = []
             for rmot_fil in rmot_fil_epo_lis:
@@ -280,7 +288,9 @@ class DownloadGnss(arocmn.StepGnss):
                 new_row["ok_inp"] = True
                 new_rows_stk.append(new_row)
 
-            self.table = pd.concat([self.table, pd.DataFrame(new_rows_stk)], ignore_index=True)
+            self.table = pd.concat(
+                [self.table, pd.DataFrame(new_rows_stk)], ignore_index=True
+            )
 
         self.table = self.table[self.table["note"] != "dir_guessed"]
         self.table.reset_index(drop=True, inplace=True)
@@ -316,7 +326,6 @@ class DownloadGnss(arocmn.StepGnss):
         logger.info("nbr local raw files asked: %s", len(local_paths_list))
 
         return local_paths_list
-
 
     def ping_remote(self):
         """
@@ -533,4 +542,3 @@ class DownloadGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = False
 
         return file_dl_out
-

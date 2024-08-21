@@ -74,9 +74,8 @@ class StepGnss:
         out_dir,
         tmp_dir,
         log_dir,
+        inp_dir,
         epoch_range=None,
-        inp_dir_parent=None,
-        inp_structure=None,
         site=None,
         session=None,
         options=None,
@@ -129,9 +128,7 @@ class StepGnss:
         self.out_dir = out_dir
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
-
-        self.inp_dir_parent = inp_dir_parent
-        self.inp_structure = inp_structure
+        self.inp_dir = inp_dir
 
         ### temp dirs init
         self._init_tmp_dirs_paths()
@@ -177,6 +174,14 @@ class StepGnss:
     @log_dir.setter
     def log_dir(self, value):
         self._log_dir = value
+
+    @property
+    def inp_dir(self):
+        return self.translate_path(self._inp_dir)
+
+    @inp_dir.setter
+    def inp_dir(self, value):
+        self._inp_dir = value
 
     ### site
     @property
