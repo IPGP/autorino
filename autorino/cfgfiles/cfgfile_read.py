@@ -135,6 +135,14 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
 
             # ++++ EPOCH RANGE AT THE STEP LEVEL
 
+            if not _is_cfg_bloc_active(y_stp):
+                continue
+
+            step_cls = step_cls_select(k_stp)
+            if not step_cls:
+                logger.warning("unknown step %s, skip", k_stp)
+                continue
+
             if y_stp["epoch_range"] == "FROM_SESSION":
                 epo_obj_stp = epo_obj_ses
                 y_stp["epoch_range"] = y_ses["epoch_range"]
@@ -142,98 +150,29 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                 epo_obj_stp = _epoch_range_from_cfg_bloc(y_stp["epoch_range"])
 
             out_dir, _, _ = _get_dir_path(y_stp, "out")
-            inp_dir, _, _ = _get_dir_path(
-                y_stp, "inp", check_parent_dir_existence=False
-            )
+            inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
 
-            if k_stp == "download":
-                if not _is_cfg_bloc_active(y_stp):
-                    continue
-
-                dwl = arodwl.DownloadGnss
-                step_obj = dwl(
-                    out_dir=out_dir,
-                    tmp_dir=tmp_dir,
-                    log_dir=log_dir,
-                    inp_dir=inp_dir,
-                    epoch_range=epo_obj_stp,
-                    access=y_station["access"],
-                    site=y_station["site"],
-                    session=y_ses["general"],
-                    options=y_stp["options"],
-                )
-
-            # appended in lis and dic at the end of the tests
-
-            elif k_stp == "convert":
-                if not _is_cfg_bloc_active(y_stp):
-                    continue
-
-                if y_station["site"]["sitelog_path"]:
-                    sitelogs = y_station["site"]["sitelog_path"]
-                else:
-                    sitelogs = None
-
-                cnv = arocnv.ConvertGnss
-                step_obj = cnv(
-                    out_dir=out_dir,
-                    tmp_dir=tmp_dir,
-                    log_dir=log_dir,
-                    inp_dir=inp_dir,
-                    epoch_range=epo_obj_stp,
-                    site=y_station["site"],
-                    session=y_ses["general"],
-                    metadata=sitelogs,
-                    options=y_stp["options"],
-                )
-
-            elif k_stp == "split":
-                if not _is_cfg_bloc_active(y_stp):
-                    continue
-
-                if y_station["site"]["sitelog_path"]:
-                    sitelogs = y_station["site"]["sitelog_path"]
-                else:
-                    sitelogs = None
-
-                spl = arohdl.SplitGnss
-                step_obj = spl(
-                    out_dir=out_dir,
-                    tmp_dir=tmp_dir,
-                    log_dir=log_dir,
-                    inp_dir=inp_dir,
-                    epoch_range=epo_obj_stp,
-                    site=y_station["site"],
-                    session=y_ses["general"],
-                    metadata=sitelogs,
-                    options=y_stp["options"],
-                )
-
-            elif k_stp == "splice":
-                if not _is_cfg_bloc_active(y_stp):
-                    continue
-
-                if y_station["site"]["sitelog_path"]:
-                    sitelogs = y_station["site"]["sitelog_path"]
-                else:
-                    sitelogs = None
-
-                spl = arohdl.SpliceGnss
-                step_obj = spl(
-                    out_dir=out_dir,
-                    tmp_dir=tmp_dir,
-                    log_dir=log_dir,
-                    inp_dir=inp_dir,
-                    epoch_range=epo_obj_stp,
-                    site=y_station["site"],
-                    session=y_ses["general"],
-                    metadata=sitelogs,
-                    options=y_stp["options"],
-                )
-
+            if y_station["site"]["sitelog_path"]:
+                metadata = y_station["site"]["sitelog_path"]
             else:
-                logger.warning("unknown step %s in cfgfiles file, skipped...", k_stp)
-                continue
+                metadata = None
+
+            kwargs_for_step = {
+                "out_dir": out_dir,
+                "tmp_dir": tmp_dir,
+                "log_dir": log_dir,
+                "inp_dir": inp_dir,
+                "epoch_range": epo_obj_stp,
+                "site": y_station["site"],
+                "session": y_ses["general"],
+                "options": y_stp["options"],
+                "metadata": metadata,
+            }
+
+            if k_stp in "download":
+                kwargs_for_step["access"] = y_station["access"]
+
+            step_obj = step_cls(**kwargs_for_step)
 
             # appended in lis and dic at the end of the k_stp tests
             steps_lis.append(step_obj)
@@ -243,6 +182,20 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         steps_dic_dic[k_ses] = steps_dic
 
     return steps_lis_lis, steps_dic_dic
+
+
+def step_cls_select(step_name):
+    if step_name == "download":
+        return arodwl.DownloadGnss
+    elif step_name == "convert":
+        return arocnv.ConvertGnss
+    elif step_name == "split":
+        return arohdl.SplitGnss
+    elif step_name == "splice":
+        return arohdl.SpliceGnss
+    else:
+        logger.warning("unknown step %s in cfgfiles file, skip", step_name)
+        return None
 
 
 def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
@@ -351,7 +304,7 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
     )
 
 
-def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
+def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
     """
     Constructs a directory path based on the provided parameters.
 
@@ -368,7 +321,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
         A dictionary containing step information.
     dir_type : str, optional
         The type of directory to be constructed. Default is 'out'.
-    check_parent_dir_existence : bool, optional
+    check_parent_dir_exist : bool, optional
         A flag indicating whether to check if the parent directory exists.
         Default is True.
 
@@ -380,7 +333,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
     """
     dir_parent = y_step[dir_type + "_dir_parent"]
     structure = y_step[dir_type + "_structure"]
-    if check_parent_dir_existence:
+    if check_parent_dir_exist:
         _check_parent_dir_existence(dir_parent, parent_dir_key=dir_type + "_dir_parent")
     dir_path = os.path.join(dir_parent, structure)
 
