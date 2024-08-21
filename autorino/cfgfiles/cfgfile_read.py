@@ -158,8 +158,6 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     inp_dir=inp_dir,
                     epoch_range=epo_obj_stp,
                     access=y_station["access"],
-                    inp_dir_parent=inp_dir_parent,
-                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     options=y_stp["options"],
@@ -181,7 +179,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
                     log_dir=log_dir,
-                    inp_dir=inp_dir
+                    inp_dir=inp_dir,
                     epoch_range=epo_obj_stp,
                     site=y_station["site"],
                     session=y_ses["general"],
@@ -457,7 +455,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
                 stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
             else:
                 stp_rnx_inp = "find"
-            stp.splice(stp_rnx_inp,verbose=print_table)
+            stp.splice(stp_rnx_inp, verbose=print_table)
         elif stp.get_step_type() == "split":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.split()
