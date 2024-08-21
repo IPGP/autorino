@@ -181,8 +181,6 @@ class ConvertGnss(arocmn.StepGnss):
             "inp"
         )  # tests if the input local files are already there
 
-        self.print_table()
-
         if force_use:
             self.table["ok_inp"] = True
             self.table["note"] = "force_convert"

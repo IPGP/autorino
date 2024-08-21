@@ -109,7 +109,7 @@ class HandleGnss(arocmn.StepGnss):
             round_method=round_method,
         )
 
-        spc_main_obj = HandleGnss(
+        spc_main_obj = SpliceGnss(
             out_dir=self.out_dir,
             tmp_dir=self.tmp_dir,
             log_dir=self.log_dir,
