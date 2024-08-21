@@ -94,10 +94,6 @@ class DownloadGnss(arocmn.StepGnss):
             The range of epochs for which data will be downloaded.
         access : dict
             A dictionary containing access information such as protocol, hostname, login, and password.
-        inp_dir_parent : str
-            The parent directory of the input files.
-        inp_structure : str
-            The structure of the input files.
         site : str, optional
             The site identifier. Default is None.
         session : str, optional

@@ -419,8 +419,8 @@ class SpliceGnss(HandleGnss):
             )
 
             if not self.table.loc[irow, "ok_out"] and self.table.loc[irow, "ok_inp"]:
-                # print this only if input is ok
-                logger.error("unable to splice %s, skip", self.table.loc[irow])
+                # print this only if ok_inp is True, i.e. the file should have been converted
+                logger.error("unable to splice\n%s", self.table.loc[irow].to_string())
                 continue
 
             self.on_row_rinexmod(
