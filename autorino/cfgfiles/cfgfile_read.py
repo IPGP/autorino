@@ -18,6 +18,8 @@ import autorino.convert as arocnv
 import autorino.download as arodwl
 import autorino.handle as arohdl
 
+import rinexmod as rinexmod_api
+
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
 #### Import the logger
@@ -152,8 +154,16 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
             out_dir, _, _ = _get_dir_path(y_stp, "out")
             inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
 
+            # ++++ METADATA
             if y_station["site"]["sitelog_path"]:
-                metadata = y_station["site"]["sitelog_path"]
+                slpath = y_station["site"]["sitelog_path"]
+                if os.path.isdir(slpath) or os.path.isfile(slpath):
+                    # we load the metadata if the path is a directory or a file
+                    metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
+                else:
+                    # if not we consider it as a string
+                    # (because the path might be translated later in the object)
+                    metadata = slpath
             else:
                 metadata = None
 
