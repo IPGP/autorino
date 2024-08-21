@@ -142,7 +142,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                 epo_obj_stp = _epoch_range_from_cfg_bloc(y_stp["epoch_range"])
 
             out_dir, _, _ = _get_dir_path(y_stp, "out")
-            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(
+            inp_dir, _, _ = _get_dir_path(
                 y_stp, "inp", check_parent_dir_existence=False
             )
 
@@ -155,6 +155,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
                     log_dir=log_dir,
+                    inp_dir=inp_dir,
                     epoch_range=epo_obj_stp,
                     access=y_station["access"],
                     inp_dir_parent=inp_dir_parent,
@@ -180,9 +181,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
                     log_dir=log_dir,
+                    inp_dir=inp_dir
                     epoch_range=epo_obj_stp,
-                    inp_dir_parent=inp_dir_parent,
-                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     metadata=sitelogs,
@@ -203,9 +203,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
                     log_dir=log_dir,
+                    inp_dir=inp_dir,
                     epoch_range=epo_obj_stp,
-                    inp_dir_parent=inp_dir_parent,
-                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     metadata=sitelogs,
@@ -226,9 +225,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                     out_dir=out_dir,
                     tmp_dir=tmp_dir,
                     log_dir=log_dir,
+                    inp_dir=inp_dir,
                     epoch_range=epo_obj_stp,
-                    inp_dir_parent=inp_dir_parent,
-                    inp_structure=inp_structure,
                     site=y_station["site"],
                     session=y_ses["general"],
                     metadata=sitelogs,
