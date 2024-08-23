@@ -73,7 +73,7 @@ class ConvertRinexModGnss():
         #                            "fpath_local",
         #                            "size_local"])
                                    
-        # df.epoch = self.epoch_range.epoch_range_list()
+        # df.epoch = self.epoch_range_inp.epoch_range_list()
         # df.set_index("epoch",inplace=True,drop=True)
         # df = df.where(pd.notnull(df), None)        
         

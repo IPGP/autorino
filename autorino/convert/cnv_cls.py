@@ -58,7 +58,7 @@ class ConvertGnss(arocmn.StepGnss):
 
     Methods
     -------
-    __init__(self, out_dir, tmp_dir, log_dir, epoch_range=None, site=None, session=None, options=None, metadata=None)
+    __init__(self, out_dir, tmp_dir, log_dir, epoch_range_inp=None, site=None, session=None, options=None, metadata=None)
         Initializes the ConvertGnss class with the specified parameters.
     """
 
@@ -118,6 +118,10 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
+
+
+
+
     def convert(self, verbose=False, force=False, rinexmod_options=None):
         """
         "total action" method
@@ -147,16 +151,20 @@ class ConvertGnss(arocmn.StepGnss):
         logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
-        if self.options.get("rinexmod_options") and rinexmod_options is None:
-            rinexmod_options = self.options.get("rinexmod_options")
-        if rinexmod_options is None:
-            rinexmod_options = {}
+        # if self.options.get("rinexmod_options") and rinexmod_options is None:
+        #    rinexmod_options_ini = self.options.get("rinexmod_options")
+        # if rinexmod_options is None:
+        #    rinexmod_options_ini = {}
 
-        if self.options.get("force") or force:
-            force_use = True
-            logger.info("Force conversion is enabled.")
-        else:
-            force_use = False
+        # if self.options.get("force") or force:
+        #     force_use = True
+        #     logger.info("Force conversion is enabled.")
+        # else:
+        #     force_use = False
+
+        verbose_use = arocmn.select_options('verbose', locals(), self.options)
+        rinexmod_options_ini = arocmn.select_options('rinexmod_options', locals(), self.options, dict())
+        force_use = arocmn.select_options('force', locals(), self.options)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -174,14 +182,13 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx()  # generate the potential local files
-        self.check_local_files(
-            "out"
-        )  # tests if the output local files are already there
-        self.check_local_files(
-            "inp"
-        )  # tests if the input local files are already there
+        self.check_local_files("out")
+        # tests if the output local files are already there
+        self.check_local_files("inp")
+        # tests if the input local files are already there
 
         if force_use:
+            logger.info("force conversion is enabled")
             self.table["ok_inp"] = True
             self.table["note"] = "force_convert"
 
@@ -212,7 +219,7 @@ class ConvertGnss(arocmn.StepGnss):
             n_tot_inp,
         )
 
-        if verbose:
+        if verbose_use:
             self.print_table()
 
         ######################### START THE LOOP ##############################
@@ -275,7 +282,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ RINEXMOD
-            rinexmod_options_use = rinexmod_options.copy()
+            rinexmod_options_use = rinexmod_options_ini.copy()
 
             debug_print_rinexmod_options = False
             if debug_print_rinexmod_options:
