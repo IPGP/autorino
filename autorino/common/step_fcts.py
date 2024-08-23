@@ -262,3 +262,40 @@ def rnxs2step_obj(rnxs_lis_inp):
     stp_obj.updt_epotab_rnx(use_rnx_filename_only=True, update_epoch_range=True)
 
     return stp_obj
+
+def select_options(opt_name, opt_source1, opt_source2, opt_def_val=None):
+    """
+    Selects an option from two sources.
+
+    This method selects an option from two sources.
+    If the option is not specified in either source, the default value is used.
+
+    Parameters
+    ----------
+    opt_name : str
+        The name of the option.
+    opt_source1 : dict
+        The first source of the option.
+    opt_source2 : dict
+        The second source of the option.
+    opt_def_val : any
+        The default value of the option.
+
+    Returns
+    -------
+    any
+        The selected option.
+    """
+    if opt_source1.get(opt_name):
+        opt_out = opt_source1[opt_name]
+    elif opt_source2.get(opt_name):
+        opt_out = opt_source2[opt_name]
+    else:
+        if opt_def_val is None:
+            logger.warning(f"Option {opt_name} is not defined. but it should be.")
+
+        opt_out = opt_def_val
+
+
+
+    return opt_out

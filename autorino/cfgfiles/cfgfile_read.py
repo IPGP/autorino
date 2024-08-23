@@ -18,7 +18,7 @@ import autorino.convert as arocnv
 import autorino.download as arodwl
 import autorino.handle as arohdl
 
-import rinexmod as rinexmod_api
+from rinexmod import rinexmod_api
 
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
@@ -96,13 +96,15 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     y_station = y["station"]
 
     steps_lis_lis, steps_dic_dic = read_cfg_sessions(
-        y_station["sessions"], y_station=y_station, epoch_range=epoch_range
+        y_station["sessions"],
+        y_station=y_station,
+        epoch_range_inp=epoch_range
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
 
 
-def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
+def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
     steps_lis_lis = []
     steps_dic_dic = {}
 
@@ -119,10 +121,10 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         log_dir, _, _ = _get_dir_path(y_gen, "log")
 
         # ++++ EPOCH RANGE AT THE SESSION LEVEL
-        if not epoch_range:
-            epo_obj_ses = _epoch_range_from_cfg_bloc(y_ses["epoch_range"])
+        if epoch_range_inp:
+            epo_obj_ses = epoch_range_inp
         else:
-            epo_obj_ses = epoch_range
+            epo_obj_ses = _epoch_range_from_cfg_bloc(y_ses["epoch_range"])
 
         steps_lis = []
         steps_dic = {}
@@ -242,15 +244,15 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
     """
     parent_dir_out = arocmn.translator(parent_dir)
 
-    if (
-        parent_dir_out == "FROM_MAIN"
-    ):  # case when the parent directory is not defined in the main cfgfiles file
+    if parent_dir_out == "FROM_MAIN":
+        # case when the parent directory is not defined in the main cfgfiles file
 
         if not parent_dir_key:
             parent_dir_key = "a directory"
 
         logger.error(
-            "%s is not correctly defined in the main cfgfiles file (FROM_MAIN alias remains)",
+            "%s is not correctly defined in the main cfgfiles file"
+            "(FROM_MAIN can not be replaced)",
             parent_dir_key,
         )
         raise FileNotFoundError(
@@ -259,9 +261,7 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
 
     elif not os.path.isdir(parent_dir_out):  # standard case
         logger.error("%s do not exists, create it first", parent_dir_out)
-        raise FileNotFoundError(
-            None, parent_dir_out + " do not exists, create it first"
-        )
+        raise FileNotFoundError(None, parent_dir_out + " do not exists, create it first")
     else:
         return None
 

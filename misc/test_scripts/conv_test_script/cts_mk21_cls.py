@@ -37,7 +37,7 @@ Y1 = yaml.safe_load(open(pconfig))
 #REQ = REQlist[1]
 #SES = SESlist
 #REQ = REQlist
-#EPOC = REQ.epoch_range
+#EPOC = REQ.epoch_range_inp
 
 pout = "/home/sakic/090_TEMP/convcls_test"
 psitelogs = "/work/metadata/SITELOGS"

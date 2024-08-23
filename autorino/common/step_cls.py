@@ -205,7 +205,7 @@ class StepGnss:
         else:
             return self._site_id[:4] + "00XXX"
 
-    # epoch_range
+    # epoch_range_inp
     @property
     def epoch_range(self):
         return self._epoch_range
@@ -1912,7 +1912,7 @@ class StepGnss:
             ### update table if things go well
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, table_col] = frnxmod
-            self.table.loc[irow, "size_out"] = os.path.getsize(frnxmod)
+            self.table.loc[irow, "size_out"] = os.path.getsize(str(frnxmod))
             if (
                 not self.table.loc[irow, "epoch_srt"]
                 or not self.table.loc[irow, "epoch_end"]
