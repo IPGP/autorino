@@ -250,6 +250,7 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_dir_use = row["fpath_inp"]
 
             if self.access["protocol"] == "http":
+                print("AAAAAAAAAAA", self.access["hostname"], rmot_dir_use)
                 rmot_fil_epo_lis = arodwl.list_remote_files_http(
                     self.access["hostname"], rmot_dir_use
                 )
