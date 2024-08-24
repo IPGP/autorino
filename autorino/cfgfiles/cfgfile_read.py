@@ -96,9 +96,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     y_station = y["station"]
 
     steps_lis_lis, steps_dic_dic = read_cfg_sessions(
-        y_station["sessions"],
-        y_station=y_station,
-        epoch_range_inp=epoch_range
+        y_station["sessions"], y_station=y_station, epoch_range_inp=epoch_range
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
@@ -261,7 +259,9 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
 
     elif not os.path.isdir(parent_dir_out):  # standard case
         logger.error("%s do not exists, create it first", parent_dir_out)
-        raise FileNotFoundError(None, parent_dir_out + " do not exists, create it first")
+        raise FileNotFoundError(
+            None, parent_dir_out + " do not exists, create it first"
+        )
     else:
         return None
 
@@ -415,13 +415,9 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
-            opt = True
-            if opt:
-                stp_rnx_inp = stp.copy()
-                stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
-            else:
-                stp_rnx_inp = "find"
-            stp.splice(input_rinexs=stp_rnx_inp, **stp.options)
+            stp_rnx_inp = stp.copy()
+            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.split()
