@@ -143,6 +143,7 @@ def list_remote_files_http(host_name, remote_dir):
 
 
     url = os.path.join(host_name, remote_dir)
+    url = host_name + '/' + remote_dir
     print("AAAAAAAAAABBBBBBBBBBB host_name", host_name, "remote_dir", remote_dir, "url", url)
 
     logger.debug("HTTP file list: %s", url)
