@@ -250,7 +250,6 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_dir_use = row["fpath_inp"]
 
             if self.access["protocol"] == "http":
-                print("AAAAAAAAAAA", self.access["hostname"], rmot_dir_use)
                 rmot_fil_epo_lis = arodwl.list_remote_files_http(
                     self.access["hostname"], rmot_dir_use
                 )
@@ -387,6 +386,11 @@ class DownloadGnss(arocmn.StepGnss):
         # Set up and clean temporary directories
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
+
+        if remote_find_method == "ask" and self.access["protocol"] == "http":
+            logger.warning("HTTP protocol does not support remote file listing ('ask' method).")
+            logger.warning("Switching to 'guess' method.")
+            remote_find_method = "guess"
 
         # Guess remote and local raw file paths
         if remote_find_method == "guess":
