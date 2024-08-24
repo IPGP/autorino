@@ -388,8 +388,8 @@ class DownloadGnss(arocmn.StepGnss):
         self.clean_tmp_dirs()
 
         if remote_find_method == "ask" and self.access["protocol"] == "http":
-            logger.warning("HTTP protocol does not support remote file listing ('ask' method).")
-            logger.warning("Switching to 'guess' method.")
+            logger.warning("HTTP protocol doesn't support file listing ('ask' method).")
+            logger.warning("Switching to 'guess' remote find method.")
             remote_find_method = "guess"
 
         # Guess remote and local raw file paths
