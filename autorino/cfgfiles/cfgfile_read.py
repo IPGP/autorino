@@ -406,11 +406,14 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             )
             continue
 
+        if print_table:
+            stp.options["verbose"] = True
+
         if stp.get_step_type() == "download":
-            stp.download(verbose=print_table)
+            stp.download(**stp.options)
         elif stp.get_step_type() == "convert":
             stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.convert(verbose=print_table)
+            stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
             opt = True
             if opt:
@@ -418,7 +421,7 @@ def run_steps(steps_lis, step_select=[], print_table=True):
                 stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
             else:
                 stp_rnx_inp = "find"
-            stp.splice(stp_rnx_inp, verbose=print_table)
+            stp.splice(input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp.load_table_from_prev_step_table(wkf_prev.table)
             stp.split()

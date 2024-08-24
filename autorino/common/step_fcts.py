@@ -12,7 +12,7 @@ import re
 import numpy as np
 import pandas as pd
 
-
+from autorino.handle.test_scripts.split_ts_mk11 import out_dir
 from geodezyx import utils
 from filelock import FileLock, Timeout
 
@@ -263,39 +263,49 @@ def rnxs2step_obj(rnxs_lis_inp):
 
     return stp_obj
 
-def select_options(opt_name, opt_source1, opt_source2, opt_def_val=None):
+def select_options(opt_name, opt_extern_dict, opt_local_val, opt_def_val=None, ext_over_loc=True):
     """
-    Selects an option from two sources.
+    DISCONTINUED FUNCTION
 
-    This method selects an option from two sources.
-    If the option is not specified in either source, the default value is used.
+    Selects an option value based on the provided parameters.
+
+    This function determines the output option value by checking the external dictionary
+    for the specified option name. If the option name is not found in the external dictionary,
+    it uses the local value. If the local value is None, it defaults to the provided default value.
+    The behavior can be controlled by the 'ext_over_loc' flag.
 
     Parameters
     ----------
     opt_name : str
-        The name of the option.
-    opt_source1 : dict
-        The first source of the option.
-    opt_source2 : dict
-        The second source of the option.
-    opt_def_val : any
-        The default value of the option.
+        The name of the option to be selected.
+    opt_extern_dict : dict
+        The external dictionary containing option values.
+    opt_local_val : any
+        The local value to be used if the option is not found in the external dictionary.
+    opt_def_val : any, optional
+        The default value to be used if both the external dictionary and local value are None. Default is None.
+    ext_over_loc : bool, optional
+        If True, the external dictionary value takes precedence over the local value. Default is True.
 
     Returns
     -------
-    any
-        The selected option.
+    opt_out
+        The selected option value.
     """
-    if opt_source1.get(opt_name):
-        opt_out = opt_source1[opt_name]
-    elif opt_source2.get(opt_name):
-        opt_out = opt_source2[opt_name]
+    if ext_over_loc:
+        if opt_extern_dict.get(opt_name):
+            opt_out = opt_extern_dict[opt_name]
+        else:
+            opt_out = opt_local_val
     else:
-        if opt_def_val is None:
-            logger.warning(f"Option {opt_name} is not defined. but it should be.")
+        if opt_local_val is not None:
+            opt_out = opt_local_val
+        elif opt_extern_dict.get(opt_name):
+            opt_out = opt_extern_dict[opt_name]
+        else:
+            opt_out = opt_def_val
 
+    if opt_out is None:
         opt_out = opt_def_val
-
-
 
     return opt_out
