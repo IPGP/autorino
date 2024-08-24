@@ -176,7 +176,7 @@ class ConvertGnss(arocmn.StepGnss):
         self.check_local_files("inp")
         # tests if the input local files are already there
 
-        if force_use:
+        if force:
             logger.info("force conversion is enabled")
             self.table["ok_inp"] = True
             self.table["note"] = "force_convert"
@@ -208,7 +208,7 @@ class ConvertGnss(arocmn.StepGnss):
             n_tot_inp,
         )
 
-        if verbose_use:
+        if verbose:
             self.print_table()
 
         ######################### START THE LOOP ##############################
@@ -271,7 +271,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ RINEXMOD
-            rinexmod_options_use = rinexmod_options_ini.copy()
+            rinexmod_options_use = rinexmod_options.copy()
 
             debug_print_rinexmod_options = False
             if debug_print_rinexmod_options:
