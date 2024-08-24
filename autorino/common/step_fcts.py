@@ -12,7 +12,6 @@ import re
 import numpy as np
 import pandas as pd
 
-from autorino.handle.test_scripts.split_ts_mk11 import out_dir
 from geodezyx import utils
 from filelock import FileLock, Timeout
 
