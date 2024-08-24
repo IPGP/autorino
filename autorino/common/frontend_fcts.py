@@ -362,7 +362,8 @@ def splice_rnx_abs(
                             epoch_range=(epoch_srt, epoch_end, period),
                             metadata=metadata)
 
-    spc.splice(rnxs_inp,
+    spc.splice(input_mode="given",
+               input_rinexs=rnxs_inp,
                handle_software=handle_software,
                rinexmod_options=rinexmod_options)
 
