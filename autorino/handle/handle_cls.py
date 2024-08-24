@@ -262,11 +262,7 @@ class HandleGnss(arocmn.StepGnss):
 
         for epoch in self.epoch_range.epoch_range_list(end_bound=True):
             # guess the potential local files
-            local_dir_use = self.translate_path(
-                os.path.join(str(self.inp_dir_parent), str(self.inp_structure)),
-                epoch,
-                make_dir=False,
-            )
+            local_dir_use = self.translate_path(self.inp_dir,epoch,make_dir=False)
 
             if rnx3_regex:
                 patrn = self.site_id9 + conv.rinex_regex_long_name()[9:]
@@ -345,6 +341,8 @@ class SpliceGnss(HandleGnss):
             The software to use for handling the RINEX files. Default is "converto".
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
+        verbose : bool, optional
+            If True, prints the table for debugging purposes. Default is False.
 
         Returns
         -------
@@ -352,6 +350,7 @@ class SpliceGnss(HandleGnss):
         """
 
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
+
 
         method_msg = "input method for splicing: "
         if input_rinexs == "find":

@@ -118,10 +118,6 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-
-
-
-
     def convert(self, verbose=False, force=False, rinexmod_options=None):
         """
         "total action" method
@@ -150,21 +146,14 @@ class ConvertGnss(arocmn.StepGnss):
 
         logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
-        # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
-        # if self.options.get("rinexmod_options") and rinexmod_options is None:
-        #    rinexmod_options_ini = self.options.get("rinexmod_options")
-        # if rinexmod_options is None:
-        #    rinexmod_options_ini = {}
+        ### DANGEROUS STYLE TO GET THE OPTIONS as a sideeffect !!!!!
 
-        # if self.options.get("force") or force:
-        #     force_use = True
-        #     logger.info("Force conversion is enabled.")
-        # else:
-        #     force_use = False
-
-        verbose_use = arocmn.select_options('verbose', locals(), self.options)
-        rinexmod_options_ini = arocmn.select_options('rinexmod_options', locals(), self.options, dict())
-        force_use = arocmn.select_options('force', locals(), self.options)
+        # get the options from the funtions arguments the class attributes
+        # verbose_use = arocmn.select_options("verbose", self.options, verbose)
+        # rinexmod_options_ini = arocmn.select_options(
+        #     "rinexmod_options", self.options, rinexmod_options, dict()
+        # )
+        # force_use = arocmn.select_options("force", self.options, force)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
