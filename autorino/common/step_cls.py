@@ -110,16 +110,16 @@ class StepGnss:
              Defaults to None.
         """
         # initialized in the next line = these attributes use both a setter and an _init method
-        self.epoch_range = None # initialized in the next line
+        self.epoch_range = None  # initialized in the next line
         self._init_epoch_range(epoch_range)
         self._init_site(site)
         self._init_session(session)
         self._init_options(options)
-        self.site_id = None # initialized in the next line
+        self.site_id = None  # initialized in the next line
         self._init_site_id()
-        self.table = None # initialized in the next line
+        self.table = None  # initialized in the next line
         self._init_table()
-        self.translate_dict = None # initialized in the next line
+        self.translate_dict = None  # initialized in the next line
         self.set_translate_dict()
 
         ### sitelog init (needs translate dict)
@@ -148,7 +148,9 @@ class StepGnss:
 
     def __repr__(self):
         name = type(self).__name__
-        out = "{} {}/{}/{} elts".format(name, self.site_id, self.epoch_range,len(self.table))
+        out = "{} {}/{}/{} elts".format(
+            name, self.site_id, self.epoch_range, len(self.table)
+        )
         return out
 
     @property
@@ -659,14 +661,15 @@ class StepGnss:
         if len(sites_uniq) == 1:
             self.site_id = sites_uniq[0]
         elif len(sites_uniq) > 1:
-            logger.warning("unable to update site_id, multiple sites %s in %s", sites_uniq, self)
+            logger.warning(
+                "unable to update site_id, multiple sites %s in %s", sites_uniq, self
+            )
         else:
             logger.warning("unable to update site_id, no site found in %s", self)
 
         return None
-    def updt_epotab_rnx(
-        self, use_rnx_filename_only=False, update_epoch_range=True
-    ):
+
+    def updt_epotab_rnx(self, use_rnx_filename_only=False, update_epoch_range=True):
         """
         Updates the StepGnss table's columns 'epoch_srt' and 'epoch_end' based on the RINEX files.
 
@@ -722,9 +725,7 @@ class StepGnss:
 
         return None
 
-    def updt_eporng_tab(
-        self, column_srt="epoch_srt", column_end="epoch_end"
-    ):
+    def updt_eporng_tab(self, column_srt="epoch_srt", column_end="epoch_end"):
         """
         Updates the EpochRange of the StepGnss object based on the min/max epochs in the object's table.
 
@@ -773,7 +774,9 @@ class StepGnss:
             tz=self.epoch_range.tz,
         )
 
-        logger.debug("new epoch range %s for %s", self.epoch_range, str(self).split("/")[0])
+        logger.debug(
+            "new epoch range %s for %s", self.epoch_range, str(self).split("/")[0]
+        )
 
     def translate_path(
         self, path_inp: str, epoch_inp=None, make_dir: bool = False
@@ -1813,6 +1816,85 @@ class StepGnss:
             out = self.table[self.table[col]]
         return out
 
+    def updt_rnxmodopts(
+        self, rinexmod_options_inp=None, irow=None, debug_print_rinexmod_options=False
+    ):
+        """
+        Updates the rinexmod options dictionnary.
+
+        This method updates the rinexmod options based on the provided input options and the current
+        state of the StepGnss object. It handles default options, merges them with input options, and sets
+        specific options like metadata and site name/marker.
+
+        Parameters
+        ----------
+        rinexmod_options_inp : dict, optional
+            Input options for RINEX modification. Default is None.
+        irow : int, optional
+            Row index for setting the site name/marker from the table. Default is None.
+        debug_print_rinexmod_options : bool, optional
+            If True, prints the RINEX modification options for debugging purposes. Default is False.
+
+        Returns
+        -------
+        dict
+            Updated RINEX modification options.
+        """
+
+        # just a shorter alias
+        rimopts_inp = rinexmod_options_inp
+
+        # default options/arguments for rinexmod
+        rimopts_def = {
+            # 'marker': 'XXXX', # forced below
+            # 'sitelog': metadata, # forced below
+            "compression": "gz",
+            "longname": True,
+            "force_rnx_load": True,
+            "verbose": False,
+            "tolerant_file_period": False,
+            "full_history": True,
+        }
+
+        # handle the very specific case of a station.info input
+        # not very sure if it is necessary, but I keep it for now
+        if rimopts_inp:
+            if not rimopts_inp["sitelog"] and "station_info" in rimopts_inp.keys():
+                rimopts_def.pop("sitelog", None)
+
+        # create the  working copy of the default options
+        rimopts_out = rimopts_def.copy()
+        if rimopts_inp:
+            rimopts_wrk = rimopts_inp.copy()
+        else:
+            rimopts_wrk = {}
+
+        # print the initial state
+        if debug_print_rinexmod_options:
+            logger.debug("default options for rinexmod: %s", rimopts_def)
+            logger.debug("input options for rinexmod: %s", rimopts_inp)
+
+        # set #1: the metadata/sitelog
+        rimopts_wrk["sitelog"] =  self.metadata
+
+        # set #2: site name/marker
+        if self.site_id9:
+            rimopts_wrk["marker"] = self.site_id9
+        elif irow is not None:
+            rimopts_wrk["marker"] = self.table.loc[irow, "site"]
+        else:
+            logger.warning("unable to set the marker (irow is %s, self.site_id9 is %s)",
+                           irow, self.site_id9)
+            rimopts_wrk["marker"] = "XXXX00XXX"
+
+        # DO THE UPDATE HERE
+        rimopts_out.update(rimopts_wrk)
+
+        if debug_print_rinexmod_options:
+            logger.debug("final options for rinexmod: %s", rimopts_wrk)
+
+        return rimopts_out
+
     #               _   _
     #     /\       | | (_)
     #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
@@ -1868,34 +1950,7 @@ class StepGnss:
         else:
             out_dir_use = self.tmp_dir
 
-        # default options/arguments for rinexmod
-        rinexmod_options_use = {
-            # 'marker': 'XXXX', # forced in .convert()
-            # 'sitelog': metadata, # forced in .convert()
-            "compression": "gz",
-            "longname": True,
-            "force_rnx_load": True,
-            "verbose": False,
-            "tolerant_file_period": False,
-            "full_history": True,
-        }
-
-        if rinexmod_options:
-            if (
-                not rinexmod_options["sitelog"]
-                and "station_info" in rinexmod_options.keys()
-            ):
-                rinexmod_options.pop("sitelog", None)
-
-        # update options/arguments for rinexmod with inputs
-        if rinexmod_options:
-            debug_print_rinexmod_options = False
-            if debug_print_rinexmod_options:
-                logger.debug("input options for rinexmod: %s", rinexmod_options)
-                logger.debug("default options for rinexmod: %s", rinexmod_options_use)
-            rinexmod_options_use.update(rinexmod_options)
-            if debug_print_rinexmod_options:
-                logger.debug("final options for rinexmod: %s", rinexmod_options_use)
+        rinexmod_options_use = self.updt_rnxmodopts(rinexmod_options, irow)
 
         frnx = self.table.loc[irow, table_col]
 
