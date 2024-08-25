@@ -146,15 +146,6 @@ class ConvertGnss(arocmn.StepGnss):
 
         logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
-        ### DANGEROUS STYLE TO GET THE OPTIONS as a sideeffect !!!!!
-
-        # get the options from the funtions arguments the class attributes
-        # verbose_use = arocmn.select_options("verbose", self.options, verbose)
-        # rinexmod_options_ini = arocmn.select_options(
-        #     "rinexmod_options", self.options, rinexmod_options, dict()
-        # )
-        # force_use = arocmn.select_options("force", self.options, force)
-
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
         # other tmps subdirs come also later in the loop
@@ -235,14 +226,16 @@ class ConvertGnss(arocmn.StepGnss):
 
             ###########################################################################
             # change the site_id here is a very bad idea, it f*cks the outdir 240605
-            # in fact not, because of the new IGS update (9 char in sitlog)
+            # (the outdir has not the country code anymore)
+            #
+            # but, because of the new IGS update (9 char in sitlog)
             # it should not be a pb anymore
 
             # +++ since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate_dic (necessary for the output dir)
             self.on_row_site_upd(irow, site4_list)
-            self.site_id = self.table.loc[irow, "site"]  # for the output dir
+            self.site_id = self.table.loc[irow, "site"]  # for translation of the output dir & rinexmod options
 
             self.set_translate_dict()
             ###########################################################################
@@ -271,23 +264,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ RINEXMOD
-            rinexmod_options_use = rinexmod_options.copy()
-
-            debug_print_rinexmod_options = False
-            if debug_print_rinexmod_options:
-                logger.debug("input options for rinexmod: %s", rinexmod_options_use)
-
-            # if "marker" is in rinexmod_options_use keys, use it, else use site
-            if "marker" in rinexmod_options_use.keys():
-                marker_use = rinexmod_options_use["marker"]
-            else:
-                marker_use = self.table.loc[irow, "site"]
-
-            rinexmod_options_use.update(
-                {"marker": marker_use, "sitelog": self.metadata}
-            )
-            if debug_print_rinexmod_options:
-                logger.debug("final options for rinexmod: %s", rinexmod_options_use)
+            rinexmod_options_use = self.updt_rnxmodopts(rinexmod_options, irow)
 
             self.on_row_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
