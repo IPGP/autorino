@@ -202,8 +202,8 @@ class HandleGnss(arocmn.StepGnss):
             logger.info(
                 ">>>>>> Feeding RINEXs for %s between %s & %s",
                 site,
-                pd.Timestamp(epo_srt),
-                pd.Timestamp(epo_end),
+                pd.Timestamp(epo_srt).isoformat().replace('+00:00', 'Z'),
+                pd.Timestamp(epo_end).isoformat().replace('+00:00', 'Z'),
             )
 
             epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
