@@ -279,6 +279,28 @@ class HandleGnss(arocmn.StepGnss):
             return local_paths_list
 
     def get_input_rnxs(self, input_mode, input_rinexs):
+        """
+        Get the input RINEX files for handeling (splice or split).
+
+        This method retrieves the input RINEX files based on the specified input mode and input RINEXs.
+        It can find local input files or use a provided input list.
+
+        Parameters
+        ----------
+        input_mode : str
+            The mode for finding input RINEX files. It can be:
+            - "find": to find local input files.
+            - "given": to use provided input RINEX files.
+        input_rinexs : str or list or StepGnss
+            The input RINEX files. It can be:
+            - A list of RINEX file paths.
+            - An existing StepGnss object.
+
+        Returns
+        -------
+        StepGnss or None
+            A StepGnss object containing the input RINEX files, or None if an error occurs.
+        """
         method_msg = "input method to handle RINEXs: "
         if input_mode == "find":
             # Find local RINEX files and convert them to a StepGnss object
@@ -575,19 +597,49 @@ class SplitGnss(HandleGnss):
         )
 
 
-    def split(self,input_mode="given",input_rinexs=None,handle_software="converto",
-              rinexmod_options=None,verbose=False):
+    def split(self, input_mode="given", input_rinexs=None, handle_software="converto",
+              rinexmod_options=None, verbose=False):
+        """
+        Split RINEX files.
 
-        # Log the start of the spliting operation
-        logger.info(BOLD_SRT + ">>>>>>>>> Spliting RINEX files" + BOLD_END)
+        This method splits RINEX files based on the provided input. It can find local input files,
+        convert a list of RINEX files to a StepGnss object, or use an existing StepGnss object.
+        The splitting operation is performed using the specified software and options.
+
+        Parameters
+        ----------
+        input_mode : str, optional
+            The mode for finding input RINEX files. It can be:
+            - "find": to find local input files.
+            - "given": to use provided input RINEX files.
+            Default is "given".
+        input_rinexs : str or list or StepGnss, optional
+            The input RINEX files. It can be:
+            - A list of RINEX file paths.
+            - An existing StepGnss object.
+            Default is None.
+        handle_software : str, optional
+            The software to use for handling the RINEX files. Default is "converto".
+        rinexmod_options : dict, optional
+            Additional options for the RINEX modification. Default is None.
+        verbose : bool, optional
+            If True, prints the table for debugging purposes. Default is False.
+
+        Returns
+        -------
+        None
+        """
+
+        # Log the start of the splitting operation
+        logger.info(BOLD_SRT + ">>>>>>>>> Splitting RINEX files" + BOLD_END)
 
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
 
-        # Feed the epochs for spliting
+        # Feed the epochs for splitting
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose)
 
-        # Perform the core spliting operation
+        # Perform the core splitting operation
         self.split_core(
             handle_software=handle_software, rinexmod_options=rinexmod_options
         )
@@ -597,7 +649,22 @@ class SplitGnss(HandleGnss):
 
     def split_core(self, handle_software="converto", rinexmod_options=None):
         """
-        "total action" method
+        Perform the core splitting operation.
+
+        This method handles the core splitting operation for RINEX files. It iterates over each row
+        in the table, performs the splitting operation using the specified software, and applies
+        RINEX modifications if necessary. Temporary files are removed after the operation.
+
+        Parameters
+        ----------
+        handle_software : str, optional
+            The software to use for handling the RINEX files. Default is "converto".
+        rinexmod_options : dict, optional
+            Additional options for the RINEX modification. Default is None.
+
+        Returns
+        -------
+        None
         """
 
         self.set_tmp_dirs()
