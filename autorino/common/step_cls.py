@@ -771,7 +771,8 @@ class StepGnss:
             epoch1,
             epoch2,
             period_new,
-            round_method=self.epoch_range.round_method,
+            round_method='none',
+            #round_method=self.epoch_range.round_method,
             tz=self.epoch_range.tz,
         )
 
