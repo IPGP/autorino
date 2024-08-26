@@ -725,7 +725,7 @@ class StepGnss:
 
         return None
 
-    def updt_eporng_tab(self, column_srt="epoch_srt", column_end="epoch_end"):
+    def updt_eporng_tab(self, column_srt="epoch_srt", column_end="epoch_end",round_method='none'):
         """
         Updates the EpochRange of the StepGnss object based on the min/max epochs in the object's table.
 
@@ -739,6 +739,8 @@ class StepGnss:
             The name of the column in the table that contains the start epochs. Default is 'epoch_srt'.
         column_end : str, optional
             The name of the column in the table that contains the end epochs. Default is 'epoch_end'.
+        round_method : str, optional
+            The method used for rounding the epochs. The default is 'none'.
 
         Notes
         -----
@@ -771,7 +773,7 @@ class StepGnss:
             epoch1,
             epoch2,
             period_new,
-            round_method='none',
+            round_method=round_method,
             #round_method=self.epoch_range.round_method,
             tz=self.epoch_range.tz,
         )

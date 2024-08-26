@@ -506,11 +506,11 @@ class SpliceGnss(HandleGnss):
 
         # definition of the output directory (after the action)
         if out_dir:
-            out_dir_use = out_dir
+            out_dir_main_use = out_dir
         elif hasattr(self, "tmp_dir_converted"):
-            out_dir_use = self.tmp_dir_converted
+            out_dir_main_use = self.tmp_dir_converted
         else:
-            out_dir_use = self.tmp_dir
+            out_dir_main_use = self.tmp_dir
 
         spc_row = self.table.loc[irow, "fpath_inp"]
 
@@ -525,7 +525,7 @@ class SpliceGnss(HandleGnss):
 
             #### add a test here to be sure that only one epoch is inside
             out_dir_use = self.translate_path(
-                self.out_dir, self.table.loc[irow, "epoch_srt"]
+                out_dir_main_use, self.table.loc[irow, "epoch_srt"]
             )
 
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
