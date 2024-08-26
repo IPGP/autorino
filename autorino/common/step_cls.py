@@ -1841,6 +1841,9 @@ class StepGnss:
             Updated RINEX modification options.
         """
 
+        if not rinexmod_options_inp:
+            rinexmod_options_inp = dict()
+
         # just a shorter alias
         rimopts_inp = rinexmod_options_inp
 
@@ -1859,17 +1862,14 @@ class StepGnss:
         # handle the specific case of a station.info input
         # necessary for users using the station.info input (like EK@ENS)
         update_sitelog = True
-        if rimopts_inp:
-            if not rimopts_inp["sitelog"] and "station_info" in rimopts_inp.keys():
-                rimopts_def.pop("sitelog", None)
-                update_sitelog = False
+        if not rimopts_inp.get("sitelog") and rimopts_inp.get("station_info"):
+            rimopts_def.pop("sitelog", None)
+            update_sitelog = False
 
-        # create the  working copy of the default options
+        # create the working copy of the default options
         rimopts_out = rimopts_def.copy()
-        if rimopts_inp:
-            rimopts_wrk = rimopts_inp.copy()
-        else:
-            rimopts_wrk = {}
+        rimopts_wrk = rimopts_inp.copy()
+
 
         # print the initial state
         if debug_print:
