@@ -1816,9 +1816,7 @@ class StepGnss:
             out = self.table[self.table[col]]
         return out
 
-    def updt_rnxmodopts(
-        self, rinexmod_options_inp=None, irow=None, debug_print=False
-    ):
+    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
         """
         Updates the rinexmod options dictionnary.
 
@@ -1870,7 +1868,6 @@ class StepGnss:
         rimopts_out = rimopts_def.copy()
         rimopts_wrk = rimopts_inp.copy()
 
-
         # print the initial state
         if debug_print:
             logger.debug("default options for rinexmod: %s", rimopts_def)
@@ -1878,7 +1875,7 @@ class StepGnss:
 
         # set #1: the metadata/sitelog
         if update_sitelog:
-            rimopts_wrk["sitelog"] =  self.metadata
+            rimopts_wrk["sitelog"] = self.metadata
 
         # set #2: site name/marker
 
@@ -1887,8 +1884,11 @@ class StepGnss:
         elif self.site_id9:
             rimopts_wrk["marker"] = self.site_id9
         else:
-            logger.warning("unable to set the marker (irow is %s, self.site_id9 is %s)",
-                           irow, self.site_id9)
+            logger.warning(
+                "unable to set the marker (irow is %s, self.site_id9 is %s)",
+                irow,
+                self.site_id9,
+            )
             rimopts_wrk["marker"] = "XXXX00XXX"
 
         # DO THE UPDATE HERE
@@ -2062,3 +2062,4 @@ class StepGnss:
             # raise e
 
         return frnxfin
+

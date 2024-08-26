@@ -40,7 +40,7 @@ handle_software = 'gfzrnx'
 
 splt.decompress()
 
-splt.split(handle_software=handle_software)
+splt.split_core(handle_software=handle_software)
 
 
 
