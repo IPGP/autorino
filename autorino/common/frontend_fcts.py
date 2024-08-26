@@ -299,12 +299,11 @@ def split_rnx0(
 
     spt_split = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_inp, metadata=metadata)
     spt_split.feed_by_epochs(spt_store, mode="split")
-    spt_split.split_core(handle_software=handle_software, rinexmod_options=rinexmod_options)
+    spt_split.split_core(
+        handle_software=handle_software, rinexmod_options=rinexmod_options
+    )
 
     return spt_split
-
-
-
 
 
 def split_rnx(
@@ -367,10 +366,15 @@ def split_rnx(
 
     spt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_rng, metadata=metadata)
 
-    spt.split(input_mode="toto",input_rinexs=rnxs_inp,
-              handle_software=handle_software, rinexmod_options=rinexmod_options)
+    spt.split(
+        input_mode="toto",
+        input_rinexs=rnxs_inp,
+        handle_software=handle_software,
+        rinexmod_options=rinexmod_options,
+    )
 
     return spt
+
 
 def splice_rnx_abs(
     rnxs_inp,
@@ -428,14 +432,16 @@ def splice_rnx_abs(
 
     epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
 
-    spc = arohdl.SpliceGnss(out_dir, tmp_dir, log_dir,
-                            epoch_range=epo_rng,
-                            metadata=metadata)
+    spc = arohdl.SpliceGnss(
+        out_dir, tmp_dir, log_dir, epoch_range=epo_rng, metadata=metadata
+    )
 
-    spc.splice(input_mode="given",
-               input_rinexs=rnxs_inp,
-               handle_software=handle_software,
-               rinexmod_options=rinexmod_options)
+    spc.splice(
+        input_mode="given",
+        input_rinexs=rnxs_inp,
+        handle_software=handle_software,
+        rinexmod_options=rinexmod_options,
+    )
 
     return spc
 
