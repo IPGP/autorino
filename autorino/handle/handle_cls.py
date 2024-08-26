@@ -550,7 +550,6 @@ class SpliceGnss(HandleGnss):
                 logger.error("Exception raised: %s", e)
                 frnx_spliced = None
 
-
         if frnx_spliced:
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, "fpath_out"] = frnx_spliced
