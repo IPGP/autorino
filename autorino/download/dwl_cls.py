@@ -442,7 +442,7 @@ class DownloadGnss(arocmn.StepGnss):
         # +++ DOWNLOAD CORE a.k.a FETCH
         lock.acquire()
         try:
-            self.fetch_remote_files(force=force_use)
+            self.fetch_remote_files(force=force)
         finally:
             lock.release()
             os.remove(lock.lock_file)
