@@ -196,12 +196,16 @@ class HandleGnss(arocmn.StepGnss):
 
         for irow, row in self.table.iterrows():
             site = self.table.loc[irow, "site"]
-            epo_srt = pd.Timestamp(self.table.loc[irow, "epoch_srt"])
-            epo_end = pd.Timestamp(self.table.loc[irow, "epoch_end"])
+            epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
+            epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
 
             logger.info(
-                ">>>>>> Feeding RINEXs for %s between %s & %s", site, epo_srt, epo_end
+                ">>>>>> Feeding RINEXs for %s between %s & %s",
+                site,
+                pd.Timestamp(epo_srt),
+                pd.Timestamp(epo_end),
             )
+
             epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
             epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
 
@@ -373,7 +377,6 @@ class SpliceGnss(HandleGnss):
             options=options,
             metadata=metadata,
         )
-
 
     def splice(
         self,
@@ -596,9 +599,14 @@ class SplitGnss(HandleGnss):
             metadata=metadata,
         )
 
-
-    def split(self, input_mode="given", input_rinexs=None, handle_software="converto",
-              rinexmod_options=None, verbose=False):
+    def split(
+        self,
+        input_mode="given",
+        input_rinexs=None,
+        handle_software="converto",
+        rinexmod_options=None,
+        verbose=False,
+    ):
         """
         Split RINEX files.
 
@@ -645,7 +653,6 @@ class SplitGnss(HandleGnss):
         )
 
         return None
-
 
     def split_core(self, handle_software="converto", rinexmod_options=None):
         """

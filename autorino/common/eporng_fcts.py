@@ -149,10 +149,10 @@ def round_date(date_in, period, round_method="round"):
     # we separate the Series case of the simple datetime-like
     # both for ease and performance reason
 
-    if type(date_in) is pd._libs.tslibs.nattype.NaTType:  ### NaT case
+    if pd.isna(date_in):  ### NaT case
         date_out = date_in
 
-    elif type(date_in) is pd.Series:
+    elif isinstance(date_in,pd.Series):
 
         date_use = date_in
 
