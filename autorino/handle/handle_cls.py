@@ -278,6 +278,45 @@ class HandleGnss(arocmn.StepGnss):
         else:
             return local_paths_list
 
+    def get_input_rnxs(self, input_mode, input_rinexs):
+        method_msg = "input method to handle RINEXs: "
+        if input_mode == "find":
+            # Find local RINEX files and convert them to a StepGnss object
+            logger.debug(
+                method_msg
+                + "find local RINEX files and convert them to a StepGnss object"
+            )
+            stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
+        elif input_mode == "given":
+            if utils.is_iterable(input_rinexs):
+                # Convert a list of RINEX files to a StepGnss object
+                logger.debug(
+                    method_msg + "convert a RINEX files list to a StepGnss object"
+                )
+                stp_obj_rnxs_inp = arocmn.rnxs2step_obj(rnxs_lis_inp=input_rinexs)
+
+            elif isinstance(input_rinexs, arocmn.StepGnss):
+                # Use an existing StepGnss object containing the RINEX files
+                logger.debug(
+                    method_msg + "a StepGnss object containing the RINEX files"
+                )
+                stp_obj_rnxs_inp = input_rinexs
+            else:
+                # Log an error if the input_rinexs value is invalid
+                logger.error(
+                    "wrong input_rinexs value for the creation of a StepGnss object: %s",
+                    input_rinexs,
+                )
+                return None
+        else:
+            # Log an error if the mode value is invalid
+            logger.error(
+                "wrong mode value: %s (only 'find' and 'given' are valid)", input_mode
+            )
+            return None
+
+        return stp_obj_rnxs_inp
+
     #   _____       _ _
     #  / ____|     | (_)
     # | (___  _ __ | |_  ___ ___
@@ -312,6 +351,7 @@ class SpliceGnss(HandleGnss):
             options=options,
             metadata=metadata,
         )
+
 
     def splice(
         self,
@@ -354,41 +394,8 @@ class SpliceGnss(HandleGnss):
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
-        method_msg = "input method for splicing: "
-        if input_mode == "find":
-            # Find local RINEX files and convert them to a StepGnss object
-            logger.debug(
-                method_msg
-                + "find local RINEX files and convert them to a StepGnss object"
-            )
-            stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
-        elif input_mode == "given":
-            if utils.is_iterable(input_rinexs):
-                # Convert a list of RINEX files to a StepGnss object
-                logger.debug(
-                    method_msg + "convert a RINEX files list to a StepGnss object"
-                )
-                stp_obj_rnxs_inp = arocmn.rnxs2step_obj(rnxs_lis_inp=input_rinexs)
-
-            elif isinstance(input_rinexs, arocmn.StepGnss):
-                # Use an existing StepGnss object containing the RINEX files
-                logger.debug(
-                    method_msg + "a StepGnss object containing the RINEX files"
-                )
-                stp_obj_rnxs_inp = input_rinexs
-            else:
-                # Log an error if the input_rinexs value is invalid
-                logger.error(
-                    "wrong input_rinexs value for the creation of a StepGnss object: %s",
-                    input_rinexs,
-                )
-                return None
-        else:
-            # Log an error if the mode value is invalid
-            logger.error(
-                "wrong mode value: %s (only 'find' and 'given' are valid)", input_mode
-            )
-            return None
+        # Find the input RINEX files
+        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
 
         # Feed the epochs for splicing
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
@@ -566,6 +573,27 @@ class SplitGnss(HandleGnss):
             options=options,
             metadata=metadata,
         )
+
+
+    def split(self,input_mode="given",input_rinexs=None,handle_software="converto",
+              rinexmod_options=None,verbose=False):
+
+        # Log the start of the spliting operation
+        logger.info(BOLD_SRT + ">>>>>>>>> Spliting RINEX files" + BOLD_END)
+
+        # Find the input RINEX files
+        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
+
+        # Feed the epochs for spliting
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose)
+
+        # Perform the core spliting operation
+        self.split_core(
+            handle_software=handle_software, rinexmod_options=rinexmod_options
+        )
+
+        return None
+
 
     def split_core(self, handle_software="converto", rinexmod_options=None):
         """

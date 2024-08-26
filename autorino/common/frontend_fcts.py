@@ -243,7 +243,7 @@ def convert_rnx(
     return cnv
 
 
-def split_rnx(
+def split_rnx0(
     rnxs_inp,
     epo_inp,
     out_dir,
@@ -304,6 +304,74 @@ def split_rnx(
     return spt_split
 
 
+
+
+
+def split_rnx(
+    rnxs_inp,
+    epoch_srt,
+    epoch_end,
+    period,
+    out_dir,
+    tmp_dir,
+    log_dir=None,
+    handle_software="converto",
+    rinexmod_options=None,
+    metadata=None,
+):
+    """
+    Frontend function to split RINEX files based on certain criteria
+
+    Parameters
+    ----------
+    rnxs_inp : list
+        The input RINEX files to be split
+        The input can be:
+        * a python list
+        * a text file path containing a list of files
+        * a tuple containing several text files path
+        * a directory path.
+    epoch_srt : str
+        The start epoch for the splicing operation.
+    epoch_end : str
+        The end epoch for the splicing operation.
+    period : str
+        The period for the splicing operation.
+    out_dir : str
+        The output directory where the split files will be stored
+    tmp_dir : str
+        The temporary directory used during the splitting process
+    log_dir : str, optional
+        The directory where logs will be stored. If not provided, it defaults to tmp_dir
+    handle_software : str, optional
+        The software to be used for handling the RINEX files during the split operation
+    rinexmod_options : dict, optional
+        The options for modifying the RINEX files during the split operation
+    metadata : str or list, optional
+        The metadata to be included in the split RINEX files
+        Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path)
+         * single string (directory containing the sitelogs)
+         * list of MetaData objects
+         * single MetaData object
+
+    Returns
+    -------
+    None
+    """
+    if not log_dir:
+        log_dir = tmp_dir
+
+    epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
+
+    spt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_rng, metadata=metadata)
+
+    spt.split(input_mode="toto",input_rinexs=rnxs_inp,
+              handle_software=handle_software, rinexmod_options=rinexmod_options)
+
+    return spt
+
 def splice_rnx_abs(
     rnxs_inp,
     epoch_srt,
@@ -358,8 +426,10 @@ def splice_rnx_abs(
     if not log_dir:
         log_dir = tmp_dir
 
+    epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
+
     spc = arohdl.SpliceGnss(out_dir, tmp_dir, log_dir,
-                            epoch_range=(epoch_srt, epoch_end, period),
+                            epoch_range=epo_rng,
                             metadata=metadata)
 
     spc.splice(input_mode="given",
