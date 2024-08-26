@@ -312,6 +312,9 @@ def conv_regex_mdb2rnx(f):
     # fsdc176p11.18n
     # fsdc176p11.18g
     # and even for OVSG
+    # souf226n 8.24l
+    # souf226n 8.24n
+    # souf226n 8.24o
 
 
     finp = str(f)
