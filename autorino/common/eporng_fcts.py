@@ -122,7 +122,7 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
 def round_date(date_in, period, round_method="round"):
     """
     low-level function to round a Pandas Serie or a datetime-like object
-    according to the "ceil", "floor" or "round" approach
+    according to the "ceil", "floor", "round", "none" approach
 
     Parameters
     ----------
@@ -132,7 +132,7 @@ def round_date(date_in, period, round_method="round"):
         the rounding period.
         Use the pandas' frequency aliases convention (see bellow for details).
     round_method : str, optional
-        round method: 'ceil', 'floor', 'round'. The default is "floor".
+        round method: 'ceil', 'floor', 'round', 'none'. The default is "floor".
 
     Returns
     -------
@@ -152,7 +152,7 @@ def round_date(date_in, period, round_method="round"):
     if pd.isna(date_in):  ### NaT case
         date_out = date_in
 
-    elif isinstance(date_in,pd.Series):
+    elif isinstance(date_in, pd.Series):
 
         date_use = date_in
 
@@ -162,6 +162,8 @@ def round_date(date_in, period, round_method="round"):
             date_out = date_use.dt.floor(period)
         elif round_method == "round":
             date_out = date_use.dt.round(period)
+        elif round_method == "none":
+            date_out = date_use
         else:
             raise Exception
 
@@ -172,13 +174,14 @@ def round_date(date_in, period, round_method="round"):
         else:
             date_use = pd.Timestamp(date_in)
 
-
         if round_method == "ceil":
             date_out = date_use.ceil(period)
         elif round_method == "floor":
             date_out = date_use.floor(period)
         elif round_method == "round":
             date_out = date_use.round(period)
+        elif round_method == "none":
+            date_out = date_use
         else:
             raise Exception
 
@@ -247,7 +250,9 @@ def round_epochs(
 
         roll_diff = epochs_use - rolling_ref_use
 
-        epochs_rnd = arocmn.round_date(roll_diff, period, round_method) + rolling_ref_use
+        epochs_rnd = (
+            arocmn.round_date(roll_diff, period, round_method) + rolling_ref_use
+        )
 
     return epochs_rnd
 
