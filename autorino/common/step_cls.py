@@ -1817,7 +1817,7 @@ class StepGnss:
         return out
 
     def updt_rnxmodopts(
-        self, rinexmod_options_inp=None, irow=None, debug_print_rinexmod_options=False
+        self, rinexmod_options_inp=None, irow=None, debug_print=False
     ):
         """
         Updates the rinexmod options dictionnary.
@@ -1832,7 +1832,7 @@ class StepGnss:
             Input options for RINEX modification. Default is None.
         irow : int, optional
             Row index for setting the site name/marker from the table. Default is None.
-        debug_print_rinexmod_options : bool, optional
+        debug_print : bool, optional
             If True, prints the RINEX modification options for debugging purposes. Default is False.
 
         Returns
@@ -1856,11 +1856,13 @@ class StepGnss:
             "full_history": True,
         }
 
-        # handle the very specific case of a station.info input
-        # not very sure if it is necessary, but I keep it for now
+        # handle the specific case of a station.info input
+        # necessary for users using the station.info input (like EK@ENS)
+        update_sitelog = True
         if rimopts_inp:
             if not rimopts_inp["sitelog"] and "station_info" in rimopts_inp.keys():
                 rimopts_def.pop("sitelog", None)
+                update_sitelog = False
 
         # create the  working copy of the default options
         rimopts_out = rimopts_def.copy()
@@ -1870,18 +1872,20 @@ class StepGnss:
             rimopts_wrk = {}
 
         # print the initial state
-        if debug_print_rinexmod_options:
+        if debug_print:
             logger.debug("default options for rinexmod: %s", rimopts_def)
             logger.debug("input options for rinexmod: %s", rimopts_inp)
 
         # set #1: the metadata/sitelog
-        rimopts_wrk["sitelog"] =  self.metadata
+        if update_sitelog:
+            rimopts_wrk["sitelog"] =  self.metadata
 
         # set #2: site name/marker
-        if self.site_id9:
-            rimopts_wrk["marker"] = self.site_id9
-        elif irow is not None:
+
+        if irow is not None:
             rimopts_wrk["marker"] = self.table.loc[irow, "site"]
+        elif self.site_id9:
+            rimopts_wrk["marker"] = self.site_id9
         else:
             logger.warning("unable to set the marker (irow is %s, self.site_id9 is %s)",
                            irow, self.site_id9)
@@ -1890,7 +1894,7 @@ class StepGnss:
         # DO THE UPDATE HERE
         rimopts_out.update(rimopts_wrk)
 
-        if debug_print_rinexmod_options:
+        if debug_print:
             logger.debug("final options for rinexmod: %s", rimopts_wrk)
 
         return rimopts_out
