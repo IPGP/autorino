@@ -567,7 +567,7 @@ class SplitGnss(HandleGnss):
             metadata=metadata,
         )
 
-    def split(self, handle_software="converto", rinexmod_options=None):
+    def split_core(self, handle_software="converto", rinexmod_options=None):
         """
         "total action" method
         """

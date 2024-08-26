@@ -420,4 +420,4 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.split()
+            stp.split(**stp.options)

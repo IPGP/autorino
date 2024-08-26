@@ -266,7 +266,7 @@ def split_rnx(
         * a tuple containing several text files path
         * a directory path.
     epo_inp : str
-        The input epoch for splitting the RINEX files
+        The input EpochRange for splitting the RINEX files
     out_dir : str
         The output directory where the split files will be stored
     tmp_dir : str
@@ -298,8 +298,8 @@ def split_rnx(
     spt_store.updt_epotab_rnx(use_rnx_filename_only=True)
 
     spt_split = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_inp, metadata=metadata)
-    spt_split.feed_by_epochs(spt_store)
-    spt_split.split(handle_software=handle_software, rinexmod_options=rinexmod_options)
+    spt_split.feed_by_epochs(spt_store, mode="split")
+    spt_split.split_core(handle_software=handle_software, rinexmod_options=rinexmod_options)
 
     return spt_split
 
