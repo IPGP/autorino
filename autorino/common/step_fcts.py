@@ -254,7 +254,8 @@ def rnxs2step_obj(rnxs_lis_inp):
     """
     stp_obj = arocmn.StepGnss(out_dir="",
                               tmp_dir="",
-                              log_dir="")
+                              log_dir="",
+                              inp_dir="")
 
     stp_obj.load_table_from_filelist(rnxs_lis_inp)
     stp_obj.updt_site_w_rnx_fname()

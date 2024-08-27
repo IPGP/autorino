@@ -43,7 +43,37 @@ class HandleGnss(arocmn.StepGnss):
         options=None,
         metadata=None,
     ):
+        """
+        Initialize a HandleGnss object.
 
+        This constructor initializes a HandleGnss object, which is used for handling
+        GNSS data processing. It inherits from the StepGnss class.
+
+        Parameters
+        ----------
+        out_dir : str
+            The output directory for the processed files.
+        tmp_dir : str
+            The temporary directory for intermediate files.
+        log_dir : str
+            The directory for log files.
+        inp_dir : str, optional
+            The input directory for raw files. Default is None.
+        epoch_range : EpochRange, optional
+            The range of epochs to be processed. Default is None.
+        inp_dir_parent : str, optional
+            The parent directory of the input directory. Default is None.
+        inp_structure : dict, optional
+            The structure of the input files. Default is None.
+        site : dict, optional
+            Information about the site. Default is None.
+        session : dict, optional
+            Information about the session. Default is None.
+        options : dict, optional
+            Additional options for the processing operation. Default is None.
+        metadata : dict, optional
+            Metadata for the processing operation. Default is None.
+        """
         super().__init__(
             out_dir=out_dir,
             tmp_dir=tmp_dir,
@@ -190,8 +220,10 @@ class HandleGnss(arocmn.StepGnss):
             )
 
         if print_table:
-            logger.info("Feeding table:\n%s", str(step_obj_store.table))
-            logger.info("Table to be feeded:\n%s", str(self.table))
+            logger.info("> Feeding table:")
+            step_obj_store.print_table()
+            logger.info("> Table to be feeded:")
+            self.print_table()
 
         self.table["ok_inp"] = False
 
@@ -204,26 +236,49 @@ class HandleGnss(arocmn.StepGnss):
                 ">>>>>> Feeding RINEXs for %s between %s & %s",
                 site,
                 arocmn.iso_zulu_epoch(epo_srt),
-                arocmn.iso_zulu_epoch(epo_end)
+                arocmn.iso_zulu_epoch(epo_end),
             )
-
-            epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
-            epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
+            if mode == "splice":
+                epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
+                epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
+            elif mode == "split":
+                epoch_srt_bol = step_obj_store.table["epoch_srt"] <= epo_srt
+                epoch_end_bol = step_obj_store.table["epoch_end"] >= epo_end
+            else:
+                logger.error("wrong mode value (accept 'splice' or 'split'): %s", mode)
+                raise ValueError
 
             epoch_bol = epoch_srt_bol & epoch_end_bol
 
-            if np.sum(epoch_bol) == 0:
+            debug = False
+            if debug:
+                bol_stk = pd.DataFrame(
+                    np.column_stack((epoch_srt_bol, epoch_end_bol, epoch_bol))
+                )
+                print(bol_stk.to_string())
+
+            bol_sum = np.sum(epoch_bol)
+
+            if bol_sum == 0:
                 self.table.loc[irow, "ok_inp"] = False
                 self.table.loc[irow, "fpath_inp"] = None
-                logger.warning("no valid input RINEX between %s & %s", epo_srt, epo_end)
+                logger.warning(
+                    "no valid input RINEX between %s & %s",
+                    arocmn.iso_zulu_epoch(epo_srt),
+                    arocmn.iso_zulu_epoch(epo_end),
+                )
 
-            elif np.sum(epoch_bol) >= 1 and mode == "split":
+            elif mode == "split":
+                if bol_sum > 1:
+                    logger.warning("%i (>1) RINEX found for feed: %s", bol_sum)
+
                 rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
                 ###### can be improved !
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
+                logger.info("found for feed: %s", rnxinp_row["fpath_inp"])
 
-            elif np.sum(epoch_bol) >= 1 and mode == "splice":
+            elif mode == "splice":
                 spc_obj = HandleGnss(
                     out_dir=self.out_dir,
                     tmp_dir=self.tmp_dir,
@@ -367,6 +422,34 @@ class SpliceGnss(HandleGnss):
         options=None,
         metadata=None,
     ):
+        """
+        Initialize a SpliceGnss object.
+
+        This constructor initializes a SpliceGnss object, which is used for handling
+        the splicing of RINEX files. It inherits from the HandleGnss class.
+
+        Parameters
+        ----------
+        out_dir : str
+            The output directory for the spliced RINEX files.
+        tmp_dir : str
+            The temporary directory for intermediate files.
+        log_dir : str
+            The directory for log files.
+        inp_dir : str, optional
+            The input directory for raw files. Default is None.
+        epoch_range : EpochRange, optional
+            The range of epochs to be processed. Default is None.
+        site : dict, optional
+            Information about the site. Default is None.
+        session : dict, optional
+            Information about the session. Default is None.
+        options : dict, optional
+            Additional options for the splicing operation. Default is None.
+        metadata : dict, optional
+            Metadata for the splicing operation. Default is None.
+        """
+
         super().__init__(
             out_dir=out_dir,
             tmp_dir=tmp_dir,
@@ -582,13 +665,42 @@ class SplitGnss(HandleGnss):
         log_dir,
         inp_dir=None,
         epoch_range=None,
-        inp_dir_parent=None,
-        inp_structure=None,
         site=None,
         session=None,
         options=None,
         metadata=None,
     ):
+        """
+        Initialize a SplitGnss object.
+
+        This constructor initializes a SplitGnss object, which is used for handling
+        the splitting of RINEX files. It inherits from the HandleGnss class.
+
+        Parameters
+        ----------
+        out_dir : str
+            The output directory for the split RINEX files.
+        tmp_dir : str
+            The temporary directory for intermediate files.
+        log_dir : str
+            The directory for log files.
+        inp_dir : str, optional
+            The input directory for raw files. Default is None.
+        epoch_range : EpochRange, optional
+            The range of epochs to be processed. Default is None.
+        inp_dir_parent : str, optional
+            The parent directory of the input directory. Default is None.
+        inp_structure : dict, optional
+            The structure of the input files. Default is None.
+        site : dict, optional
+            Information about the site. Default is None.
+        session : dict, optional
+            Information about the session. Default is None.
+        options : dict, optional
+            Additional options for the splitting operation. Default is None.
+        metadata : dict, optional
+            Metadata for the splitting operation. Default is None.
+        """
         super().__init__(
             out_dir=out_dir,
             tmp_dir=tmp_dir,

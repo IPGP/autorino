@@ -1893,7 +1893,10 @@ class StepGnss:
                 irow,
                 self.site_id9,
             )
-            rimopts_wrk["marker"] = "XXXX00XXX"
+
+        # better give nothing rather than XXXX00XXX (nasty side effects)
+        if rimopts_wrk["marker"] == "XXXX00XXX":
+            rimopts_wrk.pop("marker", None)
 
         # DO THE UPDATE HERE
         rimopts_out.update(rimopts_wrk)
@@ -2066,4 +2069,5 @@ class StepGnss:
             # raise e
 
         return frnxfin
+
 
