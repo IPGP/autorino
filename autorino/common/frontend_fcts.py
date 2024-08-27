@@ -266,9 +266,9 @@ def split_rnx(
         * a text file path containing a list of files
         * a tuple containing several text files path
         * a directory path.
-    epoch_srt : str
+    epoch_srt : datetime-like
         The start epoch for the splicing operation.
-    epoch_end : str
+    epoch_end : datetime-like
         The end epoch for the splicing operation.
     period : str
         The period for the splicing operation.
@@ -300,13 +300,15 @@ def split_rnx(
 
     epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
 
-    spt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo_rng, metadata=metadata)
+    spt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir,
+                           epoch_range=epo_rng, metadata=metadata)
 
     spt.split(
-        input_mode="toto",
+        input_mode="given",
         input_rinexs=rnxs_inp,
         handle_software=handle_software,
         rinexmod_options=rinexmod_options,
+        verbose=True
     )
 
     return spt

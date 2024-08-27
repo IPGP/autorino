@@ -29,7 +29,8 @@ class ConvertGnss(arocmn.StepGnss):
     """
     A class used to represent the GNSS conversion process.
 
-    This class inherits from the StepGnss class and is used to handle the conversion of GNSS data.
+    This class inherits from the StepGnss class
+    and is used to handle the conversion of GNSS data.
 
     Attributes
     ----------

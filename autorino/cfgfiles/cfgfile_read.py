@@ -419,5 +419,6 @@ def run_steps(steps_lis, step_select=[], print_table=True):
             stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
-            stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.split(**stp.options)
+            stp_rnx_inp = stp.copy()
+            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
