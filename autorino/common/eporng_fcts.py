@@ -297,3 +297,6 @@ def create_dummy_epochrange():
 
     epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period="15min")
     return epo
+
+def iso_zulu_epoch(epo_in):
+    return pd.Timestamp(epo_in).isoformat().replace('+00:00', 'Z')

@@ -78,8 +78,8 @@ class EpochRange:
 
     def __repr__(self):
         return "from {} to {}, period {}".format(
-            self.epoch_start.isoformat().replace('+00:00', 'Z'),
-            self.epoch_end.isoformat().replace('+00:00', 'Z'),
+            arocmn.iso_zulu_epoch(self.epoch_start),
+            arocmn.iso_zulu_epoch(self.epoch_end),
             self.period
         )
 
