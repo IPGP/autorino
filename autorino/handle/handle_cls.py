@@ -7,6 +7,7 @@ Created on Wed Jan 10 15:00:40 2024
 """
 # Create a logger object.
 import os
+import time
 
 import numpy as np
 import pandas as pd
@@ -539,6 +540,7 @@ class SpliceGnss(HandleGnss):
                 raise ValueError
 
             try:
+                time.sleep(1)
                 frnx_spliced, _ = arocnv.converter_run(
                     fpath_inp_lst,
                     out_dir_use,
