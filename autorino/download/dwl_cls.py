@@ -168,6 +168,9 @@ class DownloadGnss(arocmn.StepGnss):
             self.table.loc[iepoch, "fpath_inp"] = rmot_path_use
             logger.debug("remote file guessed: %s", rmot_path_use)
 
+        # for guess, all input files are considered as ok a priori
+        self.table["ok_inp"] = True
+
         rmot_paths_list = sorted(list(set(rmot_paths_list)))
 
         logger.info("nbr remote files guessed: %s", len(rmot_paths_list))
