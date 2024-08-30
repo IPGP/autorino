@@ -85,10 +85,8 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
 
     if main_cfg_path:
         y_main = yaml.safe_load(open(main_cfg_path))
-        y_main_sessions = y_main["station"]["sessions"]
     else:
         y_main = None
-        y_main_sessions = None
 
     y = update_w_main_dic(y, y_main)
     logger.debug("Used configuration (updated with the main):\n %s", y)
