@@ -104,6 +104,20 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
 
 
 def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
+
+    # ++++ METADATA
+    if y_station["site"]["sitelog_path"]:
+        slpath = y_station["site"]["sitelog_path"]
+        if os.path.isdir(slpath) or os.path.isfile(slpath):
+            # we load the metadata if the path is a directory or a file
+            metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
+        else:
+            # if not we consider it as a string
+            # (because the path might be translated later in the object)
+            metadata = slpath
+    else:
+        metadata = None
+
     steps_lis_lis = []
     steps_dic_dic = {}
 
@@ -154,19 +168,6 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
 
             out_dir, _, _ = _get_dir_path(y_stp, "out")
             inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
-
-            # ++++ METADATA
-            if y_station["site"]["sitelog_path"]:
-                slpath = y_station["site"]["sitelog_path"]
-                if os.path.isdir(slpath) or os.path.isfile(slpath):
-                    # we load the metadata if the path is a directory or a file
-                    metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
-                else:
-                    # if not we consider it as a string
-                    # (because the path might be translated later in the object)
-                    metadata = slpath
-            else:
-                metadata = None
 
             kwargs_for_step = {
                 "out_dir": out_dir,
