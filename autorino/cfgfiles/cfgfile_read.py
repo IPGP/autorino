@@ -53,9 +53,11 @@ def load_cfg(configfile_path):
 
 def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     """
-    Read and interpret a configuration file (YAML format) and return a list of StepGnss objects to be launched sequentially.
+    Read and interpret a configuration file (YAML format) and
+    return a list of StepGnss objects to be launched sequentially.
 
-    This function takes in a path to a configuration file, an optional EpochRange object, and an optional path
+    This function takes in a path to a configuration file,
+    an optional EpochRange object, and an optional path
     to a main configuration file.
     It reads the configuration file, updates it with the main configuration file if provided,
     and creates a list of StepGnss objects based on the configuration.
@@ -66,7 +68,8 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     configfile_path : str
         The path to the configuration file.
     epoch_range : EpochRange, optional
-        An EpochRange object which will override the epoch ranges given in the configuration file. Default is None.
+        An EpochRange object which will override the epoch ranges
+        given in the configuration file. Default is None.
     main_cfg_path : str, optional
         The path to the main configuration file. Default is None.
 

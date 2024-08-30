@@ -583,7 +583,11 @@ class StepGnss:
         None
         """
         if metadata:
-            metadata_set = self.translate_path(metadata)
+            if isinstance(metadata, str): # the input is a str, i.e. a path
+                metadata_set = self.translate_path(metadata)
+            else: # all the other cases, i.e. already some MetaData objects
+                metadata_set = metadata
+
             self.metadata = rinexmod_api.metadata_input_manage(
                 metadata_set, force=False
             )
