@@ -1295,7 +1295,7 @@ class StepGnss:
         files_uncmp_list = []  #### the UNcompressed files i.e. ALL the usables ones
 
         for irow, row in self.table.iterrows():
-            file_decmp, bool_decmp = self.on_row_decompress(
+            file_decmp, bool_decmp = self.mono_decompress(
                 irow, table_col=table_col, table_ok_col=table_ok_col
             )
 
@@ -1357,7 +1357,7 @@ class StepGnss:
 
         return files_decmp_list
 
-    def on_row_decompress(
+    def mono_decompress(
         self, irow, out_dir=None, table_col="fpath_inp", table_ok_col="ok_inp"
     ):
         """
@@ -1918,7 +1918,7 @@ class StepGnss:
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_rinexmod(
+    def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
     ):
         """
@@ -2002,7 +2002,7 @@ class StepGnss:
 
         return frnxmod
 
-    def on_row_mv_final(self, irow, out_dir=None, table_col="fpath_out"):
+    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out"):
         """
         "on row" method
 

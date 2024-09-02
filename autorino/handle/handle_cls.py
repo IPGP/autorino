@@ -543,11 +543,11 @@ class SpliceGnss(HandleGnss):
             logger.info(
                 ">>>>>> Splicing %s between %s and %s",
                 self.table.loc[irow, "site"],
-                self.table.loc[irow, "epoch_srt"],
-                self.table.loc[irow, "epoch_end"],
+                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_end"]),
             )
 
-            self.on_row_splice(
+            self.mono_splice(
                 irow, self.tmp_dir_converted, handle_software=handle_software
             )
 
@@ -556,18 +556,18 @@ class SpliceGnss(HandleGnss):
                 logger.error("unable to splice\n%s", self.table.loc[irow].to_string())
                 continue
 
-            self.on_row_rinexmod(
+            self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
 
             if self.tmp_dir_rinexmoded != self.out_dir:
-                self.on_row_mv_final(irow, self.out_dir)
+                self.mono_mv_final(irow, self.out_dir)
 
         self.remov_tmp_files()
 
         return None
 
-    def on_row_splice(
+    def mono_splice(
         self, irow, out_dir=None, table_col="fpath_inp", handle_software="converto"
     ):
         """
@@ -583,7 +583,7 @@ class SpliceGnss(HandleGnss):
         if not self.table.loc[irow, "ok_inp"]:
             logger.warning(
                 "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "epoch_srt"],
+                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
             )
             self.table.loc[irow, "ok_out"] = False
             return None
@@ -791,10 +791,10 @@ class SplitGnss(HandleGnss):
         self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
-            fdecmptmp, _ = self.on_row_decompress(irow)
+            fdecmptmp, _ = self.mono_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
-            frnx_splited = self.on_row_split(
+            frnx_splited = self.mono_split(
                 irow, self.tmp_dir_converted, handle_software=handle_software
             )
             if not self.table.loc[irow, "ok_out"]:
@@ -803,18 +803,18 @@ class SplitGnss(HandleGnss):
 
             self.tmp_rnx_files.append(frnx_splited)
 
-            self.on_row_rinexmod(
+            self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
 
             if self.tmp_dir_rinexmoded != self.out_dir:
-                self.on_row_mv_final(irow)
+                self.mono_mv_final(irow)
 
         self.remov_tmp_files()
 
         return None
 
-    def on_row_split(
+    def mono_split(
         self, irow, out_dir=None, table_col="fpath_inp", handle_software="converto"
     ):
         """
@@ -827,7 +827,7 @@ class SplitGnss(HandleGnss):
         if not self.table.loc[irow, "ok_inp"]:
             logger.warning(
                 "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "epoch_srt"],
+                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
             )
             self.table.loc[irow, "ok_out"] = False
             return None
