@@ -1881,12 +1881,11 @@ class StepGnss:
             logger.debug("default options for rinexmod: %s", rimopts_def)
             logger.debug("input options for rinexmod: %s", rimopts_inp)
 
-        # set #1: the metadata/sitelog
+        #+++ set #1: the metadata/sitelog
         if update_sitelog:
             rimopts_wrk["sitelog"] = self.metadata
 
-        # set #2: site name/marker
-
+        #+++ set #2: site name/marker
         if irow is not None:
             rimopts_wrk["marker"] = self.table.loc[irow, "site"]
         elif self.site_id9:
@@ -1897,7 +1896,6 @@ class StepGnss:
                 irow,
                 self.site_id9,
             )
-
         # better give nothing rather than XXXX00XXX (nasty side effects)
         if rimopts_wrk["marker"] == "XXXX00XXX":
             rimopts_wrk.pop("marker", None)
