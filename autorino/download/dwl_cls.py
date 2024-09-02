@@ -368,7 +368,7 @@ class DownloadGnss(arocmn.StepGnss):
         download_files_list = []
 
         for irow, row in self.table.iterrows():
-            file_dl_out = self.on_row_fetch(irow, force=force)
+            file_dl_out = self.mono_fetch(irow, force=force)
             if file_dl_out:
                 download_files_list.append(file_dl_out)
 
@@ -464,7 +464,7 @@ class DownloadGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_fetch(self, irow, force=False):
+    def mono_fetch(self, irow, force=False):
 
         if self.table.loc[irow, "ok_out"] and not force:
             logger.info(

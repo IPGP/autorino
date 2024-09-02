@@ -235,7 +235,7 @@ class ConvertGnss(arocmn.StepGnss):
             # +++ since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate_dic (necessary for the output dir)
-            self.on_row_site_upd(irow, site4_list)
+            self.mono_site_upd(irow, site4_list)
             self.site_id = self.table.loc[irow, "site"]  # for translation of the output dir & rinexmod options
 
             self.set_translate_dict()
@@ -258,7 +258,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ CONVERSION
-            frnxtmp = self.on_row_convert(
+            frnxtmp = self.mono_convert(
                 irow, self.tmp_dir_converted, converter_inp=converter_name_use
             )
             self.tmp_rnx_files.append(frnxtmp)  # list for final remove
@@ -267,13 +267,13 @@ class ConvertGnss(arocmn.StepGnss):
             # +++++ RINEXMOD
             rinexmod_options_use = self.updt_rnxmodopts(rinexmod_options, irow)
 
-            self.on_row_rinexmod(
+            self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
             )
 
             #############################################################
             # +++++ FINAL MOVE
-            self.on_row_mv_final(irow)
+            self.mono_mv_final(irow)
 
         # ++++ remove temporary files
         self.remov_tmp_files()
@@ -288,7 +288,7 @@ class ConvertGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(
+    def mono_convert(
         self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
     ):
         """
@@ -356,7 +356,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = False
         return frnxtmp
 
-    def on_row_site_upd(self, irow, metadata_or_sites_list_inp, force=False):
+    def mono_site_upd(self, irow, metadata_or_sites_list_inp, force=False):
         """
         Updates the 'site' entry for each row of the table.
 
