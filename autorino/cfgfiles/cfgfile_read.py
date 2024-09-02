@@ -184,7 +184,9 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             if k_stp in "download":
                 kwargs_for_step["access"] = y_station["access"]
 
+            logger.error("AAAAAAAACCCCCCCCCCCCCCC",kwargs_for_step)
             step_obj = step_cls(**kwargs_for_step)
+            logger.error("AAAAAAAADDDDDDDDDDDDDD",step_obj.options)
 
             # appended in lis and dic at the end of the k_stp tests
             steps_lis.append(step_obj)
