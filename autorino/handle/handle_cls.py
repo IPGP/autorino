@@ -503,6 +503,8 @@ class SpliceGnss(HandleGnss):
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
+        logger.error("AAAAAAAAAAAAAAAAAAAAAAAAA",rinexmod_options)
+
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
 
