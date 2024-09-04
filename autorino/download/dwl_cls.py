@@ -400,7 +400,6 @@ class DownloadGnss(arocmn.StepGnss):
         # Guess remote raw file paths
         if remote_find_method == "guess":
             self.guess_remot_raw()
-            self.guess_local_raw()
         # Ask remote raw file paths (works for FTP only!
         elif remote_find_method == "ask":
             self.ask_remote_raw()

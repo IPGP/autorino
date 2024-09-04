@@ -1824,7 +1824,7 @@ class StepGnss:
             out = self.table[self.table[col]]
         return out
 
-    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=True):
+    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
         """
         Updates the rinexmod options dictionnary.
 
