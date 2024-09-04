@@ -106,7 +106,11 @@ def ftp_create_object(url_host_inp, timeout=15, max_try=3, sleep_time=5):
                 raise e
             else:
                 print(e)
-                os.sleep(sleep_time)
+                time.sleep(sleep_time)
+        #
+        except OSError as e:
+            logger.error("FTP connection failed: %s", str(e))
+            return None
 
 
 def list_remote_files_ftp(
@@ -122,7 +126,12 @@ def list_remote_files_ftp(
     # join_url()
 
     # connect to FTP server
-    ftp = ftplib.FTP(host_name, timeout=timeout)
+    ftp = ftp_create_object(host_name, timeout=timeout)
+
+    if not ftp:
+        logger.error("FTP connection failed for %s", host_name)
+        return []
+
     ftp.login(username, password)
 
     # change to remote directory
@@ -199,6 +208,10 @@ def download_ftp(
     ftp = ftp_create_object(
         url_host, timeout=timeout, max_try=max_try, sleep_time=sleep_time
     )
+
+    if not ftp:
+        logger.error("FTP connection failed for %s", url)
+        return ''
 
     ftp.login(username, password)
     ftp.cwd(url_dir)
