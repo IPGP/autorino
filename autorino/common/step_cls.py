@@ -1861,7 +1861,7 @@ class StepGnss:
             "longname": True,
             "force_rnx_load": True,
             "verbose": False,
-            "tolerant_file_period": False,
+            "filename_style": 'basic',
             "full_history": True,
         }
 
