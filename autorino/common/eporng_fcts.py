@@ -70,7 +70,7 @@ def dateparser_interpret(date_inp, tz="UTC"):
     else:
         date_out = pd.Timestamp(date_inp)
 
-    if isinstance(date_out, pd.NaT):
+    if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
         ### NaT case. can not support tz
         pass
     elif not date_out.tz:
