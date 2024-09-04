@@ -89,14 +89,14 @@ class StationTest:
         for remote_dir_use in remote_dir_list:
             print(remote_dir_use)
             if self.protocol == "http":
-                list_ = ardl.list_remote_files_http(self.hostname,
-                                                    remote_dir_use)
+                list_ = ardl.list_remote_http(self.hostname,
+                                              remote_dir_use)
                 remote_files_list = remote_files_list + list_
             elif self.protocol == "ftp":
-                list_ = ardl.list_remote_files_ftp(self.hostname,
-                                                   remote_dir_use,
-                                                   self.sta_user,
-                                                   self.sta_pass)
+                list_ = ardl.list_remote_ftp(self.hostname,
+                                             remote_dir_use,
+                                             self.sta_user,
+                                             self.sta_pass)
                 remote_files_list = remote_files_list + list_
 
             else:
@@ -195,14 +195,14 @@ print(L)
 output_path = "/home/gps/tests_pierres/dltest"
 
 # if protocol == "http":
-    # list_ = ardl.list_remote_files_http(hostname,remote_dir_use)
+    # list_ = ardl.list_remote_http(hostname,remote_dir_use)
     # print(list_)
     # print(size_remote_file_http([list_[0]]))
     # ardl.download_http(list_[0], output_path)
     # #download(list_[0], output_path)
 
 # elif protocol == "ftp":    
-    # list_ = ardl.list_remote_files_ftp(hostname,remote_dir_use,sta_user,sta_pass)
+    # list_ = ardl.list_remote_ftp(hostname,remote_dir_use,sta_user,sta_pass)
     # print(list_)
     # ardl.download_ftp(list_[0], output_path, sta_user, sta_pass)
     

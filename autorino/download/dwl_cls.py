@@ -253,12 +253,12 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_dir_use = row["fpath_inp"]
 
             if self.access["protocol"] == "http":
-                rmot_fil_epo_lis = arodwl.list_remote_files_http(
+                rmot_fil_epo_lis = arodwl.list_remote_http(
                     self.access["hostname"], rmot_dir_use
                 )
                 rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
             elif self.access["protocol"] == "ftp":
-                rmot_fil_epo_lis = arodwl.list_remote_files_ftp(
+                rmot_fil_epo_lis = arodwl.list_remote_ftp(
                     self.access["hostname"],
                     rmot_dir_use,
                     self.access["login"],
