@@ -124,14 +124,14 @@ class RequestGnss():
         rmot_files_list = []
         for rmot_dir_use in rmot_dir_list:
             if self.session.protocol == "http":
-                list_ = ardl.list_remote_files_http(self.session.hostname,
-                                                  rmot_dir_use)
+                list_ = ardl.list_remote_http(self.session.hostname,
+                                              rmot_dir_use)
                 rmot_files_list = rmot_files_list + list_
             elif self.session.protocol == "ftp":
-                list_ = ardl.list_remote_files_ftp(self.session.hostname,
-                                                 rmot_dir_use,
-                                                 self.session.sta_user,
-                                                 self.session.sta_pass)
+                list_ = ardl.list_remote_ftp(self.session.hostname,
+                                             rmot_dir_use,
+                                             self.session.sta_user,
+                                             self.session.sta_pass)
                 rmot_files_list = rmot_files_list + list_
 
             else:

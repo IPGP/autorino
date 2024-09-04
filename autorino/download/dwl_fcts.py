@@ -90,7 +90,7 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
 ############# list remote files
 
 
-def ftp_create_object(url_host_inp, timeout=15, max_try=3, sleep_time=5):
+def ftp_create_objt(url_host_inp, timeout=15, max_try=3, sleep_time=5):
     """
     create an FTP object, and retry in case of a timeout
     """
@@ -109,11 +109,11 @@ def ftp_create_object(url_host_inp, timeout=15, max_try=3, sleep_time=5):
                 time.sleep(sleep_time)
         #
         except OSError as e:
-            logger.error("FTP connection failed: %s", str(e))
+            logger.error("Unable to create FTP object: %s", str(e))
             return None
 
 
-def list_remote_files_ftp(
+def list_remote_ftp(
     host_name, remote_dir, username, password, timeout=15, max_try=3
 ):
     # clean hostname & inp_dir_parent
@@ -126,7 +126,7 @@ def list_remote_files_ftp(
     # join_url()
 
     # connect to FTP server
-    ftp = ftp_create_object(host_name, timeout=timeout)
+    ftp = ftp_create_objt(host_name, timeout=timeout)
 
     if not ftp:
         logger.error("FTP connection failed for %s", host_name)
@@ -148,7 +148,7 @@ def list_remote_files_ftp(
     return file_list
 
 
-def list_remote_files_http(host_name, remote_dir):
+def list_remote_http(host_name, remote_dir):
 
 
     url = os.path.join(host_name, remote_dir)
@@ -205,7 +205,7 @@ def download_ftp(
     url_dir = os.path.dirname(urlp.path)[1:]
     url_fname = os.path.basename(urlp.path)
 
-    ftp = ftp_create_object(
+    ftp = ftp_create_objt(
         url_host, timeout=timeout, max_try=max_try, sleep_time=sleep_time
     )
 
