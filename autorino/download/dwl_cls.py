@@ -396,6 +396,11 @@ class DownloadGnss(arocmn.StepGnss):
             logger.warning("Switching to 'guess' remote find method.")
             remote_find_method = "guess"
 
+        # Ping the remote server to check if it is reachable
+        ping_out = self.ping_remote()
+        if not ping_out:
+            return None
+
         # Guess remote and local raw file paths
         if remote_find_method == "guess":
             self.guess_remot_raw()
@@ -404,11 +409,6 @@ class DownloadGnss(arocmn.StepGnss):
         elif remote_find_method == "ask":
             self.ask_remote_raw()
             self.ask_local_raw()
-
-        # Ping the remote server to check if it is reachable
-        ping_out = self.ping_remote()
-        if not ping_out:
-            return None
 
         # Check local files and update table
         self.check_local_files()
