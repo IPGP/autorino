@@ -65,12 +65,12 @@ def dateparser_interpret(date_inp, tz="UTC"):
     If the resulting date does not have a timezone, the specified timezone is applied.
     """
 
-    if type(date_inp) is str:
+    if isinstance(date_inp, str):
         date_out = pd.Timestamp(dateparser.parse(date_inp))
     else:
         date_out = pd.Timestamp(date_inp)
 
-    if type(date_out) is pd._libs.tslibs.nattype.NaTType:
+    if isinstance(date_out, pd.NaT):
         ### NaT case. can not support tz
         pass
     elif not date_out.tz:
@@ -85,7 +85,7 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
 
     Parameters
     ----------
-    dates_list_inp : list
+    dates_list_inp : iterable
         The input list of dates.
     period : str, optional
         The rounding period. If not provided, the period is determined as the unique difference
@@ -299,4 +299,18 @@ def create_dummy_epochrange():
     return epo
 
 def iso_zulu_epoch(epo_in):
+    """
+    Convert an input epoch to ISO 8601 format with Zulu time (UTC).
+
+    Parameters
+    ----------
+    epo_in : datetime-like
+        The input epoch to be converted.
+
+    Returns
+    -------
+    str
+        The epoch in ISO 8601 format with Zulu time (UTC).
+    """
     return pd.Timestamp(epo_in).isoformat().replace('+00:00', 'Z')
+
