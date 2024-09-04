@@ -383,19 +383,19 @@ class DownloadGnss(arocmn.StepGnss):
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
 
-
+        # Check the remote find method, and switch to 'guess' if HTTP protocol is used
         if remote_find_method == "ask" and self.access["protocol"] == "http":
             logger.warning("HTTP protocol doesn't support file listing ('ask' method).")
             logger.warning("Switching to 'guess' remote find method.")
             remote_find_method = "guess"
 
+        # local raw are always asked, no need to guess them
+        self.ask_local_raw()
+
         # Ping the remote server to check if it is reachable
         ping_out = self.ping_remote()
         if not ping_out:
             return None
-
-        #local raw are always asked, no need to guess them
-        self.ask_local_raw()
 
         # Guess remote raw file paths
         if remote_find_method == "guess":
@@ -403,7 +403,6 @@ class DownloadGnss(arocmn.StepGnss):
         # Ask remote raw file paths (works for FTP only!
         elif remote_find_method == "ask":
             self.ask_remote_raw()
-
 
         # Check local files and update table
         self.check_local_files()
