@@ -324,13 +324,12 @@ class DownloadGnss(arocmn.StepGnss):
 
         return local_paths_list
 
-    def ping_remote(self):
+    def ping_remote(self, count_max=4):
         """
         Ping the remote server to check if it is reachable.
         """
         count = 0
         ping_out = None
-        count_max = 4
         while count < count_max and not ping_out:
             ping_out = arodwl.ping(self.access["hostname"])
             count += 1
@@ -380,12 +379,6 @@ class DownloadGnss(arocmn.StepGnss):
         """
         logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
-        ### DANGEROUS STYLE TO GET THE OPTIONS as a sideeffect !!!!!
-        # Check if force download is required
-        # verbose_use = arocmn.select_options('verbose', self.options, locals())
-        # force_use = arocmn.select_options('force', self.options, locals())
-        # remote_find_method_use = arocmn.select_options('remote_find_method', self.options, locals())
-
         # Set up and clean temporary directories
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -401,14 +394,16 @@ class DownloadGnss(arocmn.StepGnss):
         if not ping_out:
             return None
 
-        # Guess remote and local raw file paths
+        #local raw are always asked, no need to guess them
+        self.ask_local_raw()
+
+        # Guess remote raw file paths
         if remote_find_method == "guess":
             self.guess_remot_raw()
-            self.guess_local_raw()
-        # Ask remote and local raw file paths (works for FTP only!
+        # Ask remote raw file paths (works for FTP only!
         elif remote_find_method == "ask":
             self.ask_remote_raw()
-            self.ask_local_raw()
+
 
         # Check local files and update table
         self.check_local_files()
