@@ -392,6 +392,8 @@ class DownloadGnss(arocmn.StepGnss):
         # local raw are always asked, no need to guess them
         self.ask_local_raw()
 
+        print("AAAAAAAAAAAA",self.print_table())
+
         # Ping the remote server to check if it is reachable
         ping_out = self.ping_remote()
         if not ping_out:
