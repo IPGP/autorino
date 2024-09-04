@@ -390,6 +390,11 @@ class DownloadGnss(arocmn.StepGnss):
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
 
+        # Ping the remote server to check if it is reachable
+        ping_out = self.ping_remote()
+        if not ping_out:
+            return None
+
         if remote_find_method == "ask" and self.access["protocol"] == "http":
             logger.warning("HTTP protocol doesn't support file listing ('ask' method).")
             logger.warning("Switching to 'guess' remote find method.")
@@ -432,11 +437,6 @@ class DownloadGnss(arocmn.StepGnss):
         # Print the table if verbose is enabled
         if verbose:
             self.print_table()
-
-        # Ping the remote server to check if it is reachable
-        ping_out = self.ping_remote()
-        if not ping_out:
-            return None
 
         # Create a lockfile to ensure exclusive access during download
         lock = self.create_lockfile()
