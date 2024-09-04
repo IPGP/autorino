@@ -184,9 +184,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             if k_stp in "download":
                 kwargs_for_step["access"] = y_station["access"]
 
-            logger.error("AAAAAAAACCCCCCCCCCCCCCC %s",kwargs_for_step)
             step_obj = step_cls(**kwargs_for_step)
-            logger.error("AAAAAAAADDDDDDDDDDDDDD %s",step_obj.options)
 
             # appended in lis and dic at the end of the k_stp tests
             steps_lis.append(step_obj)
@@ -421,7 +419,6 @@ def run_steps(steps_lis, step_select=[], print_table=True):
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
             stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
-            logger.error("AAAAAAAAAABBBBBBBBBBBB %s",stp.options)
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
