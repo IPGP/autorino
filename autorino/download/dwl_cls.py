@@ -359,7 +359,7 @@ class DownloadGnss(arocmn.StepGnss):
         """
         Create the FTP object for the FTP protocol.
         """
-        self.ftp_obj = arodwl.create_ftp_obj(
+        self.ftp_obj = arodwl.ftp_create_obj(
             self.access["hostname"], self.access["login"], self.access["password"]
         )
 
