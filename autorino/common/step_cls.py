@@ -268,7 +268,7 @@ class StepGnss:
             df["epoch_srt"] = self.epoch_range.epoch_range_list()
             df["epoch_end"] = self.epoch_range.epoch_range_list(end_bound=True)
 
-            df["site"] = self.site_id
+        df["site"] = self.site_id
 
         self.table = df
         return None
@@ -1033,6 +1033,32 @@ class StepGnss:
         """
         self.table["ok_inp"] = self.table["ok_inp"].apply(arocmn.is_ok)
         self.table["ok_out"] = self.table["ok_out"].apply(arocmn.is_ok)
+
+        return None
+
+    def load_table_from_datelist(self, dates_list,  period = "1D"):
+        """
+        Loads the table from a list of dates.
+
+        This method takes a list of dates and uses it to update the current step's table.
+        It sets the 'epoch_srt' and 'epoch_end' columns of the table based on the dates in the list.
+
+        Parameters
+        ----------
+        dates_list : list
+            The list of dates to be loaded into the table.
+
+        period : str, optional
+            The period between "epoch_srt" and "epoch_end".
+             Default is "1D" which means 1 day.
+
+        Returns
+        -------
+        None
+        """
+        self.table["epoch_srt"] = pd.to_datetime(dates_list)
+        self.table["epoch_end"] = pd.to_datetime(dates_list) + pd.Timedelta(period)
+        self.updt_eporng_tab()
 
         return None
 
