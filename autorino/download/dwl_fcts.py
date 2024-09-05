@@ -97,9 +97,33 @@ def ftp_create_obj(
     url_host_inp, username=None, password=None, timeout=15, max_try=3, sleep_time=5
 ):
     """
-    create an FTP object, and retry in case of a timeout
-    """
+    Create an FTP object, and retry in case of a timeout.
 
+    Parameters
+    ----------
+    url_host_inp : str
+        The hostname of the FTP server.
+    username : str, optional
+        The username for FTP login. Default is None.
+    password : str, optional
+        The password for FTP login. Default is None.
+    timeout : int, optional
+        The timeout for FTP connection in seconds. Default is 15 seconds.
+    max_try : int, optional
+        The maximum number of retry attempts in case of failure. Default is 3.
+    sleep_time : int, optional
+        The sleep time between retry attempts in seconds. Default is 5 seconds.
+
+    Returns
+    -------
+    ftplib.FTP or None
+        The FTP object if the connection is successful, otherwise None.
+
+    Raises
+    ------
+    TimeoutError
+        If the connection fails after the maximum number of retry attempts.
+    """
     try_count = 0
     while True:
         try:
@@ -114,7 +138,6 @@ def ftp_create_obj(
             else:
                 print(e)
                 time.sleep(sleep_time)
-        #
         except OSError as e:
             logger.error("Unable to create FTP object: %s", str(e))
             return None
@@ -138,8 +161,10 @@ def list_remote_ftp(
 
     # connect to FTP server
     if ftp_obj_inp:
+        disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
     elif username and password:
+        disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
             host_name, username, password, timeout=timeout, max_try=max_try
         )
@@ -162,7 +187,8 @@ def list_remote_ftp(
     file_list = ["/".join((host_name, remote_dir, f)) for f in file_list]
 
     # close connection
-    ftp_obj.quit()
+    if disposable_ftp_obj:
+        ftp_obj.quit()
 
     return file_list
 
@@ -219,8 +245,10 @@ def download_ftp(
     url_fname = os.path.basename(urlp.path)
 
     if ftp_obj_inp:
+        disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
     elif username and password:
+        disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
             url_host,
             username=username,
@@ -277,8 +305,12 @@ def download_ftp(
                 )
                 time.sleep(sleep_time)
 
-    ftp_obj.quit()
     f.close()
+
+    if disposable_ftp_obj:
+        ftp_obj.quit()
+
+
     return output_path
 
 
