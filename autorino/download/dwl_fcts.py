@@ -85,12 +85,12 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     return url_out
 
 
- #  ______ _______ _____
- # |  ____|__   __|  __ \
- # | |__     | |  | |__) |
- # |  __|    | |  |  ___/
- # | |       | |  | |
- # |_|       |_|  |_|
+#  ______ _______ _____
+# |  ____|__   __|  __ \
+# | |__     | |  | |__) |
+# |  __|    | |  |  ___/
+# | |       | |  | |
+# |_|       |_|  |_|
 
 
 def ftp_create_obj(
@@ -121,7 +121,13 @@ def ftp_create_obj(
 
 
 def list_remote_ftp(
-    host_name, remote_dir, username, password, timeout=15, max_try=3, ftp_obj_inp=None
+    host_name,
+    remote_dir,
+    username=None,
+    password=None,
+    timeout=15,
+    max_try=3,
+    ftp_obj_inp=None,
 ):
     # clean hostname & inp_dir_parent
     # MUST BE IMPROVED !!!
@@ -133,10 +139,15 @@ def list_remote_ftp(
     # connect to FTP server
     if ftp_obj_inp:
         ftp_obj = ftp_obj_inp
-    else:
+    elif username and password:
         ftp_obj = ftp_create_obj(
             host_name, username, password, timeout=timeout, max_try=max_try
         )
+    else:
+        logger.error(
+            "unable to create FTP object, missing username/password or input object"
+        )
+        raise AutorinoDownloadError
 
     if not ftp_obj:
         logger.error("FTP connection failed for %s", host_name)
@@ -155,16 +166,53 @@ def list_remote_ftp(
 
     return file_list
 
+
 def download_ftp(
     url,
     output_dir,
-    username,
-    password,
+    username=None,
+    password=None,
     timeout=15,
     max_try=3,
     sleep_time=5,
     ftp_obj_inp=None,
 ):
+    """
+    Download a file from an FTP server with retry logic and progress bar.
+
+    Parameters
+    ----------
+    url : str
+        The URL of the file to download.
+    output_dir : str
+        The directory where the downloaded file will be saved.
+    username : str
+        The username for FTP login.
+        Overrided by the ftp_obj_inp parameter.
+    password : str
+        The password for FTP login.
+        Overrided by the ftp_obj_inp parameter.
+    timeout : int, optional
+        The timeout for FTP connection in seconds. Default is 15 seconds.
+    max_try : int, optional
+        The maximum number of retry attempts in case of failure. Default is 3.
+    sleep_time : int, optional
+        The sleep time between retry attempts in seconds. Default is 5 seconds.
+    ftp_obj_inp : ftplib.FTP, optional
+        An existing FTP object to use for the connection.
+        Overrides the username and password parameters.
+        Default is None.
+
+    Returns
+    -------
+    str
+        The path to the downloaded file, or an empty string if the download failed.
+
+    Raises
+    ------
+    AutorinoDownloadError
+        If the download fails after the maximum number of retry attempts.
+    """
     urlp = urlparse(url)
     url_host = urlp.netloc
     url_dir = os.path.dirname(urlp.path)[1:]
@@ -172,7 +220,7 @@ def download_ftp(
 
     if ftp_obj_inp:
         ftp_obj = ftp_obj_inp
-    else:
+    elif username and password:
         ftp_obj = ftp_create_obj(
             url_host,
             username=username,
@@ -181,6 +229,11 @@ def download_ftp(
             max_try=max_try,
             sleep_time=sleep_time,
         )
+    else:
+        logger.error(
+            "unable to create FTP object, missing username/password or input object"
+        )
+        raise AutorinoDownloadError
 
     if not ftp_obj:
         logger.error("FTP connection failed for %s", url)
@@ -195,8 +248,6 @@ def download_ftp(
     file_size = ftp_obj.size(filename)
 
     output_path = os.path.join(output_dir, filename)
-    # f = open(output_path, 'wb')
-    # tqdm_out = TqdmToLogger(logger,level=logging.INFO)
     try_count = 0
     while True:
         try:
@@ -231,14 +282,13 @@ def download_ftp(
     return output_path
 
 
- #  _    _ _______ _______ _____
- # | |  | |__   __|__   __|  __ \
- # | |__| |  | |     | |  | |__) |
- # |  __  |  | |     | |  |  ___/
- # | |  | |  | |     | |  | |
- # |_|  |_|  |_|     |_|  |_|
- #
-
+#  _    _ _______ _______ _____
+# | |  | |__   __|__   __|  __ \
+# | |__| |  | |     | |  | |__) |
+# |  __  |  | |     | |  |  ___/
+# | |  | |  | |     | |  | |
+# |_|  |_|  |_|     |_|  |_|
+#
 
 
 def list_remote_http(host_name, remote_dir):
@@ -316,14 +366,16 @@ def download_http(url, output_dir, timeout=15, max_try=3, sleep_time=5):
 
     return output_path
 
- #  _____ _
- # |  __ (_)
- # | |__) | _ __   __ _
- # |  ___/ | '_ \ / _` |
- # | |   | | | | | (_| |
- # |_|   |_|_| |_|\__, |
- #                 __/ |
- #                |___/
+
+#  _____ _
+# |  __ (_)
+# | |__) | _ __   __ _
+# |  ___/ | '_ \ / _` |
+# | |   | | | | | (_| |
+# |_|   |_|_| |_|\__, |
+#                 __/ |
+#                |___/
+
 
 def ping(host, timeout=20):
     """

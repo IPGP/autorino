@@ -120,6 +120,9 @@ class DownloadGnss(arocmn.StepGnss):
         # specific to the DownloadGnss class
         self.access = access
 
+        # initialize the ftp object
+        self.ftp_obj = None
+
     # legacy properties, specific to the DownloadGnss class
     @property
     def inp_dir_parent(self):
@@ -352,6 +355,15 @@ class DownloadGnss(arocmn.StepGnss):
 
         return ping_out
 
+    def set_ftp_obj(self):
+        """
+        Create the FTP object for the FTP protocol.
+        """
+        self.ftp_obj = arodwl.create_ftp_obj(
+            self.access["hostname"], self.access["login"], self.access["password"]
+        )
+
+
     def fetch_remote_files(self, force=False):
         """
         will download locally the files which have been identified by
@@ -437,6 +449,9 @@ class DownloadGnss(arocmn.StepGnss):
         # Create a lockfile to ensure exclusive access during download
         lock = self.create_lockfile()
 
+        if self.access["protocol"] == "ftp":
+            self.set_ftp_obj()
+
         ###############################
         # +++ DOWNLOAD CORE a.k.a FETCH
         lock.acquire()
@@ -518,6 +533,7 @@ class DownloadGnss(arocmn.StepGnss):
                     tmpdir_use,
                     self.access["login"],
                     self.access["password"],
+                    self.ftp_obj,
                 )
                 dl_ok = True
                 file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
