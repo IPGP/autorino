@@ -33,8 +33,10 @@ def epoch_range_interpret(epo_inp):
     """
     if type(epo_inp) is arocmn.EpochRange:
         epo_range_out = epo_inp
-    else:
+    elif type(epo_inp) is tuple and len(epo_inp) == 3:
         epo_range_out = arocmn.EpochRange(*epo_inp)
+    elif type(epo_inp) is tuple and len(epo_inp) == 2:
+        epo_range_out = arocmn.EpochRange(epo_inp[0], epo_inp[1])
 
     return epo_range_out
 

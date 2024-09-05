@@ -76,21 +76,26 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     ### remove (strip) slashs in the dir path
     dirr = dir_inp.strip("/")
 
-    ### safty warning to check a stupid cpoy/paste
+    ### safty warning to check a stupid copy/paste
     if fname_inp in dirr:
-        logger.warning(
-            "%s file's name also appears in dir name, check your cfgfiles file", fname_inp
-        )
+        logger.warning("%s 's filename also appears in dirname", fname_inp)
 
     url_out = os.path.join(prot_n_host, dirr, fname_inp)
 
     return url_out
 
 
-############# list remote files
+ #  ______ _______ _____
+ # |  ____|__   __|  __ \
+ # | |__     | |  | |__) |
+ # |  __|    | |  |  ___/
+ # | |       | |  | |
+ # |_|       |_|  |_|
 
 
-def ftp_create_objt(url_host_inp, timeout=15, max_try=3, sleep_time=5):
+def ftp_create_obj(
+    url_host_inp, username=None, password=None, timeout=15, max_try=3, sleep_time=5
+):
     """
     create an FTP object, and retry in case of a timeout
     """
@@ -99,6 +104,8 @@ def ftp_create_objt(url_host_inp, timeout=15, max_try=3, sleep_time=5):
     while True:
         try:
             ftp = ftplib.FTP(url_host_inp, timeout=timeout)
+            if username and password:
+                ftp.login(username, password)
             return ftp
         except TimeoutError as e:
             try_count += 1
@@ -114,7 +121,7 @@ def ftp_create_objt(url_host_inp, timeout=15, max_try=3, sleep_time=5):
 
 
 def list_remote_ftp(
-    host_name, remote_dir, username, password, timeout=15, max_try=3
+    host_name, remote_dir, username, password, timeout=15, max_try=3, ftp_obj_inp=None
 ):
     # clean hostname & inp_dir_parent
     # MUST BE IMPROVED !!!
@@ -123,36 +130,121 @@ def list_remote_ftp(
     host_name = host_name.replace("/", "")
     remote_dir = remote_dir.replace(host_name, "")
 
-    # join_url()
-
     # connect to FTP server
-    ftp = ftp_create_objt(host_name, timeout=timeout)
+    if ftp_obj_inp:
+        ftp_obj = ftp_obj_inp
+    else:
+        ftp_obj = ftp_create_obj(
+            host_name, username, password, timeout=timeout, max_try=max_try
+        )
 
-    if not ftp:
+    if not ftp_obj:
         logger.error("FTP connection failed for %s", host_name)
         return []
 
-    ftp.login(username, password)
-
     # change to remote directory
-    ftp.cwd(remote_dir)
+    ftp_obj.cwd(remote_dir)
 
     # retrieve list of files
-    file_list = ftp.nlst()
+    file_list = ftp_obj.nlst()
 
     file_list = ["/".join((host_name, remote_dir, f)) for f in file_list]
 
     # close connection
-    ftp.quit()
+    ftp_obj.quit()
 
     return file_list
+
+def download_ftp(
+    url,
+    output_dir,
+    username,
+    password,
+    timeout=15,
+    max_try=3,
+    sleep_time=5,
+    ftp_obj_inp=None,
+):
+    urlp = urlparse(url)
+    url_host = urlp.netloc
+    url_dir = os.path.dirname(urlp.path)[1:]
+    url_fname = os.path.basename(urlp.path)
+
+    if ftp_obj_inp:
+        ftp_obj = ftp_obj_inp
+    else:
+        ftp_obj = ftp_create_obj(
+            url_host,
+            username=username,
+            password=password,
+            timeout=timeout,
+            max_try=max_try,
+            sleep_time=sleep_time,
+        )
+
+    if not ftp_obj:
+        logger.error("FTP connection failed for %s", url)
+        return ""
+
+    ftp_obj.cwd(url_dir)
+    filename = url_fname
+
+    def _ftp_callback(data):
+        _ftp_callback.bytes_transferred += len(data)
+
+    file_size = ftp_obj.size(filename)
+
+    output_path = os.path.join(output_dir, filename)
+    # f = open(output_path, 'wb')
+    # tqdm_out = TqdmToLogger(logger,level=logging.INFO)
+    try_count = 0
+    while True:
+        try:
+            with tqdm.tqdm(
+                total=file_size, unit="B", unit_scale=True, desc=filename
+            ) as pbar, open(output_path, "wb") as f:
+
+                _ftp_callback.bytes_transferred = 0
+                ftp_obj.retrbinary(
+                    "RETR " + filename,
+                    lambda data: (f.write(data), pbar.update(len(data))),
+                    1024,
+                )
+                break
+        except (
+            ftplib.error_temp,
+            ftplib.error_reply,
+            BrokenPipeError,
+            socket.timeout,
+        ) as e:
+            try_count += 1
+            if try_count > max_try:
+                raise AutorinoDownloadError
+            else:
+                logger.warning(
+                    "download failed (%s), try %i/%i", str(e), try_count, max_try
+                )
+                time.sleep(sleep_time)
+
+    ftp_obj.quit()
+    f.close()
+    return output_path
+
+
+ #  _    _ _______ _______ _____
+ # | |  | |__   __|__   __|  __ \
+ # | |__| |  | |     | |  | |__) |
+ # |  __  |  | |     | |  |  ___/
+ # | |  | |  | |     | |  | |
+ # |_|  |_|  |_|     |_|  |_|
+ #
+
 
 
 def list_remote_http(host_name, remote_dir):
 
-
     url = os.path.join(host_name, remote_dir)
-    url = 'http://' + host_name + '/' + remote_dir
+    url = "http://" + host_name + "/" + remote_dir
 
     logger.debug("HTTP file list: %s", url)
 
@@ -186,77 +278,10 @@ def list_remote_http(host_name, remote_dir):
     return file_list  # , fsize_list
 
 
-############# get size remote files
-
-
 def size_remote_file_http(url):
     req = urllib.request.Request(url, method="HEAD")
     f = urllib.request.urlopen(req)
     return f.headers["Content-Length"]
-
-
-############# download remote file
-def download_ftp(
-    url, output_dir, username, password, timeout=15, max_try=3, sleep_time=5
-):
-    urlp = urlparse(url)
-
-    url_host = urlp.netloc
-    url_dir = os.path.dirname(urlp.path)[1:]
-    url_fname = os.path.basename(urlp.path)
-
-    ftp = ftp_create_objt(
-        url_host, timeout=timeout, max_try=max_try, sleep_time=sleep_time
-    )
-
-    if not ftp:
-        logger.error("FTP connection failed for %s", url)
-        return ''
-
-    ftp.login(username, password)
-    ftp.cwd(url_dir)
-    filename = url_fname
-
-    def _ftp_callback(data):
-        _ftp_callback.bytes_transferred += len(data)
-
-    file_size = ftp.size(filename)
-
-    output_path = os.path.join(output_dir, filename)
-    # f = open(output_path, 'wb')
-    # tqdm_out = TqdmToLogger(logger,level=logging.INFO)
-    try_count = 0
-    while True:
-        try:
-            with tqdm.tqdm(
-                total=file_size, unit="B", unit_scale=True, desc=filename
-            ) as pbar, open(output_path, "wb") as f:
-
-                _ftp_callback.bytes_transferred = 0
-                ftp.retrbinary(
-                    "RETR " + filename,
-                    lambda data: (f.write(data), pbar.update(len(data))),
-                    1024,
-                )
-                break
-        except (
-            ftplib.error_temp,
-            ftplib.error_reply,
-            BrokenPipeError,
-            socket.timeout,
-        ) as e:
-            try_count += 1
-            if try_count > max_try:
-                raise AutorinoDownloadError
-            else:
-                logger.warning(
-                    "download failed (%s), try %i/%i", str(e), try_count, max_try
-                )
-                time.sleep(sleep_time)
-
-    ftp.quit()
-    f.close()
-    return output_path
 
 
 def download_http(url, output_dir, timeout=15, max_try=3, sleep_time=5):
@@ -291,6 +316,14 @@ def download_http(url, output_dir, timeout=15, max_try=3, sleep_time=5):
 
     return output_path
 
+ #  _____ _
+ # |  __ (_)
+ # | |__) | _ __   __ _
+ # |  ___/ | '_ \ / _` |
+ # | |   | | | | | (_| |
+ # |_|   |_|_| |_|\__, |
+ #                 __/ |
+ #                |___/
 
 def ping(host, timeout=20):
     """
