@@ -531,9 +531,9 @@ class DownloadGnss(arocmn.StepGnss):
                 file_dl_tmp = arodwl.download_ftp(
                     self.table.loc[irow, "fpath_inp"],
                     tmpdir_use,
-                    self.access["login"],
-                    self.access["password"],
-                    self.ftp_obj,
+                    username=self.access["login"],
+                    password=self.access["password"],
+                    ftp_obj_inp=self.ftp_obj,
                 )
                 dl_ok = True
                 file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
