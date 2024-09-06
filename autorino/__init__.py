@@ -17,3 +17,4 @@ if os.path.isfile(log_file_path):
 
 else:
     print("ERR:logger cfgfiles file",log_file_path,"is missing")
+

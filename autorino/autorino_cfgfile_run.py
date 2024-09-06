@@ -23,7 +23,7 @@ if __name__ == '__main__':
                         help='', default=None)
     parser.add_argument('-p', '--period', type=str,
                         help='', default='1D')
-    parser.add_argument('-l', '--list_sites', type=str,
+    parser.add_argument('-ls', '--list_sites', type=str,
                         help='Comma-separated list of site identifiers', default='')
 
     args = parser.parse_args()
