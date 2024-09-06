@@ -179,7 +179,11 @@ def list_remote_ftp(
         return []
 
     # change to remote directory
-    ftp_obj.cwd(remote_dir)
+    try:
+        ftp_obj.cwd(remote_dir)
+    except ftplib.error_perm as e:
+        logger.error("FTP directory change failed: %s", str(e))
+        return []
 
     # retrieve list of files
     file_list = ftp_obj.nlst()
@@ -267,7 +271,12 @@ def download_ftp(
         logger.error("FTP connection failed for %s", url)
         return ""
 
-    ftp_obj.cwd(url_dir)
+    try:
+        ftp_obj.cwd(url_dir)
+    except ftplib.error_perm as e:
+        logger.error("FTP directory change failed: %s", str(e))
+        return ""
+
     filename = url_fname
 
     def _ftp_callback(data):
@@ -290,15 +299,18 @@ def download_ftp(
                     1024,
                 )
                 break
+        # here are all the possible exceptions that can be raised
         except (
             ftplib.error_temp,
             ftplib.error_reply,
             BrokenPipeError,
             socket.timeout,
+            EOFError,
         ) as e:
             try_count += 1
             if try_count > max_try:
-                raise AutorinoDownloadError
+                logger.error("download failed, max try exceeded: %s", str(e))
+                return ""
             else:
                 logger.warning(
                     "download failed (%s), try %i/%i", str(e), try_count, max_try
@@ -309,7 +321,6 @@ def download_ftp(
 
     if disposable_ftp_obj:
         ftp_obj.quit()
-
 
     return output_path
 

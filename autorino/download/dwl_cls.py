@@ -266,6 +266,7 @@ class DownloadGnss(arocmn.StepGnss):
                     rmot_dir_use,
                     self.access["login"],
                     self.access["password"],
+                    ftp_obj_inp=self.ftp_obj,
                 )
                 rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
                 epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
@@ -408,6 +409,10 @@ class DownloadGnss(arocmn.StepGnss):
             self.guess_local_raw()
             return None
 
+        # Set up the DownloadGnss's FTP object if the protocol is FTP
+        if self.access["protocol"] == "ftp":
+            self.set_ftp_obj()
+
         # Guess remote raw file paths
         if remote_find_method == "guess":
             self.guess_remot_raw()
@@ -448,9 +453,6 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Create a lockfile to ensure exclusive access during download
         lock = self.create_lockfile()
-
-        if self.access["protocol"] == "ftp":
-            self.set_ftp_obj()
 
         ###############################
         # +++ DOWNLOAD CORE a.k.a FETCH
