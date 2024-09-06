@@ -150,7 +150,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         rmot_paths_list = []
 
-        for epoch in self.epoch_range.epoch_range_list():  ### go for irow !
+        for epoch in self.epoch_range.eporng_list():  ### go for irow !
             ### guess the potential remote files
             rmot_dir_use = str(self.inp_dir_parent)
             rmot_fname_use = str(self.inp_structure)
@@ -190,7 +190,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         local_paths_list = []
 
-        for epoch in self.epoch_range.epoch_range_list():  # go for irow !
+        for epoch in self.epoch_range.eporng_list():  # go for irow !
             # guess the potential local files
             local_dir_use = str(self.out_dir)
             local_fname_use = str(self.inp_structure)

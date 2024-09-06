@@ -320,7 +320,7 @@ class HandleGnss(arocmn.StepGnss):
 
         local_paths_list = []
 
-        for epoch in self.epoch_range.epoch_range_list(end_bound=True):
+        for epoch in self.epoch_range.eporng_list(end_bound=True):
             # guess the potential local files
             local_dir_use = self.translate_path(self.inp_dir, epoch, make_dir=False)
 

@@ -31,4 +31,4 @@ out = arocfg.read_cfg(psite, main_cfg_path=pmain)
 out
 
 a = arocmn.EpochRange(pd.NaT,pd.NaT)
-a.epoch_range_list()
+a.eporng_list()
