@@ -265,8 +265,8 @@ class StepGnss:
         df = pd.DataFrame([], columns=table_cols)
 
         if init_epoch:
-            df["epoch_srt"] = self.epoch_range.epoch_range_list()
-            df["epoch_end"] = self.epoch_range.epoch_range_list(end_bound=True)
+            df["epoch_srt"] = self.epoch_range.eporng_list()
+            df["epoch_end"] = self.epoch_range.eporng_list(end_bound=True)
 
         df["site"] = self.site_id
 
