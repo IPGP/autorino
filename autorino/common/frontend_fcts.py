@@ -24,7 +24,7 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def autorino_cfgfile_run(
-    cfg_in, main_cfg_in, sites_list=None, start=None, end=None, period="1D"
+    cfg_in, main_cfg_in, sites_list=None, start=None, end=None, period="1D",
 ):
     """
     Run the Autorino configuration files.
@@ -42,8 +42,9 @@ def autorino_cfgfile_run(
     sites_list : list, optional
         A list of site identifiers to filter the configuration files.
          If provided, only configurations for sites in this list will be processed. Default is None.
-    start : str, optional
+    start : str, list, optional
         The start date for the epoch range. Default is None.
+        if it is a file path, the file contains a list of start epochs
     end : str, optional
         The end date for the epoch range. Default is None.
     period : str, optional
@@ -68,6 +69,16 @@ def autorino_cfgfile_run(
 
     if start and end:
         epoch_range = arocmn.EpochRange(start, end, period)
+    if start and not end:
+        if os.path.isfile(start):
+            with open(start, "r") as f:
+                start_use = f.read().splitlines()
+        elif isinstance(start, list):
+            start_use = start
+        else:
+            logger.critical("start must be a list or a file path")
+            raise Exception
+        epoch_range = arocmn.EpochRange(start_use, period=period)
     else:
         epoch_range = None
 

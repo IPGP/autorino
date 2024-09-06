@@ -89,7 +89,10 @@ Ask Trimble support for the official Linux converter _t0xConverter_.
 #### Trimble (unofficial dockerized converter)
 converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)    
 This docker image is a wrapper around Trimble's official converter _trm2rinex_ which is not available for Linux.  
-A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.
+A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.  
+It relies on Trimble's official converter for Windows `ConvertToRinex` available 
+[here](https://geospatial.trimble.com/en/support) & [there](https://trl.trimble.com/docushare/dsweb/Get/Document-1051259/).
+
 #### Trimble's runpkr00
 for legacy RINEX2 conversion with _teqc_ 
 converter here: [runpkr00](https://kb.unavco.org/article/trimble-runpkr00-latest-versions-744.html)

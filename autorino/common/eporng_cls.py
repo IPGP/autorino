@@ -16,6 +16,11 @@ from geodezyx import utils
 
 import autorino.common as arocmn
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 class EpochRange:
     """
@@ -50,7 +55,7 @@ class EpochRange:
 
         Parameters
         ----------
-            epoch1 : str, datetime, pd.Timestamp, pd.NaT, iterable
+            epoch1 : str, datetime, pd.Timestamp, pd.NaT, list
                 the start of the epoch range.
             epoch2 : str, datetime, pd.Timestamp, pd.NaT
                 the end of the epoch range.
@@ -78,11 +83,10 @@ class EpochRange:
             self.epoch_start = _epoch_min_tmp  ### setter bellow
             self.epoch_end = _epoch_max_tmp  ### setter bellow
 
-            self.forced_range = False
-            self.forced_range_list = []
+            self.manual_range = False
+            self._manu_range_list = []
 
         elif utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw: # 2) case a start is given as a list, but no end
-
             _epoch1tmp = [arocmn.dateparser_interpret(e) for e in self._epoch1_raw]
             _epoch_min_tmp = np.min(_epoch1tmp)
             _epoch_max_tmp = np.max(_epoch1tmp)
@@ -90,10 +94,10 @@ class EpochRange:
             self.epoch_start = _epoch_min_tmp
             self.epoch_end = _epoch_max_tmp
 
-            self.forced_range = True
-            self.forced_range_list = _epoch1tmp
+            self.manual_range = True
+            self._manu_range_list = _epoch1tmp
 
-
+    ## NB: i think it is a bad idea to have an attribute (property) to get the list of epochs
 
     def __repr__(self):
         return "from {} to {}, period {}".format(
@@ -141,21 +145,52 @@ class EpochRange:
         unit = str("".join(*alphabets))
         return val, unit
 
+    ########### methods
     def eporng_list(self, end_bound=False):
-        if self.forced_range:
-            return self.eporng_list_forced(end_bound=end_bound)
-        else:
-            return self.eporng_list_continuous(end_bound=end_bound)
+        """
+        Compute the list of epochs corresponding to the EpochRange.
 
-    def eporng_list_forced(self, end_bound=False):
+        Parameters
+        ----------
+        end_bound : bool, optional
+            If True, gives the end bound of the range. Default is False.
+
+        Returns
+        -------
+        list
+            List of epochs.
+        """
+        if self.manual_range:
+            return self.eporng_list_manual(end_bound=end_bound)
+        else:
+            return self.eporng_list_steady(end_bound=end_bound)
+
+    def eporng_list_manual(self, end_bound=False):
+        """
+        Compute the list of epochs for a forced range.
+
+        Parameters
+        ----------
+        end_bound : bool, optional
+            If True, gives the end bound of the range. Default is False.
+
+        Returns
+        -------
+        list
+            List of epochs.
+        """
+        if not self.eporng_list_manual:
+            logger.error("No forced range list available")
+            return []
+
         if not end_bound:
-            return self.forced_range_list
+            return self._manu_range_list
         else:
             plus_one = pd.Timedelta(self.period)
-            return list(np.array(self.forced_range_list) + plus_one)
+            # subtract one second for security reason
+            return list(np.array(self._manu_range_list) + plus_one - np.timedelta64(1, "s"))
 
-    ########### methods
-    def eporng_list_continuous(self, end_bound=False):
+    def eporng_list_steady(self, end_bound=False):
         """
         Compute the list of epochs corresponding to the EpochRange
         if end_bound = True, give the end bound of the range
