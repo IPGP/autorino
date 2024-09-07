@@ -188,7 +188,7 @@ class EpochRange:
         else:
             plus_one = pd.Timedelta(self.period)
             # subtract one second for security reason
-            return list(np.array(self._manu_range_list) + plus_one - np.timedelta64(1, "s"))
+            return list(np.array(self._manu_range_list) + plus_one)) # - np.timedelta64(1, "s"))
 
     def eporng_list_steady(self, end_bound=False):
         """
