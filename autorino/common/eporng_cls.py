@@ -186,9 +186,9 @@ class EpochRange:
         if not end_bound:
             return self._manu_range_list
         else:
+            # subtract also one second for security reason
             plus_one = pd.Timedelta(self.period)
-            # subtract one second for security reason
-            return list(np.array(self._manu_range_list) + plus_one) # - np.timedelta64(1, "s"))
+            return list(np.array(self._manu_range_list) + plus_one - pd.Timedelta('1s'))
 
     def eporng_list_steady(self, end_bound=False):
         """
@@ -218,7 +218,8 @@ class EpochRange:
             eprrng_end = pd.date_range(
                 self.epoch_start, self.epoch_end + plus_one, freq=self.period
             )
-            # subtract one second for security reason
+            # subtract also one second for security reason
+            # first element is the epoch start, thus we remove it
             eporng = eprrng_end[1:] - np.timedelta64(1, "s")
 
         return list(eporng)

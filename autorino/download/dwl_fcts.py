@@ -202,8 +202,8 @@ def download_ftp(
     output_dir,
     username=None,
     password=None,
-    timeout=15,
-    max_try=3,
+    timeout=30,
+    max_try=4,
     sleep_time=5,
     ftp_obj_inp=None,
 ):
@@ -377,7 +377,7 @@ def size_remote_file_http(url):
     return f.headers["Content-Length"]
 
 
-def download_http(url, output_dir, timeout=15, max_try=3, sleep_time=5):
+def download_http(url, output_dir, timeout=60, max_try=4, sleep_time=5):
     # Get file size
     response = requests.head(url, timeout=timeout)
     file_size = int(response.headers.get("content-length", 0))
