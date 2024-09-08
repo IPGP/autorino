@@ -69,7 +69,7 @@ def autorino_cfgfile_run(
 
     if start and end:
         epoch_range = arocmn.EpochRange(start, end, period)
-    if start and not end:
+    elif start and not end:
         if os.path.isfile(start):
             with open(start, "r") as f:
                 start_use = f.read().splitlines()
