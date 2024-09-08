@@ -328,20 +328,20 @@ class DownloadGnss(arocmn.StepGnss):
 
         return local_paths_list
 
-    def ping_remote(self, count_max=4):
+    def ping_remote(self, ping_max_try=4, ping_timeout=20):
         """
         Ping the remote server to check if it is reachable.
         """
         count = 0
         ping_out = None
-        while count < count_max and not ping_out:
-            ping_out = arodwl.ping(self.access["hostname"])
+        while count < ping_max_try and not ping_out:
+            ping_out = arodwl.ping(host=self.access["hostname"], timeout=ping_timeout)
             count += 1
             if count > 1:
                 logger.warning(
                     "attempt %i/%i to ping %s",
                     count,
-                    count_max,
+                    ping_max_try,
                     self.access["hostname"],
                 )
 
