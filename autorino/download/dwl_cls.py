@@ -4,6 +4,7 @@
 import ftplib
 import os
 import shutil
+
 import numpy as np
 import pandas as pd
 
@@ -364,8 +365,7 @@ class DownloadGnss(arocmn.StepGnss):
             self.access["hostname"], self.access["login"], self.access["password"]
         )
 
-
-    def fetch_remote_files(self, force=False):
+    def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):
         """
         will download locally the files which have been identified by
         the guess_remote_files method
@@ -380,13 +380,30 @@ class DownloadGnss(arocmn.StepGnss):
         download_files_list = []
 
         for irow, row in self.table.iterrows():
-            file_dl_out = self.mono_fetch(irow, force=force)
+            file_dl_out = self.mono_fetch(
+                irow,
+                force=force,
+                timeout=timeout,
+                max_try=max_try,
+                sleep_time=sleep_time,
+            )
             if file_dl_out:
                 download_files_list.append(file_dl_out)
 
         return download_files_list
 
-    def download(self, verbose=False, force=False, remote_find_method="ask"):
+    def download(
+        self,
+        verbose=False,
+        force=False,
+        remote_find_method="ask",
+        invalidate_small_local_files=True,
+        timeout=60,
+        max_try=4,
+        sleep_time=5,
+        ping_max_try=4,
+        ping_timeout=20,
+    ):
         """
         frontend method to download files from a GNSS receiver
         """
@@ -403,7 +420,8 @@ class DownloadGnss(arocmn.StepGnss):
             remote_find_method = "guess"
 
         # Ping the remote server to check if it is reachable
-        ping_out = self.ping_remote()
+        ping_out = self.ping_remote(ping_max_try=ping_max_try, ping_timeout=ping_timeout)
+
         if not ping_out:
             # local raw are guessed anyway, to resume the next steps if download is not possible
             self.guess_local_raw()
@@ -425,7 +443,8 @@ class DownloadGnss(arocmn.StepGnss):
         # Check local files and update table
         self.check_local_files()
         self.table_ok_cols_bool()
-        self.invalidate_small_local_files()
+        if invalidate_small_local_files:
+            self.invalidate_small_local_files()
         self.filter_ok_out()
 
         # Force download if required
@@ -458,7 +477,12 @@ class DownloadGnss(arocmn.StepGnss):
         # +++ DOWNLOAD CORE a.k.a FETCH
         lock.acquire()
         try:
-            self.fetch_remote_files(force=force)
+            self.fetch_remote_files(
+                force=force,
+                timeout=timeout,
+                max_try=max_try,
+                sleep_time=sleep_time
+            )
         finally:
             lock.release()
             os.remove(lock.lock_file)
@@ -477,7 +501,7 @@ class DownloadGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def mono_fetch(self, irow, force=False):
+    def mono_fetch(self, irow, force=False, timeout=60, max_try=4, sleep_time=5):
 
         if self.table.loc[irow, "ok_out"] and not force:
             logger.info(
@@ -520,7 +544,11 @@ class DownloadGnss(arocmn.StepGnss):
         elif self.access["protocol"] == "http":
             try:
                 file_dl_tmp = arodwl.download_http(
-                    self.table.loc[irow, "fpath_inp"], tmpdir_use
+                    url=self.table.loc[irow, "fpath_inp"],
+                    output_dir=tmpdir_use,
+                    timeout=timeout,
+                    max_try=max_try,
+                    sleep_time=sleep_time,
                 )
                 file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
                 dl_ok = True
@@ -535,6 +563,9 @@ class DownloadGnss(arocmn.StepGnss):
                     tmpdir_use,
                     username=self.access["login"],
                     password=self.access["password"],
+                    timeout=timeout,
+                    max_try=max_try,
+                    sleep_time=sleep_time,
                     ftp_obj_inp=self.ftp_obj,
                 )
                 dl_ok = True

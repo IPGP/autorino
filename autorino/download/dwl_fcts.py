@@ -152,14 +152,44 @@ def list_remote_ftp(
     max_try=3,
     ftp_obj_inp=None,
 ):
-    # clean hostname & inp_dir_parent
-    # MUST BE IMPROVED !!!
+    """
+    List files in a remote FTP directory.
+
+    Parameters
+    ----------
+    host_name : str
+        The hostname of the FTP server.
+    remote_dir : str
+        The remote directory to list files from.
+    username : str, optional
+        The username for FTP login. Default is None.
+    password : str, optional
+        The password for FTP login. Default is None.
+    timeout : int, optional
+        The timeout for FTP connection in seconds. Default is 15 seconds.
+    max_try : int, optional
+        The maximum number of retry attempts in case of failure. Default is 3.
+    ftp_obj_inp : ftplib.FTP, optional
+        An existing FTP object to use for the connection. Default is None.
+
+    Returns
+    -------
+    list
+        A list of file paths in the remote directory.
+
+    Raises
+    ------
+    AutorinoDownloadError
+        If the FTP connection fails or if username/password are missing.
+    """
+    # must be improved !!!
+    # Clean hostname and remote directory
     remote_dir = remote_dir.replace(host_name, "")
     host_name = host_name.replace("ftp://", "")
     host_name = host_name.replace("/", "")
     remote_dir = remote_dir.replace(host_name, "")
 
-    # connect to FTP server
+    # Connect to FTP server
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
@@ -178,19 +208,18 @@ def list_remote_ftp(
         logger.error("FTP connection failed for %s", host_name)
         return []
 
-    # change to remote directory
+    # Change to remote directory
     try:
         ftp_obj.cwd(remote_dir)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
         return []
 
-    # retrieve list of files
+    # Retrieve list of files
     file_list = ftp_obj.nlst()
-
     file_list = ["/".join((host_name, remote_dir, f)) for f in file_list]
 
-    # close connection
+    # Close connection
     if disposable_ftp_obj:
         ftp_obj.quit()
 
@@ -378,12 +407,40 @@ def size_remote_file_http(url):
 
 
 def download_http(url, output_dir, timeout=120, max_try=4, sleep_time=5):
+    """
+    Download a file from an HTTP server with retry logic and progress bar.
+
+    Parameters
+    ----------
+    url : str
+        The URL of the file to download.
+    output_dir : str
+        The directory where the downloaded file will be saved.
+    timeout : int, optional
+        The timeout for the HTTP connection in seconds. Default is 120 seconds.
+    max_try : int, optional
+        The maximum number of retry attempts in case of failure. Default is 4.
+    sleep_time : int, optional
+        The sleep time between retry attempts in seconds. Default is 5 seconds.
+
+    Returns
+    -------
+    str
+        The path to the downloaded file, or an empty string if the download failed.
+
+    Raises
+    ------
+    AutorinoDownloadError
+        If the download fails after the maximum number of retry attempts.
+    """
     # Get file size
     response = requests.head(url, timeout=timeout)
     file_size = int(response.headers.get("content-length", 0))
+
     # Construct output path
     filename = url.split("/")[-1]
     output_path = os.path.join(output_dir, filename)
+
     # Download file with progress bar
     try_count = 0
     while True:
@@ -424,7 +481,8 @@ def ping(host, timeout=20):
     """
     Executes the ping command and captures the output.
 
-    This function sends a single ICMP echo request to the specified host and captures the round-trip time (RTT) from the output.
+    This function sends a single ICMP echo request to the specified
+    host and captures the round-trip time (RTT) from the output.
 
     Parameters
     ----------
@@ -436,7 +494,8 @@ def ping(host, timeout=20):
     Returns
     -------
     float or None
-        The round-trip time (RTT) in seconds if the ping is successful, otherwise None.
+        The round-trip time (RTT) in seconds if the ping is successful,
+        otherwise None.
     """
 
     result = subprocess.run(
