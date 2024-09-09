@@ -8,7 +8,7 @@ Created on Tue Mar 14 12:03:40 2023
 #### converted files regular expressions functions
 #### main = the regex for the main file i.e. the Observation RINEX
 #### annex = the regex for the ALL outputed files (Observation RINEX included)
-#### the main with be processed before the annex, 
+#### the main with be processed before the annex,
 #### thus annex regex will finally not include the main
 """
 
@@ -17,7 +17,6 @@ from pathlib import Path
 
 
 ###################################################################
-
 
 def conv_regex_void(f):
     """
@@ -235,6 +234,43 @@ def conv_regex_trm2rinex(f):
     return conv_regex_main, conv_regex_annex
 
 
+def conv_regex_t0xconvert(f):
+    """
+    Generate the regular expressions of the mainand annex converted files
+    outputed by t0xconvert (Trimble)
+
+    It has the same behavior as all the `conv_regex` functions
+    See note below
+
+    Parameters
+    ----------
+    f : str or Path
+        the input Raw filename or path
+        (the filename will be extracted in the function).
+
+    Returns
+    -------
+    conv_regex_main & conv_regex_annex : Complied Regex Objects
+        The regular expressions.
+
+    Note
+    ----
+    general behavior of the `conv_regex` functions:
+    main = the regex for the main file i.e. the Observation RINEX
+    annex = the regex for the ALL outputed files (Observation RINEX included)
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+    """
+
+    f = Path(Path(f).name)  ### keep the filename only
+    # date_full = re.search("[0-9]{12}[a-zA-Z]",f.name).group() ##too restrictive, sometime there is no final letter
+    date_full = re.search("20[0-9]{10}", f.name).group()
+    yyyy = date_full[:4]
+    conv_regex_main = re.compile(f.with_suffix("." + yyyy[2:] + "o").name)
+    conv_regex_annex = re.compile(f.with_suffix("." + yyyy[2:]).name)
+    return conv_regex_main, conv_regex_annex
+
+
 def conv_regex_mdb2rnx(f):
     """
     Generate the regular expressions of the mainand annex converted files
@@ -275,6 +311,12 @@ def conv_regex_mdb2rnx(f):
     # fsdc176p11.18o
     # fsdc176p11.18n
     # fsdc176p11.18g
+    # and even for OVSG
+    # souf226n 8.24l
+    # souf226n 8.24n
+    # souf226n 8.24o
+
+
     finp = str(f)
     f = Path(Path(f).name)  ### keep the filename only
     if finp.lower().endswith("mdb"):
@@ -297,8 +339,8 @@ def conv_regex_mdb2rnx(f):
 
     site = re.match(regex_doy_site, f.name).group(1).lower()
     doy = re.match(regex_doy_site, f.name).group(doygroup).lower()
-    conv_regex_main = re.compile(site + doy + ".([0-9]{2})?\.[0-9]{2}o")
-    conv_regex_annex = re.compile(site + doy + ".([0-9]{2})?\.[0-9]{2}\w")
+    conv_regex_main = re.compile(site + doy + ".(.{2})?\.[0-9]{2}o")
+    conv_regex_annex = re.compile(site + doy + ".(.{2})?\.[0-9]{2}\w")
     return conv_regex_main, conv_regex_annex
 
 

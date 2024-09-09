@@ -1,7 +1,7 @@
 <img src="./logo_autorino.png" width="300">
 
 # autorino
-_Assisted Unloading, Treatment & Organisation of RINex Observations_
+autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
 **Version 0.1.0 / 2024-05-29**, README Revision: 2024-05-29
 
@@ -73,21 +73,26 @@ GNSS manufacturers websites.
 You can find the official converters here:
 #### Leica
 converter here: [mdb2rinex](https://myworld-portal.leica-geosystems.com/s/fr/application?c__app=downloads)  
-Go in: _Products & Services > Downloads > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
+Go in: _Products & Services > Downloads > GNSS Products > GRxx receiver > Tools > MDB to RINEX Converter for LINUX._  
 see IGSMAIL-8341 for more details.
 #### Septentrio
 converter here: [sbf2rin](https://www.septentrio.com/en/products/software/rxtools#resources)
 #### Topcon
 converter here: [tps2rin](https://mytopcon.topconpositioning.com/support/products/tps2rin-converter)  
-_autorino_ will emulate it with `wine`. Be sure to have `wine` installed on your computer. Detailled precedure will be added soon.
+_autorino_ will emulate it with _wine_. Be sure to have `wine` installed on your computer. Detailled precedure will be added soon.
 #### BINEX
 converter here: [convbin](https://github.com/rtklibexplorer/RTKLIB)  
-`convbin` is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.  
+_convbin_ is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.  
 Detailled procedure will be added soon.
-#### Trimble
+#### Trimble (official Linux converter)
+Ask Trimble support for the official Linux converter _t0xConverter_.
+#### Trimble (unofficial dockerized converter)
 converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)    
-This docker image is a wrapper around Trimble's official converter `trm2rinex` which is not available for Linux.  
-A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.
+This docker image is a wrapper around Trimble's official converter _trm2rinex_ which is not available for Linux.  
+A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.  
+It relies on Trimble's official converter for Windows `ConvertToRinex` available 
+[here](https://geospatial.trimble.com/en/support) & [there](https://trl.trimble.com/docushare/dsweb/Get/Document-1051259/).
+
 #### Trimble's runpkr00
 for legacy RINEX2 conversion with _teqc_ 
 converter here: [runpkr00](https://kb.unavco.org/article/trimble-runpkr00-latest-versions-744.html)
@@ -231,7 +236,8 @@ Each session is in a sub-block with its own parameters.
 The different possible steps are:
 * `download` : download the data
 * `convert` : convert the data
-* `handle` : handle the data (not implemented yet)
+* `splice` : splice (concatenate) the data
+* `split` : split the data
 
 A step has the following generic structure:
 * `active`: a boolean (`True` or `False`) to activate or deactivate the step
@@ -249,7 +255,7 @@ i.e. all the parameters, paths, options ... which are the same for all stations.
 _main_ values can be called and used in the _sites_ configuration files using the alias `FROM_MAIN`
 (see below).
 
-### aliases in the configuration files
+### Aliases in the configuration files
 
 To use generic or variables values in the configuration files, you can use aliases.
 Aliases take the form of `<aliasname>` or `<ALIASNAME>` with `< >`. Alias are case-sensitive: 
@@ -259,9 +265,12 @@ The following aliases are managed:
 * `<site_id9>` or `<SITE_ID9>`: the 9-characters site name
 
 Time aliases can also be used. They follow the `date` format convention, 
-e.g. `%Y` for the year, `%H` for the hour, `%j` for the day of year, etc... 
+e.g. `%Y` for the year, `%H` for the hour, `%j` for the day of year, etc...
 
-Pper default values can be called and used in the configuration files using the alias:
+The environment variables can also be used as aliases. They follow the `<$ENVVAR>` convention,
+using `$` and between `<` & `>`, e.g. `<$HOME>` for the home directory.
+
+Per default values can be called and used in the configuration files using the alias:
 * `FROM_MAIN`. Then, the value is taken from the _main_ configuration file, see above
 * `FROM_SESSION`. Then, the value is taken from the `session` block
 
@@ -273,7 +282,9 @@ It performs generic actions on input files, saving them in an output folder.
 `StepGnss` has three daughter classes: 
 * `DownloadGnss`: for downloading a RAW file to the local server 
 * `ConvertGnss`: for RAW > RINEX conversion
-* `HandleGnss`: to perform decimation, spliting or splicing operations on a RINEX
+* `HandleGnss`: to perform decimation, spliting or splicing operations on a RINEX. It has two daughter classes:
+  * `SplitGnss`: to split a RINEX file
+  * `SpliceGnss`: to splice (concatenate) RINEX files
 
 The central attribute of a `StepGnss` object is its table (`step_gnss.table`). 
 

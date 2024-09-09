@@ -33,8 +33,10 @@ def epoch_range_interpret(epo_inp):
     """
     if type(epo_inp) is arocmn.EpochRange:
         epo_range_out = epo_inp
-    else:
+    elif type(epo_inp) is tuple and len(epo_inp) == 3:
         epo_range_out = arocmn.EpochRange(*epo_inp)
+    elif type(epo_inp) is tuple and len(epo_inp) == 2:
+        epo_range_out = arocmn.EpochRange(epo_inp[0], epo_inp[1])
 
     return epo_range_out
 
@@ -65,12 +67,12 @@ def dateparser_interpret(date_inp, tz="UTC"):
     If the resulting date does not have a timezone, the specified timezone is applied.
     """
 
-    if type(date_inp) is str:
+    if isinstance(date_inp, str):
         date_out = pd.Timestamp(dateparser.parse(date_inp))
     else:
         date_out = pd.Timestamp(date_inp)
 
-    if type(date_out) is pd._libs.tslibs.nattype.NaTType:
+    if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
         ### NaT case. can not support tz
         pass
     elif not date_out.tz:
@@ -85,10 +87,11 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
 
     Parameters
     ----------
-    dates_list_inp : list
+    dates_list_inp : iterable
         The input list of dates.
     period : str, optional
-        The rounding period. If not provided, the period is determined as the unique difference between consecutive dates in the input list. The default is None.
+        The rounding period. If not provided, the period is determined as the unique difference
+         between consecutive dates in the input list. The default is None.
     round_method : str, optional
         The method used for rounding the epochs. The default is 'floor'.
 
@@ -99,7 +102,9 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
 
     Note
     ----
-    The current method for determining the period when not provided is a simple calculation of the unique difference between consecutive dates. This may not be the most accurate or desired method and should be improved in future iterations of this function.
+    The current method for determining the period when not provided is a simple calculation of
+    the unique difference between consecutive dates.
+    This may not be the most accurate or desired method and should be improved in future iterations of this function.
     """
     epoch1 = np.min(dates_list_inp)
     epoch2 = np.max(dates_list_inp)
@@ -119,7 +124,7 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
 def round_date(date_in, period, round_method="round"):
     """
     low-level function to round a Pandas Serie or a datetime-like object
-    according to the "ceil", "floor" or "round" approach
+    according to the "ceil", "floor", "round", "none" approach
 
     Parameters
     ----------
@@ -129,7 +134,7 @@ def round_date(date_in, period, round_method="round"):
         the rounding period.
         Use the pandas' frequency aliases convention (see bellow for details).
     round_method : str, optional
-        round method: 'ceil', 'floor', 'round'. The default is "floor".
+        round method: 'ceil', 'floor', 'round', 'none'. The default is "floor".
 
     Returns
     -------
@@ -146,10 +151,10 @@ def round_date(date_in, period, round_method="round"):
     # we separate the Series case of the simple datetime-like
     # both for ease and performance reason
 
-    if type(date_in) is pd._libs.tslibs.nattype.NaTType:  ### NaT case
+    if pd.isna(date_in):  ### NaT case
         date_out = date_in
 
-    elif type(date_in) is pd.Series:
+    elif isinstance(date_in, pd.Series):
 
         date_use = date_in
 
@@ -159,6 +164,8 @@ def round_date(date_in, period, round_method="round"):
             date_out = date_use.dt.floor(period)
         elif round_method == "round":
             date_out = date_use.dt.round(period)
+        elif round_method == "none":
+            date_out = date_use
         else:
             raise Exception
 
@@ -169,13 +176,14 @@ def round_date(date_in, period, round_method="round"):
         else:
             date_use = pd.Timestamp(date_in)
 
-
         if round_method == "ceil":
             date_out = date_use.ceil(period)
         elif round_method == "floor":
             date_out = date_use.floor(period)
         elif round_method == "round":
             date_out = date_use.round(period)
+        elif round_method == "none":
+            date_out = date_use
         else:
             raise Exception
 
@@ -244,7 +252,9 @@ def round_epochs(
 
         roll_diff = epochs_use - rolling_ref_use
 
-        epochs_rnd = arocmn.round_date(roll_diff, period, round_method) + rolling_ref_use
+        epochs_rnd = (
+            arocmn.round_date(roll_diff, period, round_method) + rolling_ref_use
+        )
 
     return epochs_rnd
 
@@ -289,3 +299,20 @@ def create_dummy_epochrange():
 
     epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period="15min")
     return epo
+
+def iso_zulu_epoch(epo_in):
+    """
+    Convert an input epoch to ISO 8601 format with Zulu time (UTC).
+
+    Parameters
+    ----------
+    epo_in : datetime-like
+        The input epoch to be converted.
+
+    Returns
+    -------
+    str
+        The epoch in ISO 8601 format with Zulu time (UTC).
+    """
+    return pd.Timestamp(epo_in).isoformat().replace('+00:00', 'Z')
+
