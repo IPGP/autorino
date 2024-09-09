@@ -112,7 +112,7 @@ print(DR)
 
 REQ = ardl.RequestGnss(SESS,DR,output_path)
 
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = REQ.guess_remote_local_files(guess_local=1)
 L = REQ.check_local_files()
 

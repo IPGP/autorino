@@ -21,9 +21,9 @@ p="/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"
 L = utils.find_recursive(p,"*gz")
 
 hdl.load_table_from_filelist(L)
-hdl.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+hdl.updt_epotab_rnx(use_rnx_filename_only=True)
 
-a = hdl.divide_by_epochs()
+a = hdl.group_by_epochs()
 
 
 

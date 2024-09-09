@@ -12,9 +12,15 @@ import re
 
 import numpy as np
 import pandas as pd
+from geodezyx import utils
 
 import autorino.common as arocmn
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 class EpochRange:
     """
@@ -37,21 +43,21 @@ class EpochRange:
 
     Methods
     -------
-    epoch_range_list(end_bound=False):
+    eporng_list(end_bound=False):
         Computes the list of epochs corresponding to the EpochRange.
     is_valid():
         Checks if the epoch range is valid.
     """
 
-    def __init__(self, epoch1, epoch2, period="1d", round_method="round", tz="UTC"):
+    def __init__(self, epoch1, epoch2=None, period="1d", round_method="round", tz="UTC"):
         """
         Constructs all the necessary attributes for the epoch range object.
 
         Parameters
         ----------
-            epoch1 : datetime
+            epoch1 : str, datetime, pd.Timestamp, pd.NaT, list
                 the start of the epoch range.
-            epoch2 : datetime
+            epoch2 : str, datetime, pd.Timestamp, pd.NaT
                 the end of the epoch range.
             period : str, optional
                 the rounding period. Use the pandas' frequency aliases convention.
@@ -61,24 +67,43 @@ class EpochRange:
                 the timezone used for the epochs.
         """
 
+        self._epoch1_raw = epoch1
+        self._epoch2_raw = epoch2
+
         self.period = period
         self.round_method = round_method
         self.tz = tz
 
-        self._epoch1_raw = epoch1
-        self._epoch2_raw = epoch2
+        if self._epoch1_raw and self._epoch2_raw: # 1) historical case a start and an end are given
+            _epoch1tmp = arocmn.dateparser_interpret(self._epoch1_raw)
+            _epoch2tmp = arocmn.dateparser_interpret(self._epoch2_raw)
+            _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
+            _epoch_max_tmp = np.max((_epoch1tmp, _epoch2tmp))
 
-        _epoch1tmp = arocmn.dateparser_interpret(self._epoch1_raw)
-        _epoch2tmp = arocmn.dateparser_interpret(self._epoch2_raw)
-        _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
-        _epoch_max_tmp = np.max((_epoch1tmp, _epoch2tmp))
+            self.epoch_start = _epoch_min_tmp  ### setter bellow
+            self.epoch_end = _epoch_max_tmp  ### setter bellow
 
-        self.epoch_start = _epoch_min_tmp  ### setter bellow
-        self.epoch_end = _epoch_max_tmp  ### setter bellow
+            self.manual_range = False
+            self._manu_range_list = []
+
+        elif utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw: # 2) case a start is given as a list, but no end
+            _epoch1tmp = [arocmn.dateparser_interpret(e) for e in self._epoch1_raw]
+            _epoch_min_tmp = np.min(_epoch1tmp)
+            _epoch_max_tmp = np.max(_epoch1tmp)
+
+            self.epoch_start = _epoch_min_tmp
+            self.epoch_end = _epoch_max_tmp
+
+            self.manual_range = True
+            self._manu_range_list = _epoch1tmp
+
+    ## NB: i think it is a bad idea to have an attribute (property) to get the list of epochs
 
     def __repr__(self):
-        return "epoch range from {} to {}, period {}".format(
-            self.epoch_start, self.epoch_end, self.period
+        return "from {} to {}, period {}".format(
+            arocmn.iso_zulu_epoch(self.epoch_start),
+            arocmn.iso_zulu_epoch(self.epoch_end),
+            self.period
         )
 
     ############ getters and setters
@@ -121,7 +146,51 @@ class EpochRange:
         return val, unit
 
     ########### methods
-    def epoch_range_list(self, end_bound=False):
+    def eporng_list(self, end_bound=False):
+        """
+        Compute the list of epochs corresponding to the EpochRange.
+
+        Parameters
+        ----------
+        end_bound : bool, optional
+            If True, gives the end bound of the range. Default is False.
+
+        Returns
+        -------
+        list
+            List of epochs.
+        """
+        if self.manual_range:
+            return self.eporng_list_manual(end_bound=end_bound)
+        else:
+            return self.eporng_list_steady(end_bound=end_bound)
+
+    def eporng_list_manual(self, end_bound=False):
+        """
+        Compute the list of epochs for a forced range.
+
+        Parameters
+        ----------
+        end_bound : bool, optional
+            If True, gives the end bound of the range. Default is False.
+
+        Returns
+        -------
+        list
+            List of epochs.
+        """
+        if not self.eporng_list_manual:
+            logger.error("No forced range list available")
+            return []
+
+        if not end_bound:
+            return self._manu_range_list
+        else:
+            # subtract also one second for security reason
+            plus_one = pd.Timedelta(self.period)
+            return list(np.array(self._manu_range_list) + plus_one - pd.Timedelta('1s'))
+
+    def eporng_list_steady(self, end_bound=False):
         """
         Compute the list of epochs corresponding to the EpochRange
         if end_bound = True, give the end bound of the range
@@ -149,7 +218,8 @@ class EpochRange:
             eprrng_end = pd.date_range(
                 self.epoch_start, self.epoch_end + plus_one, freq=self.period
             )
-            # subtract one second for security reason
+            # subtract also one second for security reason
+            # first element is the epoch start, thus we remove it
             eporng = eprrng_end[1:] - np.timedelta64(1, "s")
 
         return list(eporng)

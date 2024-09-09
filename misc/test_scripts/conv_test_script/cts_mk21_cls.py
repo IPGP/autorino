@@ -37,7 +37,7 @@ Y1 = yaml.safe_load(open(pconfig))
 #REQ = REQlist[1]
 #SES = SESlist
 #REQ = REQlist
-#EPOC = REQ.epoch_range
+#EPOC = REQ.epoch_range_inp
 
 pout = "/home/sakic/090_TEMP/convcls_test"
 psitelogs = "/work/metadata/SITELOGS"
@@ -73,7 +73,7 @@ CONV.print_table()
 #CONV.filter_year_min_max(2019,2020)
 
 # if prev_table_logs:
-#     CONV.filter_previous_tables(DF_prev_tbl)
+#     CONV.filter_prev_tab(DF_prev_tbl)
 
 CONV.convert()
 
