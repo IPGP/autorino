@@ -101,7 +101,7 @@ def extract_trimble_filelist(
                 rok = r
                 r_stk.append(rok.group(0))
 
-        if output_csv_dir:
+        if output_csv_dir and len(r_stk) > 0:
             output_csv = os.path.join(
                 output_csv_dir, os.path.basename(html_file).replace(".html", ".csv")
             )
