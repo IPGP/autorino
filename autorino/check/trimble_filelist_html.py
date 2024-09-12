@@ -14,6 +14,7 @@ import re
 import argparse
 
 import autorino.common as arocmn
+import autorino.download as arodwl
 
 
 def download_html_page(url_inp, output_file_inp):
@@ -34,7 +35,6 @@ def download_html_page(url_inp, output_file_inp):
     """
     try:
         # Send a GET request to the URL
-        print(f"Downloading page from {url_inp}")
         response = requests.get(url_inp)
 
         # Check if the request was successful
@@ -106,11 +106,14 @@ def extract_trimble_filelist(
                 output_csv_dir, os.path.basename(html_file).replace(".html", ".csv")
             )
             df = pd.DataFrame(r_stk)
+            df[1] = df[0].extract("2[0-9]{7}").apply(pd.to_datetime)
             df.to_csv(output_csv, index=False, header=False)
+            print(f"Trimble file list saved to {output_csv}")
 
         t02_stk = t02_stk + sorted(list(set(r_stk)))
 
-    return sorted(list(set(t02_stk)))
+    t02_stk = sorted(list(set(t02_stk)))
+    return t02_stk
 
 def trimble_filelist_html(
     site,
@@ -120,20 +123,28 @@ def trimble_filelist_html(
     end_date,
     period="1m",
     structure="download/Internal/%Y%M",
+    force=False
 ):
 
     eporng = arocmn.EpochRange(start_date, end_date, period)
-    output_paths = []
+    output_paths_ok = []
     for curr_date in eporng.eporng_list():
         url = str(os.path.join(host_name, curr_date.strftime(structure)))
         output_filename = site + "_" + os.path.basename(url) + ".html"
         output_path = str(os.path.join(output_dir, output_filename))
 
-        output_path_ok = download_html_page(url, output_path)
+        if not force and os.path.exists(output_path):
+            print(f"File {output_path} already exists. Skipping download.")
+            output_paths_ok.append(output_path)
+            continue
 
-        if output_path_ok:
-            output_paths.append(output_path_ok)
-            extract_trimble_filelist(output_path_ok, output_csv_dir=output_dir)
+        print(f"Downloading page from {url}")
+
+        output_path_out = arodwl.download_http(url, output_path)
+
+        if output_path_out:
+            output_paths_ok.append(output_path_out)
+            extract_trimble_filelist(output_path_out, output_csv_dir=output_dir)
 
 
 def main():
