@@ -126,7 +126,7 @@ def trimble_filelist_html(
     force=False
 ):
 
-    eporng = arocmn.EpochRange(start_date, end_date, period)
+    eporng = arocmn.EpochRange(start_date, end_date, period, round_method="none")
     output_paths_ok = []
     for curr_date in eporng.eporng_list():
         url = str(os.path.join(host_name, curr_date.strftime(structure)))
