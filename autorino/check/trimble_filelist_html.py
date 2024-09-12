@@ -122,7 +122,7 @@ def trimble_filelist_html(
     start_date,
     end_date,
     period="1M",
-    structure="download/Internal/%Y%M",
+    structure="download/Internal/%Y%m",
     force=False
 ):
 
@@ -162,8 +162,8 @@ def main():
                         help="The end date for the file search (format: YYYY-MM-DD).")
     parser.add_argument("--period", type=str, default="1M",
                         help="The period for the file search. Default is '1M'.")
-    parser.add_argument("--structure", type=str, default="download/Internal/%Y%M",
-                        help="The directory structure on the remote server. Default is 'download/Internal/YM'.")
+    parser.add_argument("--structure", type=str, default="download/Internal/%Y%m",
+                        help="The directory structure on the remote server. Default is 'download/Internal/Ym'.")
 
     args = parser.parse_args()
 
