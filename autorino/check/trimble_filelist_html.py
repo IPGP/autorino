@@ -16,6 +16,13 @@ import argparse
 import autorino.common as arocmn
 import autorino.download as arodwl
 
+#### Import the logger
+import logging
+import autorino.cfgenv.env_read as aroenv
+
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 def download_html_page(url_inp, output_file_inp):
     """
@@ -52,13 +59,13 @@ def download_html_page(url_inp, output_file_inp):
                 for data in response.iter_content(chunk_size=1024):
                     file.write(data)
                     bar.update(len(data))
-            print(f"Page downloaded successfully and saved to {output_file_inp}")
+            logger.info(f"Page downloaded successfully and saved to {output_file_inp}")
             return output_file_inp
         else:
-            print(f"Failed to download page. Status code: {response.status_code}")
+            logger.info(f"Failed to download page. Status code: {response.status_code}")
             return None
     except requests.RequestException as e:
-        print(f"An error occurred: {e}")
+        logger.info(f"An error occurred: {e}")
         return None
 
 # Example usage
@@ -108,7 +115,7 @@ def extract_trimble_filelist(
             df = pd.DataFrame(sorted(list(set(r_stk))))
             df[1] = df[0].str.extract("(2[0-9]{7})").apply(pd.to_datetime)
             df.to_csv(output_csv, index=False, header=False)
-            print(f"Trimble file list saved to {output_csv}")
+            logger.info(f"Trimble file list saved to {output_csv}")
 
         t02_stk = t02_stk + sorted(list(set(r_stk)))
 
@@ -136,10 +143,10 @@ def trimble_filelist_html(
         output_path_ok = str(os.path.join(output_dir, output_fnam_ok))
 
         if not force and os.path.exists(output_path_ok):
-            print(f"File {output_path_ok} already exists. Skipping download.")
+            logger.info(f"File {output_path_ok} already exists. Skipping download.")
             output_paths_ok.append(output_path_ok)
         else:
-            print(f"Downloading page from {url}")
+            logger.info(f"Downloading page from {url}")
             output_path_out = arodwl.download_http(url, output_dir)
             if output_path_out:
                 os.rename(output_path_out, output_path_ok)
