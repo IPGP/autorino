@@ -106,7 +106,7 @@ def extract_trimble_filelist(
                 output_csv_dir, os.path.basename(html_file).replace(".html", ".csv")
             )
             df = pd.DataFrame(r_stk)
-            df[1] = df[0].extract("2[0-9]{7}").apply(pd.to_datetime)
+            df[1] = df[0].str.extract("2[0-9]{7}").apply(pd.to_datetime)
             df.to_csv(output_csv, index=False, header=False)
             print(f"Trimble file list saved to {output_csv}")
 
@@ -130,21 +130,22 @@ def trimble_filelist_html(
     output_paths_ok = []
     for curr_date in eporng.eporng_list():
         url = str(os.path.join('http://', host_name, curr_date.strftime(structure)))
-        output_filename = site + "_" + os.path.basename(url) + ".html"
-        output_path = os.path.join(output_dir, os.path.basename(url))
 
-        if not force and os.path.exists(output_path):
-            print(f"File {output_path} already exists. Skipping download.")
-            output_paths_ok.append(output_path)
-            output_path_out = output_path
+        #output_path_ini = os.path.join(output_dir, os.path.basename(url))
+        output_fnam_ok = site + "_" + os.path.basename(url) + ".html"
+        output_path_ok = str(os.path.join(output_dir, output_fnam_ok))
+
+        if not force and os.path.exists(output_path_ok):
+            print(f"File {output_path_ok} already exists. Skipping download.")
+            output_paths_ok.append(output_path_ok)
         else:
             print(f"Downloading page from {url}")
             output_path_out = arodwl.download_http(url, output_dir)
+            if output_path_out:
+                os.rename(output_path_out, output_path_ok)
+                output_paths_ok.append(output_path_ok)
 
-        if output_path_out:
-            output_path_ok = str(os.path.join(output_dir, output_filename))
-            os.rename(output_path_out, output_path_ok)
-            output_paths_ok.append(output_path_ok)
+        if output_path_ok:
             extract_trimble_filelist(output_path_ok, output_csv_dir=output_dir)
 
 
