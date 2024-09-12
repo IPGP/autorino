@@ -156,14 +156,14 @@ def main():
     parser.add_argument("host_name", type=str, help="The hostname of the remote server.")
     parser.add_argument("output_dir", type=str,
                         help="The directory where the downloaded HTML files will be saved.")
-    parser.add_argument("start_date", type=lambda s: datetime.strptime(s, '\\%Y-\\%m-\\%d'),
+    parser.add_argument("start_date", type=lambda s: datetime.strptime(s, '%Y-%m-%d'),
                         help="The start date for the file search (format: YYYY-MM-DD).")
-    parser.add_argument("end_date", type=lambda s: datetime.strptime(s, '\\%Y-\\%m-\\%d'),
+    parser.add_argument("end_date", type=lambda s: datetime.strptime(s, '%Y-%m-%d'),
                         help="The end date for the file search (format: YYYY-MM-DD).")
     parser.add_argument("--period", type=str, default="1m",
                         help="The period for the file search. Default is '1m'.")
-    parser.add_argument("--structure", type=str, default="download/Internal/\\%Y\\%M",
-                        help="The directory structure on the remote server. Default is 'download/Internal/\\%Y\\%M'.")
+    parser.add_argument("--structure", type=str, default="download/Internal/YM",
+                        help="The directory structure on the remote server. Default is 'download/Internal/YM'.")
 
     args = parser.parse_args()
 
