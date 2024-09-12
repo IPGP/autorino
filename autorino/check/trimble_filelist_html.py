@@ -105,7 +105,7 @@ def extract_trimble_filelist(
             output_csv = os.path.join(
                 output_csv_dir, os.path.basename(html_file).replace(".html", ".csv")
             )
-            df = pd.DataFrame(list(set(r_stk)))
+            df = pd.DataFrame(sorted(list(set(r_stk))))
             df[1] = df[0].str.extract("(2[0-9]{7})").apply(pd.to_datetime)
             df.to_csv(output_csv, index=False, header=False)
             print(f"Trimble file list saved to {output_csv}")
