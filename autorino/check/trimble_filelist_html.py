@@ -129,7 +129,7 @@ def trimble_filelist_html(
     eporng = arocmn.EpochRange(start_date, end_date, period, round_method="none")
     output_paths_ok = []
     for curr_date in eporng.eporng_list():
-        url = str(os.path.join(host_name, curr_date.strftime(structure)))
+        url = str(os.path.join('http://', host_name, curr_date.strftime(structure)))
         output_filename = site + "_" + os.path.basename(url) + ".html"
         output_path = str(os.path.join(output_dir, output_filename))
 
@@ -162,7 +162,7 @@ def main():
                         help="The end date for the file search (format: YYYY-MM-DD).")
     parser.add_argument("--period", type=str, default="1M",
                         help="The period for the file search. Default is '1M'.")
-    parser.add_argument("--structure", type=str, default="download/Internal/YM",
+    parser.add_argument("--structure", type=str, default="download/Internal/%Y%M",
                         help="The directory structure on the remote server. Default is 'download/Internal/YM'.")
 
     args = parser.parse_args()
