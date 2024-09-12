@@ -136,17 +136,16 @@ def trimble_filelist_html(
         if not force and os.path.exists(output_path):
             print(f"File {output_path} already exists. Skipping download.")
             output_paths_ok.append(output_path)
-            continue
-
-        print(f"Downloading page from {url}")
-
-        output_path_out = arodwl.download_http(url, output_dir)
+            output_path_out = output_path
+        else:
+            print(f"Downloading page from {url}")
+            output_path_out = arodwl.download_http(url, output_dir)
 
         if output_path_out:
             output_path_ok = str(os.path.join(output_dir, output_filename))
             os.rename(output_path_out, output_path_ok)
-            output_paths_ok.append(output_path_out)
-            extract_trimble_filelist(output_path_out, output_csv_dir=output_dir)
+            output_paths_ok.append(output_path_ok)
+            extract_trimble_filelist(output_path_ok, output_csv_dir=output_dir)
 
 
 def main():
