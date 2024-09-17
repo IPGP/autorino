@@ -24,7 +24,7 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def autorino_cfgfile_run(
-    cfg_in, main_cfg_in, sites_list=None, start=None, end=None, period="1D",
+    cfg_in, main_cfg_in, sites_list=None, epo_srt=None, epo_end=None, period="1D",
 ):
     """
     Run the Autorino configuration files.
@@ -42,10 +42,10 @@ def autorino_cfgfile_run(
     sites_list : list, optional
         A list of site identifiers to filter the configuration files.
          If provided, only configurations for sites in this list will be processed. Default is None.
-    start : str, list, optional
+    epo_srt : str, list, optional
         The start date for the epoch range. Default is None.
         if it is a file path, the file contains a list of start epochs
-    end : str, optional
+    epo_end : str, optional
         The end date for the epoch range. Default is None.
     period : str, optional
         The period for the epoch range. Default is "1D".
@@ -67,14 +67,14 @@ def autorino_cfgfile_run(
         logger.error("%s does not exist, check input cfgfiles file/dir", cfg_in)
         raise Exception
 
-    if start and end:
-        epoch_range = arocmn.EpochRange(start, end, period)
-    elif start and not end:
-        if os.path.isfile(start):
-            with open(start, "r") as f:
+    if epo_srt and epo_end:
+        epoch_range = arocmn.EpochRange(epo_srt, epo_end, period)
+    elif epo_srt and not epo_end:
+        if os.path.isfile(epo_srt):
+            with open(epo_srt, "r") as f:
                 start_use = f.read().splitlines()
-        elif isinstance(start, list):
-            start_use = start
+        elif isinstance(epo_srt, list):
+            start_use = epo_srt
         else:
             logger.critical("start must be a list or a file path")
             raise Exception
@@ -102,11 +102,14 @@ def autorino_cfgfile_run(
 
 
 def download_raw(
-    epoch_range,
-    out_dir,
+    epoch_srt,
+    epoch_end,
+    period,
     hostname,
-    inp_dir,
+    inp_dir_parent,
     inp_structure,
+    out_dir_parent,
+    out_structure,
     site_id="XXXX00XXX",
     login="",
     password="",
@@ -123,16 +126,22 @@ def download_raw(
 
     Parameters
     ----------
-    epoch_range : object
-        The epoch range for which the data files are to be downloaded.
-    out_dir : str
-        The output directory where the downloaded files will be stored.
+    epoch_srt : datetime-like
+        The start epoch for the splicing operation.
+    epoch_end : datetime-like
+        The end epoch for the splicing operation.
+    period : str
+        The period for the splicing operation.
+    out_dir_parent : str
+        The parent output directory where the downloaded files will be stored.
+    out_structure : str
+        The structure of the output sub-directory where the downloaded files will be stored.
     hostname : str
         The hostname of the server from which the data files will be downloaded.
-    inp_dir : str
-        The parent directory on the server where the data files are located.
+    inp_dir_parent : str
+        The parent directory on the server where the raw data files are located.
     inp_structure : str
-        The structure of the input directory on the server.
+        The raw file generic name structure on the server.
     site_id : str, optional
         The site identifier for the data files. Default is "XXXX00XXX".
     login : str, optional
@@ -161,14 +170,18 @@ def download_raw(
     site_dic = dict()
     site_dic["site_id"] = site_id
 
+    epoch_range = arocmn.EpochRange(epoch_srt, epoch_end, period)
+
+    inp_dir = os.path.join(inp_dir_parent, inp_structure)
+    out_dir = os.path.join(out_dir_parent, out_structure)
+
     dwl = arodwl.DownloadGnss(
         out_dir=out_dir,
         tmp_dir=tmp_dir,
         log_dir=log_dir,
+        inp_dir=inp_dir,
         epoch_range=epoch_range,
         access=access_dic,
-        #inp_dir_parent=inp_dir,
-        #inp_structure=inp_structure,
         site=site_dic,
         session=session,
         options=options,
