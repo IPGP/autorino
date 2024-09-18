@@ -6,12 +6,6 @@ Created on 18/09/2024 18:25:28
 @author: psakic
 """
 
-import glob
-import os
-
-import autorino.cfgfiles as arocfg
-import autorino.download as arodwl
-import autorino.convert as arocnv
 import autorino.handle as arohdl
 import autorino.common as arocmn
 
