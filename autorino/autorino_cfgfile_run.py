@@ -35,9 +35,9 @@ if __name__ == '__main__':
     period = args.period
     list_sites = args.list_sites.split(',') if args.list_sites else None
 
-    aroapi.autorino_cfgfile_run(cfg_in=config,
-                                main_cfg_in=main_config,
-                                sites_list=list_sites,
-                                epo_srt=start,
-                                epo_end=end,
-                                period=period)
+    aroapi.cfgfile_run(cfg_in=config,
+                       main_cfg_in=main_config,
+                       sites_list=list_sites,
+                       epo_srt=start,
+                       epo_end=end,
+                       period=period)

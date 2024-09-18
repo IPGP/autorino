@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def autorino_cfgfile_run(
+def cfgfile_run(
         cfg_in, main_cfg_in,
         sites_list=None,
         epo_srt=None,
