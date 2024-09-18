@@ -24,7 +24,12 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def autorino_cfgfile_run(
-    cfg_in, main_cfg_in, sites_list=None, epo_srt=None, epo_end=None, period="1D", steps_select_list=None,
+        cfg_in, main_cfg_in,
+        sites_list=None,
+        epo_srt=None,
+        epo_end=None,
+        period="1D",
+        steps_select_list=None,
         exclude_steps_select=False
 ):
     """
