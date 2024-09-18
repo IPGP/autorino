@@ -8,7 +8,7 @@ Created on 30/05/2024 16:22:55
 
 import argparse
 import json
-import autorino.common as arocmn
+import autorino.api as aroapi
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert RAW files to RINEX.")
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    arocmn.convert_rnx(
+    aroapi.convert_rnx(
         args.raws_inp,
         args.out_dir,
         args.tmp_dir,
