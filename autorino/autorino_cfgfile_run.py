@@ -7,7 +7,7 @@ Created on Sun Feb 11 18:44:52 2024
 """
 
 import argparse
-import autorino.common as arocmn
+import autorino.api as aroapi
 
 if __name__ == '__main__':
     ##### Parsing Args
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     period = args.period
     list_sites = args.list_sites.split(',') if args.list_sites else None
 
-    arocmn.autorino_cfgfile_run(cfg_in=config,
+    aroapi.autorino_cfgfile_run(cfg_in=config,
                                 main_cfg_in=main_config,
                                 sites_list=list_sites,
                                 epo_srt=start,
