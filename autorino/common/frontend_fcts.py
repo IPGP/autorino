@@ -213,9 +213,9 @@ def download_raw(
 def convert_rnx(
     raws_inp,
     out_dir,
+    out_structure="<SITE_ID4>/%Y/",
     tmp_dir=None,
     log_dir=None,
-    out_structure="<SITE_ID4>/%Y/",
     rinexmod_options=None,
     metadata=None,
     force=False,
@@ -234,6 +234,12 @@ def convert_rnx(
         * a directory path.
     out_dir : str
         The output directory where the converted files will be stored.
+    out_structure : str, optional
+        The structure of the output directory.
+        If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
+        See README.md for more information.
+        Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
+        Default value is '<SITE_ID4>/%Y/'.
     tmp_dir : str, optional
         The temporary directory used during the conversion process.
         If not provided, it defaults to <out_dir>/tmp_convert_rnx.
@@ -241,12 +247,6 @@ def convert_rnx(
     log_dir : str, optional
         The directory where logs will be stored. If not provided, it defaults to tmp_dir.
          Defaults to None.
-    out_structure : str, optional
-        The structure of the output directory.
-        If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
-        See README.md for more information.
-        Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
-        Default value is '<SITE_ID4>/%Y/'.
     rinexmod_options : dict, optional
         The options for modifying the RINEX files during the conversion. Defaults to None.
     metadata : str or list, optional
