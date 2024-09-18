@@ -124,7 +124,7 @@ def download_raw(
     inp_dir_parent,
     inp_structure,
     out_dir_parent,
-    out_structure,
+    out_structure='<SITE_ID9>/%Y/',
     site_id="XXXX00XXX",
     login="",
     password="",
@@ -151,6 +151,8 @@ def download_raw(
         The parent output directory where the downloaded files will be stored.
     out_structure : str
         The structure of the output sub-directory where the downloaded files will be stored.
+        Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
+        Default value is '<SITE_ID4>/%Y/'.
     hostname : str
         The hostname of the server from which the data files will be downloaded.
     inp_dir_parent : str
@@ -242,7 +244,8 @@ def convert_rnx(
     out_structure : str, optional
         The structure of the output directory.
         If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
-        See README.md for more information. Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
+        See README.md for more information.
+        Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
         Default value is '<SITE_ID4>/%Y/'.
     rinexmod_options : dict, optional
         The options for modifying the RINEX files during the conversion. Defaults to None.
