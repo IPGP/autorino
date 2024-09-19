@@ -9,6 +9,7 @@ Created on Sun Feb 11 18:44:52 2024
 import argparse
 import autorino.api as aroapi
 
+
 if __name__ == '__main__':
     ##### Parsing Args
     parser = argparse.ArgumentParser(description='Assisted Unloading, Treatment and Organization of RINEX observations')
@@ -25,6 +26,10 @@ if __name__ == '__main__':
                         help='', default='1D')
     parser.add_argument('-ls', '--list_sites', type=str,
                         help='Comma-separated list of site identifiers', default='')
+    parser.add_argument('-ss', '--steps_select_list', type=str,
+                        help='Comma-separated list of selected steps to be executed', default='')
+    parser.add_argument('-es', '--exclude_steps_select', action='store_true',
+                        help='Flag to exclude the selected steps', default=False)
 
     args = parser.parse_args()
 
@@ -34,10 +39,14 @@ if __name__ == '__main__':
     end = args.end
     period = args.period
     list_sites = args.list_sites.split(',') if args.list_sites else None
+    steps_select_list = args.steps_select_list.split(',') if args.steps_select_list else None
+    exclude_steps_select = args.exclude_steps_select
 
     aroapi.cfgfile_run(cfg_in=config,
                        main_cfg_in=main_config,
                        sites_list=list_sites,
                        epo_srt=start,
                        epo_end=end,
-                       period=period)
+                       period=period,
+                       steps_select_list=steps_select_list,
+                       exclude_steps_select=exclude_steps_select)
