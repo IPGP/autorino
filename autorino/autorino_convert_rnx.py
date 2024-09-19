@@ -81,14 +81,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    if args.list_file_input:
+        raws_inp = open(args.raws_inp, "r").readlines()
+    else:
+        raws_inp = args.raws_inp
+
     aroapi.convert_rnx(
-        args.raws_inp,
-        args.out_dir,
-        args.tmp_dir,
-        args.log_dir,
-        args.out_dir_structure,
-        args.rinexmod_options,
-        args.metadata,
-        args.force,
-        args.list_file_input,
+        raws_inp=raws_inp,
+        out_dir=args.out_dir,
+        out_structure=args.out_dir_structure,
+        tmp_dir=args.tmp_dir,
+        log_dir=args.log_dir,
+        rinexmod_options=args.rinexmod_options,
+        metadata=args.metadata,
+        force=args.force,
     )

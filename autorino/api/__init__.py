@@ -6,7 +6,6 @@ Created on 18/09/2024 18:13:25
 @author: psakic
 """
 
-from .api_fcts import *
 from .configfile_run import *
 from .convert_rnx import *
 from .download_raw import *
