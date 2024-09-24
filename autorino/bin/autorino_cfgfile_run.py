@@ -9,8 +9,7 @@ Created on Sun Feb 11 18:44:52 2024
 import argparse
 import autorino.api as aroapi
 
-
-if __name__ == '__main__':
+def main():
     ##### Parsing Args
     parser = argparse.ArgumentParser(description='Assisted Unloading, Treatment and Organization of RINEX observations')
 
@@ -50,3 +49,7 @@ if __name__ == '__main__':
                        period=period,
                        steps_select_list=steps_select_list,
                        exclude_steps_select=exclude_steps_select)
+
+if __name__ == '__main__':
+    main()
+
