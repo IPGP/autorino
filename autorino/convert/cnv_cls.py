@@ -21,12 +21,16 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+BOLD_SRT = "\033[1m"
+BOLD_END = "\033[0m"
+
 
 class ConvertGnss(arocmn.StepGnss):
     """
     A class used to represent the GNSS conversion process.
 
-    This class inherits from the StepGnss class and is used to handle the conversion of GNSS data.
+    This class inherits from the StepGnss class
+    and is used to handle the conversion of GNSS data.
 
     Attributes
     ----------
@@ -55,7 +59,7 @@ class ConvertGnss(arocmn.StepGnss):
 
     Methods
     -------
-    __init__(self, out_dir, tmp_dir, log_dir, epoch_range=None, site=None, session=None, options=None, metadata=None)
+    __init__(self, out_dir, tmp_dir, log_dir, epoch_range_inp=None, site=None, session=None, options=None, metadata=None)
         Initializes the ConvertGnss class with the specified parameters.
     """
 
@@ -64,7 +68,10 @@ class ConvertGnss(arocmn.StepGnss):
         out_dir,
         tmp_dir,
         log_dir,
+        inp_dir=None,
         epoch_range=None,
+        inp_dir_parent=None,
+        inp_structure=None,
         site=None,
         session=None,
         options=None,
@@ -99,9 +106,10 @@ class ConvertGnss(arocmn.StepGnss):
             * single MetaData object
         """
         super().__init__(
-            out_dir,
-            tmp_dir,
-            log_dir,
+            out_dir=out_dir,
+            tmp_dir=tmp_dir,
+            log_dir=log_dir,
+            inp_dir=inp_dir,
             epoch_range=epoch_range,
             site=site,
             session=session,
@@ -137,16 +145,7 @@ class ConvertGnss(arocmn.StepGnss):
         None
         """
 
-        # here the None to dict is necessary, because we use a defaut rinexmod_options bellow
-        if rinexmod_options is None:
-            rinexmod_options = {}
-
-        if self.options.get("force") or force:
-            force_use = True
-        else:
-            force_use = False
-
-        logger.info(">>>>>> RAW > RINEX files conversion")
+        logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -164,16 +163,22 @@ class ConvertGnss(arocmn.StepGnss):
 
         ### guess and deactivate existing local RINEX files
         self.guess_local_rnx()  # generate the potential local files
-        self.check_local_files()  # tests if the local flies are already there
+        self.check_local_files("out")
+        # tests if the output local files are already there
+        self.check_local_files("inp")
+        # tests if the input local files are already there
 
-        if force_use:
+        if force:
+            logger.info("force conversion is enabled")
             self.table["ok_inp"] = True
             self.table["note"] = "force_convert"
-        else:
+
+        filter_prev_tables = False
+        if filter_prev_tables:
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
-                self.filter_previous_tables(prv_tbl_df)
+                self.filter_prev_tab(prv_tbl_df)
             self.filter_ok_out()
 
         self.tmp_decmp_files, _ = self.decompress()
@@ -182,13 +187,17 @@ class ConvertGnss(arocmn.StepGnss):
         # table_init_ok must be used only for the following statistics!
         self.table_ok_cols_bool()
         table_init_ok = self.filter_purge()
+
+        n_tot_inp = len(self.table["ok_inp"])
         n_ok_inp = (self.table["ok_inp"]).sum()
         n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()
 
         logger.info(
-            "%6i files will be converted, %6i files are excluded",
+            "%5i/%5i files will be converted, %5i/%5i files are excluded",
             n_ok_inp,
+            n_tot_inp,
             n_not_ok_inp,
+            n_tot_inp,
         )
 
         if verbose:
@@ -202,27 +211,32 @@ class ConvertGnss(arocmn.StepGnss):
             if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
                 logger.info("conversion skipped (output already exists): %s", fraw)
                 continue
-            if self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-                logger.info(
-                    "conversion skipped (already converted in a previous run): %s", fraw
-                )
-                continue
-            if not self.table.loc[irow, "ok_inp"]:
+            # +++ the test bellow conflicts the Force option
+            # elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            #    logger.info(
+            #        "conversion skipped (already converted in a previous run): %s", fraw
+            #    )
+            #    continue
+            elif not self.table.loc[irow, "ok_inp"]:
                 logger.warning("conversion skipped (something went wrong): %s", fraw)
                 continue
+            else:
+                pass
 
-            logger.info(">>> input raw file for conversion: %s", fraw.name)
+            logger.info(">>>>>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################
             # change the site_id here is a very bad idea, it f*cks the outdir 240605
-            # in fact not, because of the new IGS update (9 char in sitlog)
+            # (the outdir has not the country code anymore)
+            #
+            # but, because of the new IGS update (9 char in sitlog)
             # it should not be a pb anymore
 
             # +++ since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate_dic (necessary for the output dir)
-            self.on_row_site_upd(irow, site4_list)
-            self.site_id = self.table.loc[irow, "site"]  # for the output dir
+            self.mono_site_upd(irow, site4_list)
+            self.site_id = self.table.loc[irow, "site"]  # for translation of the output dir & rinexmod options
 
             self.set_translate_dict()
             ###########################################################################
@@ -244,41 +258,25 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ CONVERSION
-            frnxtmp = self.on_row_convert(
+            frnxtmp = self.mono_convert(
                 irow, self.tmp_dir_converted, converter_inp=converter_name_use
             )
             self.tmp_rnx_files.append(frnxtmp)  # list for final remove
 
             #############################################################
             # +++++ RINEXMOD
-            rinexmod_options_use = rinexmod_options.copy()
+            rinexmod_options_use = self.updt_rnxmodopts(rinexmod_options, irow)
 
-            debug_print_rinexmod_options = False
-            if debug_print_rinexmod_options:
-                logger.debug("input options for rinexmod: %s", rinexmod_options_use)
-
-            # if "marker" is in rinexmod_options_use keys, use it, else use site
-            if "marker" in rinexmod_options_use.keys():
-                marker_use = rinexmod_options_use["marker"]
-            else:
-                marker_use = self.table.loc[irow, "site"]
-
-            rinexmod_options_use.update(
-                {"marker": marker_use, "sitelog": self.metadata}
-            )
-            if debug_print_rinexmod_options:
-                logger.debug("final options for rinexmod: %s", rinexmod_options_use)
-
-            self.on_row_rinexmod(
+            self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
             )
 
             #############################################################
             # +++++ FINAL MOVE
-            self.on_row_mv_final(irow)
+            self.mono_mv_final(irow)
 
         # ++++ remove temporary files
-        self.remove_tmp_files()
+        self.remov_tmp_files()
 
         return None
 
@@ -290,7 +288,7 @@ class ConvertGnss(arocmn.StepGnss):
     # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
     #
 
-    def on_row_convert(
+    def mono_convert(
         self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
     ):
         """
@@ -358,7 +356,7 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = False
         return frnxtmp
 
-    def on_row_site_upd(self, irow, metadata_or_sites_list_inp, force=False):
+    def mono_site_upd(self, irow, metadata_or_sites_list_inp, force=False):
         """
         Updates the 'site' entry for each row of the table.
 

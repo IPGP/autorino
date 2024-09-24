@@ -7,7 +7,7 @@
 # from autorino import general as arocmn
 import yaml
 
-from autorino import config as arocfg
+from autorino import cfgfiles as arocfg
 
 ###########################################################################################
 
@@ -23,7 +23,7 @@ dwl = dwl_lst[0]
 ses = ses_lst[0]
 #req = req_lst
 
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = dwl.guess_remote_files()
 L = dwl.guess_local_files()
 L = dwl.check_local_files()
@@ -40,7 +40,7 @@ dwl.print_table()
 # out = "/home/sysop/workflow_tests/convert_tests"
 # sitelog_dir = '/home/sysop/metadata/OVPF'
 
-# conv = arocnv.ConvertGnss(ses,dwl.epoch_range,out,sitelog_dir)
+# conv = arocnv.ConvertGnss(ses,dwl.epoch_range_inp,out,sitelog_dir)
 
 # conv.load_table_from_prev_step_table(dwl.table)
 # conv.verbose()
