@@ -1,5 +1,5 @@
-git+https://github.com/IPGP/geodezyx
-git+https://github.com/IPGP/rinexmod
+#git+https://github.com/IPGP/geodezyx
+#git+https://github.com/IPGP/rinexmod
 dateparser~=1.1.7
 docker~=6.0.1
 filelock~=3.14.0
@@ -13,3 +13,5 @@ requests~=2.31.0
 tqdm~=4.64.1
 bs4~=0.0.2
 beautifulsoup4~=4.12.2
+colorlog
+geodezyx

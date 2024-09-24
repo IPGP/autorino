@@ -10,7 +10,7 @@ import argparse
 import json
 import autorino.api as aroapi
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Convert RAW files to RINEX.")
     parser.add_argument(
         "raws_inp",
@@ -96,3 +96,6 @@ if __name__ == "__main__":
         metadata=args.metadata,
         force=args.force,
     )
+
+if __name__ == "__main__":
+    main()
