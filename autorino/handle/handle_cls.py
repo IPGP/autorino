@@ -302,7 +302,7 @@ class HandleGnss(arocmn.StepGnss):
     def find_local_inp(self, return_as_step_obj=True, rnx3_regex=False):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_structure` attributes of the DownloadGnss object.
+        EpochRange and `inp_basename` attributes of the DownloadGnss object.
 
         Parameters
         ----------
@@ -690,7 +690,7 @@ class SplitGnss(HandleGnss):
             The range of epochs to be processed. Default is None.
         inp_dir_parent : str, optional
             The parent directory of the input directory. Default is None.
-        inp_structure : dict, optional
+        inp_basename : dict, optional
             The structure of the input files. Default is None.
         site : dict, optional
             Information about the site. Default is None.
