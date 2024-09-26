@@ -223,7 +223,7 @@ def list_remote_ftp(
     if disposable_ftp_obj:
         ftp_obj.quit()
 
-    return file_list
+    return list(file_list)
 
 
 def download_ftp(

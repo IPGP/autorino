@@ -3,6 +3,7 @@
 
 import ftplib
 import os
+import re
 import shutil
 
 import numpy as np
@@ -16,6 +17,7 @@ import warnings
 # +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+from autorino.download import AutorinoDownloadError
 
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
@@ -126,11 +128,11 @@ class DownloadGnss(arocmn.StepGnss):
 
     # legacy properties, specific to the DownloadGnss class
     @property
-    def inp_dir_parent(self):
+    def inp_dirname(self):
         return os.path.dirname(self.inp_dir)
 
     @property
-    def inp_structure(self):
+    def inp_basename(self):
         return os.path.basename(self.inp_dir)
 
     def guess_remot_raw(self):
@@ -141,7 +143,7 @@ class DownloadGnss(arocmn.StepGnss):
         see also method ``guess_local_raw()``
         """
 
-        if not self.inp_structure:
+        if not self.inp_basename:
             logger.warning(
                 "generic filename empty for %s, the guessed remote filepaths will be wrong",
                 self.session,
@@ -153,8 +155,8 @@ class DownloadGnss(arocmn.StepGnss):
 
         for epoch in self.epoch_range.eporng_list():  ### go for irow !
             ### guess the potential remote files
-            rmot_dir_use = str(self.inp_dir_parent)
-            rmot_fname_use = str(self.inp_structure)
+            rmot_dir_use = str(self.inp_dirname)
+            rmot_fname_use = str(self.inp_basename)
 
             rmot_path_use = arodwl.join_url(
                 self.access["protocol"], hostname_use, rmot_dir_use, rmot_fname_use
@@ -184,7 +186,7 @@ class DownloadGnss(arocmn.StepGnss):
     def guess_local_raw(self):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_structure` attributes of the DownloadGnss object
+        EpochRange and `inp_basename` attributes of the DownloadGnss object
 
         see also method ``guess_remot_raw()``,
         """
@@ -194,7 +196,7 @@ class DownloadGnss(arocmn.StepGnss):
         for epoch in self.epoch_range.eporng_list():  # go for irow !
             # guess the potential local files
             local_dir_use = str(self.out_dir)
-            local_fname_use = str(self.inp_structure)
+            local_fname_use = str(self.inp_basename)
             local_path_use = os.path.join(local_dir_use, local_fname_use)
 
             local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
@@ -216,14 +218,14 @@ class DownloadGnss(arocmn.StepGnss):
     def guess_remote_dirs(self):
         """
         this method is specific for ask_remote_raw
-        guessing the directories is different than guessing the files:
+        guessing the directories is different from guessing the files:
         * no hostname
         * no filename (obviously)
         """
         rmot_dir_list = []
         for irow, row in self.table.iterrows():
             epoch = self.table.loc[irow, "epoch_srt"]
-            rmot_dir_use = str(self.inp_dir_parent)
+            rmot_dir_use = str(self.inp_dirname)
             rmot_dir_use = self.translate_path(rmot_dir_use, epoch, make_dir=False)
             row["fpath_inp"] = rmot_dir_use
             row["note"] = "dir_guessed"
@@ -247,40 +249,61 @@ class DownloadGnss(arocmn.StepGnss):
         list
             A list of remote file paths.
         """
-        rmot_dir_list = self.guess_remote_dirs()
+
+        # guess the remote directories
+        self.guess_remote_dirs()
+
         rmot_fil_all_lis = []
         rmot_fil_epo_lis = []
         epo_lis = []
 
+        # step 1: iterate over the input table and list the remote files (table is updated in step 2)
         for irow, row in self.table.iterrows():
             epoch = row["epoch_srt"]
             rmot_dir_use = row["fpath_inp"]
 
             if self.access["protocol"] == "http":
-                rmot_fil_epo_lis = arodwl.list_remote_http(
-                    self.access["hostname"], rmot_dir_use
+                logger.warning("HTTP protocol doesn't support well file listing. Nasty effects may occur.")
+                rmot_fil_epo_bulk_lis = arodwl.list_remote_http(
+                    self.access["hostname"],
+                    rmot_dir_use
                 )
-                rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
             elif self.access["protocol"] == "ftp":
-                rmot_fil_epo_lis = arodwl.list_remote_ftp(
+                rmot_fil_epo_bulk_lis = arodwl.list_remote_ftp(
                     self.access["hostname"],
                     rmot_dir_use,
                     self.access["login"],
                     self.access["password"],
                     ftp_obj_inp=self.ftp_obj,
                 )
-                rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
-                epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
-            else:
-                logger.error("wrong protocol")
 
-            logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
+            else:
+                logger.error("wrong protocol. Only 'http' and 'ftp' are supported.")
+                raise AutorinoDownloadError
+
+            rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
+
+            ### match the right input structure
+            if self.inp_basename:
+                logger.debug("remote files (bulk) found on rec: %s", rmot_fil_epo_bulk_lis)
+                rmot_fname_theo = self.translate_path(self.inp_basename, epoch, make_dir=False)
+                rmot_fil_epo_lis = [re.search(rmot_fname_theo, os.path.basename(f)) for f in rmot_fil_epo_bulk_lis]
+
+                if len(rmot_fil_epo_lis) != len(rmot_fil_epo_bulk_lis):
+                    logger.debug("remote files (regex-cleaned) found on rec: %s", rmot_fil_epo_lis)
+            else:
+                rmot_fil_epo_lis = rmot_fil_epo_bulk_lis
+                logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
+
+            rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
+            epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
 
             # re add protocol:
             rmot_fil_epo_lis = [
                 self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
             ]
-            ## update the table
+
+            ## step 2: the table is updated with the found files
             new_rows_stk = []
             for rmot_fil in rmot_fil_epo_lis:
                 new_row = row.copy()
@@ -294,6 +317,7 @@ class DownloadGnss(arocmn.StepGnss):
                 [self.table, pd.DataFrame(new_rows_stk)], ignore_index=True
             )
 
+        # step 3: remove the guessed directories
         self.table = self.table[self.table["note"] != "dir_guessed"]
         self.table.reset_index(drop=True, inplace=True)
 
@@ -303,7 +327,7 @@ class DownloadGnss(arocmn.StepGnss):
     def ask_local_raw(self):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_structure` attributes of the DownloadGnss object
+        EpochRange and `inp_basename` attributes of the DownloadGnss object
 
         see also method ``guess_remot_raw()``,
         """
@@ -420,7 +444,9 @@ class DownloadGnss(arocmn.StepGnss):
             remote_find_method = "guess"
 
         # Ping the remote server to check if it is reachable
-        ping_out = self.ping_remote(ping_max_try=ping_max_try, ping_timeout=ping_timeout)
+        ping_out = self.ping_remote(
+            ping_max_try=ping_max_try, ping_timeout=ping_timeout
+        )
 
         if not ping_out:
             # local raw are guessed anyway, to resume the next steps if download is not possible
@@ -478,10 +504,7 @@ class DownloadGnss(arocmn.StepGnss):
         lock.acquire()
         try:
             self.fetch_remote_files(
-                force=force,
-                timeout=timeout,
-                max_try=max_try,
-                sleep_time=sleep_time
+                force=force, timeout=timeout, max_try=max_try, sleep_time=sleep_time
             )
         finally:
             lock.release()
