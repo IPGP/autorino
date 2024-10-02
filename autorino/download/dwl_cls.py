@@ -17,7 +17,6 @@ import warnings
 # +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-from autorino.download import AutorinoDownloadError
 
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
@@ -279,7 +278,7 @@ class DownloadGnss(arocmn.StepGnss):
 
             else:
                 logger.error("wrong protocol. Only 'http' and 'ftp' are supported.")
-                raise AutorinoDownloadError
+                raise exception
 
             rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
 
