@@ -7,7 +7,7 @@ Created on 30/05/2024 16:22:55
 """
 
 import argparse
-import json
+import yaml
 import autorino.api as aroapi
 
 def main():
@@ -55,10 +55,10 @@ def main():
     parser.add_argument(
         "-rimo",
         "--rinexmod_options",
-        type=json.loads,
+        type=yaml.safe_load,
         help="The options for modifying the RINEX files during the conversion."
              "The options must be provided in a dictionnary represented as a string"
-             #"\"'{"name": "img.png","voids": "#00ff00ff","0": "#ff00ff00","100%": "#f80654ff"}'"
+             "e.g. '{longname: False, filename_style: basic}'"
              "Defaults to None",
     )
     parser.add_argument(
@@ -89,7 +89,7 @@ def main():
     aroapi.convert_rnx(
         raws_inp=raws_inp,
         out_dir=args.out_dir,
-        out_structure=args.out_dir_structure,
+        out_structure=args.out_structure,
         tmp_dir=args.tmp_dir,
         log_dir=args.log_dir,
         rinexmod_options=args.rinexmod_options,
