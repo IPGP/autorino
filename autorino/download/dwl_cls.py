@@ -278,7 +278,7 @@ class DownloadGnss(arocmn.StepGnss):
 
             else:
                 logger.error("wrong protocol. Only 'http' and 'ftp' are supported.")
-                raise exception
+                raise Exception
 
             rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
 
@@ -286,7 +286,7 @@ class DownloadGnss(arocmn.StepGnss):
             if self.inp_basename:
                 logger.debug("remote files (bulk) found on rec: %s", rmot_fil_epo_bulk_lis)
                 rmot_fname_theo = self.translate_path(self.inp_basename, epoch, make_dir=False)
-                rmot_fil_epo_lis = [re.search(rmot_fname_theo, os.path.basename(f)) for f in rmot_fil_epo_bulk_lis]
+                rmot_fil_epo_lis = [str(re.search(rmot_fname_theo, os.path.basename(f))) for f in rmot_fil_epo_bulk_lis]
 
                 if len(rmot_fil_epo_lis) != len(rmot_fil_epo_bulk_lis):
                     logger.debug("remote files (regex-cleaned) found on rec: %s", rmot_fil_epo_lis)
@@ -302,7 +302,7 @@ class DownloadGnss(arocmn.StepGnss):
                 self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
             ]
 
-            ## step 2: the table is updated with the found files
+            ## step 2: the table is updated with the files found
             new_rows_stk = []
             for rmot_fil in rmot_fil_epo_lis:
                 new_row = row.copy()
