@@ -1162,7 +1162,7 @@ class StepGnss:
         for iepoch, epoch in self.table["epoch_srt"].items():
             # guess the potential local files
             local_dir_use = str(self.out_dir)
-            # local_fname_use = str(self.inp_structure)
+            # local_fname_use = str(self.inp_basename)
 
             epo_dt_srt = epoch.to_pydatetime()
             epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
@@ -1850,7 +1850,7 @@ class StepGnss:
             out = self.table[self.table[col]]
         return out
 
-    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
+    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=True):
         """
         Updates the rinexmod options dictionnary.
 
@@ -1884,7 +1884,7 @@ class StepGnss:
             # 'marker': 'XXXX', # forced below
             # 'sitelog': metadata, # forced below
             "compression": "gz",
-            "longname": True,
+            #"longname": True,
             "force_rnx_load": True,
             "verbose": False,
             "filename_style": 'basic',

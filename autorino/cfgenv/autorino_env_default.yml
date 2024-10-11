@@ -1,4 +1,5 @@
 conv_software_paths:
+  # key : "value"
   convbin : "convbin" #RTKLIB converter
   mdb2rinex : "mdb2rinex" # Leica
   sbf2rin : "sbf2rin" # Septentrio
@@ -13,5 +14,5 @@ conv_software_paths:
   teqc : "teqc"
 general:
   log_level: "DEBUG"
-  trimble_default_software: "t0xconvert" # name of the Trimble converter key in the conv_software_paths above
+  trimble_default_software: "trm2rinex" # name of the Trimble converter key in the conv_software_paths above
 

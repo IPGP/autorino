@@ -1,3 +1,6 @@
 *.pyc
 .idea/
 venv/
+/venvraro1/
+/venvraro2/
+/autorino.egg-info/

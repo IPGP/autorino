@@ -7,10 +7,10 @@ Created on 30/05/2024 16:22:55
 """
 
 import argparse
-import json
-import autorino.common as arocmn
+import yaml
+import autorino.api as aroapi
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Convert RAW files to RINEX.")
     parser.add_argument(
         "raws_inp",
@@ -55,10 +55,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "-rimo",
         "--rinexmod_options",
-        type=json.loads,
+        type=yaml.safe_load,
         help="The options for modifying the RINEX files during the conversion."
              "The options must be provided in a dictionnary represented as a string"
-             #"\"'{"name": "img.png","voids": "#00ff00ff","0": "#ff00ff00","100%": "#f80654ff"}'"
+             "e.g. '{longname: False, filename_style: basic}'"
              "Defaults to None",
     )
     parser.add_argument(
@@ -81,14 +81,21 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    arocmn.convert_rnx(
-        args.raws_inp,
-        args.out_dir,
-        args.tmp_dir,
-        args.log_dir,
-        args.out_dir_structure,
-        args.rinexmod_options,
-        args.metadata,
-        args.force,
-        args.list_file_input,
+    if args.list_file_input:
+        raws_inp = open(args.raws_inp, "r").readlines()
+    else:
+        raws_inp = args.raws_inp
+
+    aroapi.convert_rnx(
+        raws_inp=raws_inp,
+        out_dir=args.out_dir,
+        out_structure=args.out_structure,
+        tmp_dir=args.tmp_dir,
+        log_dir=args.log_dir,
+        rinexmod_options=args.rinexmod_options,
+        metadata=args.metadata,
+        force=args.force,
     )
+
+if __name__ == "__main__":
+    main()
