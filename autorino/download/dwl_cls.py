@@ -256,6 +256,11 @@ class DownloadGnss(arocmn.StepGnss):
         rmot_fil_epo_lis = []
         epo_lis = []
 
+        if self.inp_basename:
+            logger.debug("remote files will be filtered with regex: %s", self.inp_basename)
+        else:
+            logger.debug("no regex filtering will be applied to remote files")
+
         # step 1: iterate over the input table and list the remote files (table is updated in step 2)
         for irow, row in self.table.iterrows():
             epoch = row["epoch_srt"]
@@ -282,17 +287,17 @@ class DownloadGnss(arocmn.StepGnss):
 
             rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
 
-            ### match the right input structure
+            ### match the right input structure, if a regex input is provided
             if self.inp_basename:
-                logger.debug("remote files (bulk) found on rec: %s", rmot_fil_epo_bulk_lis)
-                rmot_fname_theo = self.translate_path(self.inp_basename, epoch, make_dir=False)
-                rmot_fil_epo_lis = [f for f in rmot_fil_epo_bulk_lis if re.search(rmot_fname_theo, os.path.basename(f))]
-
-                if len(rmot_fil_epo_lis) != len(rmot_fil_epo_bulk_lis):
-                    logger.debug("remote files (regex-cleaned) found on rec: %s", rmot_fil_epo_lis)
+                rmot_fname_theo = re.compile(self.translate_path(self.inp_basename, epoch, make_dir=False))
+                rmot_fil_epo_lis = [f for f in rmot_fil_epo_bulk_lis if rmot_fname_theo.search(os.path.basename(f))]
             else:
                 rmot_fil_epo_lis = rmot_fil_epo_bulk_lis
-                logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
+
+            logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
+            if len(rmot_fil_epo_lis) != len(rmot_fil_epo_bulk_lis):
+                logger.warning("%i files have been filtered out (non-matching regex)",
+                               len(rmot_fil_epo_bulk_lis) - len(rmot_fil_epo_lis))
 
             rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
             epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
