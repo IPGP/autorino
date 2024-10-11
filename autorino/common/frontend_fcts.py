@@ -9,10 +9,11 @@ Created on 23/04/2024 14:21:56
 import glob
 import os
 
-import autorino.config as arocfg
+import autorino.cfgfiles as arocfg
 import autorino.download as arodwl
 import autorino.convert as arocnv
 import autorino.handle as arohdl
+import autorino.common as arocmn
 
 #### Import the logger
 import logging
@@ -22,7 +23,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def autorino_cfgfile_run(cfg_in, main_cfg_in):
+def autorino_cfgfile_run(
+    cfg_in, main_cfg_in, sites_list=None, start=None, end=None, period="1D",
+):
     """
     Run the Autorino configuration files.
 
@@ -36,6 +39,16 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
         If a directory is provided, all files ending with '.yml' will be used.
     main_cfg_in : str
         The main configuration file to be used.
+    sites_list : list, optional
+        A list of site identifiers to filter the configuration files.
+         If provided, only configurations for sites in this list will be processed. Default is None.
+    start : str, list, optional
+        The start date for the epoch range. Default is None.
+        if it is a file path, the file contains a list of start epochs
+    end : str, optional
+        The end date for the epoch range. Default is None.
+    period : str, optional
+        The period for the epoch range. Default is "1D".
 
     Raises
     ------
@@ -51,13 +64,37 @@ def autorino_cfgfile_run(cfg_in, main_cfg_in):
     elif os.path.isfile(cfg_in):
         cfg_use_lis = [cfg_in]
     else:
-        logger.error("%s does not exist, check input config file/dir", cfg_in)
+        logger.error("%s does not exist, check input cfgfiles file/dir", cfg_in)
         raise Exception
 
+    if start and end:
+        epoch_range = arocmn.EpochRange(start, end, period)
+    elif start and not end:
+        if os.path.isfile(start):
+            with open(start, "r") as f:
+                start_use = f.read().splitlines()
+        elif isinstance(start, list):
+            start_use = start
+        else:
+            logger.critical("start must be a list or a file path")
+            raise Exception
+        epoch_range = arocmn.EpochRange(start_use, period=period)
+    else:
+        epoch_range = None
+
     for cfg_use in cfg_use_lis:
+        if sites_list:
+            # quick load to check if the site is in the list or not
+            y_quick = arocfg.load_cfg(configfile_path=cfg_use)
+            site_quick = y_quick["station"]["site"]["site_id"]
+            if site_quick not in sites_list:
+                logger.info("Skipping site %s (not in sites list)", site_quick)
+                continue
+
         steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
-            configfile_path=cfg_use, main_cfg_path=main_cfg_in
+            configfile_path=cfg_use, main_cfg_path=main_cfg_in, epoch_range=epoch_range
         )
+
         for steps_lis in steps_lis_lis:
             arocfg.run_steps(steps_lis)
 
@@ -81,7 +118,8 @@ def download_raw(
     """
     Downloads raw GNSS data files.
 
-    This function downloads raw GNSS data files for a specified epoch range and stores them in the specified output directory.
+    This function downloads raw GNSS data files for a specified epoch range and stores them
+    in the specified output directory.
 
     Parameters
     ----------
@@ -129,8 +167,8 @@ def download_raw(
         log_dir=log_dir,
         epoch_range=epoch_range,
         access=access_dic,
-        inp_dir_parent=inp_dir,
-        inp_structure=inp_structure,
+        #inp_dir_parent=inp_dir,
+        #inp_structure=inp_structure,
         site=site_dic,
         session=session,
         options=options,
@@ -215,10 +253,11 @@ def convert_rnx(
 
     return cnv
 
-
 def split_rnx(
     rnxs_inp,
-    epo_inp,
+    epoch_srt,
+    epoch_end,
+    period,
     out_dir,
     tmp_dir,
     log_dir=None,
@@ -238,8 +277,12 @@ def split_rnx(
         * a text file path containing a list of files
         * a tuple containing several text files path
         * a directory path.
-    epo_inp : str
-        The input epoch for splitting the RINEX files
+    epoch_srt : datetime-like
+        The start epoch for the splicing operation.
+    epoch_end : datetime-like
+        The end epoch for the splicing operation.
+    period : str
+        The period for the splicing operation.
     out_dir : str
         The output directory where the split files will be stored
     tmp_dir : str
@@ -266,18 +309,93 @@ def split_rnx(
     if not log_dir:
         log_dir = tmp_dir
 
-    spt_store = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, metadata=metadata)
-    spt_store.load_table_from_filelist(rnxs_inp)
-    spt_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+    epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
 
-    spt_split = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo_inp, metadata=metadata)
-    spt_split.find_rnxs_for_handle(spt_store)
-    spt_split.split(handle_software=handle_software, rinexmod_options=rinexmod_options)
+    spt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir,
+                           epoch_range=epo_rng, metadata=metadata)
 
-    return spt_split
+    spt.split(
+        input_mode="given",
+        input_rinexs=rnxs_inp,
+        handle_software=handle_software,
+        rinexmod_options=rinexmod_options,
+        verbose=True
+    )
+
+    return spt
 
 
-def splice_rnx(
+def splice_rnx_abs(
+    rnxs_inp,
+    epoch_srt,
+    epoch_end,
+    period,
+    out_dir,
+    tmp_dir,
+    log_dir=None,
+    handle_software="converto",
+    rinexmod_options=None,
+    metadata=None,
+):
+    """
+    Splice RINEX files together in an absolute way, based on the provided epoch range.
+
+    This function takes in a list of RINEX files and splices them together based on the specified
+    epoch range and other criteria. The spliced files are stored in the specified output directory.
+
+    Parameters
+    ----------
+    rnxs_inp : list
+        The input RINEX files to be spliced.
+    epoch_srt : str
+        The start epoch for the splicing operation.
+    epoch_end : str
+        The end epoch for the splicing operation.
+    period : str
+        The period for the splicing operation.
+    out_dir : str
+        The output directory where the spliced files will be stored.
+    tmp_dir : str
+        The temporary directory used during the splicing process.
+    log_dir : str, optional
+        The directory where logs will be stored. If not provided, it defaults to tmp_dir.
+    handle_software : str, optional
+        The software to be used for handling the RINEX files during the splice operation. Defaults to "converto".
+    rinexmod_options : dict, optional
+        The options for modifying the RINEX files during the splice operation. Defaults to None.
+    metadata : str or list, optional
+        The metadata to be included in the spliced RINEX files. Possible inputs are:
+         * list of string (sitelog file paths),
+         * single string (single sitelog file path),
+         * single string (directory containing the sitelogs),
+         * list of MetaData objects,
+         * single MetaData object. Defaults to None.
+
+    Returns
+    -------
+    object
+        The SpliceGnss object after the splice operation.
+    """
+    if not log_dir:
+        log_dir = tmp_dir
+
+    epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
+
+    spc = arohdl.SpliceGnss(
+        out_dir, tmp_dir, log_dir, epoch_range=epo_rng, metadata=metadata
+    )
+
+    spc.splice(
+        input_mode="given",
+        input_rinexs=rnxs_inp,
+        handle_software=handle_software,
+        rinexmod_options=rinexmod_options,
+    )
+
+    return spc
+
+
+def splice_rnx_rel(
     rnxs_inp,
     out_dir,
     tmp_dir,
@@ -292,7 +410,7 @@ def splice_rnx(
     metadata=None,
 ):
     """
-    Splices RINEX files together based on certain criteria.
+    Splices RINEX files together in a relative way, based on certain criteria.
 
     This function takes in a list of RINEX files and splices them together based on the provided criteria.
     The spliced files are stored in the specified output directory.
@@ -354,9 +472,9 @@ def splice_rnx(
     if not log_dir:
         log_dir = tmp_dir
 
-    spc_inp = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, metadata=metadata)
+    spc_inp = arohdl.SpliceGnss(out_dir, tmp_dir, log_dir, metadata=metadata)
     spc_inp.load_table_from_filelist(rnxs_inp)
-    spc_inp.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+    spc_inp.updt_epotab_rnx(use_rnx_filename_only=True)
 
     spc_main_obj, spc_objs_lis = spc_inp.group_by_epochs(
         period=period,
@@ -366,7 +484,7 @@ def splice_rnx(
         drop_epoch_rnd=drop_epoch_rnd,
     )
 
-    spc_main_obj.splice(
+    spc_main_obj.splice_core(
         handle_software=handle_software, rinexmod_options=rinexmod_options
     )
 

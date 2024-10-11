@@ -401,7 +401,7 @@ def converter_run(
     )
 
     #### find the converted file matching the regex
-    conv_files_main, conv_files_annex = _find_converted_files(
+    conv_files_main, conv_files_annex = find_conv_files(
         out_dir, conv_regex_main, conv_regex_annex
     )
 
@@ -429,7 +429,7 @@ def converter_run(
 ### Low level functions
 
 
-def _find_converted_files(directory, pattern_main, pattern_annex, n_sec=10):
+def find_conv_files(directory, pattern_main, pattern_annex, n_sec=10):
     """
     Searches for the files in a directory that were recently created (within the last n_sec seconds)
     and match the main and annex patterns.

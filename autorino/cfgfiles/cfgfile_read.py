@@ -9,7 +9,6 @@ Created on Thu Dec  1 15:47:05 2022
 import collections.abc
 
 # Create a logger object.
-import logging
 import os
 
 import yaml
@@ -18,6 +17,8 @@ import autorino.common as arocmn
 import autorino.convert as arocnv
 import autorino.download as arodwl
 import autorino.handle as arohdl
+
+from rinexmod import rinexmod_api
 
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
@@ -28,52 +29,35 @@ import autorino.cfgenv.env_read as aroenv
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
-def run_steps(steps_lis, step_select=[], print_table=True):
-    """
-    Executes the steps in the provided list.
 
-    This function takes a list of StepGnss objects, an optional list of selected steps,
-     and an optional boolean flag for printing tables.
-    It iterates over the list of StepGnss objects and executes
-    the 'download' or 'convert' method depending on the type of the step.
-    If a list of selected steps is provided, only the steps in the list will be executed.
-    If the 'verbose' flag is set to True, the tables will be printed during the execution of the steps.
+def load_cfg(configfile_path):
+    """
+    Loads quickly a configuration file (YAML format) without interpretation.
+
+    This function reads a YAML configuration file from the specified path and returns the parsed content.
 
     Parameters
     ----------
-    steps_lis : list
-        A list of StepGnss objects to be executed.
-    step_select : list, optional
-        A list of selected steps to be executed. If not provided, all steps in 'steps_lis' will be executed.
-        Default is an empty list.
-    print_table : bool, optional
-        A flag indicating whether to print the tables during the execution of the steps. Default is True.
+    configfile_path : str
+        The path to the configuration file.
 
     Returns
     -------
-    None
+    dict
+        The parsed content of the configuration file.
     """
-
-    wkf_prev = None
-    for istp, stp in enumerate(steps_lis):
-        if istp > 0:
-            wkf_prev = steps_lis[istp - 1]
-
-        if step_select and stp.get_step_type() not in step_select:
-            continue
-
-        if stp.get_step_type() == "download":
-            stp.download(print_table)
-        elif stp.get_step_type() == "convert":
-            stp.load_table_from_prev_step_table(wkf_prev.table)
-            stp.convert(print_table)
+    logger.info("start to read configfile: %s", configfile_path)
+    y = yaml.safe_load(open(configfile_path))
+    return y
 
 
 def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     """
-    Load a configuration file (YAML format) and return a list of StepGnss objects to be launched sequentially.
+    Read and interpret a configuration file (YAML format) and
+    return a list of StepGnss objects to be launched sequentially.
 
-    This function takes in a path to a configuration file, an optional EpochRange object, and an optional path
+    This function takes in a path to a configuration file,
+    an optional EpochRange object, and an optional path
     to a main configuration file.
     It reads the configuration file, updates it with the main configuration file if provided,
     and creates a list of StepGnss objects based on the configuration.
@@ -84,7 +68,8 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     configfile_path : str
         The path to the configuration file.
     epoch_range : EpochRange, optional
-        An EpochRange object which will override the epoch ranges given in the configuration file. Default is None.
+        An EpochRange object which will override the epoch ranges
+        given in the configuration file. Default is None.
     main_cfg_path : str, optional
         The path to the main configuration file. Default is None.
 
@@ -97,30 +82,42 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     y_station : dict
         A dictionary of station information.
     """
-    global y_main
-    logger.info("start to read configfile: %s", configfile_path)
+    # global y_main
 
-    y = yaml.safe_load(open(configfile_path))
+    y = load_cfg(configfile_path)
 
     if main_cfg_path:
         y_main = yaml.safe_load(open(main_cfg_path))
-        y_main_sessions = y_main["station"]["sessions"]
     else:
-        y_main_sessions = None
+        y_main = None
 
     y = update_w_main_dic(y, y_main)
-    logger.debug("Used config file (updated with the main):\n %s", y)
+    logger.debug("Used configuration (updated with the main):\n %s", y)
 
     y_station = y["station"]
 
     steps_lis_lis, steps_dic_dic = read_cfg_sessions(
-        y_station["sessions"], y_station=y_station, epoch_range=epoch_range
+        y_station["sessions"], y_station=y_station, epoch_range_inp=epoch_range
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
 
 
-def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
+def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
+
+    # ++++ METADATA
+    if y_station["site"]["sitelog_path"]:
+        slpath = y_station["site"]["sitelog_path"]
+        if os.path.isdir(slpath) or os.path.isfile(slpath):
+            # we load the metadata if the path is a directory or a file
+            metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
+        else:
+            # if not we consider it as a string
+            # (because the path might be translated later in the object)
+            metadata = slpath
+    else:
+        metadata = None
+
     steps_lis_lis = []
     steps_dic_dic = {}
 
@@ -137,10 +134,10 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         log_dir, _, _ = _get_dir_path(y_gen, "log")
 
         # ++++ EPOCH RANGE AT THE SESSION LEVEL
-        if not epoch_range:
-            epo_obj_ses = _epoch_range_from_cfg_bloc(y_ses["epoch_range"])
+        if epoch_range_inp:
+            epo_obj_ses = epoch_range_inp
         else:
-            epo_obj_ses = epoch_range
+            epo_obj_ses = _epoch_range_from_cfg_bloc(y_ses["epoch_range"])
 
         steps_lis = []
         steps_dic = {}
@@ -155,6 +152,14 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
 
             # ++++ EPOCH RANGE AT THE STEP LEVEL
 
+            if not _is_cfg_bloc_active(y_stp):
+                continue
+
+            step_cls = step_cls_select(k_stp)
+            if not step_cls:
+                logger.warning("unknown step %s, skip", k_stp)
+                continue
+
             if y_stp["epoch_range"] == "FROM_SESSION":
                 epo_obj_stp = epo_obj_ses
                 y_stp["epoch_range"] = y_ses["epoch_range"]
@@ -162,78 +167,26 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
                 epo_obj_stp = _epoch_range_from_cfg_bloc(y_stp["epoch_range"])
 
             out_dir, _, _ = _get_dir_path(y_stp, "out")
-            inp_dir, inp_dir_parent, inp_structure = _get_dir_path(
-                y_stp, "inp", check_parent_dir_existence=False
-            )
+            inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
 
-            if k_stp == "download":
-                if not _is_cfg_bloc_active(y_stp):
-                    continue
+            kwargs_for_step = {
+                "out_dir": out_dir,
+                "tmp_dir": tmp_dir,
+                "log_dir": log_dir,
+                "inp_dir": inp_dir,
+                "epoch_range": epo_obj_stp,
+                "site": y_station["site"],
+                "session": y_ses["general"],
+                "options": y_stp["options"],
+                "metadata": metadata,
+            }
 
-                dwl = arodwl.DownloadGnss
-                step_obj = dwl(
-                    out_dir=out_dir,
-                    tmp_dir=tmp_dir,
-                    log_dir=log_dir,
-                    epoch_range=epo_obj_stp,
-                    access=y_station["access"],
-                    inp_dir_parent=inp_dir_parent,
-                    inp_structure=inp_structure,
-                    site=y_station["site"],
-                    session=y_ses["general"],
-                    options=y_stp["options"],
-                )
+            if k_stp in "download":
+                kwargs_for_step["access"] = y_station["access"]
 
-            # appended in lis and dic at the end of the tests
+            step_obj = step_cls(**kwargs_for_step)
 
-            elif k_stp == "convert":
-                if not _is_cfg_bloc_active(y_stp):
-                    continue
-
-                if y_station["site"]["sitelog_path"]:
-                    sitelogs = y_station["site"]["sitelog_path"]
-                else:
-                    sitelogs = None
-
-                cnv = arocnv.ConvertGnss
-                step_obj = cnv(
-                    out_dir=out_dir,
-                    tmp_dir=tmp_dir,
-                    log_dir=log_dir,
-                    epoch_range=epo_obj_stp,
-                    site=y_station["site"],
-                    session=y_ses["general"],
-                    metadata=sitelogs,
-                    options=y_stp["options"],
-                )
-
-            elif k_stp == "split":
-                if not _is_cfg_bloc_active(y_stp):
-                    continue
-
-                if y_station["site"]["sitelog_path"]:
-                    sitelogs = y_station["site"]["sitelog_path"]
-                else:
-                    sitelogs = None
-
-                spl = arohdl.HandleGnss
-                step_obj = spl(
-                    out_dir=out_dir,
-                    tmp_dir=tmp_dir,
-                    log_dir=log_dir,
-                    epoch_range=epo_obj_stp,
-                    site=y_station["site"],
-                    session=y_ses["general"],
-                    metadata=sitelogs,
-                    options=y_stp["options"],
-                )
-
-                # appended in lis and dic at the end of the k_stp tests
-
-            else:
-                logger.warning("unknown step %s in config file, skipped...", k_stp)
-                continue
-
+            # appended in lis and dic at the end of the k_stp tests
             steps_lis.append(step_obj)
             steps_dic[k_stp] = step_obj
 
@@ -241,6 +194,20 @@ def read_cfg_sessions(y_sessions_dict, epoch_range=None, y_station=None):
         steps_dic_dic[k_ses] = steps_dic
 
     return steps_lis_lis, steps_dic_dic
+
+
+def step_cls_select(step_name):
+    if step_name == "download":
+        return arodwl.DownloadGnss
+    elif step_name == "convert":
+        return arocnv.ConvertGnss
+    elif step_name == "split":
+        return arohdl.SplitGnss
+    elif step_name == "splice":
+        return arohdl.SpliceGnss
+    else:
+        logger.warning("unknown step %s in cfgfiles file, skip", step_name)
+        return None
 
 
 def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
@@ -277,15 +244,15 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
     """
     parent_dir_out = arocmn.translator(parent_dir)
 
-    if (
-        parent_dir_out == "FROM_MAIN"
-    ):  # case when the parent directory is not defined in the main config file
+    if parent_dir_out == "FROM_MAIN":
+        # case when the parent directory is not defined in the main cfgfiles file
 
         if not parent_dir_key:
             parent_dir_key = "a directory"
 
         logger.error(
-            "%s is not correctly defined in the main config file (FROM_MAIN alias remains)",
+            "%s is not correctly defined in the main cfgfiles file"
+            "(FROM_MAIN can not be replaced)",
             parent_dir_key,
         )
         raise FileNotFoundError(
@@ -349,7 +316,7 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
     )
 
 
-def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
+def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
     """
     Constructs a directory path based on the provided parameters.
 
@@ -366,7 +333,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
         A dictionary containing step information.
     dir_type : str, optional
         The type of directory to be constructed. Default is 'out'.
-    check_parent_dir_existence : bool, optional
+    check_parent_dir_exist : bool, optional
         A flag indicating whether to check if the parent directory exists.
         Default is True.
 
@@ -378,7 +345,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_existence=True):
     """
     dir_parent = y_step[dir_type + "_dir_parent"]
     structure = y_step[dir_type + "_structure"]
-    if check_parent_dir_existence:
+    if check_parent_dir_exist:
         _check_parent_dir_existence(dir_parent, parent_dir_key=dir_type + "_dir_parent")
     dir_path = os.path.join(dir_parent, structure)
 
@@ -399,3 +366,61 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
             if d[k] == specific_value:
                 d[k] = v
     return d
+
+
+def run_steps(steps_lis, step_select=[], print_table=True):
+    """
+    Executes the steps in the provided list.
+
+    This function takes a list of StepGnss objects, an optional list of selected steps,
+     and an optional boolean flag for printing tables.
+    It iterates over the list of StepGnss objects and executes
+    the 'download' or 'convert' method depending on the type of the step.
+    If a list of selected steps is provided, only the steps in the list will be executed.
+    If the 'verbose' flag is set to True, the tables will be printed during the execution of the steps.
+
+    Parameters
+    ----------
+    steps_lis : Iterable
+        A list of StepGnss objects to be executed.
+    step_select : list, optional
+        A list of selected steps to be executed. If not provided, all steps in 'steps_lis' will be executed.
+        Default is an empty list.
+    print_table : bool, optional
+        A flag indicating whether to print the tables during the execution of the steps. Default is True.
+
+    Returns
+    -------
+    None
+    """
+
+    wkf_prev = None
+
+    logger.info("%i steps will be run %s", len(steps_lis), steps_lis)
+
+    for istp, stp in enumerate(steps_lis):
+        if istp > 0:
+            wkf_prev = steps_lis[istp - 1]
+
+        if step_select and stp.get_step_type() not in step_select:
+            logger.warning(
+                "step %s skipped, not selected in %s", stp.get_step_type(), step_select
+            )
+            continue
+
+        if print_table:
+            stp.options["verbose"] = True
+
+        if stp.get_step_type() == "download":
+            stp.download(**stp.options)
+        elif stp.get_step_type() == "convert":
+            stp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.convert(**stp.options)
+        elif stp.get_step_type() == "splice":
+            stp_rnx_inp = stp.copy()
+            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+        elif stp.get_step_type() == "split":
+            stp_rnx_inp = stp.copy()
+            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
