@@ -1884,7 +1884,7 @@ class StepGnss:
             # 'marker': 'XXXX', # forced below
             # 'sitelog': metadata, # forced below
             "compression": "gz",
-            "longname": True,
+            #"longname": True,
             "force_rnx_load": True,
             "verbose": False,
             "filename_style": 'basic',
