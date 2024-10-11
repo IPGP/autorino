@@ -306,6 +306,9 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_fil_epo_lis = [
                 self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
             ]
+            #### DIRTY URL CLEAN ME
+
+
 
             ## step 2: the table is updated with the files found
             new_rows_stk = []
