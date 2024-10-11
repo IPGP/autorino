@@ -124,14 +124,14 @@ class RequestGnss():
         rmot_files_list = []
         for rmot_dir_use in rmot_dir_list:
             if self.session.protocol == "http":
-                list_ = ardl.list_remote_files_http(self.session.hostname,
-                                                  rmot_dir_use)
+                list_ = ardl.list_remote_http(self.session.hostname,
+                                              rmot_dir_use)
                 rmot_files_list = rmot_files_list + list_
             elif self.session.protocol == "ftp":
-                list_ = ardl.list_remote_files_ftp(self.session.hostname,
-                                                 rmot_dir_use,
-                                                 self.session.sta_user,
-                                                 self.session.sta_pass)
+                list_ = ardl.list_remote_ftp(self.session.hostname,
+                                             rmot_dir_use,
+                                             self.session.sta_user,
+                                             self.session.sta_pass)
                 rmot_files_list = rmot_files_list + list_
 
             else:
@@ -150,14 +150,14 @@ class RequestGnss():
                 
         for rmot_file in rmot_files_list:
             if self.session.protocol == "http":
-                file_dl = ardl.download_file_http(rmot_file,
-                                                  self.out_dir)
+                file_dl = ardl.download_http(rmot_file,
+                                             self.out_dir)
                 download_files_list.append(file_dl)
             elif self.session.protocol == "ftp":
-                file_dl = ardl.download_file_ftp(rmot_file,
-                                               self.out_dir,
-                                               self.session.sta_user,
-                                               self.session.sta_pass)
+                file_dl = ardl.download_ftp(rmot_file,
+                                            self.out_dir,
+                                            self.session.sta_user,
+                                            self.session.sta_pass)
                 download_files_list.append(file_dl)
 
             else:
@@ -299,7 +299,7 @@ DR = DateRange(date_interest,now)
 REQ = RequestGnss(SESS,DR,output_path)
 
 #L = STAT.list_remote_files(DR)
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = REQ.guess_remote_files()
 
 print("AAAAAA",REQ.req_remote_files)

@@ -16,4 +16,5 @@ if os.path.isfile(log_file_path):
     logging.config.dictConfig(cfglog.log_config_dict)
 
 else:
-    print("ERR:logger config file",log_file_path,"is missing")
+    print("ERR:logger cfgfiles file",log_file_path,"is missing")
+
