@@ -38,6 +38,6 @@ if __name__ == '__main__':
     arocmn.autorino_cfgfile_run(cfg_in=config,
                                 main_cfg_in=main_config,
                                 sites_list=list_sites,
-                                start=start,
-                                end=end,
+                                epo_srt=start,
+                                epo_end=end,
                                 period=period)

@@ -47,10 +47,10 @@ class DownloadGnss(arocmn.StepGnss):
         The range of epochs for which data will be downloaded.
     access : dict
         A dictionary containing access information such as protocol, hostname, login, and password.
-    site : str, optional
-        The site identifier. Default is None.
-    session : str, optional
-        The session identifier. Default is None.
+    site : dict, optional
+        The site information. Default is None.
+    session : dict, optional
+        The session information. Default is None.
     options : dict, optional
         Additional options for the download process. Default is None.
     metadata : str or list, optional
@@ -91,10 +91,10 @@ class DownloadGnss(arocmn.StepGnss):
             The range of epochs for which data will be downloaded.
         access : dict
             A dictionary containing access information such as protocol, hostname, login, and password.
-        site : str, optional
-            The site identifier. Default is None.
-        session : str, optional
-            The session identifier. Default is None.
+        site : dict, optional
+            The site information. Default is None.
+        session : dict, optional
+            The session information. Default is None.
         options : dict, optional
             Additional options for the download process. Default is None.
         metadata : str or list, optional

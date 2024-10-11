@@ -368,12 +368,12 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     return d
 
 
-def run_steps(steps_lis, step_select=[], print_table=True):
+def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, print_table=True):
     """
     Executes the steps in the provided list.
 
     This function takes a list of StepGnss objects, an optional list of selected steps,
-     and an optional boolean flag for printing tables.
+    and an optional boolean flag for printing tables.
     It iterates over the list of StepGnss objects and executes
     the 'download' or 'convert' method depending on the type of the step.
     If a list of selected steps is provided, only the steps in the list will be executed.
@@ -383,9 +383,14 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     ----------
     steps_lis : Iterable
         A list of StepGnss objects to be executed.
-    step_select : list, optional
-        A list of selected steps to be executed. If not provided, all steps in 'steps_lis' will be executed.
-        Default is an empty list.
+    steps_select_list : list, optional
+        A list of selected steps to be executed.
+        If not provided, all steps in 'steps_lis' will be executed.
+        Default is None.
+    exclude_steps_select : bool, optional
+        If True the selected steps indicated in step_select_list are excluded.
+        It is the opposite behavior of the regular one using steps_select_list
+        Default is False.
     print_table : bool, optional
         A flag indicating whether to print the tables during the execution of the steps. Default is True.
 
@@ -394,23 +399,42 @@ def run_steps(steps_lis, step_select=[], print_table=True):
     None
     """
 
+    # If no steps are selected, initialize an empty list
+    if not steps_select_list:
+        steps_select_list = []
+
     wkf_prev = None
 
+    # Log the number of steps to be run
     logger.info("%i steps will be run %s", len(steps_lis), steps_lis)
 
+    # Iterate over the list of steps
     for istp, stp in enumerate(steps_lis):
         if istp > 0:
             wkf_prev = steps_lis[istp - 1]
 
-        if step_select and stp.get_step_type() not in step_select:
-            logger.warning(
-                "step %s skipped, not selected in %s", stp.get_step_type(), step_select
-            )
-            continue
+        # Check if there are selected steps to be run
+        if len(steps_select_list) > 0:
+            # Forced case: steps_select_list contains the steps to be run only
+            if not exclude_steps_select and stp.get_step_type() not in steps_select_list:
+                logger.warning(
+                    "step %s skipped, not selected in %s", stp.get_step_type(), steps_select_list
+                )
+                continue
+            # Exclusion case: steps_select_list contains steps to be excluded
+            elif exclude_steps_select and stp.get_step_type() in steps_select_list:
+                logger.warning(
+                    "step %s skipped, selected in %s", stp.get_step_type(), steps_select_list
+                )
+                continue
+            else:
+                pass
 
+        # Set the verbose option if print_table is True
         if print_table:
             stp.options["verbose"] = True
 
+        # Execute the step based on its type
         if stp.get_step_type() == "download":
             stp.download(**stp.options)
         elif stp.get_step_type() == "convert":
