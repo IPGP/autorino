@@ -53,7 +53,7 @@ def is_compressed(file_inp):
     return bool_compress
 
 
-def _decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
+def decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
     """
     Decompresses a gzipped file.
 
@@ -94,7 +94,7 @@ def _decomp_gzip(gzip_file_inp, out_dir_inp=None, force=False):
     return str(file_out)
 
 
-def _decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
+def decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
     """
     Decompresses a Hatanaka-compressed RINEX file.
 
@@ -168,11 +168,11 @@ def decompress_file(file_inp, out_dir_inp=None, force=False):
         bool_decomp_out = False
     ## RINEX Case
     elif conv.rinex_regex_search_tester(file_inp, compressed=True):
-        file_out = _decomp_hatanaka(file_inp, out_dir_inp, force=force)
+        file_out = decomp_hatanaka(file_inp, out_dir_inp, force=force)
         bool_decomp_out = True
     ## Generic gzipped case (e.g. RAW file)
     elif ext == ".gz":
-        file_out = _decomp_gzip(file_inp, out_dir_inp, force=force)
+        file_out = decomp_gzip(file_inp, out_dir_inp, force=force)
         bool_decomp_out = True
     else:
         logger.debug("no valid compression for %s, nothing is done", file_inp2.name)
