@@ -192,9 +192,9 @@ def list_remote_ftp(
 
     url_parsed = urlparse(hostname)
     if url_parsed.scheme:
-        hostname_use2 = url_parsed.netloc
+        hostname_use = url_parsed.netloc
     else:
-        hostname_use2 = url_parsed.path
+        hostname_use = url_parsed.path
 
     # be sure there is no hostname in the remote_dir
     remote_dir_use = remote_dir.replace(hostname, "")
@@ -228,9 +228,9 @@ def list_remote_ftp(
 
     # Retrieve list of files
     file_list = ftp_obj.nlst()
-    #file_list = [join_url('',hostname_use, remote_dir_use, f) for f in file_list if f not in ('.', '..')]
+    file_list = [join_url('',hostname_use, remote_dir_use, f) for f in file_list if f not in ('.', '..')]
     # legacy manual join (urltambouille)
-    file_list = ["/".join((hostname_use, remote_dir, f)) for f in file_list if f not in ('.', '..')]
+    # file_list = ["/".join((hostname_use, remote_dir, f)) for f in file_list if f not in ('.', '..')]
     # current directory (.) and parent directory (..) are removed anyway
 
     # Close connection
