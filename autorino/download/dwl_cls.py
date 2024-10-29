@@ -302,13 +302,12 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
             epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
 
-            # re add protocol:
-            rmot_fil_epo_lis = [
-                self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
-            ]
-            #### DIRTY URL CLEAN ME
-
-
+            # re add protocol: (urltambouille)
+            rmot_fil_epo_lis = [arodwl.join_url(self.access["protocol"], f, '', '') for f in rmot_fil_epo_lis]
+            #legacy readd
+            #rmot_fil_epo_lis = [
+            #    self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
+            #]
 
             ## step 2: the table is updated with the files found
             new_rows_stk = []

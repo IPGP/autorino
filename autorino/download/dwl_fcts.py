@@ -66,9 +66,9 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     """
     a wrapper to classical join to format correctly the URL
     """
-
+    # urltambouille
     ### add the protocol if missing
-    if not (hostname_inp.startswith("http") or hostname_inp.startswith("ftp")):
+    if protocol_inp and not (hostname_inp.startswith("http") or hostname_inp.startswith("ftp")):
         prot_n_host = protocol_inp + "://" + hostname_inp
     else:
         prot_n_host = hostname_inp
@@ -94,14 +94,14 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
 
 
 def ftp_create_obj(
-    url_host_inp, username=None, password=None, timeout=15, max_try=3, sleep_time=5
+    hostname_inp, username=None, password=None, timeout=15, max_try=3, sleep_time=5
 ):
     """
     Create an FTP object, and retry in case of a timeout.
 
     Parameters
     ----------
-    url_host_inp : str
+    hostname_inp : str
         The hostname of the FTP server.
     username : str, optional
         The username for FTP login. Default is None.
@@ -127,7 +127,7 @@ def ftp_create_obj(
     try_count = 0
     while True:
         try:
-            ftp = ftplib.FTP(url_host_inp, timeout=timeout)
+            ftp = ftplib.FTP(hostname_inp, timeout=timeout)
             if username and password:
                 ftp.login(username, password)
             return ftp
@@ -144,7 +144,7 @@ def ftp_create_obj(
 
 
 def list_remote_ftp(
-    host_name,
+    hostname,
     remote_dir,
     username=None,
     password=None,
@@ -157,7 +157,7 @@ def list_remote_ftp(
 
     Parameters
     ----------
-    host_name : str
+    hostname : str
         The hostname of the FTP server.
     remote_dir : str
         The remote directory to list files from.
@@ -182,13 +182,16 @@ def list_remote_ftp(
     AutorinoDownloadError
         If the FTP connection fails or if username/password are missing.
     """
-    # must be improved !!!
+
     # Clean hostname and remote directory
-    #### DIRTY URL CLEAN ME
-    remote_dir = remote_dir.replace(host_name, "")
-    host_name = host_name.replace("ftp://", "")
-    host_name = host_name.replace("/", "")
-    remote_dir = remote_dir.replace(host_name, "")
+    hostname_use = urlparse(hostname).netloc
+    # be sure there is no hostname in the remote_dir
+    remote_dir_use = remote_dir.replace(hostname, "")
+    remote_dir_use = remote_dir_use.replace(hostname_use, "")
+
+    #legacy hostname_use defintion (urltambouille)
+    #hostname_use = hostname.replace("ftp://", "")
+    #hostname_use = hostname_use.replace("/", "")
 
     # Connect to FTP server
     if ftp_obj_inp:
@@ -197,7 +200,7 @@ def list_remote_ftp(
     elif username and password:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
-            host_name, username, password, timeout=timeout, max_try=max_try
+            hostname_use, username, password, timeout=timeout, max_try=max_try
         )
     else:
         logger.error(
@@ -206,20 +209,21 @@ def list_remote_ftp(
         raise AutorinoDownloadError
 
     if not ftp_obj:
-        logger.error("FTP connection failed for %s", host_name)
+        logger.error("FTP connection failed for %s", hostname_use)
         return []
 
     # Change to remote directory
     try:
-        ftp_obj.cwd(remote_dir)
+        ftp_obj.cwd(remote_dir_use)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
         return []
 
     # Retrieve list of files
     file_list = ftp_obj.nlst()
-    #### DIRTY URL CLEAN ME
-    file_list = ["/".join((host_name, remote_dir, f)) for f in file_list if f not in ('.', '..')]
+    file_list = [join_url('',hostname_use, remote_dir_use, f) for f in file_list if f not in ('.', '..')]
+    # legacy manual join (urltambouille)
+    #file_list = ["/".join((hostname_use, remote_dir, f)) for f in file_list if f not in ('.', '..')]
     # current directory (.) and parent directory (..) are removed anyway
 
     # Close connection
@@ -275,6 +279,7 @@ def download_ftp(
     AutorinoDownloadError
         If the download fails after the maximum number of retry attempts.
     """
+
     urlp = urlparse(url)
     url_host = urlp.netloc
     url_dir = os.path.dirname(urlp.path)[1:]
@@ -366,10 +371,13 @@ def download_ftp(
 #
 
 
-def list_remote_http(host_name, remote_dir):
+def list_remote_http(hostname, remote_dir):
 
-    url = os.path.join(host_name, remote_dir)
-    url = "http://" + host_name + "/" + remote_dir
+    url = join_url("http", hostname, remote_dir, "")
+
+    # legacy manual join (urltambouille
+    #url = os.path.join(hostname, remote_dir)
+    #url = "http://" + hostname + "/" + remote_dir
 
     logger.debug("HTTP file list: %s", url)
 
@@ -394,7 +402,7 @@ def list_remote_http(host_name, remote_dir):
         link.get("href") for link in soup.find_all("a") if link.get("href") != "../"
     ]
     file_list = _parse_remote_file_http(file_list)
-    file_list = [host_name + f for f in file_list][
+    file_list = [hostname + f for f in file_list][
         1:
     ]  # remove the 1st element, which is the folder itself
 
