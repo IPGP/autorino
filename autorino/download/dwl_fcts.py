@@ -187,8 +187,8 @@ def list_remote_ftp(
 
     # Clean hostname and remote directory
     #legacy hostname_use defintion (urltambouille)
-    hostname_use = hostname.replace("ftp://", "")
-    hostname_use = hostname_use.replace("/", "")
+    #hostname_use = hostname.replace("ftp://", "")
+    #hostname_use = hostname_use.replace("/", "")
 
     url_parsed = urlparse(hostname)
     if url_parsed.scheme:
@@ -196,7 +196,6 @@ def list_remote_ftp(
     else:
         hostname_use2 = url_parsed.path
 
-    print("AAAAAAAAAAB",hostname_use,hostname_use2, url_parsed)
     # be sure there is no hostname in the remote_dir
     remote_dir_use = remote_dir.replace(hostname, "")
     remote_dir_use = remote_dir_use.replace(hostname_use, "")
