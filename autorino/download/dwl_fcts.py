@@ -189,7 +189,9 @@ def list_remote_ftp(
     #legacy hostname_use defintion (urltambouille)
     hostname_use = hostname.replace("ftp://", "")
     hostname_use = hostname_use.replace("/", "")
-    hostname_use2 = urlparse(hostname).netloc
+
+    url_parsed = urlparse(hostname)
+    hostname_use2 = url_parsed.netloc
     print("AAAAAAAAAA",hostname_use,hostname_use2)
     # be sure there is no hostname in the remote_dir
     remote_dir_use = remote_dir.replace(hostname, "")
