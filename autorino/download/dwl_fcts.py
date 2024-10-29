@@ -228,10 +228,13 @@ def list_remote_ftp(
 
     # Retrieve list of files
     file_list = ftp_obj.nlst()
-    #file_list = [join_url('',hostname_use, remote_dir_use, f) for f in file_list if f not in ('.', '..')]
+    file_list2 = [join_url('',hostname_use, remote_dir_use, f) for f in file_list if f not in ('.', '..')]
     # legacy manual join (urltambouille)
-    file_list = ["/".join((hostname_use, remote_dir, f)) for f in file_list if f not in ('.', '..')]
+    file_list = ["/".join((hostname_use, remote_dir_use, f)) for f in file_list if f not in ('.', '..')]
     # current directory (.) and parent directory (..) are removed anyway
+
+    print(file_list, file_list2)
+
 
     # Close connection
     if disposable_ftp_obj:
