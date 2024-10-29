@@ -311,6 +311,12 @@ def conv_regex_mdb2rnx(f):
     # fsdc176p11.18o
     # fsdc176p11.18n
     # fsdc176p11.18g
+    # and even for OVSG
+    # souf226n 8.24l
+    # souf226n 8.24n
+    # souf226n 8.24o
+
+
     finp = str(f)
     f = Path(Path(f).name)  ### keep the filename only
     if finp.lower().endswith("mdb"):
@@ -333,8 +339,8 @@ def conv_regex_mdb2rnx(f):
 
     site = re.match(regex_doy_site, f.name).group(1).lower()
     doy = re.match(regex_doy_site, f.name).group(doygroup).lower()
-    conv_regex_main = re.compile(site + doy + ".([0-9]{2})?\.[0-9]{2}o")
-    conv_regex_annex = re.compile(site + doy + ".([0-9]{2})?\.[0-9]{2}\w")
+    conv_regex_main = re.compile(site + doy + ".(.{2})?\.[0-9]{2}o")
+    conv_regex_annex = re.compile(site + doy + ".(.{2})?\.[0-9]{2}\w")
     return conv_regex_main, conv_regex_annex
 
 
