@@ -18,7 +18,7 @@ station:
     access:
         protocol: "ftp"
         hostname: "***REMOVED***" 
-        login: "***REMOVED***"
+        login: "admin"
         password: "***REMOVED***"
     sessions:
         session_01h01s:

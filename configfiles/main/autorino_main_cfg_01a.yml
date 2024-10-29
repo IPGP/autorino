@@ -1,6 +1,6 @@
 station:
     site:
-        sitelog_path: <$HOME>/metadata/OVPF/  ###  can be a specific file or a directory path containing the sitelogs
+        sitelog_path: <$HOME>/sitelogs/OVPF/  ###  can be a specific file or a directory path containing the sitelogs
     sessions:
         session_15m01s: ####Keep session in dictionnary / Object not necessary
             general:
@@ -19,7 +19,7 @@ station:
                 tz : 'UTC'
             steps:
                 download:
-                    inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+                    inp_dir_parent: "/Internal/%y/%m/%d/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
                     inp_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
                     out_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
                     out_structure: <SITE_ID>/%Y/%j
@@ -58,7 +58,7 @@ station:
                 tz : 'UTC'
             steps:
                 download:
-                    inp_dir_parent: "/DSK1/SSN/LOG3_C/%y%j/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+                    inp_dir_parent: "/Internal/%y/%m/%d/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
                     inp_structure:  "<SITE_ID4>%j<hourchar>%M.%y_.gz" 
                     out_dir_parent: '<$HOME>/autorino_workflow_tests/raw/'
                     out_structure: <SITE_ID>/%Y/%j

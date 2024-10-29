@@ -219,8 +219,8 @@ def list_remote_ftp(
     # Retrieve list of files
     file_list = ftp_obj.nlst()
     #### DIRTY URL CLEAN ME
-    file_list = ["/".join((host_name, remote_dir, f)) for f in file_list if f not in ('.', '..')]
     # current directory (.) and parent directory (..) are removed anyway
+    file_list = ["/".join((host_name, remote_dir, f.split()[-1])) for f in file_list]
 
     # Close connection
     if disposable_ftp_obj:
