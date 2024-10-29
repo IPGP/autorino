@@ -85,6 +85,8 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     return url_out
 
 
+print(join_url("http", "www.test.com", "", "file.txt"))
+
 #  ______ _______ _____
 # |  ____|__   __|  __ \
 # | |__     | |  | |__) |
@@ -184,14 +186,13 @@ def list_remote_ftp(
     """
 
     # Clean hostname and remote directory
+    #legacy hostname_use defintion (urltambouille)
+    #hostname_use = hostname.replace("ftp://", "")
+    #hostname_use = hostname_use.replace("/", "")
     hostname_use = urlparse(hostname).netloc
     # be sure there is no hostname in the remote_dir
     remote_dir_use = remote_dir.replace(hostname, "")
     remote_dir_use = remote_dir_use.replace(hostname_use, "")
-
-    #legacy hostname_use defintion (urltambouille)
-    #hostname_use = hostname.replace("ftp://", "")
-    #hostname_use = hostname_use.replace("/", "")
 
     # Connect to FTP server
     if ftp_obj_inp:

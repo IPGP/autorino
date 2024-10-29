@@ -303,7 +303,7 @@ class DownloadGnss(arocmn.StepGnss):
             epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
 
             # re add protocol: (urltambouille)
-            rmot_fil_epo_lis = [arodwl.join_url(self.access["protocol"], f, '', '') for f in rmot_fil_epo_lis]
+            rmot_fil_epo_lis = [arodwl.join_url(self.access["protocol"], '', '',f) for f in rmot_fil_epo_lis]
             #legacy readd
             #rmot_fil_epo_lis = [
             #    self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
