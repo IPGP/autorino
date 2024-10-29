@@ -286,7 +286,7 @@ def download_ftp(
     url_dir = os.path.dirname(urlp.path)[1:]
     url_fname = os.path.basename(urlp.path)
 
-    print(url_host, url_dir, url_fname,"AAAAAAAAAAAAAAAAAAAA")
+    print("AAAAA",url_host, url_dir, url_fname)
 
     if ftp_obj_inp:
         disposable_ftp_obj = False
