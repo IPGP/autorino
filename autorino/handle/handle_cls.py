@@ -226,11 +226,11 @@ class HandleGnss(arocmn.StepGnss):
             logger.info("> Table to be feeded:")
             self.print_table()
 
-        self.table["ok_inp"] = False
+        self.table["ok_inp"] = True
 
         for irow, row in self.table.iterrows():
 
-            if not self.mono_ok_check(irow, 'feed_by_epochs',
+            if not self.mono_ok_check(irow, 'feed by epochs',
                                       fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
                                       check_ok_out_only=True):
                 continue
@@ -303,6 +303,14 @@ class HandleGnss(arocmn.StepGnss):
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
+            else: # should not happend
+                self.table.loc[irow, "ok_inp"] = False
+                self.table.loc[irow, "fpath_inp"] = None
+                logger.warning(
+                    "no valid input RINEX between %s & %s",
+                    arocmn.iso_zulu_epoch(epo_srt),
+                    arocmn.iso_zulu_epoch(epo_end),
+                )
 
         return None
 
