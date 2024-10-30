@@ -507,6 +507,11 @@ class SpliceGnss(HandleGnss):
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
+        # Find the input RINEX files
+        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
+        # Feed the epochs for splicing
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
+
         # generate the potential local files
         self.guess_local_rnx()
         # tests if the output local files are already there
@@ -514,12 +519,6 @@ class SpliceGnss(HandleGnss):
 
         if force:
             self.force("splice")
-
-        # Find the input RINEX files
-        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
-
-        # Feed the epochs for splicing
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
 
         # Perform the core splicing operation
         self.splice_core(
@@ -580,7 +579,6 @@ class SpliceGnss(HandleGnss):
                 self.mono_mv_final(irow, self.out_dir)
 
         self.remov_tmp_files()
-
         return None
 
     def mono_splice(
@@ -813,7 +811,8 @@ class SplitGnss(HandleGnss):
         self.set_tmp_dirs()
         for irow, row in self.table.iterrows():
 
-            if self.mono_ok_check(irow,'split'):
+            if self.mono_ok_check(irow,'split',
+                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
                 continue
 
             fdecmptmp, _ = self.mono_decompress(irow)
