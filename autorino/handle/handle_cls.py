@@ -497,6 +497,8 @@ class SpliceGnss(HandleGnss):
             Additional options for the RINEX modification. Default is None.
         verbose : bool, optional
             If True, prints the table for debugging purposes. Default is False.
+        force : bool, optional
+            If True, forces the splicing operation. Default is False.
 
         Returns
         -------
@@ -550,7 +552,8 @@ class SpliceGnss(HandleGnss):
 
         for irow, row in self.table.iterrows():
 
-            if self.mono_ok_check(irow,'splice'):
+            if self.mono_ok_check(irow,'splice',
+                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
                 continue
 
             logger.info(
