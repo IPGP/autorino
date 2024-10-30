@@ -1135,12 +1135,26 @@ class StepGnss:
 
         return None
 
-    def force(self,step_name=""):
+    def force(self, step_name=""):
+        """
+        Enables the force mode for the current step.
+
+        This method sets the 'ok_inp' column of the table to True and updates the 'note' column
+        to indicate that the force mode is enabled for the specified step.
+
+        Parameters
+        ----------
+        step_name : str, optional
+            The name of the step for which the force mode is enabled. Default is an empty string.
+
+        Returns
+        -------
+        None
+        """
         logger.info("force %s is enabled", step_name)
         self.table["ok_inp"] = True
         self.table["note"] = "force_" + step_name
         return None
-
 
     def guess_local_rnx(self):
         """

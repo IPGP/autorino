@@ -507,15 +507,15 @@ class SpliceGnss(HandleGnss):
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
-        # Find the input RINEX files
-        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
-        # Feed the epochs for splicing
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
-
         # generate the potential local files
         self.guess_local_rnx()
         # tests if the output local files are already there
         self.check_local_files("out")
+
+        # Find the input RINEX files
+        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
+        # Feed the epochs for splicing
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
 
         if force:
             self.force("splice")
