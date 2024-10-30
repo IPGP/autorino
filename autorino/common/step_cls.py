@@ -12,6 +12,8 @@ import os
 import re
 import shutil
 import time
+from pathlib import Path
+
 from filelock import FileLock, Timeout
 
 
@@ -2099,4 +2101,34 @@ class StepGnss:
 
         return frnxfin
 
+    def mono_ok_check(self, irow, step_name="splice"):
+        """
+        Checks the status of the input and output files for a specific row in the table.
 
+        This method verifies if the input file is valid and if the output file already exists.
+        It logs appropriate messages and determines if the current step should be skipped.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to check.
+        step_name : str, optional
+            The name of the step being checked. Default is "splice".
+
+        Returns
+        -------
+        bool
+            False if the step should be skipped, True otherwise.
+        """
+        fraw = Path(self.table.loc[irow, "fpath_inp"])
+
+        if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            logger.info("%s skipped (output already exists): %s", step_name, fraw)
+            bool_ok = False
+        elif not self.table.loc[irow, "ok_inp"]:
+            logger.warning("%s skipped (input disabled): %s", step_name, fraw)
+            bool_ok = False
+        else:
+            bool_ok = True
+
+        return bool_ok
