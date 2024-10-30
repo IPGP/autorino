@@ -226,7 +226,7 @@ class HandleGnss(arocmn.StepGnss):
             logger.info("> Table to be feeded:")
             self.print_table()
 
-        #self.table["ok_inp"] = True
+        #self.table["ok_inp"] = True # this is dangerous !!
 
         for irow, row in self.table.iterrows():
 
@@ -564,7 +564,6 @@ class SpliceGnss(HandleGnss):
         self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
-            print("AAAAAAAAAAA" , row)
             if not self.mono_ok_check(irow,'splice',
                                       fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
                 continue
