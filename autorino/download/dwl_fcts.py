@@ -235,7 +235,7 @@ def list_remote_ftp(
 
     print("AAAAAA",file_list_join, file_list_leg)
 
-    file_list = file_list_leg
+    file_list = file_list_join
 
     # Close connection
     if disposable_ftp_obj:
@@ -293,7 +293,7 @@ def download_ftp(
 
     urlp = urlparse(url)
     url_host = urlp.netloc
-    url_dir = os.path.dirname(urlp.path)[1:]
+    url_dir = os.path.dirname(urlp.path) #[1:]
     url_fname = os.path.basename(urlp.path)
 
     print("AAAAABbbBBB", urlp, url_host, url_dir, url_fname)
