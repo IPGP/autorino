@@ -1173,6 +1173,11 @@ class StepGnss:
 
             epo_dt_srt = epoch.to_pydatetime()
             epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
+
+            # removing the timezone to avoid nasty effects
+            epo_dt_srt = epo_dt_srt.replace(tzinfo=None)
+            epo_dt_end = epo_dt_end.replace(tzinfo=None)
+
             prd_str = rinexmod.rinexfile.file_period_from_timedelta(
                 epo_dt_srt, epo_dt_end
             )[0]
