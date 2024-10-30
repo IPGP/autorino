@@ -522,28 +522,32 @@ class DownloadGnss(arocmn.StepGnss):
             self.print_table()
         return None
 
-    #               _   _
-    #     /\       | | (_)
-    #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
-    #   / /\ \ / __| __| |/ _ \| '_ \/ __|  / _ \| '_ \  | '__/ _ \ \ /\ / / __|
-    #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
-    # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
-    #
+#               _   _                   _ _                           _ _    __                                 __
+#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
+#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
+#   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
+#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
+# /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
+#                                                                           \_\                                 /_/
 
     def mono_fetch(self, irow, force=False, timeout=60, max_try=4, sleep_time=5):
 
-        if self.table.loc[irow, "ok_out"] and not force:
-            logger.info(
-                "%s action on row skiped (output exists)",
-                self.table.loc[irow, "fpath_out"],
-            )
-            return None
+        # +++ oldcheck (to be removed)
+        # if self.table.loc[irow, "ok_out"] and not force:
+        #     logger.info(
+        #         "%s action on row skiped (output exists)",
+        #         self.table.loc[irow, "fpath_out"],
+        #     )
+        #     return None
+        #
+        # if not self.table.loc[irow, "ok_inp"]:
+        #     logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         self.table.loc[irow, "fname"],
+        #     )
+        #     return None
 
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
+        if not self.mono_ok_check(irow, 'fetch (mono)'):
             return None
 
         logger.info(">>>>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])

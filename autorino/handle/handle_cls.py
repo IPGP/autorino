@@ -584,12 +584,18 @@ class SpliceGnss(HandleGnss):
         containing the RINEXs to splice
         """
 
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-            )
-            self.table.loc[irow, "ok_out"] = False
+        # +++ oldcheck (to be removed)
+        # if not self.table.loc[irow, "ok_inp"]:
+        #     logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+        #     )
+        #     self.table.loc[irow, "ok_out"] = False
+        #     return None
+
+        if not self.mono_ok_check(irow, 'splice (mono)',
+                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+                                  switch_ok_out_false=True):
             return None
 
         # definition of the output directory (after the action)
@@ -793,8 +799,11 @@ class SplitGnss(HandleGnss):
         """
 
         self.set_tmp_dirs()
-
         for irow, row in self.table.iterrows():
+
+            if self.mono_ok_check(irow,'split'):
+                continue
+
             fdecmptmp, _ = self.mono_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
@@ -828,12 +837,18 @@ class SplitGnss(HandleGnss):
         typically 'fpath_inp' file
         """
 
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-            )
-            self.table.loc[irow, "ok_out"] = False
+        # +++ oldcheck (to be removed)
+        # if not self.table.loc[irow, "ok_inp"]:
+        #     logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+        #     )
+        #     self.table.loc[irow, "ok_out"] = False
+        #     return None
+
+        if not self.mono_ok_check(irow, 'split (mono)',
+                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+                                  switch_ok_out_false=True):
             return None
 
         # definition of the output directory (after the action)
