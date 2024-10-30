@@ -2016,7 +2016,7 @@ class StepGnss:
         if force:
             logger.info("%s forced: %s", step_name, finp_use)
             bool_ok = True
-        if check_ok_out_only:
+        elif check_ok_out_only:
             if self.table.loc[irow, "ok_out"]:
                 logger.info("%s skipped (output already exists): %s", step_name, fout_use)
                 bool_ok = False
