@@ -1975,7 +1975,8 @@ class StepGnss:
                       step_name,
                       fname_custom="",
                       force = False,
-                      switch_ok_out_false = False):
+                      switch_ok_out_false = False,
+                      check_ok_out_only = False):
         """
         Checks the status of the input and output files for a specific row in the table.
 
@@ -2009,12 +2010,15 @@ class StepGnss:
             finp_use = fname_custom
             fout_use = fname_custom
         else:
-            finp_use = Path(self.table.loc[irow, "fpath_inp"])
-            fout_use = Path(self.table.loc[irow, "fpath_inp"])
+            finp_use = Path(str(self.table.loc[irow, "fpath_inp"]))
+            fout_use = Path(str(self.table.loc[irow, "fpath_inp"]))
 
         if force:
             logger.info("%s forced: %s", step_name, finp_use)
             bool_ok = True
+        elif check_ok_out_only and self.table.loc[irow, "ok_out"]:
+            logger.info("%s skipped (output already exists): %s", step_name, fout_use)
+            bool_ok = False
         elif not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
             logger.info("%s skipped (output already exists): %s", step_name, fout_use)
             bool_ok = False
