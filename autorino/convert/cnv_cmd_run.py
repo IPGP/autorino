@@ -217,11 +217,6 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_kwoptions,
     )
 
-
-# set current user as constant
-USER, GROUP = arocnv.get_current_user_grp()
-
-
 def converter_run(
     inp_raw_fpath: Union[Path, str, List[Path], List[str]],
     out_dir: Union[Path, str],
@@ -299,6 +294,9 @@ def converter_run(
     process_converter
         The subprocess object which ran the conversion (for debug purposes).
     """
+
+    # set current user as constant
+    USER, GROUP = arocnv.get_current_user_grp()
 
     #### Convert the paths as Path objects
     out_dir = Path(out_dir)
