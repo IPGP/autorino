@@ -159,7 +159,7 @@ class ConvertGnss(arocmn.StepGnss):
             site4_list, site9_list = [], []
 
         ### initialize the table as log
-        self.set_table_log(out_dir=self.tmp_dir_logs)
+        self.set_table_log(out_dir=self.tmp_dir_tables)
 
         ### guess and deactivate existing local RINEX files
         # generate the potential local files
@@ -174,7 +174,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         filter_prev_tables = False
         if filter_prev_tables:
-            prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
+            prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_tables)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
                 self.filter_prev_tab(prv_tbl_df)
