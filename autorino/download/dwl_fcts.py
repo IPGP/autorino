@@ -235,7 +235,7 @@ def list_remote_ftp(
 
     print("AAAAAA",file_list_join, file_list_leg)
 
-    file_list = file_list_join
+    file_list = file_list_leg
 
     # Close connection
     if disposable_ftp_obj:
