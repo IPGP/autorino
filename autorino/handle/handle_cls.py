@@ -312,10 +312,6 @@ class HandleGnss(arocmn.StepGnss):
                     arocmn.iso_zulu_epoch(epo_end),
                 )
 
-        if print_table:
-            logger.info("> Table feeded:")
-            self.print_table()
-
         return None
 
     def find_local_inp(self, return_as_step_obj=True, rnx3_regex=False):
@@ -569,8 +565,8 @@ class SpliceGnss(HandleGnss):
 
         for irow, row in self.table.iterrows():
 
-            if self.mono_ok_check(irow,'splice',
-                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
+            if not self.mono_ok_check(irow,'splice',
+                                      fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
                 continue
 
             logger.info(
@@ -829,8 +825,8 @@ class SplitGnss(HandleGnss):
         self.set_tmp_dirs()
         for irow, row in self.table.iterrows():
 
-            if self.mono_ok_check(irow,'split',
-                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
+            if not self.mono_ok_check(irow,'split',
+                                      fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
                 continue
 
             fdecmptmp, _ = self.mono_decompress(irow)
