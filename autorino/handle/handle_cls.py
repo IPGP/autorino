@@ -229,6 +229,10 @@ class HandleGnss(arocmn.StepGnss):
         self.table["ok_inp"] = False
 
         for irow, row in self.table.iterrows():
+
+            if not self.mono_ok_check(irow, 'feed_by_epochs'):
+                continue
+
             site = self.table.loc[irow, "site"]
             epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
             epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
@@ -512,13 +516,15 @@ class SpliceGnss(HandleGnss):
         # tests if the output local files are already there
         self.check_local_files("out")
 
+        # if force is True, force the splicing operation
+        if force:
+            self.force("splice")
+
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
         # Feed the epochs for splicing
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
 
-        if force:
-            self.force("splice")
 
         # Perform the core splicing operation
         self.splice_core(
