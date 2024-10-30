@@ -226,7 +226,7 @@ class HandleGnss(arocmn.StepGnss):
             logger.info("> Table to be feeded:")
             self.print_table()
 
-        self.table["ok_inp"] = True
+        #self.table["ok_inp"] = True
 
         for irow, row in self.table.iterrows():
 
