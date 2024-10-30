@@ -876,7 +876,7 @@ class StepGnss:
     #               __/ | __/ |         __/ |
     #              |___/ |___/         |___/
 
-    def set_logfile(self, log_dir_inp=None, step_suffix=None):
+    def set_logfile(self, log_dir_inp=None, step_suffix=''):
         """
         set logging in a file
         """
