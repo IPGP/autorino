@@ -312,6 +312,10 @@ class HandleGnss(arocmn.StepGnss):
                     arocmn.iso_zulu_epoch(epo_end),
                 )
 
+        if print_table:
+            logger.info("> Table feeded:")
+            self.print_table()
+
         return None
 
     def find_local_inp(self, return_as_step_obj=True, rnx3_regex=False):
@@ -533,7 +537,6 @@ class SpliceGnss(HandleGnss):
         stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
         # Feed the epochs for splicing
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
-
 
         # Perform the core splicing operation
         self.splice_core(
