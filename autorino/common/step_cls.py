@@ -426,7 +426,7 @@ class StepGnss:
 
     def _init_tmp_dirs_paths(
         self,
-        tmp_subdir_logs="logs",
+        tmp_subdir_tables="tables",
         tmp_subdir_unzip="unzipped",
         tmp_subdir_conv="converted",
         tmp_subdir_rnxmod="rinexmoded",
@@ -435,12 +435,13 @@ class StepGnss:
         """
         Initializes the temporary directories paths for the StepGnss object.
 
-        This method sets the paths for the temporary directories of the StepGnss object. It creates the paths in a generic form, with placeholders and without creating the actual directories.
+        This method sets the paths for the temporary directories of the StepGnss object.
+        It creates the paths in a generic form, with placeholders and without creating the actual directories.
         The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
 
         Parameters
         ----------
-        tmp_subdir_logs : str, optional
+        tmp_subdir_tables : str, optional
             The subdirectory for logs. Default is 'logs'.
         tmp_subdir_unzip : str, optional
             The subdirectory for unzipped files. Default is 'unzipped'.
@@ -456,14 +457,14 @@ class StepGnss:
         None
         """
         # Internal versions have not been translated
-        self._tmp_dir_logs = os.path.join(self.tmp_dir, tmp_subdir_logs)
+        self._tmp_dir_tables = os.path.join(self.tmp_dir, tmp_subdir_tables)
         self._tmp_dir_unzipped = os.path.join(self.tmp_dir, tmp_subdir_unzip)
         self._tmp_dir_converted = os.path.join(self.tmp_dir, tmp_subdir_conv)
         self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir, tmp_subdir_rnxmod)
         self._tmp_dir_downloaded = os.path.join(self.tmp_dir, tmp_subdir_dwnld)
 
         # Translation of the paths
-        self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
+        self.tmp_dir_tables = self.translate_path(self._tmp_dir_tables)
         self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
         self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
         self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
@@ -492,7 +493,7 @@ class StepGnss:
         """
         # This translation is also done in _init_tmp_dirs_paths
         # but we redo it here, simply to be sure
-        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs, make_dir=True)
+        tmp_dir_tables_set = self.translate_path(self._tmp_dir_tables, make_dir=True)
         tmp_dir_unzipped_set = self.translate_path(
             self._tmp_dir_unzipped, make_dir=True
         )
@@ -507,7 +508,7 @@ class StepGnss:
         )
 
         return (
-            tmp_dir_logs_set,
+            tmp_dir_tables_set,
             tmp_dir_unzipped_set,
             tmp_dir_converted_set,
             tmp_dir_rinexmoded_set,
@@ -545,7 +546,7 @@ class StepGnss:
 
         # Iterate through the temporary directories
         for tmp_dir in [
-            self.tmp_dir_logs,
+            self.tmp_dir_tables,
             self.tmp_dir_unzipped,
             self.tmp_dir_converted,
             self.tmp_dir_rinexmoded,
@@ -875,7 +876,7 @@ class StepGnss:
     #               __/ | __/ |         __/ |
     #              |___/ |___/         |___/
 
-    def set_logfile(self, log_dir_inp=None, step_suffix=""):
+    def set_logfile(self, log_dir_inp=None, step_suffix=None):
         """
         set logging in a file
         """
@@ -887,12 +888,17 @@ class StepGnss:
         else:
             log_dir = log_dir_inp
 
+        if not step_suffix:
+            step_suffix_use = self.get_step_type()
+        else:
+            step_suffix_use = step_suffix
+
         log_dir_use = self.translate_path(log_dir)
 
         _logger = logging.getLogger("autorino")
 
         ts = utils.get_timestamp()
-        log_name = "_".join((ts, step_suffix, ".log"))
+        log_name = "_".join((ts, step_suffix_use, ".log"))
         log_path = os.path.join(log_dir_use, log_name)
 
         log_cfg_dic = arologcfg.log_config_dict
@@ -1011,7 +1017,7 @@ class StepGnss:
         # add +1 in max_colwidth for safety
         if not no_print:
             # print it in the logger (if silent , just return it)
-            name = type(self).__name__
+            name = self.get_step_type(True)
             logger.info("%s %s/%s\n%s", name, self.site_id, self.epoch_range, str_out)
         if no_return:
             return None
@@ -1999,6 +2005,10 @@ class StepGnss:
         switch_ok_out_false : bool, optional
             If True, the 'ok_out' column of the table is set to False if the step should be skipped.
             Default is False.
+        check_ok_out_only : bool, optional
+            If True, the step is skipped if the output file already exists.
+            (no check on the ok_inp column)
+            Default is False.
 
         Returns
         -------
@@ -2161,6 +2171,9 @@ class StepGnss:
                 self.table.loc[irow, "fname"],
             )
             return None
+        # !!!!!
+        # must be changed for .mono_ok_check(irow, step_name="mv_final (mono)", check_ok_out_only=True)
+        # !!!!!
 
         # definition of the output directory (after the action)
         if out_dir:
