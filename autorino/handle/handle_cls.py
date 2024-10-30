@@ -231,7 +231,8 @@ class HandleGnss(arocmn.StepGnss):
         for irow, row in self.table.iterrows():
 
             if not self.mono_ok_check(irow, 'feed_by_epochs',
-                                      fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
+                                      fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+                                      check_ok_out_only=True):
                 continue
 
             site = self.table.loc[irow, "site"]
@@ -516,7 +517,6 @@ class SpliceGnss(HandleGnss):
         self.guess_local_rnx()
         # tests if the output local files are already there
         self.check_local_files("out")
-
         # if force is True, force the splicing operation
         if force:
             self.force("splice")
