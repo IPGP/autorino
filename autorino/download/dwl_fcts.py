@@ -227,13 +227,11 @@ def list_remote_ftp(
         return []
 
     # Retrieve list of files
-    file_list = ftp_obj.nlst()
-    file_list_join = [join_url('',hostname_use, remote_dir_use, f) for f in file_list if f not in ('.', '..')]
+    file_list_bulk = ftp_obj.nlst()
+    file_list_join = [join_url('',hostname_use, remote_dir_use, f) for f in file_list_bulk if f not in ('.', '..')]
     # legacy manual join (urltambouille)
-    file_list_leg = ["/".join((hostname_use, remote_dir_use, f)) for f in file_list if f not in ('.', '..')]
+    #file_list_leg = ["/".join((hostname_use, remote_dir_use, f)) for f in file_list_bulk if f not in ('.', '..')]
     # current directory (.) and parent directory (..) are removed anyway
-
-    print("AAAAAA",file_list_join, file_list_leg)
 
     file_list = file_list_join
 
@@ -291,13 +289,16 @@ def download_ftp(
         If the download fails after the maximum number of retry attempts.
     """
 
+    def _ftp_callback(data):
+        _ftp_callback.bytes_transferred += len(data)
+
+
     urlp = urlparse(url)
     url_host = urlp.netloc
     url_dir = os.path.dirname(urlp.path) #[1:]
     url_fname = os.path.basename(urlp.path)
 
-    print("AAAAABbbBBB", urlp, url_host, url_dir, url_fname)
-
+    # create the FTP object
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
@@ -317,10 +318,12 @@ def download_ftp(
         )
         raise AutorinoDownloadError
 
+    # connect to the FTP server
     if not ftp_obj:
         logger.error("FTP connection failed for %s", url)
         return ""
 
+    # change to the remote directory
     try:
         ftp_obj.cwd(url_dir)
     except ftplib.error_perm as e:
@@ -328,14 +331,10 @@ def download_ftp(
         return ""
 
     filename = url_fname
-
-    def _ftp_callback(data):
-        _ftp_callback.bytes_transferred += len(data)
-
     file_size = ftp_obj.size(filename)
-
     output_path = os.path.join(output_dir, filename)
     try_count = 0
+
     while True:
         try:
             with tqdm.tqdm(
