@@ -564,7 +564,7 @@ class SpliceGnss(HandleGnss):
         self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
-
+            print("AAAAAAAAAAA" , row)
             if not self.mono_ok_check(irow,'splice',
                                       fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
                 continue
