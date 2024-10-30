@@ -19,6 +19,7 @@ from filelock import FileLock, Timeout
 
 import numpy as np
 import pandas as pd
+from future.builtins.disabled import fname
 
 import autorino.common as arocmn
 import autorino.cfglog as arologcfg
@@ -1937,13 +1938,69 @@ class StepGnss:
 
         return rimopts_out
 
-    #               _   _
-    #     /\       | | (_)
-    #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
-    #   / /\ \ / __| __| |/ _ \| '_ \/ __|  / _ \| '_ \  | '__/ _ \ \ /\ / / __|
-    #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
-    # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
-    #
+
+#               _   _                   _ _                           _ _    __                                 __
+#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
+#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
+#   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
+#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
+# /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
+#                                                                           \_\                                 /_/
+
+
+    def mono_ok_check(self, irow,
+                      step_name,
+                      fname_custom="",
+                      force = False,
+                      switch_ok_out_false = False):
+        """
+        Checks the status of the input and output files for a specific row in the table.
+
+        This method verifies if the input file is valid and if the output file already exists.
+        It logs appropriate messages and determines if the current step should be skipped.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to check.
+        step_name : str, optional
+            The name of the step being checked. Default is "splice".
+        fname_custom : str, optional
+            The custom filename to use for logging. If not provided, "fpath_inp" from the table is used.
+        switch_ok_out_false : bool, optional
+            If True, the 'ok_out' column of the table is set to False if the step should be skipped.
+            Default is False.
+
+        Returns
+        -------
+        bool
+            False if the step should be skipped, True otherwise.
+        """
+
+        if fname_custom:
+            finp_use = fname_custom
+            fout_use = fname_custom
+        else:
+            finp_use = Path(self.table.loc[irow, "fpath_inp"])
+            fout_use = Path(self.table.loc[irow, "fpath_inp"])
+
+        if force:
+            logger.info("%s forced: %s", step_name, finp_use)
+            bool_ok = True
+        elif not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            logger.info("%s skipped (output already exists): %s", step_name, fout_use)
+            bool_ok = False
+        elif not self.table.loc[irow, "ok_inp"]:
+            logger.warning("%s skipped (input disabled): %s", step_name, finp_use)
+            bool_ok = False
+        else:
+            bool_ok = True
+
+        if not bool_ok and switch_ok_out_false:
+            self.table.loc[irow, "ok_out"] = False
+
+        return bool_ok
+
 
     def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
@@ -1977,11 +2034,16 @@ class StepGnss:
         str or None
             The path of the modified file if the operation is successful, None otherwise.
         """
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
+
+        # +++ oldcheck (to be removed)
+        #if not self.table.loc[irow, "ok_inp"]:
+        #    logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         self.table.loc[irow, "fname"],
+        #     )
+        #     return None
+
+        if not self.mono_ok_check(irow, step_name="rinexmod (mono)"):
             return None
 
         # definition of the output directory (after the action)
@@ -2101,34 +2163,3 @@ class StepGnss:
 
         return frnxfin
 
-    def mono_ok_check(self, irow, step_name="splice"):
-        """
-        Checks the status of the input and output files for a specific row in the table.
-
-        This method verifies if the input file is valid and if the output file already exists.
-        It logs appropriate messages and determines if the current step should be skipped.
-
-        Parameters
-        ----------
-        irow : int
-            The index of the row in the table to check.
-        step_name : str, optional
-            The name of the step being checked. Default is "splice".
-
-        Returns
-        -------
-        bool
-            False if the step should be skipped, True otherwise.
-        """
-        fraw = Path(self.table.loc[irow, "fpath_inp"])
-
-        if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-            logger.info("%s skipped (output already exists): %s", step_name, fraw)
-            bool_ok = False
-        elif not self.table.loc[irow, "ok_inp"]:
-            logger.warning("%s skipped (input disabled): %s", step_name, fraw)
-            bool_ok = False
-        else:
-            bool_ok = True
-
-        return bool_ok
