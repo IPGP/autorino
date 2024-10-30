@@ -14,7 +14,7 @@ from pathlib import Path
 from subprocess import PIPE
 from typing import Union, List
 
-import autorino.convert as arcv
+import autorino.convert as arocnv
 from geodezyx import utils, conv
 
 #### Import the logger
@@ -95,38 +95,40 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     # preliminary tests: Trimble default converter must be extracted from the environment values
     if ext in (".T00", ".T00", ".T02", ".T04") and converter_inp == "auto":
         converter_inp = aroenv.aro_env_dict["general"]["trimble_default_software"]
-        logger.debug("Trimble default converter defined in environnement: %s", converter_inp)
+        logger.debug(
+            "Trimble default converter defined in environnement: %s", converter_inp
+        )
 
     # main test for Trimble : choose the right converter
     if ext in (".T00", ".T00", ".T02", ".T04") and converter_inp == "t0xconvert":
         converter_name = "t0xconvert"
         brand = "Trimble (official converter)"
-        cmd_build_fct = arcv.cmd_build_t0xconvert
-        conv_regex_fct = arcv.conv_regex_t0xconvert
+        cmd_build_fct = arocnv.cmd_build_t0xconvert
+        conv_regex_fct = arocnv.conv_regex_t0xconvert
         bin_options = []
         bin_kwoptions = dict()
 
     elif ext in (".T00", ".T00", ".T02", ".T04") and converter_inp == "trm2rinex":
         converter_name = "trm2rinex"
         brand = "Trimble (unofficial Docker converter)"
-        cmd_build_fct = arcv.cmd_build_trm2rinex
-        conv_regex_fct = arcv.conv_regex_trm2rinex
+        cmd_build_fct = arocnv.cmd_build_trm2rinex
+        conv_regex_fct = arocnv.conv_regex_trm2rinex
         bin_options = []
         bin_kwoptions = dict()
 
     elif ext == (".T00", ".T00", ".T02", ".T04") and converter_inp == "runpkr00":
         converter_name = "runpkr00"
         brand = "Trimble (legacy converter)"
-        cmd_build_fct = arcv.cmd_build_runpkr00
-        conv_regex_fct = arcv.conv_regex_runpkr00
+        cmd_build_fct = arocnv.cmd_build_runpkr00
+        conv_regex_fct = arocnv.conv_regex_runpkr00
         bin_options = []
         bin_kwoptions = dict()
 
     elif ext in (".TGD", "TG!") or converter_inp == "teqc":
         converter_name = "teqc"
         brand = "Trimble"
-        cmd_build_fct = arcv.cmd_build_teqc
-        conv_regex_fct = arcv.conv_regex_teqc
+        cmd_build_fct = arocnv.cmd_build_teqc
+        conv_regex_fct = arocnv.conv_regex_teqc
         bin_options = []
         bin_kwoptions = dict()
 
@@ -134,8 +136,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     elif re.match(".([0-9]{3})", ext) and fname[0] in ("U", "R", "B"):
         converter_name = "teqc"
         brand = "Ashtech"
-        cmd_build_fct = arcv.cmd_build_teqc
-        conv_regex_fct = arcv.conv_regex_teqc
+        cmd_build_fct = arocnv.cmd_build_teqc
+        conv_regex_fct = arocnv.conv_regex_teqc
         yyyy, doy, week, dow, date = _ashtech_name_2_date(inp_raw_fpath)
         ftype = fname[0].lower()
         if ftype == "b":
@@ -148,8 +150,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     elif re.match(".(M[0-9]{2}|MDB)", ext) or converter_inp == "mdb2rinex":
         converter_name = "mdb2rinex"
         brand = "Leica"
-        cmd_build_fct = arcv.cmd_build_mdb2rinex
-        conv_regex_fct = arcv.conv_regex_mdb2rnx
+        cmd_build_fct = arocnv.cmd_build_mdb2rinex
+        conv_regex_fct = arocnv.conv_regex_mdb2rnx
         bin_options = []
         bin_kwoptions = dict()
 
@@ -157,8 +159,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     elif re.match(".[0-9]{2}_", ext) or converter_inp == "sbf2rin":
         converter_name = "sbf2rin"
         brand = "Septentrio"
-        cmd_build_fct = arcv.cmd_build_sbf2rin
-        conv_regex_fct = arcv.conv_regex_void
+        cmd_build_fct = arocnv.cmd_build_sbf2rin
+        conv_regex_fct = arocnv.conv_regex_void
         bin_options = []
         bin_kwoptions = dict()
 
@@ -166,8 +168,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     elif ext == ".BNX" or converter_inp == "convbin":
         converter_name = "convbin"
         brand = "Generic BINEX"
-        cmd_build_fct = arcv.cmd_build_convbin
-        conv_regex_fct = arcv.conv_regex_convbin
+        cmd_build_fct = arocnv.cmd_build_convbin
+        conv_regex_fct = arocnv.conv_regex_convbin
         bin_options = []
         bin_kwoptions = dict()
 
@@ -175,8 +177,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     elif ext == ".TPS" or converter_inp == "tps2rin":
         converter_name = "tps2rin"
         brand = "Topcon"
-        cmd_build_fct = arcv.cmd_build_tps2rin
-        conv_regex_fct = arcv.conv_regex_tps2rin
+        cmd_build_fct = arocnv.cmd_build_tps2rin
+        conv_regex_fct = arocnv.conv_regex_tps2rin
         bin_options = []
         bin_kwoptions = dict()
 
@@ -184,8 +186,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     elif converter_inp == "gfzrnx":
         converter_name = "gfzrnx"
         brand = "RINEX Handeling (GFZ)"
-        cmd_build_fct = arcv.cmd_build_gfzrnx
-        conv_regex_fct = arcv.conv_regex_gfzrnx
+        cmd_build_fct = arocnv.cmd_build_gfzrnx
+        conv_regex_fct = arocnv.conv_regex_gfzrnx
         bin_options = []
         bin_kwoptions = dict()
 
@@ -193,8 +195,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     elif converter_inp == "converto":
         converter_name = "converto"
         brand = "RINEX Handeling (IGN)"
-        cmd_build_fct = arcv.cmd_build_converto
-        conv_regex_fct = arcv.conv_regex_converto
+        cmd_build_fct = arocnv.cmd_build_converto
+        conv_regex_fct = arocnv.conv_regex_converto
         bin_options = []
         bin_kwoptions = dict()
 
@@ -214,6 +216,10 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options,
         bin_kwoptions,
     )
+
+
+# set current user as constant
+USER, GROUP = arocnv.get_current_user_grp()
 
 
 def converter_run(
@@ -333,11 +339,11 @@ def converter_run(
         bin_kwoptions_use,
     ) = out_conv_sel
 
-    #### Force the arcv.cmd_build_fct, if any
+    #### Force the arocnv.cmd_build_fct, if any
     if cmd_build_fct:
         cmd_build_fct_use = cmd_build_fct
 
-    #### Force the arcv.conv_regex_fct, if any
+    #### Force the arocnv.conv_regex_fct, if any
     if conv_regex_fct:
         conv_regex_fct_use = conv_regex_fct
 
@@ -416,6 +422,12 @@ def converter_run(
             out_fpath,
             out_fpath.stat().st_size,
         )
+
+    # change ownership
+    if out_fpath:
+        outfile_owner, outfile_group = arocnv.get_file_owner(out_fpath)
+        if outfile_owner != USER or outfile_group != GROUP:
+            arocnv.change_file_owner(out_fpath, USER, GROUP)
 
     if remove_converted_annex_files:
         for f in conv_files_annex:
