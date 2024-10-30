@@ -1135,6 +1135,13 @@ class StepGnss:
 
         return None
 
+    def force(self,step_name=""):
+        logger.info("force %% is enabled", step_name)
+        self.table["ok_inp"] = True
+        self.table["note"] = "force_" + step_name
+        return None
+
+
     def guess_local_rnx(self):
         """
         For a given site name and date in a table, guess the potential local RINEX files
@@ -1964,6 +1971,11 @@ class StepGnss:
             The name of the step being checked. Default is "splice".
         fname_custom : str, optional
             The custom filename to use for logging. If not provided, "fpath_inp" from the table is used.
+        force : bool, optional
+            If True, the step is forced and the input file is processed regardless of its status.
+            Default is False.
+            Usage of this option is discouraged, and kept manily for legacy reasons.
+            It is better to set all the ok_inp boolean in the table to True with the .force() method.
         switch_ok_out_false : bool, optional
             If True, the 'ok_out' column of the table is set to False if the step should be skipped.
             Default is False.

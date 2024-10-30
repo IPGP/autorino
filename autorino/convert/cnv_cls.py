@@ -162,16 +162,15 @@ class ConvertGnss(arocmn.StepGnss):
         self.set_table_log(out_dir=self.tmp_dir_logs)
 
         ### guess and deactivate existing local RINEX files
-        self.guess_local_rnx()  # generate the potential local files
-        self.check_local_files("out")
+        # generate the potential local files
+        self.guess_local_rnx()
         # tests if the output local files are already there
-        self.check_local_files("inp")
+        self.check_local_files("out")
         # tests if the input local files are already there
+        self.check_local_files("inp")
 
         if force:
-            logger.info("force conversion is enabled")
-            self.table["ok_inp"] = True
-            self.table["note"] = "force_convert"
+            self.force("convert")
 
         filter_prev_tables = False
         if filter_prev_tables:

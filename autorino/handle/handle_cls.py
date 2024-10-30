@@ -470,6 +470,7 @@ class SpliceGnss(HandleGnss):
         handle_software="converto",
         rinexmod_options=None,
         verbose=False,
+        force=False
     ):
         """
         Splice RINEX files.
@@ -503,6 +504,14 @@ class SpliceGnss(HandleGnss):
         """
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
+
+        # generate the potential local files
+        self.guess_local_rnx()
+        # tests if the output local files are already there
+        self.check_local_files("out")
+
+        if force:
+            self.force("splice")
 
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)

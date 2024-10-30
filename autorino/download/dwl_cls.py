@@ -395,33 +395,6 @@ class DownloadGnss(arocmn.StepGnss):
             self.access["hostname"], self.access["login"], self.access["password"]
         )
 
-    def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):
-        """
-        will download locally the files which have been identified by
-        the guess_remote_files method
-
-        exploits the fname_remote column of the DownloadGnss.table
-        attribute
-
-        This `fetch_remote_files` method is for the download stricly speaking.
-        Ìn operation, use the `download` method which does a broader
-        preliminary actions.
-        """
-        download_files_list = []
-
-        for irow, row in self.table.iterrows():
-            file_dl_out = self.mono_fetch(
-                irow,
-                force=force,
-                timeout=timeout,
-                max_try=max_try,
-                sleep_time=sleep_time,
-            )
-            if file_dl_out:
-                download_files_list.append(file_dl_out)
-
-        return download_files_list
-
     def download(
         self,
         verbose=False,
@@ -481,9 +454,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Force download if required
         if force:
-            logger.info("Force download is enabled.")
-            self.table["ok_inp"] = True
-            self.table["note"] = "force_download"
+            self.force("download")
 
         # Log the number of files to be downloaded and excluded
         n_ok_inp = (self.table["ok_inp"]).sum()
@@ -510,7 +481,10 @@ class DownloadGnss(arocmn.StepGnss):
         lock.acquire()
         try:
             self.fetch_remote_files(
-                force=force, timeout=timeout, max_try=max_try, sleep_time=sleep_time
+                force=force, # force argument is now redudant, because ok_inp can be forced with .force() method
+                timeout=timeout,
+                max_try=max_try,
+                sleep_time=sleep_time
             )
         finally:
             lock.release()
@@ -521,6 +495,33 @@ class DownloadGnss(arocmn.StepGnss):
         if verbose:
             self.print_table()
         return None
+
+    def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):
+        """
+        will download locally the files which have been identified by
+        the guess_remote_files method
+
+        exploits the fname_remote column of the DownloadGnss.table
+        attribute
+
+        This `fetch_remote_files` method is for the download stricly speaking.
+        Ìn operation, use the `download` method which does a broader
+        preliminary actions.
+        """
+        download_files_list = []
+
+        for irow, row in self.table.iterrows():
+            file_dl_out = self.mono_fetch(
+                irow,
+                force=force, # force argument is now redudant, because ok_inp can be forced with .force() method
+                timeout=timeout,
+                max_try=max_try,
+                sleep_time=sleep_time,
+            )
+            if file_dl_out:
+                download_files_list.append(file_dl_out)
+
+        return download_files_list
 
 #               _   _                   _ _                           _ _    __                                 __
 #     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
