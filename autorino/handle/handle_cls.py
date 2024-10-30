@@ -11,6 +11,7 @@ import time
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 from geodezyx import utils, conv
 
@@ -539,6 +540,9 @@ class SpliceGnss(HandleGnss):
         self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
+
+            if self.mono_ok_check(irow,'splice'):
+                continue
 
             logger.info(
                 ">>>>>> Splicing %s between %s and %s",
