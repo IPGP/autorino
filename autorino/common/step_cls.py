@@ -686,8 +686,13 @@ class StepGnss:
         -------
         None
         """
-        self.table["epoch_srt"] = self.table["epoch_srt"].dt.tz_localize(tz)
-        self.table["epoch_end"] = self.table["epoch_end"].dt.tz_localize(tz)
+        if not pd.api.types.is_datetime64tz_dtype(series): # not TZ aware
+            self.table["epoch_srt"] = self.table["epoch_srt"].dt.tz_localize(tz)
+            self.table["epoch_end"] = self.table["epoch_end"].dt.tz_localize(tz)
+        else:
+            self.table["epoch_srt"] = self.table["epoch_srt"].dt.tz_convert(tz)
+            self.table["epoch_end"] = self.table["epoch_end"].dt.tz_convert(tz)
+
 
         return None
 
