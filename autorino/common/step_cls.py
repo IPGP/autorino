@@ -1202,8 +1202,6 @@ class StepGnss:
             epolist_all.extend([epoch] * n_files_epo)
             logger.debug("%i files found in %s", n_files_epo, inp_dir_epo)
 
-
-
         self.table["fpath_inp"] = flist_all
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
         self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)

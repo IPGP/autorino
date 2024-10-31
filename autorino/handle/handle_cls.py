@@ -224,9 +224,9 @@ class HandleGnss(arocmn.StepGnss):
 
         for irow, row in self.table.iterrows():
 
-            if not self.mono_ok_check(irow, 'feed by epochs',
+            if not self.mono_ok_check(irow, 'feed_by_epochs',
                                       fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-                                      check_ok_out_only=True):
+                                      check_ok_out_only=False):
                 continue
 
             site = self.table.loc[irow, "site"]
