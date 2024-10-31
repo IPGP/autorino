@@ -12,8 +12,8 @@ import os
 import re
 import shutil
 import time
+from pathlib import Path
 from filelock import FileLock, Timeout
-
 
 import numpy as np
 import pandas as pd
@@ -426,7 +426,7 @@ class StepGnss:
 
     def _init_tmp_dirs_paths(
         self,
-        tmp_subdir_logs="logs",
+        tmp_subdir_tables="tables",
         tmp_subdir_unzip="unzipped",
         tmp_subdir_conv="converted",
         tmp_subdir_rnxmod="rinexmoded",
@@ -435,12 +435,13 @@ class StepGnss:
         """
         Initializes the temporary directories paths for the StepGnss object.
 
-        This method sets the paths for the temporary directories of the StepGnss object. It creates the paths in a generic form, with placeholders and without creating the actual directories.
+        This method sets the paths for the temporary directories of the StepGnss object.
+        It creates the paths in a generic form, with placeholders and without creating the actual directories.
         The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
 
         Parameters
         ----------
-        tmp_subdir_logs : str, optional
+        tmp_subdir_tables : str, optional
             The subdirectory for logs. Default is 'logs'.
         tmp_subdir_unzip : str, optional
             The subdirectory for unzipped files. Default is 'unzipped'.
@@ -456,14 +457,14 @@ class StepGnss:
         None
         """
         # Internal versions have not been translated
-        self._tmp_dir_logs = os.path.join(self.tmp_dir, tmp_subdir_logs)
+        self._tmp_dir_tables = os.path.join(self.tmp_dir, tmp_subdir_tables)
         self._tmp_dir_unzipped = os.path.join(self.tmp_dir, tmp_subdir_unzip)
         self._tmp_dir_converted = os.path.join(self.tmp_dir, tmp_subdir_conv)
         self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir, tmp_subdir_rnxmod)
         self._tmp_dir_downloaded = os.path.join(self.tmp_dir, tmp_subdir_dwnld)
 
         # Translation of the paths
-        self.tmp_dir_logs = self.translate_path(self._tmp_dir_logs)
+        self.tmp_dir_tables = self.translate_path(self._tmp_dir_tables)
         self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
         self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
         self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
@@ -492,7 +493,7 @@ class StepGnss:
         """
         # This translation is also done in _init_tmp_dirs_paths
         # but we redo it here, simply to be sure
-        tmp_dir_logs_set = self.translate_path(self._tmp_dir_logs, make_dir=True)
+        tmp_dir_tables_set = self.translate_path(self._tmp_dir_tables, make_dir=True)
         tmp_dir_unzipped_set = self.translate_path(
             self._tmp_dir_unzipped, make_dir=True
         )
@@ -507,7 +508,7 @@ class StepGnss:
         )
 
         return (
-            tmp_dir_logs_set,
+            tmp_dir_tables_set,
             tmp_dir_unzipped_set,
             tmp_dir_converted_set,
             tmp_dir_rinexmoded_set,
@@ -545,7 +546,7 @@ class StepGnss:
 
         # Iterate through the temporary directories
         for tmp_dir in [
-            self.tmp_dir_logs,
+            self.tmp_dir_tables,
             self.tmp_dir_unzipped,
             self.tmp_dir_converted,
             self.tmp_dir_rinexmoded,
@@ -875,7 +876,7 @@ class StepGnss:
     #               __/ | __/ |         __/ |
     #              |___/ |___/         |___/
 
-    def set_logfile(self, log_dir_inp=None, step_suffix=""):
+    def set_logfile(self, log_dir_inp=None, step_suffix=''):
         """
         set logging in a file
         """
@@ -887,12 +888,17 @@ class StepGnss:
         else:
             log_dir = log_dir_inp
 
+        if not step_suffix:
+            step_suffix_use = self.get_step_type()
+        else:
+            step_suffix_use = step_suffix
+
         log_dir_use = self.translate_path(log_dir)
 
         _logger = logging.getLogger("autorino")
 
         ts = utils.get_timestamp()
-        log_name = "_".join((ts, step_suffix, ".log"))
+        log_name = "_".join((ts, step_suffix_use, ".log"))
         log_path = os.path.join(log_dir_use, log_name)
 
         log_cfg_dic = arologcfg.log_config_dict
@@ -1011,7 +1017,7 @@ class StepGnss:
         # add +1 in max_colwidth for safety
         if not no_print:
             # print it in the logger (if silent , just return it)
-            name = type(self).__name__
+            name = self.get_step_type(True)
             logger.info("%s %s/%s\n%s", name, self.site_id, self.epoch_range, str_out)
         if no_return:
             return None
@@ -1135,6 +1141,27 @@ class StepGnss:
 
         return None
 
+    def force(self, step_name=""):
+        """
+        Enables the force mode for the current step.
+
+        This method sets the 'ok_inp' column of the table to True and updates the 'note' column
+        to indicate that the force mode is enabled for the specified step.
+
+        Parameters
+        ----------
+        step_name : str, optional
+            The name of the step for which the force mode is enabled. Default is an empty string.
+
+        Returns
+        -------
+        None
+        """
+        logger.info("force %s is enabled", step_name)
+        self.table["ok_inp"] = True
+        self.table["note"] = "force_" + step_name
+        return None
+
     def guess_local_rnx(self):
         """
         For a given site name and date in a table, guess the potential local RINEX files
@@ -1166,6 +1193,11 @@ class StepGnss:
 
             epo_dt_srt = epoch.to_pydatetime()
             epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
+
+            # removing the timezone to avoid nasty effects
+            epo_dt_srt = epo_dt_srt.replace(tzinfo=None)
+            epo_dt_end = epo_dt_end.replace(tzinfo=None)
+
             prd_str = rinexmod.rinexfile.file_period_from_timedelta(
                 epo_dt_srt, epo_dt_end
             )[0]
@@ -1935,13 +1967,85 @@ class StepGnss:
 
         return rimopts_out
 
-    #               _   _
-    #     /\       | | (_)
-    #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
-    #   / /\ \ / __| __| |/ _ \| '_ \/ __|  / _ \| '_ \  | '__/ _ \ \ /\ / / __|
-    #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
-    # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
-    #
+
+#               _   _                   _ _                           _ _    __                                 __
+#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
+#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
+#   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
+#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
+# /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
+#                                                                           \_\                                 /_/
+
+
+    def mono_ok_check(self, irow,
+                      step_name,
+                      fname_custom="",
+                      force = False,
+                      switch_ok_out_false = False,
+                      check_ok_out_only = False):
+        """
+        Checks the status of the input and output files for a specific row in the table.
+
+        This method verifies if the input file is valid and if the output file already exists.
+        It logs appropriate messages and determines if the current step should be skipped.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to check.
+        step_name : str, optional
+            The name of the step being checked. Default is "splice".
+        fname_custom : str, optional
+            The custom filename to use for logging. If not provided, "fpath_inp" from the table is used.
+        force : bool, optional
+            If True, the step is forced and the input file is processed regardless of its status.
+            Default is False.
+            Usage of this option is discouraged, and kept manily for legacy reasons.
+            It is better to set all the ok_inp boolean in the table to True with the .force() method.
+        switch_ok_out_false : bool, optional
+            If True, the 'ok_out' column of the table is set to False if the step should be skipped.
+            Default is False.
+        check_ok_out_only : bool, optional
+            If True, the step is skipped if the output file already exists.
+            (no check on the ok_inp column)
+            Default is False.
+
+        Returns
+        -------
+        bool
+            False if the step should be skipped, True otherwise.
+        """
+
+        if fname_custom:
+            finp_use = fname_custom
+            fout_use = fname_custom
+        else:
+            finp_use = Path(str(self.table.loc[irow, "fpath_inp"]))
+            fout_use = Path(str(self.table.loc[irow, "fpath_inp"]))
+
+        if force:
+            logger.info("%s forced: %s", step_name, finp_use)
+            bool_ok = True
+        elif check_ok_out_only:
+            if self.table.loc[irow, "ok_out"]:
+                logger.info("%s skipped (output already exists): %s", step_name, fout_use)
+                bool_ok = False
+            else:
+                bool_ok = True
+        elif not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            logger.info("%s skipped (output already exists): %s", step_name, fout_use)
+            bool_ok = False
+        elif not self.table.loc[irow, "ok_inp"]:
+            logger.warning("%s skipped (input disabled): %s", step_name, finp_use)
+            bool_ok = False
+        else:
+            bool_ok = True
+
+        if not bool_ok and switch_ok_out_false:
+            self.table.loc[irow, "ok_out"] = False
+
+        return bool_ok
+
 
     def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
@@ -1975,11 +2079,16 @@ class StepGnss:
         str or None
             The path of the modified file if the operation is successful, None otherwise.
         """
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
+
+        # +++ oldcheck (to be removed)
+        #if not self.table.loc[irow, "ok_inp"]:
+        #    logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         self.table.loc[irow, "fname"],
+        #     )
+        #     return None
+
+        if not self.mono_ok_check(irow, step_name="rinexmod (mono)"):
             return None
 
         # definition of the output directory (after the action)
@@ -2062,6 +2171,9 @@ class StepGnss:
                 self.table.loc[irow, "fname"],
             )
             return None
+        # !!!!!
+        # must be changed for .mono_ok_check(irow, step_name="mv_final (mono)", check_ok_out_only=True)
+        # !!!!!
 
         # definition of the output directory (after the action)
         if out_dir:
@@ -2098,5 +2210,4 @@ class StepGnss:
             # raise e
 
         return frnxfin
-
 
