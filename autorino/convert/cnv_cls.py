@@ -159,23 +159,22 @@ class ConvertGnss(arocmn.StepGnss):
             site4_list, site9_list = [], []
 
         ### initialize the table as log
-        self.set_table_log(out_dir=self.tmp_dir_logs)
+        self.set_table_log(out_dir=self.tmp_dir_tables)
 
         ### guess and deactivate existing local RINEX files
-        self.guess_local_rnx()  # generate the potential local files
-        self.check_local_files("out")
+        # generate the potential local files
+        self.guess_local_rnx()
         # tests if the output local files are already there
-        self.check_local_files("inp")
+        self.check_local_files("out")
         # tests if the input local files are already there
+        self.check_local_files("inp")
 
         if force:
-            logger.info("force conversion is enabled")
-            self.table["ok_inp"] = True
-            self.table["note"] = "force_convert"
+            self.force("convert")
 
         filter_prev_tables = False
         if filter_prev_tables:
-            prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_logs)
+            prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_tables)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
                 self.filter_prev_tab(prv_tbl_df)
@@ -208,20 +207,25 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-                logger.info("conversion skipped (output already exists): %s", fraw)
+            # +++ oldcheck (to be removed)
+            # if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            #     logger.info("conversion skipped (output already exists): %s", fraw)
+            #     continue
+            # # +++ the test bellow conflicts the Force option
+            # # elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+            # #    logger.info(
+            # #        "conversion skipped (already converted in a previous run): %s", fraw
+            # #    )
+            # #    continue
+            # elif not self.table.loc[irow, "ok_inp"]:
+            #     logger.warning("conversion skipped (something went wrong): %s", fraw)
+            #     continue
+            # else:
+            #     pass
+            #
+            if not self.mono_ok_check(irow,"conversion"):
                 continue
-            # +++ the test bellow conflicts the Force option
-            # elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-            #    logger.info(
-            #        "conversion skipped (already converted in a previous run): %s", fraw
-            #    )
-            #    continue
-            elif not self.table.loc[irow, "ok_inp"]:
-                logger.warning("conversion skipped (something went wrong): %s", fraw)
-                continue
-            else:
-                pass
+
 
             logger.info(">>>>>> input raw file for conversion: %s", fraw.name)
 
@@ -320,11 +324,16 @@ class ConvertGnss(arocmn.StepGnss):
             The path of the converted file.
         """
 
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
+        ## +++ oldcheck (to be removed)
+        # if not self.table.loc[irow, "ok_inp"]:
+        #     logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         self.table.loc[irow, "fname"],
+        #     )
+        #     return None
+        #
+
+        if not self.mono_ok_check(irow,"conversion"):
             return None
 
         # definition of the output directory (after the action)
