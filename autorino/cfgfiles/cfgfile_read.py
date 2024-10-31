@@ -455,7 +455,7 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
         if stp.get_step_type() == "download":
             stp.download(**stp.options)
         elif stp.get_step_type() == "convert":
-            stp.load_from_inp_dir()
+            stp.load_table_from_inp_dir()
             stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
