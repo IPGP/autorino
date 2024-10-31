@@ -1042,7 +1042,7 @@ class StepGnss:
 
         return None
 
-    def load_table_from_datelist(self, dates_list,  period = "1D"):
+    def load_tab_datelist(self, dates_list, period ="1D"):
         """
         Loads the table from a list of dates.
 
@@ -1106,7 +1106,7 @@ class StepGnss:
 
         return flist
 
-    def load_table_from_prev_step_table(self, input_table, reset_table=True):
+    def load_tab_prev_tab(self, input_table, reset_table=True):
         """
         Loads the table from the previous step's table.
 

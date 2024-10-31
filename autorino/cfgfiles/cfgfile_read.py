@@ -438,15 +438,15 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
         # if stp.get_step_type() == "download":
         #     stp.download(**stp.options)
         # elif stp.get_step_type() == "convert":
-        #     stp.load_table_from_prev_step_table(wkf_prev.table)
+        #     stp.load_tab_prev_tab(wkf_prev.table)
         #     stp.convert(**stp.options)
         # elif stp.get_step_type() == "splice":
         #     stp_rnx_inp = stp.copy()
-        #     stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+        #     stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
         #     stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         # elif stp.get_step_type() == "split":
         #     stp_rnx_inp = stp.copy()
-        #     stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+        #     stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
         #     stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         #
 
@@ -458,11 +458,11 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
             stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
-            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
-            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
 
     return None
