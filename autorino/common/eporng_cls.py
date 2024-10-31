@@ -49,7 +49,7 @@ class EpochRange:
         Checks if the epoch range is valid.
     """
 
-    def __init__(self, epoch1, epoch2=None, period="1d", round_method="round", tz="UTC"):
+    def __init__(self, epoch1, epoch2=None, period="1d", round_method="floor", tz="UTC"):
         """
         Constructs all the necessary attributes for the epoch range object.
 
