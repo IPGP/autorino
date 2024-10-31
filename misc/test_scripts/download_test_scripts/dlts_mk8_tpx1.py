@@ -42,7 +42,7 @@ dwl.print_table()
 
 # conv = arocnv.ConvertGnss(ses,dwl.epoch_range_inp,out,sitelog_dir)
 
-# conv.load_table_from_prev_step_table(dwl.table)
+# conv.load_tab_prev_tab(dwl.table)
 # conv.verbose()
 # conv.conv_rnxmod_files()
 # conv.verbose()
