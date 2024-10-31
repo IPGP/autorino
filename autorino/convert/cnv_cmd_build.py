@@ -262,7 +262,7 @@ def cmd_build_trm2rinex(
         bin_path,
         "inp/" + inp_raw_fpath.name,
         "-n",
-        "-d",
+        #"-d",
         "-s",
         "-v",
         "3.04",
