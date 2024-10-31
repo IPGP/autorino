@@ -25,6 +25,8 @@ def split_rnx(
     out_dir,
     tmp_dir,
     log_dir=None,
+    site=None,
+    data_frequency="30S",
     handle_software="converto",
     rinexmod_options=None,
     metadata=None,
@@ -53,6 +55,12 @@ def split_rnx(
         The temporary directory used during the splitting process
     log_dir : str, optional
         The directory where logs will be stored. If not provided, it defaults to tmp_dir
+    site : str, optional
+        The site name to be used for the split RINEX files
+        Facultative but highly recommended to detect exisiting files to be skipped.
+        data_frequency : str, optional
+        The data frequency for the spliced RINEX files.
+        Facultative but highly recommended to detect exisiting files to be skipped.
     handle_software : str, optional
         The software to be used for handling the RINEX files during the split operation
     rinexmod_options : dict, optional
@@ -76,7 +84,10 @@ def split_rnx(
     epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
 
     spt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir,
-                           epoch_range=epo_rng, metadata=metadata)
+                           epoch_range=epo_rng,
+                           site={'site_id':site},
+                           session={"data_frequency": data_frequency},
+                           metadata=metadata)
 
     spt.split(
         input_mode="given",
@@ -87,3 +98,4 @@ def split_rnx(
     )
 
     return spt
+

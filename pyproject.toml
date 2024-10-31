@@ -128,22 +128,23 @@ classifiers = [
 # For an analysis of this field vs pip's requirements files see:
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
  dependencies = [
-'geodezyx@git+https://github.com/IPGP/geodezyx',
-'rinexmod@git+https://github.com/IPGP/rinexmod',
-'dateparser~=1.1.7',
-'docker~=6.0.1',
-'filelock~=3.14.0',
-'numpy~=1.23.2',
-'pandas~=2.2.2',
-'PyYAML~=6.0.1',
-'python-dateutil~=2.9.0.post0',
-'termcolor~=2.3.0',
-'hatanaka~=2.8.0',
-'requests~=2.31.0',
-'tqdm~=4.64.1',
-'bs4~=0.0.2',
-'beautifulsoup4~=4.12.2',
-'colorlog',
+    'geodezyx@git+https://github.com/IPGP/geodezyx',
+    'rinexmod@git+https://github.com/IPGP/rinexmod',
+    'dateparser~=1.1.7',
+    'docker~=6.0.1',
+    'filelock~=3.14.0',
+    'numpy~=1.23.2',
+    'pandas~=2.2.2',
+    'PyYAML~=6.0.1',
+    'python-dateutil~=2.9.0.post0',
+    'termcolor~=2.3.0',
+    'hatanaka~=2.8.0',
+    'requests~=2.31.0',
+    'tqdm~=4.64.1',
+    'bs4~=0.0.2',
+    'beautifulsoup4~=4.12.2',
+    'colorlog',
+    "versioningit",
   ]
 
 #[tool.setuptools.packages]
@@ -158,15 +159,11 @@ classifiers = [
 #exclude = []  # exclude packages matching these glob patterns (empty by default)
 #namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
-
 # depndencies from requirements.txt
 ### https://stackoverflow.com/questions/73600082/how-to-reference-a-requirements-txt-in-the-pyproject-toml-of-a-setuptools-projec
 #dynamic = ["dependencies"]
 #[tool.setuptools.dynamic]
 #dependencies = {file = ["requirements.txt"]}
-
-
-
 
 # List additional groups of dependencies here (e.g. development
 # dependencies). Users will be able to install these using the "extras"
@@ -205,3 +202,25 @@ autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 
+
+[tool.versioningit.vcs]
+# The method key:
+method = "git"  # <- The method name
+
+# Parameters to pass to the method:
+match = ["v*"]
+default-tag = "1.0.0"
+
+
+[tool.versioningit.format]
+# Format used when there have been commits since the most recent tag:
+distance = "{base_version}.post{distance}+{vcs}{rev}"
+# Example formatted version: 1.2.3.post42+ge174a1f
+
+# Format used when there are uncommitted changes:
+dirty = "{base_version}+d{build_date:%Y%m%d}"
+# Example formatted version: 1.2.3+d20230922
+
+# Format used when there are both commits and uncommitted changes:
+distance-dirty = "{base_version}.post{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
+# Example formatted version: 1.2.3.post42+ge174a1f.d20230922

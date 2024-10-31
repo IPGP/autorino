@@ -84,9 +84,6 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
 
     return url_out
 
-
-print(join_url("http", "www.test.com", "", "file.txt"))
-
 #  ______ _______ _____
 # |  ____|__   __|  __ \
 # | |__     | |  | |__) |
