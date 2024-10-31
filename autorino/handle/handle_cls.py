@@ -37,8 +37,6 @@ class HandleGnss(arocmn.StepGnss):
         log_dir,
         inp_dir=None,
         epoch_range=None,
-        inp_dir_parent=None,
-        inp_structure=None,
         site=None,
         session=None,
         options=None,
@@ -62,10 +60,6 @@ class HandleGnss(arocmn.StepGnss):
             The input directory for raw files. Default is None.
         epoch_range : EpochRange, optional
             The range of epochs to be processed. Default is None.
-        inp_dir_parent : str, optional
-            The parent directory of the input directory. Default is None.
-        inp_structure : dict, optional
-            The structure of the input files. Default is None.
         site : dict, optional
             Information about the site. Default is None.
         session : dict, optional
@@ -811,11 +805,6 @@ class SplitGnss(HandleGnss):
         )
 
         return None
-
-    # Log the start of the splicing operation
-    logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
-
-
 
     def split_core(self, handle_software="converto", rinexmod_options=None):
         """
