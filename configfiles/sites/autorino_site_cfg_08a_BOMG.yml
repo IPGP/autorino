@@ -2,8 +2,8 @@
 
 station:
     site:
-        name: SNEG 
-        site_id: SNEG00REU 
+        name: BOMG 
+        site_id: BOMG00REU 
         domes: 
         sitelog_path: FROM_MAIN #<$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
         position_xyz: (1,2,3)
@@ -17,13 +17,13 @@ station:
         rec_sn: NA 
     access:
         protocol: "ftp"
-        hostname: "10.10.4.41" 
+        hostname: "10.10.4.52" 
         login: "admin"
         password: "W1F10VPF"
     sessions:
         session_01h01s:
             general:
-                name: 01h01h 
+                name: 01h01s 
                 data_frequency: "01S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
                 tmp_dir_parent: FROM_MAIN
                 tmp_structure: FROM_MAIN 

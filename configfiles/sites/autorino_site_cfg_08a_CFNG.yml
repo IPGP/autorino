@@ -17,9 +17,9 @@ station:
         rec_sn: NA 
     access:
         protocol: "ftp"
-        hostname: "***REMOVED***" 
-        login: "***REMOVED***"
-        password: "***REMOVED***"
+        hostname: "192.168.12.20" 
+        login: "admin"
+        password: "W1F10VPF"
     sessions:
         session_15m01s:
             general:
