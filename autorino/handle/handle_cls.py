@@ -230,8 +230,8 @@ class HandleGnss(arocmn.StepGnss):
                 continue
 
             site = self.table.loc[irow, "site"]
-            epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
-            epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
+            epo_srt = self.table.loc[irow, "epoch_srt"]
+            epo_end = self.table.loc[irow, "epoch_end"]
 
             logger.info(
                 ">>>>>> Feeding RINEXs for %s between %s & %s",
