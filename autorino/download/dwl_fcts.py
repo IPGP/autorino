@@ -225,10 +225,12 @@ def list_remote_ftp(
 
     # Retrieve list of files
     file_list_bulk = ftp_obj.nlst()
-    file_list_join = [join_url('',hostname_use, remote_dir_use, f.split()[-1]) for f in file_list_bulk if f not in ('.', '..')]
+    # current directory (.) and parent directory (..) are removed anyway
+    file_list_bulk = [f for f in file_list_bulk if f not in ('.', '..')]
+    file_list_join = [join_url('',hostname_use, remote_dir_use, f.split()[-1]) for f in file_list_bulk]
+    # split()[-1] is necessary for Trimble files, to have just the filename and not the size, owner, etc.
     # legacy manual join (urltambouille)
     #file_list_leg = ["/".join((hostname_use, remote_dir_use, f)) for f in file_list_bulk if f not in ('.', '..')]
-    # current directory (.) and parent directory (..) are removed anyway
 
     file_list = file_list_join
 
