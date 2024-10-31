@@ -1150,7 +1150,9 @@ class StepGnss:
 
         for epoch in self.epoch_range.eporng_list():
             inp_dir_epo = self.translate_path(self.inp_dir, epoch_inp=epoch)
+            logger.info("loading files from %s", inp_dir_epo)
             flist_epo = arocmn.files_input_manage(inp_dir_epo, ".*")
+            logger.info("files found: %s", flist_epo)
             flist_all.extend(flist_epo)
             epolist_all.extend([epoch] * len(list(flist_epo)))
 
