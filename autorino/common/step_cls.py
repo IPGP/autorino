@@ -1141,6 +1141,31 @@ class StepGnss:
 
         return None
 
+    def load_table_from_inp_dir(self, reset_table=True):
+        if reset_table:
+            self._init_table(init_epoch=False)
+
+        flist_all = []
+        epolist_all = []
+
+        for epoch in self.epoch_range.eporng_list():
+            inp_dir_epo = self.translate_path(self.inp_dir, epoch_inp=epoch)
+            flist_epo = arocmn.files_input_manage(inp_dir_epo, ".*")
+            flist_all.extend(flist_epo)
+            epolist_all.extend([epoch] * len(list(flist_epo)))
+
+        self.table["fpath_inp"] = flist_all
+        self.table["epoch_srt"] = epolist_all
+        self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
+        self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
+        self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
+        self.table["site"] = self.site_id
+
+        return None
+
+
+
+
     def force(self, step_name=""):
         """
         Enables the force mode for the current step.
