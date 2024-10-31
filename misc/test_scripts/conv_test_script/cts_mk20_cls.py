@@ -51,7 +51,7 @@ if prev_table_logs:
     #print(DF_prev_tbl)
 
 
-CONV.load_table_from_filelist(flist)
+CONV.load_tab_filelist(flist)
 #CONV.filter_bad_keywords(['Problem','Rinex','ZIP'])
 CONV.filter_year_min_max(2019,2020)
 

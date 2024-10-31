@@ -1068,7 +1068,7 @@ class StepGnss:
 
         return None
 
-    def load_table_from_filelist(self, input_files, inp_regex=".*", reset_table=True):
+    def load_tab_filelist(self, input_files, inp_regex=".*", reset_table=True):
         """
         Loads the table from a list of input files.
 
@@ -1141,7 +1141,7 @@ class StepGnss:
 
         return None
 
-    def load_table_from_inp_dir(self, reset_table=True):
+    def load_tab_inpdir(self, reset_table=True):
         if reset_table:
             self._init_table(init_epoch=False)
 
