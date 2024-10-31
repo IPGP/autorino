@@ -1262,7 +1262,8 @@ class StepGnss:
             epo_dt_srt = epoch.to_pydatetime()
             epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
 
-            # removing the timezone to avoid nasty effects
+            # force the timezone to avoid nasty effects: rinexmod is not TZ aware... but autorino is!
+            # prefer to force the timezone elsewere in autorino
             epo_dt_srt = epo_dt_srt.replace(tzinfo=None)
             epo_dt_end = epo_dt_end.replace(tzinfo=None)
 
