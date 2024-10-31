@@ -368,7 +368,7 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     return d
 
 
-def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, print_table=True):
+def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, print_table=True, force=False):
     """
     Executes the steps in the provided list.
 
@@ -393,6 +393,10 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
         Default is False.
     print_table : bool, optional
         A flag indicating whether to print the tables during the execution of the steps. Default is True.
+    force : bool, optional
+        A flag indicating whether to force the execution of the steps.
+        overrides the 'force' parameters in the configuration file.
+        Default is False.
 
     Returns
     -------
@@ -433,6 +437,9 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
         # Set the verbose option if print_table is True
         if print_table:
             stp.options["verbose"] = True
+
+        if force:
+            stp.options["force"] = True
 
         # # Execute the step based on its type
         # if stp.get_step_type() == "download":

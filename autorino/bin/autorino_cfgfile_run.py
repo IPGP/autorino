@@ -29,6 +29,8 @@ def main():
                         help='Comma-separated list of selected steps to be executed', default='')
     parser.add_argument('-es', '--exclude_steps_select', action='store_true',
                         help='Flag to exclude the selected steps', default=False)
+    parser.add_argument('-f', '--force', action='store_true',
+                        help='force the execution of the steps', default=False)
 
     args = parser.parse_args()
 
@@ -40,6 +42,7 @@ def main():
     list_sites = args.list_sites.split(',') if args.list_sites else None
     steps_select_list = args.steps_select_list.split(',') if args.steps_select_list else None
     exclude_steps_select = args.exclude_steps_select
+    force = args.force
 
     aroapi.cfgfile_run(cfg_in=config,
                        main_cfg_in=main_config,
@@ -48,7 +51,8 @@ def main():
                        epo_end=end,
                        period=period,
                        steps_select_list=steps_select_list,
-                       exclude_steps_select=exclude_steps_select)
+                       exclude_steps_select=exclude_steps_select,
+                       force=force)
 
 if __name__ == '__main__':
     main()
