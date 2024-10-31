@@ -4,6 +4,7 @@ conv_software_paths:
   leica : "/home/psakicki/SOFTWARE_INSTALL/GNSS_CONVERTERS/Leica_mdb2rinex/mdb2rinex"
   septentrio : "sbf2rin"
   topcon : "tps2rin.exe"
+  t0xconvert : "/"
   trimble : "trm2rinex:cli-light"
   trimble_runpkr00 : "runpkr00"
   ### RINEX handeling
