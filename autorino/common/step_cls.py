@@ -670,6 +670,27 @@ class StepGnss:
 
         return None
 
+    def updt_epotab_tz(self,tz='UTC'):
+        """
+        Updates the epoch table with the specified timezone.
+
+        This method updates the 'epoch_srt' and 'epoch_end' columns of the epoch table with the specified timezone.
+        It uses the 'tz' parameter to set the timezone for the epoch table.
+
+        Parameters
+        ----------
+        tz : str, optional
+            The timezone to be applied to the epoch table. Default is 'UTC'.
+
+        Returns
+        -------
+        None
+        """
+        self.table["epoch_srt"] = self.table["epoch_srt"].dt.tz_localize(tz)
+        self.table["epoch_end"] = self.table["epoch_end"].dt.tz_localize(tz)
+
+        return None
+
     def updt_epotab_rnx(self, use_rnx_filename_only=False, update_epoch_range=True):
         """
         Updates the StepGnss table's columns 'epoch_srt' and 'epoch_end' based on the RINEX files.
@@ -717,6 +738,8 @@ class StepGnss:
 
         self.table["epoch_srt"] = pd.to_datetime(self.table["epoch_srt"])
         self.table["epoch_end"] = pd.to_datetime(self.table["epoch_end"])
+
+        self.updt_epotab_tz()
 
         if update_epoch_range:
             logger.info(
@@ -1060,6 +1083,7 @@ class StepGnss:
         """
         self.table["epoch_srt"] = pd.to_datetime(dates_list)
         self.table["epoch_end"] = pd.to_datetime(dates_list) + pd.Timedelta(period)
+        self.updt_epotab_tz()
         self.updt_eporng_tab()
 
         return None
@@ -1131,6 +1155,7 @@ class StepGnss:
         self.table["size_inp"] = input_table["size_out"].values
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
         self.table["site"] = input_table["site"].values
+        # epoch_srt and epoch_end are supposed to be timezone aware
         self.table["epoch_srt"] = input_table["epoch_srt"].values
         self.table["epoch_end"] = input_table["epoch_end"].values
         self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
@@ -1171,6 +1196,7 @@ class StepGnss:
         self.table["fpath_inp"] = flist_all
         self.table["epoch_srt"] = epolist_all
         self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
+        self.updt_epotab_tz()
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
         self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
         self.table["site"] = self.site_id
