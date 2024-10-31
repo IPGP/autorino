@@ -743,7 +743,8 @@ class StepGnss:
         self.table["epoch_srt"] = pd.to_datetime(self.table["epoch_srt"])
         self.table["epoch_end"] = pd.to_datetime(self.table["epoch_end"])
 
-        self.updt_epotab_tz()
+        # update the timezone
+        self.updt_epotab_tz(self.epoch_range.tz)
 
         if update_epoch_range:
             logger.info(
@@ -1087,7 +1088,7 @@ class StepGnss:
         """
         self.table["epoch_srt"] = pd.to_datetime(dates_list)
         self.table["epoch_end"] = pd.to_datetime(dates_list) + pd.Timedelta(period)
-        self.updt_epotab_tz()
+        self.updt_epotab_tz(self.epoch_range.tz)
         self.updt_eporng_tab()
 
         return None
@@ -1166,7 +1167,7 @@ class StepGnss:
 
         return None
 
-    def load_tab_inpdir(self, reset_table=True):
+    def load_tab_inpdir(self, reset_table=True, update_epochs=False):
         """
         Loads the table with input files from the input directory for each epoch.
 
@@ -1178,6 +1179,10 @@ class StepGnss:
         ----------
         reset_table : bool, optional
             If True, the current table is reset before loading the new data. Default is True.
+        update_epochs : bool, optional
+            If True, updates the 'epoch_srt' and 'epoch_end' columns of the table based on the RINEX files.
+            Recommended for RINEX only.
+            Default is False.
 
         Returns
         -------
@@ -1197,13 +1202,19 @@ class StepGnss:
             epolist_all.extend([epoch] * n_files_epo)
             logger.debug("%i files found in %s", n_files_epo, inp_dir_epo)
 
+
+
         self.table["fpath_inp"] = flist_all
-        self.table["epoch_srt"] = epolist_all
-        self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
-        self.updt_epotab_tz()
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
         self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
         self.table["site"] = self.site_id
+
+        if update_epochs:
+            self.updt_epotab_rnx()
+        else:
+            self.table["epoch_srt"] = epolist_all
+            self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
+            self.updt_epotab_tz()
 
         return None
 
