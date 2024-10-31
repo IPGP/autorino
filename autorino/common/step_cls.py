@@ -1142,6 +1142,22 @@ class StepGnss:
         return None
 
     def load_tab_inpdir(self, reset_table=True):
+        """
+        Loads the table with input files from the input directory for each epoch.
+
+        This method iterates over the epochs in the epoch range, translates the input directory path for each epoch,
+        and retrieves the list of input files. It then updates the table with the file paths, epochs, and other relevant
+        information.
+
+        Parameters
+        ----------
+        reset_table : bool, optional
+            If True, the current table is reset before loading the new data. Default is True.
+
+        Returns
+        -------
+        None
+        """
         if reset_table:
             self._init_table(init_epoch=False)
 
@@ -1164,7 +1180,6 @@ class StepGnss:
         self.table["site"] = self.site_id
 
         return None
-
 
 
 
