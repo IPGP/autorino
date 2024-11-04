@@ -1211,6 +1211,7 @@ class StepGnss:
             self.updt_epotab_rnx()
         else:
             self.table["epoch_srt"] = epolist_all
+            print(self.table["epoch_srt"], "AAAAAAAAAAAAAAAAA")
             self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
             self.updt_epotab_tz()
 
