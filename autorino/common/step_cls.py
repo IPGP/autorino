@@ -1212,7 +1212,7 @@ class StepGnss:
         else:
             self.table["epoch_srt"] = epolist_all
             print(self.table["epoch_srt"], "AAAAAAAAAAAAAAAAA")
-            self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
+            self.table["epoch_end"] = np.sum(self.table["epoch_srt"], pd.Timedelta(self.epoch_range.period))
             self.updt_epotab_tz()
 
         return None
