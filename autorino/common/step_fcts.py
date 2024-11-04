@@ -84,7 +84,7 @@ def dummy_sess_dic():
     return d
 
 
-def files_input_manage(inp_fil, inp_regex=".*"):
+def import_files(inp_fil, inp_regex=".*"):
     """
     Handles multiple types of input lists and returns a python list of the input.
 

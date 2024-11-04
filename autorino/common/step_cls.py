@@ -1123,7 +1123,7 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = arocmn.files_input_manage(input_files, inp_regex)
+        flist = arocmn.import_files(input_files, inp_regex)
 
         self.table["fpath_inp"] = flist
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
@@ -1196,7 +1196,7 @@ class StepGnss:
 
         for epoch in self.epoch_range.eporng_list():
             inp_dir_epo = self.translate_path(self.inp_dir, epoch_inp=epoch)
-            flist_epo = arocmn.files_input_manage(inp_dir_epo, ".*")
+            flist_epo = arocmn.import_files(inp_dir_epo, ".*")
             n_files_epo = len(list(flist_epo))
             flist_all.extend(flist_epo)
             epolist_all.extend([epoch] * n_files_epo)
@@ -1789,7 +1789,7 @@ class StepGnss:
         list
             The list of filtered raw files.
         """
-        flist_exclu = arocmn.files_input_manage(filelist_exclu_inp)
+        flist_exclu = arocmn.import_files(filelist_exclu_inp)
 
         flist_out = []
         ok_inp_bool_stk = []
