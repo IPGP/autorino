@@ -514,6 +514,9 @@ class SpliceGnss(HandleGnss):
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
+        # set ok_inp to True per default
+        self.table["ok_inp"] = True
+
         # generate the potential local files
         self.guess_local_rnx()
         # tests if the output local files are already there
@@ -783,6 +786,9 @@ class SplitGnss(HandleGnss):
 
         # Log the start of the splitting operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splitting RINEX files" + BOLD_END)
+
+        # set the ok_inp to True per default
+        self.table["ok_inp"] = True
 
         # generate the potential local files
         self.guess_local_rnx()
