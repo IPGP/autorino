@@ -28,7 +28,6 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 BOLD_SRT = "\033[1m"
 BOLD_END = "\033[0m"
 
-
 class HandleGnss(arocmn.StepGnss):
     def __init__(
         self,
@@ -220,12 +219,15 @@ class HandleGnss(arocmn.StepGnss):
             logger.info("> Table to be feeded:")
             self.print_table()
 
-        #self.table["ok_inp"] = True # this is dangerous !!
+        # self.table["ok_inp"] = True # this is dangerous !!
 
         for irow, row in self.table.iterrows():
 
-            if not self.mono_ok_check(irow, 'feed_by_epochs',
-                                      fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
+            if not self.mono_ok_check(
+                irow,
+                "feed_by_epochs",
+                fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            ):
                 continue
 
             site = self.table.loc[irow, "site"]
@@ -296,7 +298,7 @@ class HandleGnss(arocmn.StepGnss):
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
-            else: # should not happend
+            else:  # should not happend
                 self.table.loc[irow, "ok_inp"] = False
                 self.table.loc[irow, "fpath_inp"] = None
                 logger.warning(
@@ -477,7 +479,7 @@ class SpliceGnss(HandleGnss):
         handle_software="converto",
         rinexmod_options=None,
         verbose=False,
-        force=False
+        force=False,
     ):
         """
         Splice RINEX files.
@@ -563,8 +565,11 @@ class SpliceGnss(HandleGnss):
         self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
-            if not self.mono_ok_check(irow,'splice',
-                                      fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
+            if not self.mono_ok_check(
+                irow,
+                "splice",
+                fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            ):
                 continue
 
             logger.info(
@@ -615,9 +620,12 @@ class SpliceGnss(HandleGnss):
         #     self.table.loc[irow, "ok_out"] = False
         #     return None
 
-        if not self.mono_ok_check(irow, 'splice (mono)',
-                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-                                  switch_ok_out_false=True):
+        if not self.mono_ok_check(
+            irow,
+            "splice (mono)",
+            fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            switch_ok_out_false=True,
+        ):
             return None
 
         # definition of the output directory (after the action)
@@ -752,7 +760,7 @@ class SplitGnss(HandleGnss):
         handle_software="converto",
         rinexmod_options=None,
         verbose=False,
-        force=False
+        force=False,
     ):
         """
         Split RINEX files.
@@ -839,8 +847,11 @@ class SplitGnss(HandleGnss):
         self.set_tmp_dirs()
         for irow, row in self.table.iterrows():
 
-            if not self.mono_ok_check(irow,'split',
-                                      fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"])):
+            if not self.mono_ok_check(
+                irow,
+                "split",
+                fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            ):
                 continue
 
             fdecmptmp, _ = self.mono_decompress(irow)
@@ -885,9 +896,12 @@ class SplitGnss(HandleGnss):
         #     self.table.loc[irow, "ok_out"] = False
         #     return None
 
-        if not self.mono_ok_check(irow, 'split (mono)',
-                                  fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-                                  switch_ok_out_false=True):
+        if not self.mono_ok_check(
+            irow,
+            "split (mono)",
+            fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            switch_ok_out_false=True,
+        ):
             return None
 
         # definition of the output directory (after the action)
