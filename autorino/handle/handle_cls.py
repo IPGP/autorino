@@ -521,6 +521,9 @@ class SpliceGnss(HandleGnss):
         self.guess_local_rnx()
         # tests if the output local files are already there
         self.check_local_files("out")
+        # switch ok_inp to False if the output files are already there
+        self.filter_ok_out()
+
         # if force is True, force the splicing operation
         if force:
             self.force("splice")
@@ -794,6 +797,8 @@ class SplitGnss(HandleGnss):
         self.guess_local_rnx()
         # tests if the output local files are already there
         self.check_local_files("out")
+        # switch ok_inp to False if the output files are already there
+        self.filter_ok_out()
         # if force is True, force the splicing operation
         if force:
             self.force("split")
