@@ -2105,20 +2105,21 @@ class StepGnss:
             finp_use = Path(str(self.table.loc[irow, "fpath_inp"]))
             fout_use = Path(str(self.table.loc[irow, "fpath_inp"]))
 
+        ### stacklevel = 2
         if force:
-            logger.info("%s forced: %s", step_name, finp_use, stacklevel=2)
+            logger.info("%s forced: %s", step_name, finp_use)
             bool_ok = True
         elif check_ok_out_only:
             if self.table.loc[irow, "ok_out"]:
-                logger.info("%s skipped (output already exists): %s", step_name, fout_use, stacklevel=2)
+                logger.info("%s skipped (output already exists): %s", step_name, fout_use)
                 bool_ok = False
             else:
                 bool_ok = True
         elif not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-            logger.info("%s skipped (output already exists): %s", step_name, fout_use, stacklevel=2)
+            logger.info("%s skipped (output already exists): %s", step_name, fout_use)
             bool_ok = False
         elif not self.table.loc[irow, "ok_inp"]:
-            logger.warning("%s skipped (input disabled): %s", step_name, finp_use, stacklevel=2)
+            logger.warning("%s skipped (input disabled): %s", step_name, finp_use)
             bool_ok = False
         else:
             bool_ok = True
