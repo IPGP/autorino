@@ -450,6 +450,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.table_ok_cols_bool()
         if invalidate_small_local_files:
             self.invalidate_small_local_files()
+        # switch ok_inp to False if the output files are already there
         self.filter_ok_out()
 
         # Force download if required
