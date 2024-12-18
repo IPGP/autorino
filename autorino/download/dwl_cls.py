@@ -387,12 +387,17 @@ class DownloadGnss(arocmn.StepGnss):
 
         return ping_out
 
-    def set_ftp_obj(self):
+    def set_ftp_obj(self,timeout=15,max_try=4,sleep_time=5):
         """
         Create the FTP object for the FTP protocol.
         """
         self.ftp_obj = arodwl.ftp_create_obj(
-            self.access["hostname"], self.access["login"], self.access["password"]
+            hostname_inp=self.access["hostname"],
+            username=self.access["login"],
+            password=self.access["password"],
+            timeout=timeout,
+            max_try=max_try,
+            sleep_time=sleep_time
         )
 
     def download(
@@ -434,7 +439,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Set up the DownloadGnss's FTP object if the protocol is FTP
         if self.access["protocol"] == "ftp":
-            self.set_ftp_obj()
+            self.set_ftp_obj(timeout=timeout, max_try=max_try, sleep_time=sleep_time)
 
         # Guess remote raw file paths
         if remote_find_method == "guess":
@@ -444,6 +449,10 @@ class DownloadGnss(arocmn.StepGnss):
         elif remote_find_method == "ask":
             self.ask_remote_raw()
             self.ask_local_raw()
+        else:
+            logger.error("Wrong remote_find_method: %s ('ask' or 'guess' only are allowed)",
+                         remote_find_method)
+            raise Exception
 
         # Check local files and update table
         self.check_local_files()
