@@ -368,7 +368,7 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     return d
 
 
-def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, print_table=True, force=False):
+def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, verbose=True, force=False):
     """
     Executes the steps in the provided list.
 
@@ -391,7 +391,7 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
         If True the selected steps indicated in step_select_list are excluded.
         It is the opposite behavior of the regular one using steps_select_list
         Default is False.
-    print_table : bool, optional
+    verbose : bool, optional
         A flag indicating whether to print the tables during the execution of the steps. Default is True.
     force : bool, optional
         A flag indicating whether to force the execution of the steps.
@@ -434,8 +434,8 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
             else:
                 pass
 
-        # Set the verbose option if print_table is True
-        if print_table:
+        # Set the verbose option if verbose is True
+        if verbose:
             stp.options["verbose"] = True
 
         if force:
