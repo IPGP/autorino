@@ -22,7 +22,7 @@ from geodezyx import utils
 p="/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024/024"
 L = utils.find_recursive(p,"*gz")
 
-hdl.load_table_from_filelist(L)
+hdl.load_tab_filelist(L)
 hdl.updt_epotab_rnx()
 
 # bool_comp = hdl.table['fpath_inp'].apply(arocmn.is_compressed)

@@ -302,13 +302,12 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
             epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
 
-            # re add protocol:
-            rmot_fil_epo_lis = [
-                self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
-            ]
-            #### DIRTY URL CLEAN ME
-
-
+            # re add protocol: (urltambouille)
+            rmot_fil_epo_lis = [arodwl.join_url(self.access["protocol"], '', '',f) for f in rmot_fil_epo_lis]
+            #legacy readd
+            #rmot_fil_epo_lis = [
+            #    self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
+            #]
 
             ## step 2: the table is updated with the files found
             new_rows_stk = []
@@ -396,33 +395,6 @@ class DownloadGnss(arocmn.StepGnss):
             self.access["hostname"], self.access["login"], self.access["password"]
         )
 
-    def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):
-        """
-        will download locally the files which have been identified by
-        the guess_remote_files method
-
-        exploits the fname_remote column of the DownloadGnss.table
-        attribute
-
-        This `fetch_remote_files` method is for the download stricly speaking.
-        Ìn operation, use the `download` method which does a broader
-        preliminary actions.
-        """
-        download_files_list = []
-
-        for irow, row in self.table.iterrows():
-            file_dl_out = self.mono_fetch(
-                irow,
-                force=force,
-                timeout=timeout,
-                max_try=max_try,
-                sleep_time=sleep_time,
-            )
-            if file_dl_out:
-                download_files_list.append(file_dl_out)
-
-        return download_files_list
-
     def download(
         self,
         verbose=False,
@@ -478,13 +450,12 @@ class DownloadGnss(arocmn.StepGnss):
         self.table_ok_cols_bool()
         if invalidate_small_local_files:
             self.invalidate_small_local_files()
+        # switch ok_inp to False if the output files are already there
         self.filter_ok_out()
 
         # Force download if required
         if force:
-            logger.info("Force download is enabled.")
-            self.table["ok_inp"] = True
-            self.table["note"] = "force_download"
+            self.force("download")
 
         # Log the number of files to be downloaded and excluded
         n_ok_inp = (self.table["ok_inp"]).sum()
@@ -511,7 +482,10 @@ class DownloadGnss(arocmn.StepGnss):
         lock.acquire()
         try:
             self.fetch_remote_files(
-                force=force, timeout=timeout, max_try=max_try, sleep_time=sleep_time
+                force=force, # force argument is now redudant, because ok_inp can be forced with .force() method
+                timeout=timeout,
+                max_try=max_try,
+                sleep_time=sleep_time
             )
         finally:
             lock.release()
@@ -523,28 +497,59 @@ class DownloadGnss(arocmn.StepGnss):
             self.print_table()
         return None
 
-    #               _   _
-    #     /\       | | (_)
-    #    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____
-    #   / /\ \ / __| __| |/ _ \| '_ \/ __|  / _ \| '_ \  | '__/ _ \ \ /\ / / __|
-    #  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \
-    # /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/
-    #
+    def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):
+        """
+        will download locally the files which have been identified by
+        the guess_remote_files method
+
+        exploits the fname_remote column of the DownloadGnss.table
+        attribute
+
+        This `fetch_remote_files` method is for the download stricly speaking.
+        Ìn operation, use the `download` method which does a broader
+        preliminary actions.
+        """
+        download_files_list = []
+
+        for irow, row in self.table.iterrows():
+            file_dl_out = self.mono_fetch(
+                irow,
+                force=force, # force argument is now redudant, because ok_inp can be forced with .force() method
+                timeout=timeout,
+                max_try=max_try,
+                sleep_time=sleep_time,
+            )
+            if file_dl_out:
+                download_files_list.append(file_dl_out)
+
+        return download_files_list
+
+#               _   _                   _ _                           _ _    __                                 __
+#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
+#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
+#   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
+#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
+# /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
+#                                                                           \_\                                 /_/
 
     def mono_fetch(self, irow, force=False, timeout=60, max_try=4, sleep_time=5):
 
-        if self.table.loc[irow, "ok_out"] and not force:
-            logger.info(
-                "%s action on row skiped (output exists)",
-                self.table.loc[irow, "fpath_out"],
-            )
-            return None
+        # +++ oldcheck (to be removed)
+        # if self.table.loc[irow, "ok_out"] and not force:
+        #     logger.info(
+        #         "%s action on row skiped (output exists)",
+        #         self.table.loc[irow, "fpath_out"],
+        #     )
+        #     return None
+        #
+        # if not self.table.loc[irow, "ok_inp"]:
+        #     logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         self.table.loc[irow, "fname"],
+        #     )
+        #     return None
 
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
+        if not self.mono_ok_check(irow, 'fetch (mono)'):
             return None
 
         logger.info(">>>>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])

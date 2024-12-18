@@ -22,7 +22,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Generate a list of Trimble files from a remote HTML directory.")
     parser.add_argument("site", type=str, help="The site identifier.")
-    parser.add_argument("host_name", type=str, help="The hostname of the remote server.")
+    parser.add_argument("hostname", type=str, help="The hostname of the remote server.")
     parser.add_argument("output_dir", type=str,
                         help="The directory where the downloaded HTML files will be saved.")
     parser.add_argument("start_date",

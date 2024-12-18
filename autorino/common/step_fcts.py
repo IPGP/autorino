@@ -84,7 +84,7 @@ def dummy_sess_dic():
     return d
 
 
-def files_input_manage(inp_fil, inp_regex=".*"):
+def import_files(inp_fil, inp_regex=".*"):
     """
     Handles multiple types of input lists and returns a python list of the input.
 
@@ -257,7 +257,7 @@ def rnxs2step_obj(rnxs_lis_inp):
                               log_dir="",
                               inp_dir="")
 
-    stp_obj.load_table_from_filelist(rnxs_lis_inp)
+    stp_obj.load_tab_filelist(rnxs_lis_inp)
     stp_obj.updt_site_w_rnx_fname()
     stp_obj.updt_epotab_rnx(use_rnx_filename_only=True, update_epoch_range=True)
 

@@ -12,9 +12,8 @@ rnxstruct = ""
 dir = "/home/psakicki/aaa_FOURBI/test_splice_SOUF"
 
 import autorino.handle as arohdl
-
-import datetime as dt
 import geodezyx.conv as conv
+
 
 
 spc = arohdl.SpliceGnss(dir,
@@ -25,9 +24,10 @@ spc = arohdl.SpliceGnss(dir,
                                      "1d"),
                                      inp_dir=prnx)
 
+rnxsinp = spc.find_local_inp(return_as_step_obj=True)
+
+spc.splice("given",rnxsinp)
 
 
-#spc.find_local_inp(return_as_step_obj=True).print_table()
-
-spc.splice(spc.find_local_inp(return_as_step_obj=True))
-#spc.feed_by_epochs(spc.find_local_inp(return_as_step_obj=True))
+import versioningit
+versioningit.get_version('/home/psakicki/CODES/IPGP/autorino')
