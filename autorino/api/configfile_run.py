@@ -20,15 +20,16 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def cfgfile_run(
-        cfg_in, main_cfg_in,
-        sites_list=None,
-        epo_srt=None,
-        epo_end=None,
-        period="1D",
-        steps_select_list=None,
-        exclude_steps_select=False,
-        force=False):
-
+    cfg_in,
+    main_cfg_in,
+    sites_list=None,
+    epo_srt=None,
+    epo_end=None,
+    period="1D",
+    steps_select_list=None,
+    exclude_steps_select=False,
+    force=False,
+):
     """
     Run the Autorino configuration files.
 
@@ -118,9 +119,11 @@ def cfgfile_run(
         )
 
         for steps_lis in steps_lis_lis:
-            arocfg.run_steps(steps_lis,
-                             steps_select_list=steps_select_list,
-                             exclude_steps_select=exclude_steps_select,
-                             force=force)
+            arocfg.run_steps(
+                steps_lis,
+                steps_select_list=steps_select_list,
+                exclude_steps_select=exclude_steps_select,
+                force=force,
+            )
 
     return None

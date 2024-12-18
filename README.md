@@ -203,6 +203,42 @@ options:
 
 ### Call a Step workflow in CLI mode
 
+#### `autorino_cfgfile_run` minimal example
+``` bash
+python3 autorino_cfgfile_run.py  -c /path/to/your/configfile.yml -m /path/to/your/main_configfile.yml -s '2024-05-01 00:00:00' -e '2024-05-05 23:59:59' -p '01D' -ls 'SITE' -ss 'download,convert,splice' -f```
+```
+
+#### `autorino_cfgfile_run` help
+```
+usage: autorino_cfgfile_run.py [-h] [-c CONFIG] [-m MAIN_CONFIG] [-s START]
+                               [-e END] [-p PERIOD] [-ls LIST_SITES]
+                               [-ss STEPS_SELECT_LIST] [-es] [-f]
+
+Assisted Unloading, Treatment and Organization of RINEX observations
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        cfgfiles file path or directory path containing the
+                        cfgfiles file
+  -m MAIN_CONFIG, --main_config MAIN_CONFIG
+                        main cfgfiles file path
+  -s START, --start START
+  -e END, --end END
+  -p PERIOD, --period PERIOD
+  -ls LIST_SITES, --list_sites LIST_SITES
+                        Comma-separated list of site identifiers
+  -ss STEPS_SELECT_LIST, --steps_select_list STEPS_SELECT_LIST
+                        Comma-separated list of selected steps to be executed.
+                        The step's names are the ones in the config file
+                        (download, convert...)
+  -es, --exclude_steps_select
+                        Flag to exclude the selected steps. The step's names
+                        are the ones in the config file (download, convert...)
+  -f, --force           force the execution of the steps
+```
+
+
 ## The configuration files
 
 _autorino_ relies on YAML configuration files to perform its _workflow_ 

@@ -427,8 +427,36 @@ class DownloadGnss(arocmn.StepGnss):
         ping_timeout=20,
     ):
         """
-        frontend method to download files from a GNSS receiver
+        Frontend method to download files from a GNSS receiver
+
+        Parameters
+        ----------
+        verbose : bool, optional
+            If True, prints detailed information during the download process. Default is False.
+        force : bool, optional
+            If True, forces the download even if the files already exist locally. Default is False.
+        remote_find_method : str, optional
+            Method to find remote files.
+            Can be 'ask' to list files from the server (for FTP only) or 'guess' to guess file paths.
+            Default is 'ask'.
+        invalidate_small_local_files : bool, optional
+            If True, invalidates small local files to ensure they are re-downloaded. Default is True.
+        timeout : int, optional
+            Timeout in seconds for the download operations. Default is 60.
+        max_try : int, optional
+            Maximum number of retry attempts for the download operations. Default is 4.
+        sleep_time : int, optional
+            Sleep time in seconds between retry attempts. Default is 5.
+        ping_max_try : int, optional
+            Maximum number of retry attempts for pinging the remote server. Default is 4.
+        ping_timeout : int, optional
+            Timeout in seconds for pinging the remote server. Default is 20.
+
+        Returns
+        -------
+        None
         """
+
         logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories

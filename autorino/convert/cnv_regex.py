@@ -339,8 +339,8 @@ def conv_regex_mdb2rnx(f):
 
     site = re.match(regex_doy_site, f.name).group(1).lower()
     doy = re.match(regex_doy_site, f.name).group(doygroup).lower()
-    conv_regex_main = re.compile(site + doy + ".(.{2})?\.[0-9]{2}o")
-    conv_regex_annex = re.compile(site + doy + ".(.{2})?\.[0-9]{2}\w")
+    conv_regex_main = re.compile(site + doy + r".(.{2})?\.[0-9]{2}o")
+    conv_regex_annex = re.compile(site + doy + r".(.{2})?\.[0-9]{2}\w")
     return conv_regex_main, conv_regex_annex
 
 
@@ -432,7 +432,7 @@ def conv_regex_tps2rin(f):
     # conv_regex_annex  = re.compile(site+doy+".(.|)\.[0-9]{2}\w")
     ## the date of the raw file can be actually anything...
     ## doy/month-day/etc..
-    conv_regex_main = re.compile(site + "[0-9]{3}.(.|)\.[0-9]{2}o")
-    conv_regex_annex = re.compile(site + "[0-9]{3}.(.|)\.[0-9]{2}\w")
+    conv_regex_main = re.compile(site + r"[0-9]{3}.(.|)\.[0-9]{2}o")
+    conv_regex_annex = re.compile(site + r"[0-9]{3}.(.|)\.[0-9]{2}\w")
 
     return conv_regex_main, conv_regex_annex
