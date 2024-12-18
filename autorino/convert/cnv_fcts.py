@@ -7,13 +7,13 @@ Created on Fri Apr  7 12:07:18 2023
 """
 
 import datetime as dt
-#### Import the logger
 import os
 import re
 from pathlib import Path
-
 import dateutil
 import docker
+import pwd
+import grp
 
 from rinexmod import rinexmod_api
 
@@ -215,3 +215,74 @@ def stop_old_docker(max_running_time=120):
             )
 
     return None
+
+def get_current_user_grp():
+    """
+    Retrieves the current user and group names.
+
+    This function uses the `pwd` and `grp` modules to get the current user's
+    username and the current group's name.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the current user's username and the current group's name.
+    """
+    # Get the current user
+    current_user = pwd.getpwuid(os.getuid()).pw_name
+    # Get the current group
+    current_group = grp.getgrgid(os.getgid()).gr_name
+    return current_user, current_group
+
+def get_file_owner(file_inp):
+    """
+    Retrieves the owner of the specified file.
+
+    This function uses the `os` module to get the owner of the specified file.
+
+    Parameters
+    ----------
+    file_inp : str or Path
+        The path to the file whose owner is to be retrieved.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the username and group name of the file's owner.
+    """
+    # Get the UID and GID of the file
+    uid = os.stat(file_inp).st_uid
+    gid = os.stat(file_inp).st_gid
+
+    # Get the username and group name
+    user = pwd.getpwuid(uid).pw_name
+    group = grp.getgrgid(gid).gr_name
+
+    return user, group
+
+
+def change_file_owner(file_inp, user, group):
+    """
+    Changes the ownership of the specified file to the given user and group.
+
+    Parameters
+    ----------
+    file_inp : str or Path
+        The path to the file whose ownership is to be changed.
+    user : str
+        The username of the new owner.
+    group : str
+        The group name of the new owner.
+
+    Returns
+    -------
+    None
+    """
+    # Get the UID and GID
+    uid = pwd.getpwnam(user).pw_uid
+    gid = grp.getgrnam(group).gr_gid
+
+    # Change the ownership
+    os.chown(file_inp, uid, gid)
+
+

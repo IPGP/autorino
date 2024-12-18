@@ -20,7 +20,7 @@ dwl.print_table()
 dwl.fetch_remote_files()
 dwl.print_table()
 
-cnv.load_table_from_prev_step_table(dwl.table)
+cnv.load_tab_prev_tab(dwl.table)
 
 cnv.print_table()
 cnv.convert()

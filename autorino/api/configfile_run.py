@@ -26,8 +26,9 @@ def cfgfile_run(
         epo_end=None,
         period="1D",
         steps_select_list=None,
-        exclude_steps_select=False
-):
+        exclude_steps_select=False,
+        force=False):
+
     """
     Run the Autorino configuration files.
 
@@ -59,6 +60,10 @@ def cfgfile_run(
     exclude_steps_select : bool, optional
         If True the selected steps indicated in step_select_list are excluded.
         It is the opposite behavior of the regular one using steps_select_list
+        Default is False.
+    force : bool, optional
+        If True, the steps will be executed even if the output files already exist.
+        overrides the 'force' parameters in the configuration file.
         Default is False.
 
     Raises
@@ -113,6 +118,9 @@ def cfgfile_run(
         )
 
         for steps_lis in steps_lis_lis:
-            arocfg.run_steps(steps_lis, steps_select_list=steps_select_list, exclude_steps_select=exclude_steps_select)
+            arocfg.run_steps(steps_lis,
+                             steps_select_list=steps_select_list,
+                             exclude_steps_select=exclude_steps_select,
+                             force=force)
 
     return None

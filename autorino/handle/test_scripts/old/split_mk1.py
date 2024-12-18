@@ -24,7 +24,7 @@ hdl_store = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo_dummy) #, site_id='
 p="/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"
 L = utils.find_recursive(p,"*gz")
 
-hdl_store.load_table_from_filelist(L)
+hdl_store.load_tab_filelist(L)
 hdl_store.updt_epotab_rnx(use_rnx_filename_only=True)
 
 epo = arocmn.EpochRange(dt.datetime(2024,2,28,1),

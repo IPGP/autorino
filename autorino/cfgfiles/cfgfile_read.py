@@ -368,7 +368,7 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     return d
 
 
-def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, print_table=True):
+def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, print_table=True, force=False):
     """
     Executes the steps in the provided list.
 
@@ -393,6 +393,10 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
         Default is False.
     print_table : bool, optional
         A flag indicating whether to print the tables during the execution of the steps. Default is True.
+    force : bool, optional
+        A flag indicating whether to force the execution of the steps.
+        overrides the 'force' parameters in the configuration file.
+        Default is False.
 
     Returns
     -------
@@ -434,17 +438,41 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, pri
         if print_table:
             stp.options["verbose"] = True
 
+        if force:
+            stp.options["force"] = True
+
+        # # Execute the step based on its type
+        # if stp.get_step_type() == "download":
+        #     stp.download(**stp.options)
+        # elif stp.get_step_type() == "convert":
+        #     stp.load_tab_prev_tab(wkf_prev.table)
+        #     stp.convert(**stp.options)
+        # elif stp.get_step_type() == "splice":
+        #     stp_rnx_inp = stp.copy()
+        #     stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
+        #     stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+        # elif stp.get_step_type() == "split":
+        #     stp_rnx_inp = stp.copy()
+        #     stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
+        #     stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+        #
+
         # Execute the step based on its type
         if stp.get_step_type() == "download":
             stp.download(**stp.options)
         elif stp.get_step_type() == "convert":
-            stp.load_table_from_prev_step_table(wkf_prev.table)
+            logger.info("load table for step %s", stp.get_step_type())
+            stp.load_tab_inpdir()
             stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
-            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            logger.info("load table for step %s", stp.get_step_type())
+            stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
-            stp_rnx_inp.load_table_from_prev_step_table(wkf_prev.table)
+            logger.info("load table for step %s", stp.get_step_type())
+            stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+
+    return None
