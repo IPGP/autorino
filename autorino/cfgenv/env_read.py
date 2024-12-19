@@ -54,11 +54,11 @@ def read_env(envfile_path=None):
     if not os.path.isfile(envfile_path_use) or envfile_path_use == "":
         if envfile_path_use == "":
             logger.warning(
-                "custom environment configfile not defined in the environment variable AUTORINO_ENV"
+                "custom environment configfile not defined in the environment variable $AUTORINO_ENV"
             )
         else:
             logger.warning(
-                "custom environment configfile not found in %s", envfile_path_use
+                "$AUTORINO_ENV custom environment configfile not found in %s", envfile_path_use
             )
 
         logger.warning("fallback to default values in %s", envfile_path_def)

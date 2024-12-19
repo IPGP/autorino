@@ -33,23 +33,16 @@ based on _autorino_'s spinoff tool [_rinexmod_](https://github.com/IPGP/rinexmod
 
 ## Installation
 
+### Automatic installation (recommended)
 
-For the time being, the package is not available on PyPi, so you need to install it by adding the path of the _autorino_
-package to your `$PYTHONPATH` in your _.bashrc_.
+Clone the _autorino_ repository. 
 ```bash
-PYTHONPATH=$PYTHONPATH:/home/user/path_to/autorino
+git clone https://github.com/IPGP/autorino.git
 ```
-
-If you want to use _autorino_ in CLI mode, you must also add the path to the _autorino_ script to your `$PATH` in your _.bashrc_.
+And then install _autorino_ using the `pip` package manager. 
 ```bash
-$PATH=$PATH:/home/user/path_to/autorino/autorino
-``` 
-Note that it is `autorino/autorino` two times, since the CLI programs are inside the _autorino_'s module.
-
-### External dependencies
-_autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
-```
-pip install -r /home/user/path_to/autorino/requirements.txt
+cd autorino
+pip install .
 ```
 
 ### Setting up the environment
@@ -64,6 +57,26 @@ This configuration file is a YAML file that contains the paths to the different 
 
 If `$AUTORINO_ENV` is not set, _autorino_ will use the default configuration file located in the package's `configfiles/env/` folder.  
 Per defaults values assume that the converter executables are known by your system and (e.g. set in your `$PATH`).
+
+
+### Advenced user installation (legacy style)
+
+You can install _autorino_ package by adding its path of to your `$PYTHONPATH` in your _.bashrc_.
+```bash
+PYTHONPATH=$PYTHONPATH:/home/user/path_to/autorino
+```
+If you want to use _autorino_ in CLI mode, you must also add the path to the _autorino_ script to your `$PATH` in your _.bashrc_.
+```bash
+$PATH=$PATH:/home/user/path_to/autorino/autorino
+``` 
+Note that it is `autorino/autorino` two times, since the CLI programs are inside the _autorino_'s module.
+
+_autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
+```
+pip install -r /home/user/path_to/autorino/requirements.txt
+```
+
+And then set up the environment variable `$AUTORINO_ENV` as described above.
 
 ## External utilities (GNSS converters)
 
@@ -202,6 +215,42 @@ options:
 ```
 
 ### Call a Step workflow in CLI mode
+
+#### `autorino_cfgfile_run` minimal example
+``` bash
+python3 autorino_cfgfile_run.py  -c /path/to/your/configfile.yml -m /path/to/your/main_configfile.yml -s '2024-05-01 00:00:00' -e '2024-05-05 23:59:59' -p '01D' -ls 'SITE' -ss 'download,convert,splice' -f```
+```
+
+#### `autorino_cfgfile_run` help
+```
+usage: autorino_cfgfile_run.py [-h] [-c CONFIG] [-m MAIN_CONFIG] [-s START]
+                               [-e END] [-p PERIOD] [-ls LIST_SITES]
+                               [-ss STEPS_SELECT_LIST] [-es] [-f]
+
+Assisted Unloading, Treatment and Organization of RINEX observations
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        cfgfiles file path or directory path containing the
+                        cfgfiles file
+  -m MAIN_CONFIG, --main_config MAIN_CONFIG
+                        main cfgfiles file path
+  -s START, --start START
+  -e END, --end END
+  -p PERIOD, --period PERIOD
+  -ls LIST_SITES, --list_sites LIST_SITES
+                        Comma-separated list of site identifiers
+  -ss STEPS_SELECT_LIST, --steps_select_list STEPS_SELECT_LIST
+                        Comma-separated list of selected steps to be executed.
+                        The step's names are the ones in the config file
+                        (download, convert...)
+  -es, --exclude_steps_select
+                        Flag to exclude the selected steps. The step's names
+                        are the ones in the config file (download, convert...)
+  -f, --force           force the execution of the steps
+```
+
 
 ## The configuration files
 
