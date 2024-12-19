@@ -18,7 +18,7 @@ dwl = dwl_lst[0]
 ses = ses_lst[0]
 #req = req_lst
 
-#L = REQ.ask_remote_files()
+#L = REQ.ask_remote_raw()
 L = dwl.guess_local_files()
 L = dwl.guess_remote_files()
 L = dwl.check_local_files()
@@ -33,7 +33,7 @@ sitelog_dir = '/home/sysop/metadata/OVPF'
 
 conv = arocnv.ConvertGnss(ses, dwl.epoch_range, out, sitelog_dir)
 
-conv.load_table_from_prev_step_table(dwl.table)
+conv.load_tab_prev_tab(dwl.table)
 conv.print_table()
 conv.convert()
 conv.print_table()

@@ -2,8 +2,8 @@
 
 station:
     site:
-        name: FOAG 
-        site_id: FOAG00REU 
+        name: BOMG 
+        site_id: BOMG00REU 
         domes: 
         sitelog_path: FROM_MAIN #<$HOME>/sitelogs/OVPF ###  can be a specific file or a directory path containing the sitelogs
         position_xyz: (1,2,3)

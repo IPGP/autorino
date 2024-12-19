@@ -18,11 +18,11 @@ from filelock import FileLock, Timeout
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-
+import autorino.common as arocmn
 logger = logging.getLogger(__name__)
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
-def create_dummy_site_dic():
+def dummy_site_dic():
     """
     Creates a dummy site dictionary.
 
@@ -50,7 +50,7 @@ def create_dummy_site_dic():
     return d
 
 
-def create_dummy_session_dic():
+def dummy_sess_dic():
     """
     Creates a dummy session dictionary.
 
@@ -84,7 +84,7 @@ def create_dummy_session_dic():
     return d
 
 
-def files_input_manage(inp_fil, inp_regex=".*"):
+def import_files(inp_fil, inp_regex=".*"):
     """
     Handles multiple types of input lists and returns a python list of the input.
 
@@ -179,7 +179,7 @@ def is_ok(val_inp):
 
     Parameters
     ----------
-    val_inp : any
+    val_inp : any or iterable of any
         The input value to be checked.
         Can handle iterables.
 
@@ -198,7 +198,7 @@ def is_ok(val_inp):
     # scalar case
     if val_inp is None:
         return False
-    elif val_inp == np.nan: # isnan not working if weird type is given
+    elif isinstance(val_inp, float) and np.isnan(val_inp):
         return False
     elif val_inp == "":
         return False
@@ -232,3 +232,33 @@ def check_lockfile(lockfile_path):
         lock.release()
     except Timeout:
         logger.warning(f"Process is locked by a previous process for {lockfile_path}")
+
+
+def rnxs2step_obj(rnxs_lis_inp):
+    """
+    Convert a list of RINEX files to a StepGnss object.
+
+    This function creates a StepGnss object and populates it with data from the provided list of RINEX files.
+    It loads the table from the file list, updates the site information from the RINEX filenames, and updates
+    the epoch table from the RINEX filenames.
+
+    Parameters
+    ----------
+    rnxs_lis_inp : list
+        A list of RINEX file paths to be converted into a StepGnss object.
+
+    Returns
+    -------
+    StepGnss
+        A StepGnss object populated with data from the provided RINEX files.
+    """
+    stp_obj = arocmn.StepGnss(out_dir="",
+                              tmp_dir="",
+                              log_dir="",
+                              inp_dir="")
+
+    stp_obj.load_tab_filelist(rnxs_lis_inp)
+    stp_obj.updt_site_w_rnx_fname()
+    stp_obj.updt_epotab_rnx(use_rnx_filename_only=True, update_epoch_range=True)
+
+    return stp_obj

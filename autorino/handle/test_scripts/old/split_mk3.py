@@ -24,8 +24,8 @@ hdl_store = arocmn.StepGnss(out_dir, tmp_dir, log_dir, epo_dummy)
 p="/home/ovsgnss/090_TEMP_STUFFS/2402_tests_PF_pride" 
 L = utils.find_recursive(p,"*BORG*crx*gz")
 
-hdl_store.load_table_from_filelist(L)
-hdl_store.update_epoch_table_from_rnx_fname(use_rnx_filename_only=True)
+hdl_store.load_tab_filelist(L)
+hdl_store.updt_epotab_rnx(use_rnx_filename_only=True)
 
 epo = arocmn.EpochRange(dt.datetime(2023,6,4),
                         dt.datetime(2023,7,31),
@@ -34,13 +34,13 @@ epo = arocmn.EpochRange(dt.datetime(2023,6,4),
 
 splt = arohdl.SplitGnss(out_dir, tmp_dir, log_dir, epo)
 
-splt.find_rnxs_for_handle(hdl_store)
+splt.feed_by_epochs(hdl_store)
 
 handle_software = 'gfzrnx'
 
 splt.decompress()
 
-splt.split(handle_software=handle_software)
+splt.split_core(handle_software=handle_software)
 
 
 

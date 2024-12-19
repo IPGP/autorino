@@ -26,7 +26,7 @@ def update_recursive(d, u):
 
 def read_env(envfile_path=None):
     """
-    read a environement config file path (YAML format) and return
+    read a environement cfgfiles file path (YAML format) and return
     the corresponding dictionnary
 
     priority for envfile path :
@@ -54,18 +54,18 @@ def read_env(envfile_path=None):
     if not os.path.isfile(envfile_path_use) or envfile_path_use == "":
         if envfile_path_use == "":
             logger.warning(
-                "custom environment config file not defined in the environment variable AUTORINO_ENV"
+                "custom environment configfile not defined in the environment variable $AUTORINO_ENV"
             )
         else:
             logger.warning(
-                "custom environment config file not found in %s", envfile_path_use
+                "$AUTORINO_ENV custom environment configfile not found in %s", envfile_path_use
             )
 
         logger.warning("fallback to default values in %s", envfile_path_def)
         envfile_path_use = envfile_path_def
 
     # Log the path of the environment file being loaded
-    logger.info("load environment config file: %s", envfile_path_use)
+    logger.info("load environment configfile: %s", envfile_path_use)
 
     # Load the default and specified environment files and merge their contents
     env_dic_def = yaml.safe_load(open(envfile_path_def))

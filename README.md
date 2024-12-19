@@ -1,7 +1,7 @@
 <img src="./logo_autorino.png" width="300">
 
 # autorino
-_Assisted Unloading, Treatment & Organisation of RINex Observations_
+autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
 **Version 0.1.0 / 2024-05-29**, README Revision: 2024-05-29
 
@@ -33,23 +33,16 @@ based on _autorino_'s spinoff tool [_rinexmod_](https://github.com/IPGP/rinexmod
 
 ## Installation
 
+### Automatic installation (recommended)
 
-For the time being, the package is not available on PyPi, so you need to install it by adding the path of the _autorino_
-package to your `$PYTHONPATH` in your _.bashrc_.
+Clone the _autorino_ repository. 
 ```bash
-PYTHONPATH=$PYTHONPATH:/home/user/path_to/autorino
+git clone https://github.com/IPGP/autorino.git
 ```
-
-If you want to use _autorino_ in CLI mode, you must also add the path to the _autorino_ script to your `$PATH` in your _.bashrc_.
+And then install _autorino_ using the `pip` package manager. 
 ```bash
-$PATH=$PATH:/home/user/path_to/autorino/autorino
-``` 
-Note that it is `autorino/autorino` two times, since the CLI programs are inside the _autorino_'s module.
-
-### External dependencies
-_autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
-```
-pip install -r /home/user/path_to/autorino/requirements.txt
+cd autorino
+pip install .
 ```
 
 ### Setting up the environment
@@ -65,6 +58,26 @@ This configuration file is a YAML file that contains the paths to the different 
 If `$AUTORINO_ENV` is not set, _autorino_ will use the default configuration file located in the package's `configfiles/env/` folder.  
 Per defaults values assume that the converter executables are known by your system and (e.g. set in your `$PATH`).
 
+
+### Advenced user installation (legacy style)
+
+You can install _autorino_ package by adding its path of to your `$PYTHONPATH` in your _.bashrc_.
+```bash
+PYTHONPATH=$PYTHONPATH:/home/user/path_to/autorino
+```
+If you want to use _autorino_ in CLI mode, you must also add the path to the _autorino_ script to your `$PATH` in your _.bashrc_.
+```bash
+$PATH=$PATH:/home/user/path_to/autorino/autorino
+``` 
+Note that it is `autorino/autorino` two times, since the CLI programs are inside the _autorino_'s module.
+
+_autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
+```
+pip install -r /home/user/path_to/autorino/requirements.txt
+```
+
+And then set up the environment variable `$AUTORINO_ENV` as described above.
+
 ## External utilities (GNSS converters)
 
 ### Download external utilities
@@ -79,15 +92,20 @@ see IGSMAIL-8341 for more details.
 converter here: [sbf2rin](https://www.septentrio.com/en/products/software/rxtools#resources)
 #### Topcon
 converter here: [tps2rin](https://mytopcon.topconpositioning.com/support/products/tps2rin-converter)  
-_autorino_ will emulate it with `wine`. Be sure to have `wine` installed on your computer. Detailled precedure will be added soon.
+_autorino_ will emulate it with _wine_. Be sure to have `wine` installed on your computer. Detailled precedure will be added soon.
 #### BINEX
 converter here: [convbin](https://github.com/rtklibexplorer/RTKLIB)  
-`convbin` is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.  
+_convbin_ is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.  
 Detailled procedure will be added soon.
-#### Trimble
+#### Trimble (official Linux converter)
+Ask Trimble support for the official Linux converter _t0xConverter_.
+#### Trimble (unofficial dockerized converter)
 converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)    
-This docker image is a wrapper around Trimble's official converter `trm2rinex` which is not available for Linux.  
-A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.
+This docker image is a wrapper around Trimble's official converter _trm2rinex_ which is not available for Linux.  
+A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.  
+It relies on Trimble's official converter for Windows `ConvertToRinex` available 
+[here](https://geospatial.trimble.com/en/support) & [there](https://trl.trimble.com/docushare/dsweb/Get/Document-1051259/).
+
 #### Trimble's runpkr00
 for legacy RINEX2 conversion with _teqc_ 
 converter here: [runpkr00](https://kb.unavco.org/article/trimble-runpkr00-latest-versions-744.html)
@@ -198,6 +216,42 @@ options:
 
 ### Call a Step workflow in CLI mode
 
+#### `autorino_cfgfile_run` minimal example
+``` bash
+python3 autorino_cfgfile_run.py  -c /path/to/your/configfile.yml -m /path/to/your/main_configfile.yml -s '2024-05-01 00:00:00' -e '2024-05-05 23:59:59' -p '01D' -ls 'SITE' -ss 'download,convert,splice' -f```
+```
+
+#### `autorino_cfgfile_run` help
+```
+usage: autorino_cfgfile_run.py [-h] [-c CONFIG] [-m MAIN_CONFIG] [-s START]
+                               [-e END] [-p PERIOD] [-ls LIST_SITES]
+                               [-ss STEPS_SELECT_LIST] [-es] [-f]
+
+Assisted Unloading, Treatment and Organization of RINEX observations
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        cfgfiles file path or directory path containing the
+                        cfgfiles file
+  -m MAIN_CONFIG, --main_config MAIN_CONFIG
+                        main cfgfiles file path
+  -s START, --start START
+  -e END, --end END
+  -p PERIOD, --period PERIOD
+  -ls LIST_SITES, --list_sites LIST_SITES
+                        Comma-separated list of site identifiers
+  -ss STEPS_SELECT_LIST, --steps_select_list STEPS_SELECT_LIST
+                        Comma-separated list of selected steps to be executed.
+                        The step's names are the ones in the config file
+                        (download, convert...)
+  -es, --exclude_steps_select
+                        Flag to exclude the selected steps. The step's names
+                        are the ones in the config file (download, convert...)
+  -f, --force           force the execution of the steps
+```
+
+
 ## The configuration files
 
 _autorino_ relies on YAML configuration files to perform its _workflow_ 
@@ -231,7 +285,8 @@ Each session is in a sub-block with its own parameters.
 The different possible steps are:
 * `download` : download the data
 * `convert` : convert the data
-* `handle` : handle the data (not implemented yet)
+* `splice` : splice (concatenate) the data
+* `split` : split the data
 
 A step has the following generic structure:
 * `active`: a boolean (`True` or `False`) to activate or deactivate the step
@@ -249,7 +304,7 @@ i.e. all the parameters, paths, options ... which are the same for all stations.
 _main_ values can be called and used in the _sites_ configuration files using the alias `FROM_MAIN`
 (see below).
 
-### aliases in the configuration files
+### Aliases in the configuration files
 
 To use generic or variables values in the configuration files, you can use aliases.
 Aliases take the form of `<aliasname>` or `<ALIASNAME>` with `< >`. Alias are case-sensitive: 
@@ -259,9 +314,12 @@ The following aliases are managed:
 * `<site_id9>` or `<SITE_ID9>`: the 9-characters site name
 
 Time aliases can also be used. They follow the `date` format convention, 
-e.g. `%Y` for the year, `%H` for the hour, `%j` for the day of year, etc... 
+e.g. `%Y` for the year, `%H` for the hour, `%j` for the day of year, etc...
 
-Pper default values can be called and used in the configuration files using the alias:
+The environment variables can also be used as aliases. They follow the `<$ENVVAR>` convention,
+using `$` and between `<` & `>`, e.g. `<$HOME>` for the home directory.
+
+Per default values can be called and used in the configuration files using the alias:
 * `FROM_MAIN`. Then, the value is taken from the _main_ configuration file, see above
 * `FROM_SESSION`. Then, the value is taken from the `session` block
 
@@ -273,7 +331,9 @@ It performs generic actions on input files, saving them in an output folder.
 `StepGnss` has three daughter classes: 
 * `DownloadGnss`: for downloading a RAW file to the local server 
 * `ConvertGnss`: for RAW > RINEX conversion
-* `HandleGnss`: to perform decimation, spliting or splicing operations on a RINEX
+* `HandleGnss`: to perform decimation, spliting or splicing operations on a RINEX. It has two daughter classes:
+  * `SplitGnss`: to split a RINEX file
+  * `SpliceGnss`: to splice (concatenate) RINEX files
 
 The central attribute of a `StepGnss` object is its table (`step_gnss.table`). 
 

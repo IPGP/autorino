@@ -10,7 +10,7 @@ Created on Thu Dec  1 15:47:05 2022
 import pandas as pd
 
 import autorino.common as arocmn
-import autorino.config as arocfg
+import autorino.cfgfiles as arocfg
 
 
 
@@ -31,4 +31,4 @@ out = arocfg.read_cfg(psite, main_cfg_path=pmain)
 out
 
 a = arocmn.EpochRange(pd.NaT,pd.NaT)
-a.epoch_range_list()
+a.eporng_list()
