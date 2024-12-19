@@ -14,4 +14,3 @@ tqdm
 bs4
 beautifulsoup4
 colorlog
-geodezyx
