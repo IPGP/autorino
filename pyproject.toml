@@ -144,8 +144,10 @@ classifiers = [
 #exclude = []  # exclude packages matching these glob patterns (empty by default)
 #namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
-# depndencies from requirements.txt
-### https://stackoverflow.com/questions/73600082/how-to-reference-a-requirements-txt-in-the-pyproject-toml-of-a-setuptools-projec
+### depndencies from requirements.txt
+# https://stackoverflow.com/questions/73600082/how-to-reference-a-requirements-txt-in-the-pyproject-toml-of-a-setuptools-projec
+# NB: github links must have the form: mypackage @ git+https://github.com/myorg/myrepo@v1.0.0#egg=mypackage
+### https://stackoverflow.com/questions/76784012/pip-install-e-fails-with-expected-end-or-semicolon-for-githttps-in-require
 dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
@@ -186,7 +188,6 @@ test = ["coverage"]
 autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
-
 
 [tool.versioningit.vcs]
 # The method key:
