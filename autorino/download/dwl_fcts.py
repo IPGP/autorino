@@ -499,7 +499,7 @@ def download_http(url, output_dir, timeout=120, max_try=4, sleep_time=5):
 #                |___/
 
 
-def ping(host, timeout=20):
+def ping(host, ping_timeout=20):
     """
     Executes the ping command and captures the output.
 
@@ -510,7 +510,7 @@ def ping(host, timeout=20):
     ----------
     host : str
         The hostname or IP address to ping.
-    timeout : int, optional
+    ping_timeout : int, optional
         The timeout for the ping command in seconds. Default is 10 seconds.
 
     Returns
@@ -521,7 +521,7 @@ def ping(host, timeout=20):
     """
 
     result = subprocess.run(
-        ["ping", "-c", "1", "-W", str(timeout), host],
+        ["ping", "-c", "1", "-W", str(ping_timeout), host],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,

@@ -257,7 +257,9 @@ class DownloadGnss(arocmn.StepGnss):
         epo_lis = []
 
         if self.inp_basename:
-            logger.debug("remote files will be filtered with regex: %s", self.inp_basename)
+            logger.debug(
+                "remote files will be filtered with regex: %s", self.inp_basename
+            )
         else:
             logger.debug("no regex filtering will be applied to remote files")
 
@@ -267,10 +269,11 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_dir_use = row["fpath_inp"]
 
             if self.access["protocol"] == "http":
-                logger.warning("HTTP protocol doesn't support well file listing. Nasty effects may occur.")
+                logger.warning(
+                    "HTTP protocol doesn't support well file listing. Nasty effects may occur."
+                )
                 rmot_fil_epo_bulk_lis = arodwl.list_remote_http(
-                    self.access["hostname"],
-                    rmot_dir_use
+                    self.access["hostname"], rmot_dir_use
                 )
             elif self.access["protocol"] == "ftp":
                 rmot_fil_epo_bulk_lis = arodwl.list_remote_ftp(
@@ -289,25 +292,36 @@ class DownloadGnss(arocmn.StepGnss):
 
             ### match the right input structure, if a regex input is provided
             if self.inp_basename:
-                rmot_fname_theo = re.compile(self.translate_path(self.inp_basename, epoch, make_dir=False))
-                rmot_fil_epo_lis = [f for f in rmot_fil_epo_bulk_lis if rmot_fname_theo.search(os.path.basename(f))]
+                rmot_fname_theo = re.compile(
+                    self.translate_path(self.inp_basename, epoch, make_dir=False)
+                )
+                rmot_fil_epo_lis = [
+                    f
+                    for f in rmot_fil_epo_bulk_lis
+                    if rmot_fname_theo.search(os.path.basename(f))
+                ]
             else:
                 rmot_fil_epo_lis = rmot_fil_epo_bulk_lis
 
             logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
             if len(rmot_fil_epo_lis) != len(rmot_fil_epo_bulk_lis):
-                logger.warning("%i files have been filtered out (non-matching regex)",
-                               len(rmot_fil_epo_bulk_lis) - len(rmot_fil_epo_lis))
+                logger.warning(
+                    "%i files have been filtered out (non-matching regex)",
+                    len(rmot_fil_epo_bulk_lis) - len(rmot_fil_epo_lis),
+                )
 
             rmot_fil_all_lis = rmot_fil_all_lis + rmot_fil_epo_lis
             epo_lis = epo_lis + [epoch] * len(rmot_fil_epo_lis)
 
             # re add protocol: (urltambouille)
-            rmot_fil_epo_lis = [arodwl.join_url(self.access["protocol"], '', '',f) for f in rmot_fil_epo_lis]
-            #legacy readd
-            #rmot_fil_epo_lis = [
+            rmot_fil_epo_lis = [
+                arodwl.join_url(self.access["protocol"], "", "", f)
+                for f in rmot_fil_epo_lis
+            ]
+            # legacy readd
+            # rmot_fil_epo_lis = [
             #    self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
-            #]
+            # ]
 
             ## step 2: the table is updated with the files found
             new_rows_stk = []
@@ -366,7 +380,7 @@ class DownloadGnss(arocmn.StepGnss):
         count = 0
         ping_out = None
         while count < ping_max_try and not ping_out:
-            ping_out = arodwl.ping(host=self.access["hostname"], timeout=ping_timeout)
+            ping_out = arodwl.ping(host=self.access["hostname"], ping_timeout=ping_timeout)
             count += 1
             if count > 1:
                 logger.warning(
@@ -387,12 +401,17 @@ class DownloadGnss(arocmn.StepGnss):
 
         return ping_out
 
-    def set_ftp_obj(self):
+    def set_ftp_obj(self, timeout=15, max_try=4, sleep_time=5):
         """
         Create the FTP object for the FTP protocol.
         """
         self.ftp_obj = arodwl.ftp_create_obj(
-            self.access["hostname"], self.access["login"], self.access["password"]
+            hostname_inp=self.access["hostname"],
+            username=self.access["login"],
+            password=self.access["password"],
+            timeout=timeout,
+            max_try=max_try,
+            sleep_time=sleep_time,
         )
 
     def download(
@@ -408,8 +427,36 @@ class DownloadGnss(arocmn.StepGnss):
         ping_timeout=20,
     ):
         """
-        frontend method to download files from a GNSS receiver
+        Frontend method to download files from a GNSS receiver
+
+        Parameters
+        ----------
+        verbose : bool, optional
+            If True, prints detailed information during the download process. Default is False.
+        force : bool, optional
+            If True, forces the download even if the files already exist locally. Default is False.
+        remote_find_method : str, optional
+            Method to find remote files.
+            Can be 'ask' to list files from the server (for FTP only) or 'guess' to guess file paths.
+            Default is 'ask'.
+        invalidate_small_local_files : bool, optional
+            If True, invalidates small local files to ensure they are re-downloaded. Default is True.
+        timeout : int, optional
+            Timeout in seconds for the download operations. Default is 60.
+        max_try : int, optional
+            Maximum number of retry attempts for the download operations. Default is 4.
+        sleep_time : int, optional
+            Sleep time in seconds between retry attempts. Default is 5.
+        ping_max_try : int, optional
+            Maximum number of retry attempts for pinging the remote server. Default is 4.
+        ping_timeout : int, optional
+            Timeout in seconds for pinging the remote server. Default is 20.
+
+        Returns
+        -------
+        None
         """
+
         logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories
@@ -434,7 +481,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Set up the DownloadGnss's FTP object if the protocol is FTP
         if self.access["protocol"] == "ftp":
-            self.set_ftp_obj()
+            self.set_ftp_obj(timeout=timeout, max_try=max_try, sleep_time=sleep_time)
 
         # Guess remote raw file paths
         if remote_find_method == "guess":
@@ -444,6 +491,12 @@ class DownloadGnss(arocmn.StepGnss):
         elif remote_find_method == "ask":
             self.ask_remote_raw()
             self.ask_local_raw()
+        else:
+            logger.error(
+                "Wrong remote_find_method: %s ('ask' or 'guess' only are allowed)",
+                remote_find_method,
+            )
+            raise Exception
 
         # Check local files and update table
         self.check_local_files()
@@ -482,10 +535,10 @@ class DownloadGnss(arocmn.StepGnss):
         lock.acquire()
         try:
             self.fetch_remote_files(
-                force=force, # force argument is now redudant, because ok_inp can be forced with .force() method
+                force=force,  # force argument is now redudant, because ok_inp can be forced with .force() method
                 timeout=timeout,
                 max_try=max_try,
-                sleep_time=sleep_time
+                sleep_time=sleep_time,
             )
         finally:
             lock.release()
@@ -514,7 +567,7 @@ class DownloadGnss(arocmn.StepGnss):
         for irow, row in self.table.iterrows():
             file_dl_out = self.mono_fetch(
                 irow,
-                force=force, # force argument is now redudant, because ok_inp can be forced with .force() method
+                force=force,  # force argument is now redudant, because ok_inp can be forced with .force() method
                 timeout=timeout,
                 max_try=max_try,
                 sleep_time=sleep_time,
@@ -524,13 +577,13 @@ class DownloadGnss(arocmn.StepGnss):
 
         return download_files_list
 
-#               _   _                   _ _                           _ _    __                                 __
-#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
-#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
-#   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
-#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
-# /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
-#                                                                           \_\                                 /_/
+    #               _   _                   _ _                           _ _    __                                 __
+    #     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
+    #    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
+    #   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
+    #  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
+    # /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
+    #                                                                           \_\                                 /_/
 
     def mono_fetch(self, irow, force=False, timeout=60, max_try=4, sleep_time=5):
 
@@ -549,7 +602,7 @@ class DownloadGnss(arocmn.StepGnss):
         #     )
         #     return None
 
-        if not self.mono_ok_check(irow, 'fetch (mono)'):
+        if not self.mono_ok_check(irow, "fetch (mono)"):
             return None
 
         logger.info(">>>>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])
