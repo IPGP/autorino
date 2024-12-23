@@ -39,7 +39,7 @@ name = "autorino"  # REQUIRED, is the only field that cannot be marked as dynami
 #
 # For a discussion on single-sourcing the version, see
 # https://packaging.python.org/guides/single-sourcing-package-version/
-version = "1.1.0"  # REQUIRED, although can be dynamic
+version = "0.1.0"  # REQUIRED, although can be dynamic
 
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
@@ -189,24 +189,73 @@ autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 
-[tool.versioningit.vcs]
-# The method key:
-method = "git"  # <- The method name
+#[tool.versioningit.vcs]
+## The method key:
+#method = "git"  # <- The method name
+#
+## Parameters to pass to the method:
+#match = ["v*"]
+#default-tag = "1.0.0"
+#
+#
+#[tool.versioningit.format]
+## Format used when there have been commits since the most recent tag:
+#distance = "{base_version}.post{distance}+{vcs}{rev}"
+## Example formatted version: 1.2.3.post42+ge174a1f
+#
+## Format used when there are uncommitted changes:
+#dirty = "{base_version}+d{build_date:%Y%m%d}"
+## Example formatted version: 1.2.3+d20230922
+#
+## Format used when there are both commits and uncommitted changes:
+#distance-dirty = "{base_version}.post{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
+## Example formatted version: 1.2.3.post42+ge174a1f.d20230922
 
-# Parameters to pass to the method:
-match = ["v*"]
-default-tag = "1.0.0"
 
+[tool.bumpversion]
+current_version = "0.1.0"  # REQUIRED, although can be dynamic
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+ignore_missing_files = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = true
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+commit_args = "y"
+setup_hooks = []
+pre_commit_hooks = []
+post_commit_hooks = []
 
-[tool.versioningit.format]
-# Format used when there have been commits since the most recent tag:
-distance = "{base_version}.post{distance}+{vcs}{rev}"
-# Example formatted version: 1.2.3.post42+ge174a1f
+[[tool.bumpversion.files]]
+filename = "README.md"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "Version: v{current_version}"
+replace = "Version: v{new_version}"
 
-# Format used when there are uncommitted changes:
-dirty = "{base_version}+d{build_date:%Y%m%d}"
-# Example formatted version: 1.2.3+d20230922
+[[tool.bumpversion.files]]
+filename = "README.md"
+search = "Date: \\d{{4}}-\\d{{2}}-\\d{{2}}"
+replace = "Date: {now:%Y-%m-%d}"
+regex = true
 
-# Format used when there are both commits and uncommitted changes:
-distance-dirty = "{base_version}.post{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
-# Example formatted version: 1.2.3.post42+ge174a1f.d20230922
+[[tool.bumpversion.files]]
+filename = "rinexmod/__init__.py"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
