@@ -1,7 +1,9 @@
 *.pyc
 .idea/
 venv/
-/venvraro1/
-/venvraro2/
-/autorino.egg-info/
+venvraro1/
+venvraro2/
+envaro99a/
+autorino.egg-info/
+build/
 .configfiles/sites/*
