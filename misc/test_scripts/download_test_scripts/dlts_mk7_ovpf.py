@@ -33,7 +33,7 @@ sitelog_dir = '/home/sysop/metadata/OVPF'
 
 conv = arocnv.ConvertGnss(ses, dwl.epoch_range, out, sitelog_dir)
 
-conv.load_table_from_prev_step_table(dwl.table)
+conv.load_tab_prev_tab(dwl.table)
 conv.print_table()
 conv.convert()
 conv.print_table()

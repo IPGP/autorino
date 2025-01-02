@@ -11,6 +11,7 @@ import time
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 from geodezyx import utils, conv
 
@@ -27,7 +28,6 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 BOLD_SRT = "\033[1m"
 BOLD_END = "\033[0m"
 
-
 class HandleGnss(arocmn.StepGnss):
     def __init__(
         self,
@@ -36,8 +36,6 @@ class HandleGnss(arocmn.StepGnss):
         log_dir,
         inp_dir=None,
         epoch_range=None,
-        inp_dir_parent=None,
-        inp_structure=None,
         site=None,
         session=None,
         options=None,
@@ -61,10 +59,6 @@ class HandleGnss(arocmn.StepGnss):
             The input directory for raw files. Default is None.
         epoch_range : EpochRange, optional
             The range of epochs to be processed. Default is None.
-        inp_dir_parent : str, optional
-            The parent directory of the input directory. Default is None.
-        inp_structure : dict, optional
-            The structure of the input files. Default is None.
         site : dict, optional
             Information about the site. Default is None.
         session : dict, optional
@@ -225,12 +219,20 @@ class HandleGnss(arocmn.StepGnss):
             logger.info("> Table to be feeded:")
             self.print_table()
 
-        self.table["ok_inp"] = False
+        # self.table["ok_inp"] = True # this is dangerous !!
 
         for irow, row in self.table.iterrows():
+
+            if not self.mono_ok_check(
+                irow,
+                "feed_by_epochs",
+                fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            ):
+                continue
+
             site = self.table.loc[irow, "site"]
-            epo_srt = np.datetime64(self.table.loc[irow, "epoch_srt"])
-            epo_end = np.datetime64(self.table.loc[irow, "epoch_end"])
+            epo_srt = self.table.loc[irow, "epoch_srt"]
+            epo_end = self.table.loc[irow, "epoch_end"]
 
             logger.info(
                 ">>>>>> Feeding RINEXs for %s between %s & %s",
@@ -296,13 +298,21 @@ class HandleGnss(arocmn.StepGnss):
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
+            else:  # should not happend
+                self.table.loc[irow, "ok_inp"] = False
+                self.table.loc[irow, "fpath_inp"] = None
+                logger.warning(
+                    "no valid input RINEX between %s & %s",
+                    arocmn.iso_zulu_epoch(epo_srt),
+                    arocmn.iso_zulu_epoch(epo_end),
+                )
 
         return None
 
     def find_local_inp(self, return_as_step_obj=True, rnx3_regex=False):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_structure` attributes of the DownloadGnss object.
+        EpochRange and `inp_basename` attributes of the DownloadGnss object.
 
         Parameters
         ----------
@@ -469,6 +479,7 @@ class SpliceGnss(HandleGnss):
         handle_software="converto",
         rinexmod_options=None,
         verbose=False,
+        force=False,
     ):
         """
         Splice RINEX files.
@@ -495,6 +506,8 @@ class SpliceGnss(HandleGnss):
             Additional options for the RINEX modification. Default is None.
         verbose : bool, optional
             If True, prints the table for debugging purposes. Default is False.
+        force : bool, optional
+            If True, forces the splicing operation. Default is False.
 
         Returns
         -------
@@ -503,9 +516,22 @@ class SpliceGnss(HandleGnss):
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
+        # set ok_inp to True per default
+        self.table["ok_inp"] = True
+
+        # generate the potential local files
+        self.guess_local_rnx()
+        # tests if the output local files are already there
+        self.check_local_files("out")
+        # switch ok_inp to False if the output files are already there
+        self.filter_ok_out()
+
+        # if force is True, force the splicing operation
+        if force:
+            self.force("splice")
+
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
-
         # Feed the epochs for splicing
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
 
@@ -539,6 +565,12 @@ class SpliceGnss(HandleGnss):
         self.set_tmp_dirs()
 
         for irow, row in self.table.iterrows():
+            if not self.mono_ok_check(
+                irow,
+                "splice",
+                fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            ):
+                continue
 
             logger.info(
                 ">>>>>> Splicing %s between %s and %s",
@@ -564,7 +596,6 @@ class SpliceGnss(HandleGnss):
                 self.mono_mv_final(irow, self.out_dir)
 
         self.remov_tmp_files()
-
         return None
 
     def mono_splice(
@@ -580,12 +611,21 @@ class SpliceGnss(HandleGnss):
         containing the RINEXs to splice
         """
 
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-            )
-            self.table.loc[irow, "ok_out"] = False
+        # +++ oldcheck (to be removed)
+        # if not self.table.loc[irow, "ok_inp"]:
+        #     logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+        #     )
+        #     self.table.loc[irow, "ok_out"] = False
+        #     return None
+
+        if not self.mono_ok_check(
+            irow,
+            "splice (mono)",
+            fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            switch_ok_out_false=True,
+        ):
             return None
 
         # definition of the output directory (after the action)
@@ -690,7 +730,7 @@ class SplitGnss(HandleGnss):
             The range of epochs to be processed. Default is None.
         inp_dir_parent : str, optional
             The parent directory of the input directory. Default is None.
-        inp_structure : dict, optional
+        inp_basename : dict, optional
             The structure of the input files. Default is None.
         site : dict, optional
             Information about the site. Default is None.
@@ -720,6 +760,7 @@ class SplitGnss(HandleGnss):
         handle_software="converto",
         rinexmod_options=None,
         verbose=False,
+        force=False,
     ):
         """
         Split RINEX files.
@@ -746,6 +787,8 @@ class SplitGnss(HandleGnss):
             Additional options for the RINEX modification. Default is None.
         verbose : bool, optional
             If True, prints the table for debugging purposes. Default is False.
+        force : bool, optional
+            If True, forces the splitting operation. Default is False.
 
         Returns
         -------
@@ -754,6 +797,19 @@ class SplitGnss(HandleGnss):
 
         # Log the start of the splitting operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splitting RINEX files" + BOLD_END)
+
+        # set the ok_inp to True per default
+        self.table["ok_inp"] = True
+
+        # generate the potential local files
+        self.guess_local_rnx()
+        # tests if the output local files are already there
+        self.check_local_files("out")
+        # switch ok_inp to False if the output files are already there
+        self.filter_ok_out()
+        # if force is True, force the splicing operation
+        if force:
+            self.force("split")
 
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
@@ -789,8 +845,15 @@ class SplitGnss(HandleGnss):
         """
 
         self.set_tmp_dirs()
-
         for irow, row in self.table.iterrows():
+
+            if not self.mono_ok_check(
+                irow,
+                "split",
+                fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            ):
+                continue
+
             fdecmptmp, _ = self.mono_decompress(irow)
             self.tmp_decmp_files.append(fdecmptmp)
 
@@ -824,12 +887,21 @@ class SplitGnss(HandleGnss):
         typically 'fpath_inp' file
         """
 
-        if not self.table.loc[irow, "ok_inp"]:
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-            )
-            self.table.loc[irow, "ok_out"] = False
+        # +++ oldcheck (to be removed)
+        # if not self.table.loc[irow, "ok_inp"]:
+        #     logger.warning(
+        #         "action on row skipped (input disabled): %s",
+        #         arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+        #     )
+        #     self.table.loc[irow, "ok_out"] = False
+        #     return None
+
+        if not self.mono_ok_check(
+            irow,
+            "split (mono)",
+            fname_custom=arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
+            switch_ok_out_false=True,
+        ):
             return None
 
         # definition of the output directory (after the action)
