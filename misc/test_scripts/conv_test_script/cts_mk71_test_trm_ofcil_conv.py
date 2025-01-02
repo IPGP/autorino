@@ -8,7 +8,7 @@ Created on Tue May  7 16:29:30 2024
 Test the official Trimble converter
 """
 
-import autorino.common as arocmn
+import autorino.api as aroapi
 from geodezyx import utils
 
 p = "/home/sakic/050_GNSS_input_data_baiededix/OVSG_raw"
@@ -21,5 +21,5 @@ psitelogs = "/scratch/xchg_cdd/sitelogs/SITELOGS"
 print(l)
 
 out = "/home/sakic/031_SCRATCH_CONV/071_test_trm_oficl_conv"
-arocmn.convert_rnx(l,out,out,metadata=psitelogs)
+aroapi.convert_rnx(l,out,out,metadata=psitelogs)
 
