@@ -2,3 +2,4 @@
 # -*- coding: utf-8 -*-
 
 from .check import *
+from .trimble_filelist_html import *
