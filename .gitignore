@@ -5,3 +5,4 @@ venv/
 /venvraro2/
 /autorino.egg-info/
 .configfiles/sites/*
+build/
