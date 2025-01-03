@@ -2191,7 +2191,7 @@ class StepGnss:
                 frnx, out_dir_use, **rinexmod_options_use
             )
         except Exception as e:
-            logger.error("something went wrong for %s", frnx)
+            logger.error("Error for: %s", frnx)
             logger.error("Exception raised: %s", e)
             frnxmod = None
 
@@ -2277,7 +2277,7 @@ class StepGnss:
             frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
             logger.debug("file moved to final destination: %s", frnxfin)
         except Exception as e:
-            logger.error("something went wrong for %s", frnx_to_mv)
+            logger.error("Error for: %s", frnx_to_mv)
             logger.error("Exception raised: %s", e)
             frnxfin = None
 

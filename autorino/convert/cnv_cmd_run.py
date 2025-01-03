@@ -423,9 +423,7 @@ def converter_run(
 
     # change ownership
     if out_fpath:
-        outfile_owner, outfile_group = arocnv.get_file_owner(out_fpath)
-        if outfile_owner != USER or outfile_group != GROUP:
-            arocnv.change_file_owner(out_fpath, USER, GROUP)
+        arocnv.change_owner(out_fpath, USER, GROUP)
 
     if remove_converted_annex_files:
         for f in conv_files_annex:
