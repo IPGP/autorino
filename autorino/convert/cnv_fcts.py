@@ -292,7 +292,8 @@ def change_owner(file_inp, user, group):
         try:
             os.chown(file_inp, uid, gid)
         except OSError as e:
-            logger.warning(f"Unable to change ownership of {file_inp}: {e}")
+            logger.warning(f"Unable to change ownership of {file_inp}")
+            logger.warning(f"Exception: {e}")
             logger.warning(f"user: {owner_ini}, group: {group_ini} will remain")
 
     return None
