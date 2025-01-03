@@ -350,7 +350,7 @@ class ConvertGnss(arocmn.StepGnss):
                 self.table.loc[irow, table_col], out_dir, converter=converter_inp
             )
         except Exception as e:
-            logger.error("something went wrong for %s", self.table.loc[irow, table_col])
+            logger.error("Error for: %s", self.table.loc[irow, table_col])
             logger.error("Exception raised: %s", e)
             frnxtmp = None
 

@@ -5,6 +5,7 @@ Created on Mon Jan  8 15:47:58 2024
 
 @author: psakic
 """
+import logging
 
 import dateparser
 import numpy as np
@@ -12,6 +13,10 @@ import pandas as pd
 from pandas.tseries.frequencies import to_offset
 
 import autorino.common as arocmn
+import autorino.cfgenv.env_read as aroenv
+
+logger = logging.getLogger(__name__)
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def epoch_range_interpret(epo_inp):
@@ -37,6 +42,9 @@ def epoch_range_interpret(epo_inp):
         epo_range_out = arocmn.EpochRange(*epo_inp)
     elif type(epo_inp) is tuple and len(epo_inp) == 2:
         epo_range_out = arocmn.EpochRange(epo_inp[0], epo_inp[1])
+    else:
+        logger.error("epoch range input not understood")
+        raise Exception
 
     return epo_range_out
 
@@ -75,6 +83,7 @@ def dateparser_interpret(date_inp, tz="UTC"):
     if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
         ### NaT case. can not support tz
         pass
+
     elif not date_out.tz:
         date_out = pd.Timestamp(date_out, tz=tz)
 
@@ -167,6 +176,7 @@ def round_date(date_in, period, round_method="round"):
         elif round_method == "none":
             date_out = date_use
         else:
+            logger.error("round_method not understood")
             raise Exception
 
     else:
@@ -185,6 +195,7 @@ def round_date(date_in, period, round_method="round"):
         elif round_method == "none":
             date_out = date_use
         else:
+            logger.error("round_method not understood")
             raise Exception
 
         date_out = date_typ(date_out)

@@ -234,7 +234,7 @@ def get_current_user_grp():
     current_group = grp.getgrgid(os.getgid()).gr_name
     return current_user, current_group
 
-def get_file_owner(file_inp):
+def get_owner(file_inp):
     """
     Retrieves the owner of the specified file.
 
@@ -261,7 +261,7 @@ def get_file_owner(file_inp):
     return user, group
 
 
-def change_file_owner(file_inp, user, group):
+def change_owner(file_inp, user, group):
     """
     Changes the ownership of the specified file to the given user and group.
 
@@ -278,11 +278,25 @@ def change_file_owner(file_inp, user, group):
     -------
     None
     """
-    # Get the UID and GID
-    uid = pwd.getpwnam(user).pw_uid
-    gid = grp.getgrnam(group).gr_gid
+    owner_ini, group_ini = get_owner(file_inp)
 
-    # Change the ownership
-    os.chown(file_inp, uid, gid)
+    if owner_ini == user and group_ini == group:
+        # Ownership of file_inp is already user:group
+        pass
+    else:
+        # Get the UID and GID of the new owner/group
+        uid = pwd.getpwnam(user).pw_uid
+        gid = grp.getgrnam(group).gr_gid
+
+        # Change the ownership
+        try:
+            os.chown(file_inp, uid, gid)
+        except OSError as e:
+            logger.warning(f"Unable to change ownership of {file_inp}")
+            logger.warning(f"Exception: {e}")
+            logger.warning(f"user: {owner_ini}, group: {group_ini} will remain")
+
+    return None
+
 
 

@@ -671,7 +671,7 @@ class SpliceGnss(HandleGnss):
                     bin_options=bin_options,
                 )
             except Exception as e:
-                logger.error("something went wrong for %s", fpath_inp_lst)
+                logger.error("Error for: %s", fpath_inp_lst)
                 logger.error("Exception raised: %s", e)
                 frnx_spliced = None
 
@@ -949,7 +949,7 @@ class SplitGnss(HandleGnss):
                 bin_kwoptions=conv_kwoptions,
             )
         except Exception as e:
-            logger.error("something went wrong for %s", frnx_inp)
+            logger.error("Error for %s", frnx_inp)
             logger.error("Exception raised: %s", e)
             frnxtmp = None
 

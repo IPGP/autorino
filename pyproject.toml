@@ -211,6 +211,9 @@ autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 #distance-dirty = "{base_version}.post{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
 ## Example formatted version: 1.2.3.post42+ge174a1f.d20230922
 
+## Parameters to pass to the method:
+#match = ["v*"]
+#default-tag = "1.0.0"
 
 [tool.bumpversion]
 current_version = "0.1.0"  # REQUIRED, although can be dynamic

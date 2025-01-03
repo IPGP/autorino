@@ -1998,7 +1998,7 @@ class StepGnss:
             # 'marker': 'XXXX', # forced below
             # 'sitelog': metadata, # forced below
             "compression": "gz",
-            #"longname": True,
+            # "longname": True, # managed below
             "force_rnx_load": True,
             "verbose": False,
             "filename_style": 'basic',
@@ -2039,6 +2039,14 @@ class StepGnss:
         # better give nothing rather than XXXX00XXX (nasty side effects)
         if rimopts_wrk["marker"] == "XXXX00XXX":
             rimopts_wrk.pop("marker", None)
+
+        #+++ set #3: the short/longname
+        #if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
+        if not any(k in rimopts_wrk for k in ("shortname","longname")):
+            rimopts_wrk["shortname"] = False
+            rimopts_wrk["longname"] = True
+
+
 
         # DO THE UPDATE HERE
         rimopts_out.update(rimopts_wrk)
@@ -2191,7 +2199,7 @@ class StepGnss:
                 frnx, out_dir_use, **rinexmod_options_use
             )
         except Exception as e:
-            logger.error("something went wrong for %s", frnx)
+            logger.error("Error for: %s", frnx)
             logger.error("Exception raised: %s", e)
             frnxmod = None
 
@@ -2277,7 +2285,7 @@ class StepGnss:
             frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
             logger.debug("file moved to final destination: %s", frnxfin)
         except Exception as e:
-            logger.error("something went wrong for %s", frnx_to_mv)
+            logger.error("Error for: %s", frnx_to_mv)
             logger.error("Exception raised: %s", e)
             frnxfin = None
 
