@@ -934,11 +934,13 @@ class StepGnss:
 
         log_dir_use = self.translate_path(log_dir)
 
-        # save the root
         from logging_tree import printout
         print("Logging Tree:", printout())
-        _logger = logging.getLogger()
+
+        #### save the root
+        _logger = copy.deepcopy(logging.getLogger())
         _logger.handlers.clear() # Clear existing handlers
+        # https://santos-k.medium.com/solving-duplicate-log-entries-issue-in-python-logging-d4b1cad8e588
 
         ts = utils.get_timestamp()
         logfile_name = "_".join((ts, step_suffix_use, ".log"))
