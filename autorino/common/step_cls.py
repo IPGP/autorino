@@ -950,16 +950,16 @@ class StepGnss:
         logfile_handler.setFormatter(fileformatter)
         logfile_handler.setLevel("DEBUG")
 
-        # special case for rinexmod
-        imported_module_logger = logging.getLogger('rinexmod')
-        imported_module_logger.handlers = logfile_handler.handlers  # Share the handlers
-        #imported_module_logger.propagate = False  # Prevent messages from reaching the root logger if needed
-
         # the root logger
         # https://stackoverflow.com/questions/48712206/what-is-the-name-of-pythons-root-logger
         # the heritage for loggers
         # https://stackoverflow.com/questions/29069655/python-logging-with-a-common-logger-class-mixin-and-class-inheritance
         _logger.addHandler(logfile_handler)
+
+        # special case for rinexmod
+        imported_module_logger = logging.getLogger('rinexmod')
+        imported_module_logger.handlers = _logger.handlers  # Share the handlers
+        #imported_module_logger.propagate = False  # Prevent messages from reaching the root logger if needed
 
         return logfile_handler
 
