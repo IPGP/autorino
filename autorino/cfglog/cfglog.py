@@ -8,15 +8,16 @@
 log_config_dict = {
     "version": 1,
     "disable_existing_loggers": False,
-    "root": {"handlers": ["console_gyxz"],
-             "level": "DEBUG",
-             "propagate": False},
-
+    "root": {
+        "handlers": ["console_root"],
+        "level": "ERROR",
+        # "propagate": False propagate is useless for the root logger
+    },
     "loggers": {
         "autorino": {  # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
             "handlers": ["console_gyxz"],
             "level": "DEBUG",
-            "propagate": False,
+            "propagate": True,
         },
         "rinexmod": {  # Force rinexmod to use the same logger as autorino
             "handlers": ["console_gyxz"],
@@ -26,7 +27,7 @@ log_config_dict = {
     },
     "handlers": {
         "console_root": {
-            #"formatter":"fmtgzyx_nocolor",
+            "formatter":"fmtgzyx_nocolor",
             "class": "logging.StreamHandler",
             "level": "DEBUG",
         },
@@ -50,7 +51,7 @@ log_config_dict = {
             },
         },
         "fmtgzyx_nocolor": {
-            "fmt": "%(asctime)s.%(msecs)03d|%(levelname).1s|%(funcName)-15s|%(message)s",
+            "fmt": "%(name)s %(asctime)s.%(msecs)03d|%(levelname).1s|%(funcName)-15s|%(message)s",
             "datefmt": "%y%m%dT%H:%M:%S",
         },
     },

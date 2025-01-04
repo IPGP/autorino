@@ -1,6 +1,10 @@
 import argparse
 import autorino.api as aroapi
 
+from logging_tree import printout
+#print("Logging Tree:", printout())
+
+
 def main():
     ##### Parsing Args
     parser = argparse.ArgumentParser(

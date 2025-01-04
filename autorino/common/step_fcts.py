@@ -19,7 +19,7 @@ from filelock import FileLock, Timeout
 import logging
 import autorino.cfgenv.env_read as aroenv
 import autorino.common as arocmn
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def dummy_site_dic():
