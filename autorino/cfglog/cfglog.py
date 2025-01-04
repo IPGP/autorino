@@ -12,14 +12,14 @@ log_config_dict = {
     "root":{
         "handlers" : ["console_root"],
         "level": "WARN",
-        "propagate": False
+        "propagate": True
     },
     
     'loggers': {
         "autorino" : { # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
             "handlers" : ["console_gyxz"],
             "level": "DEBUG",
-            "propagate": False
+            "propagate": True
 
         }
     },
