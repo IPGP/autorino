@@ -934,7 +934,7 @@ class StepGnss:
 
         log_dir_use = self.translate_path(log_dir)
 
-        _logger = logging.getLogger("root")
+        _logger = logging.getLogger("autorino")
 
         ts = utils.get_timestamp()
         logfile_name = "_".join((ts, step_suffix_use, ".log"))
@@ -949,6 +949,11 @@ class StepGnss:
 
         logfile_handler.setFormatter(fileformatter)
         logfile_handler.setLevel("DEBUG")
+
+        # special case for rinexmod
+        imported_module_logger = logging.getLogger('rinexmod')
+        imported_module_logger.handlers = logfile_handler.handlers  # Share the handlers
+        #imported_module_logger.propagate = False  # Prevent messages from reaching the root logger if needed
 
         # the root logger
         # https://stackoverflow.com/questions/48712206/what-is-the-name-of-pythons-root-logger
