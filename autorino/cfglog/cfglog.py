@@ -16,11 +16,18 @@ log_config_dict = {
     },
     
     'loggers': {
-        "autorino" : { # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
+        "autorino" : # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
+        {
             "handlers" : ["console_gyxz"],
             "level": "DEBUG",
             "propagate": True
+        },
 
+        "rinexmod" : # Force rinexmod to use the same logger as autorino
+        {
+            "handlers" : ["console_gyxz"],
+            "level": "DEBUG",
+            "propagate": True
         }
     },
     
