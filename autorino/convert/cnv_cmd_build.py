@@ -648,7 +648,7 @@ def cmd_build_runpkr00(
     """
     Build a command to launch runpkr00, the Trimble > teqc converter
 
-    It has the same behavior as all the `cmd_build` functions
+    It has the same behavior as all th<e `cmd_build` functions
 
     Parameters
     ----------
@@ -701,8 +701,8 @@ def cmd_build_runpkr00(
 
     examples: runpkr00 -d gs00233a
               runpkr00 -dev gs00233a gnew233a
-              runpkr00 -deimv gs00233a c:\new\gs00233a
-              runpkr00 -de c:\old\gs00233a c:\new\gs00233a
+              runpkr00 -deimv gs00233a c:\\new\\gs00233a
+              runpkr00 -de c:\\old\\gs00233a c:\new\\gs00233a
               runpkr00 -demv gs00233a+gs00233b+gs00233c comb2330
               runpkr00 -demv @r00.lst comb2330
     """

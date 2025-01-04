@@ -934,7 +934,7 @@ class StepGnss:
 
         log_dir_use = self.translate_path(log_dir)
 
-        _logger = logging.getLogger("autorino")
+        _logger = logging.getLogger("root")
 
         ts = utils.get_timestamp()
         log_name = "_".join((ts, step_suffix_use, ".log"))
