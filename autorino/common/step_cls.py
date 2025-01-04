@@ -938,6 +938,7 @@ class StepGnss:
         from logging_tree import printout
         print("Logging Tree:", printout())
         _logger = logging.getLogger()
+        _logger.handlers.clear() # Clear existing handlers
 
         ts = utils.get_timestamp()
         logfile_name = "_".join((ts, step_suffix_use, ".log"))
