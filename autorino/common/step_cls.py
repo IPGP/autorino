@@ -937,13 +937,13 @@ class StepGnss:
         _logger = logging.getLogger("root")
 
         ts = utils.get_timestamp()
-        log_name = "_".join((ts, step_suffix_use, ".log"))
-        log_path = os.path.join(log_dir_use, log_name)
+        logfile_name = "_".join((ts, step_suffix_use, ".log"))
+        logfile_path = os.path.join(log_dir_use, logfile_name)
 
         log_cfg_dic = arologcfg.log_config_dict
         fmt_dic = log_cfg_dic["formatters"]["fmtgzyx_nocolor"]
 
-        logfile_handler = logging.FileHandler(log_path)
+        logfile_handler = logging.FileHandler(logfile_path)
 
         fileformatter = logging.Formatter(**fmt_dic)
 
