@@ -19,11 +19,11 @@ log_config_dict = {
             "level": "DEBUG",
             "propagate": True,
         },
-        "rinexmod": {  # Force rinexmod to use the same logger as autorino
-            "handlers": ["console_gyxz"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
+        # "rinexmod": {  # Force rinexmod to use the same logger as autorino
+        #     "handlers": ["console_gyxz"],
+        #     "level": "DEBUG",
+        #     "propagate": True,
+        # },
     },
     "handlers": {
         "console_root": {

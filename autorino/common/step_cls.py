@@ -934,7 +934,8 @@ class StepGnss:
 
         log_dir_use = self.translate_path(log_dir)
 
-        _logger = logging.getLogger("autorino")
+        # save the root
+        _logger = logging.getLogger()
 
         ts = utils.get_timestamp()
         logfile_name = "_".join((ts, step_suffix_use, ".log"))
@@ -955,11 +956,6 @@ class StepGnss:
         # the heritage for loggers
         # https://stackoverflow.com/questions/29069655/python-logging-with-a-common-logger-class-mixin-and-class-inheritance
         _logger.addHandler(logfile_handler)
-
-        # special case for rinexmod
-        imported_module_logger = logging.getLogger('rinexmod')
-        imported_module_logger.handlers = _logger.handlers  # Share the handlers
-        #imported_module_logger.propagate = False  # Prevent messages from reaching the root logger if needed
 
         return logfile_handler
 
