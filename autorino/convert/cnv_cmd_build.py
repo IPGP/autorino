@@ -24,12 +24,9 @@ cmd_str : string
 
 
 """
-import os
-import shutil
 
 # Import star style
 from pathlib import Path
-
 
 # from pathlib3x import Path
 from geodezyx import utils
@@ -106,8 +103,8 @@ def _options_list2str(options):
 
     Examples
     --------
-    >>> options = ["-a", Path(valueA), "-b", 42]
-    >>> _options_list2str(options)
+    > options = ["-a", Path(valueA), "-b", 42]
+    > _options_list2str(options)
     (['-a', 'valueA', '-b', '42'], '-a valueA -b 42')
     """
     cmd_list = []
@@ -681,7 +678,7 @@ def cmd_build_runpkr00(
     ----
     Usage of `runpkr00`
 
-    runpkr00 - Utility to unpack Trimble R00\T00\T01\T02 files, Version 6.03 (Linux) ( t01lib 8.111 )
+    runpkr00 - Utility to unpack Trimble R00, T00, T01, T02 files, Version 6.03 (Linux) ( t01lib 8.111 )
     Copyright (c) Trimble Navigation Limited 1992-2015.  All rights reserved.
 
     usage: runpkr00 [-deimacfvq] [-sfile] [-x[ehi*]] [-tfmt] [-n[!]] [-u0|1] src[+s2+s3+..+sn] [@file] [out]

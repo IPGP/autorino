@@ -702,7 +702,8 @@ class StepGnss:
         """
 
         for epo in ["epoch_srt", "epoch_end"]:
-            if not pd.api.types.is_datetime64tz_dtype(self.table[epo]): # not TZ aware
+            # if not pd.api.types.is_datetime64tz_dtype(self.table[epo]):
+            if not isinstance(self.table[epo].dt, pd.DatetimeTZDtype):  # not TZ aware
                 self.table[epo] = self.table[epo].dt.tz_localize(tz)
             else:
                 self.table[epo] = self.table[epo].dt.tz_convert(tz)
