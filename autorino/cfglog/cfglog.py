@@ -17,7 +17,7 @@ log_config_dict = {
         "autorino": {  # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
             "handlers": ["console_gyxz"],
             "level": "DEBUG",
-            "propagate": True,
+            "propagate": False, # False because a ghost logger haunt the console --> https://stackoverflow.com/questions/19561058/python-logging-module-is-printing-lines-multiple-times
         },
         # "rinexmod": {  # Force rinexmod to use the same logger as autorino
         #     "handlers": ["console_gyxz"],
