@@ -33,6 +33,9 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 import warnings
 warnings.simplefilter("always", UserWarning)
 
+from logging_tree import printout
+print("Logging Tree:", printout())
+
 class StepGnss:
     """
     The StepGnss class represents a step in a GNSS processing chain. It contains methods for initializing and managing

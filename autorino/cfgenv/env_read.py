@@ -14,10 +14,6 @@ import yaml
 logger = logging.getLogger('autorino')
 logger.setLevel("DEBUG")
 
-from logging_tree import printout
-print("Logging Tree:", printout())
-
-
 def update_recursive(d, u):
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
