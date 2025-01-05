@@ -28,10 +28,16 @@ from rinexmod import rinexmod_api
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-logger = logging.getLogger('autorino')
+
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 import warnings
+
 warnings.simplefilter("always", UserWarning)
+
+#from logging_tree import printout
+#print("Logging Tree:", printout())
+
 
 class StepGnss:
     """
@@ -127,11 +133,11 @@ class StepGnss:
         self.inp_dir = inp_dir
 
         ### temp dirs init
-        self.tmp_dir_tables = None     # initialized in the next line
-        self.tmp_dir_unzipped = None   # initialized in the next line
+        self.tmp_dir_tables = None  # initialized in the next line
+        self.tmp_dir_unzipped = None  # initialized in the next line
         self.tmp_dir_converted = None  # initialized in the next line
-        self.tmp_dir_rinexmoded = None # initialized in the next line
-        self.tmp_dir_downloaded = None # initialized in the next line
+        self.tmp_dir_rinexmoded = None  # initialized in the next line
+        self.tmp_dir_downloaded = None  # initialized in the next line
         self._init_tmp_dirs_paths()
 
         # generic log must be on request, to avoid nasty effects
@@ -465,9 +471,9 @@ class StepGnss:
         None
         """
         if metadata:
-            if isinstance(metadata, str): # the input is a str, i.e. a path
+            if isinstance(metadata, str):  # the input is a str, i.e. a path
                 metadata_set = self.translate_path(metadata)
-            else: # all the other cases, i.e. already some MetaData objects
+            else:  # all the other cases, i.e. already some MetaData objects
                 metadata_set = metadata
 
             self.metadata = rinexmod_api.metadata_input_manage(
@@ -475,8 +481,6 @@ class StepGnss:
             )
         else:
             self.metadata = None
-
-
 
     def set_translate_dict(self):
         """
@@ -544,16 +548,14 @@ class StepGnss:
         self.tmp_dir_rinexmoded = self.translate_path(
             self._tmp_dir_rinexmoded, make_dir=True
         )
-        self.tmp_dir_tables = self.translate_path(
-            self._tmp_dir_tables, make_dir=True
-        )
+        self.tmp_dir_tables = self.translate_path(self._tmp_dir_tables, make_dir=True)
 
         return (
             self.tmp_dir_downloaded,
             self.tmp_dir_unzipped,
             self.tmp_dir_converted,
             self.tmp_dir_rinexmoded,
-            self.tmp_dir_tables
+            self.tmp_dir_tables,
         )
 
     def clean_tmp_dirs(self, days=7, keep_table_logs=True):
@@ -605,7 +607,6 @@ class StepGnss:
                             logger.debug("Deleted old file: %s", file_path)
 
         return None
-
 
     #   _____                           _                  _   _               _
     #  / ____|                         | |                | | | |             | |
@@ -686,7 +687,7 @@ class StepGnss:
 
         return None
 
-    def updt_epotab_tz(self,tz='UTC'):
+    def updt_epotab_tz(self, tz="UTC"):
         """
         Updates the epoch table with the specified timezone.
 
@@ -705,7 +706,7 @@ class StepGnss:
 
         for epo in ["epoch_srt", "epoch_end"]:
             if not pd.api.types.is_datetime64tz_dtype(self.table[epo]):  # not TZ aware
-            #if not isinstance(self.table[epo].dt, pd.DatetimeTZDtype): # pycharm recommendantion does not work !!!
+                # if not isinstance(self.table[epo].dt, pd.DatetimeTZDtype): # pycharm recommendantion does not work !!!
                 self.table[epo] = self.table[epo].dt.tz_localize(tz)
             else:
                 self.table[epo] = self.table[epo].dt.tz_convert(tz)
@@ -771,7 +772,9 @@ class StepGnss:
 
         return None
 
-    def updt_eporng_tab(self, column_srt="epoch_srt", column_end="epoch_end",round_method='none'):
+    def updt_eporng_tab(
+        self, column_srt="epoch_srt", column_end="epoch_end", round_method="none"
+    ):
         """
         Updates the EpochRange of the StepGnss object based on the min/max epochs in the object's table.
 
@@ -820,7 +823,7 @@ class StepGnss:
             epoch2,
             period_new,
             round_method=round_method,
-            #round_method=self.epoch_range.round_method,
+            # round_method=self.epoch_range.round_method,
             tz=self.epoch_range.tz,
         )
 
@@ -917,7 +920,7 @@ class StepGnss:
     #               __/ | __/ |         __/ |
     #              |___/ |___/         |___/
 
-    def set_logfile(self, log_dir_inp=None, step_suffix='auto'):
+    def set_logfile(self, log_dir_inp=None, step_suffix="auto"):
         """
         set logging in a file
         """
@@ -929,15 +932,12 @@ class StepGnss:
         else:
             log_dir = log_dir_inp
 
-        if step_suffix == 'auto':
+        if step_suffix == "auto":
             step_suffix_use = self.get_step_type()
         else:
             step_suffix_use = step_suffix
 
         log_dir_use = self.translate_path(log_dir)
-
-        from logging_tree import printout
-        print("Logging Tree:", printout())
 
         #### save the root (empty parenthesis) to catch autorino + rinexmod logs
         _logger = logging.getLogger()
@@ -946,11 +946,11 @@ class StepGnss:
         # https://stackoverflow.com/questions/19561058/python-logging-module-is-printing-lines-multiple-times
         # The easiest solution is to set propagate to False, but then nothing is writed in the log file
         # Thus we must clear the existing handlers
-        _logger.handlers.clear() # Clear existing handlers
+        _logger.handlers.clear()  # Clear existing handlers
         # https://santos-k.medium.com/solving-duplicate-log-entries-issue-in-python-logging-d4b1cad8e588
 
         ts = utils.get_timestamp()
-        logfile_name = "_".join((ts, step_suffix_use, ".log"))
+        logfile_name = "_".join((ts, "autorino", step_suffix_use)) + ".log"
         logfile_path = os.path.join(log_dir_use, logfile_name)
 
         log_cfg_dic = arologcfg.log_config_dict
@@ -1094,7 +1094,7 @@ class StepGnss:
 
         return None
 
-    def load_tab_datelist(self, dates_list, period ="1D"):
+    def load_tab_datelist(self, dates_list, period="1D"):
         """
         Loads the table from a list of dates.
 
@@ -1240,15 +1240,14 @@ class StepGnss:
         else:
             self.table["epoch_srt"] = epolist_all
             if len(epolist_all) > 0:
-                self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
+                self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(
+                    self.epoch_range.period
+                )
                 self.updt_epotab_tz()
             else:
                 self.table["epoch_end"] = self.table["epoch_srt"]
 
-
         return None
-
-
 
     def force(self, step_name=""):
         """
@@ -2029,7 +2028,7 @@ class StepGnss:
             # "longname": True, # managed below
             "force_rnx_load": True,
             "verbose": False,
-            "filename_style": 'basic',
+            "filename_style": "basic",
             "full_history": True,
         }
 
@@ -2049,11 +2048,11 @@ class StepGnss:
             logger.debug("default options for rinexmod: %s", rimopts_def)
             logger.debug("input options for rinexmod: %s", rimopts_inp)
 
-        #+++ set #1: the metadata/sitelog
+        # +++ set #1: the metadata/sitelog
         if update_sitelog:
             rimopts_wrk["sitelog"] = self.metadata
 
-        #+++ set #2: site name/marker
+        # +++ set #2: site name/marker
         if irow is not None:
             rimopts_wrk["marker"] = self.table.loc[irow, "site"]
         elif self.site_id9:
@@ -2068,39 +2067,37 @@ class StepGnss:
         if rimopts_wrk["marker"] == "XXXX00XXX":
             rimopts_wrk.pop("marker", None)
 
-        #+++ set #3: the short/longname
-        #if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
-        if not any(k in rimopts_wrk for k in ("shortname","longname")):
+        # +++ set #3: the short/longname
+        # if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
+        if not any(k in rimopts_wrk for k in ("shortname", "longname")):
             rimopts_wrk["shortname"] = False
             rimopts_wrk["longname"] = True
-
-
 
         # DO THE UPDATE HERE
         rimopts_out.update(rimopts_wrk)
 
         if debug_print:
-            logger.debug("final options for rinexmod: %s",
-                         rimopts_wrk)
+            logger.debug("final options for rinexmod: %s", rimopts_wrk)
 
         return rimopts_out
 
+    #               _   _                   _ _                           _ _    __                                 __
+    #     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
+    #    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
+    #   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
+    #  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
+    # /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
+    #                                                                           \_\                                 /_/
 
-#               _   _                   _ _                           _ _    __                                 __
-#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
-#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
-#   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
-#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
-# /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
-#                                                                           \_\                                 /_/
-
-
-    def mono_ok_check(self, irow,
-                      step_name,
-                      fname_custom="",
-                      force = False,
-                      switch_ok_out_false = False,
-                      check_ok_out_only = False):
+    def mono_ok_check(
+        self,
+        irow,
+        step_name,
+        fname_custom="",
+        force=False,
+        switch_ok_out_false=False,
+        check_ok_out_only=False,
+    ):
         """
         Checks the status of the input and output files for a specific row in the table.
 
@@ -2147,7 +2144,9 @@ class StepGnss:
             bool_ok = True
         elif check_ok_out_only:
             if self.table.loc[irow, "ok_out"]:
-                logger.info("%s skipped (output already exists): %s", step_name, fout_use)
+                logger.info(
+                    "%s skipped (output already exists): %s", step_name, fout_use
+                )
                 bool_ok = False
             else:
                 bool_ok = True
@@ -2164,7 +2163,6 @@ class StepGnss:
             self.table.loc[irow, "ok_out"] = False
 
         return bool_ok
-
 
     def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
@@ -2200,7 +2198,7 @@ class StepGnss:
         """
 
         # +++ oldcheck (to be removed)
-        #if not self.table.loc[irow, "ok_inp"]:
+        # if not self.table.loc[irow, "ok_inp"]:
         #    logger.warning(
         #         "action on row skipped (input disabled): %s",
         #         self.table.loc[irow, "fname"],
@@ -2329,4 +2327,3 @@ class StepGnss:
             # raise e
 
         return frnxfin
-
