@@ -134,8 +134,10 @@ class StepGnss:
         self.tmp_dir_downloaded = None # initialized in the next line
         self._init_tmp_dirs_paths()
 
-        # generic log
-        self.set_logfile()
+        # generic log must be on request, to avoid nasty effects
+        # (missing lines in the log file, and extra lines in the console, i.e. a mess)
+        # self.set_logfile()
+
         # table log is on request only (for the moment)
         # thus this table_log_path attribute must be initialized as none
         self.table_log_path = None
@@ -915,7 +917,7 @@ class StepGnss:
     #               __/ | __/ |         __/ |
     #              |___/ |___/         |___/
 
-    def set_logfile(self, log_dir_inp=None, step_suffix=''):
+    def set_logfile(self, log_dir_inp=None, step_suffix='auto'):
         """
         set logging in a file
         """
@@ -927,7 +929,7 @@ class StepGnss:
         else:
             log_dir = log_dir_inp
 
-        if not step_suffix:
+        if step_suffix == 'auto':
             step_suffix_use = self.get_step_type()
         else:
             step_suffix_use = step_suffix
@@ -937,8 +939,13 @@ class StepGnss:
         from logging_tree import printout
         print("Logging Tree:", printout())
 
-        #### save the root
-        _logger = copy.deepcopy(logging.getLogger())
+        #### save the root (empty parenthesis) to catch autorino + rinexmod logs
+        _logger = logging.getLogger()
+        # this getlogger has a nasty side effect: it creates a new handler
+        # and then duplcated message pollute the console
+        # https://stackoverflow.com/questions/19561058/python-logging-module-is-printing-lines-multiple-times
+        # The easiest solution is to set propagate to False, but then nothing is writed in the log file
+        # Thus we must clear the existing handlers
         _logger.handlers.clear() # Clear existing handlers
         # https://santos-k.medium.com/solving-duplicate-log-entries-issue-in-python-logging-d4b1cad8e588
 

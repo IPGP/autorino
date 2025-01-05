@@ -513,6 +513,9 @@ class SpliceGnss(HandleGnss):
         -------
         None
         """
+
+        self.set_logfile()
+
         # Log the start of the splicing operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
 
@@ -794,6 +797,9 @@ class SplitGnss(HandleGnss):
         -------
         None
         """
+
+        self.set_logfile()
+
 
         # Log the start of the splitting operation
         logger.info(BOLD_SRT + ">>>>>>>>> Splitting RINEX files" + BOLD_END)

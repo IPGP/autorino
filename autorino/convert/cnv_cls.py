@@ -145,6 +145,7 @@ class ConvertGnss(arocmn.StepGnss):
         None
         """
 
+        self.set_logfile()
         logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()

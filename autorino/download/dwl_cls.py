@@ -456,12 +456,13 @@ class DownloadGnss(arocmn.StepGnss):
         -------
         None
         """
-
+        self.set_logfile()
         logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
+
 
         # Check the remote find method, and switch to 'guess' if HTTP protocol is used
         if remote_find_method == "ask" and self.access["protocol"] == "http":
