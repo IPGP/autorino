@@ -51,7 +51,7 @@ log_config_dict = {
             },
         },
         "fmtgzyx_nocolor": {
-            "fmt": "%(name)s %(asctime)s.%(msecs)03d|%(levelname).1s|%(funcName)-15s|%(message)s",
+            "fmt": "%(asctime)s.%(msecs)03d|%(levelname).1s|%(funcName)-15s|%(message)s",
             "datefmt": "%y%m%dT%H:%M:%S",
         },
     },
