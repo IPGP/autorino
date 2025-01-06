@@ -5,7 +5,7 @@ conv_software_paths:
   sbf2rin : "sbf2rin" # Septentrio
   tps2rin : "tps2rin.exe" # Topcon
   ### Trimble
-  t0xconvert : "t0xConvert" # Trimble official
+  t0xconvert : "t0xConvert" # Trimble official (NB: key is t0xconvert in lower case, value is t0xConvert, upper case C)
   trm2rinex : "trm2rinex:cli-light" # Trimble unofficial docker
   runpkr00 : "runpkr00" # Trimble legacy
   ### RINEX handeling
@@ -14,5 +14,5 @@ conv_software_paths:
   teqc : "teqc"
 general:
   log_level: "DEBUG"
-  trimble_default_software: "trm2rinex" # name of the Trimble converter key in the conv_software_paths above
+  trimble_default_software: "trm2rinex" # name of the Trimble converter *key* (lower case) in the conv_software_paths above (trm2rinex or t0xconvert)
 

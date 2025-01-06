@@ -45,12 +45,16 @@ def main():
     parser.add_argument(
         "-tmp",
         "--tmp_dir",
-        help="The temporary directory used during the conversion process",
+        help="The temporary directory used during the conversion process. "
+             "If not provided, it defaults to <out_dir>/tmp_convert_rnx.",
+        default=None,
     )
     parser.add_argument(
         "-log",
         "--log_dir",
-        help="The directory where logs will be stored. If not provided, it defaults to tmp_dir",
+        help="The directory where logs will be stored."
+             "If not provided, it defaults to tmp_dir",
+        default=None,
     )
     parser.add_argument(
         "-rimo",
