@@ -603,7 +603,7 @@ class DownloadGnss(arocmn.StepGnss):
         #     )
         #     return None
 
-        if not self.mono_ok_check(irow, "fetch (mono)"):
+        if not self.mono_ok_check(irow, "fetch"):
             return None
 
         logger.info(">>>>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])

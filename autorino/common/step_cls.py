@@ -2205,7 +2205,7 @@ class StepGnss:
         #     )
         #     return None
 
-        if not self.mono_ok_check(irow, step_name="rinexmod (mono)"):
+        if not self.mono_ok_check(irow, step_name="rinexmod"):
             return None
 
         # definition of the output directory (after the action)
@@ -2280,17 +2280,22 @@ class StepGnss:
         str or None
             The final path of the moved file if the operation is successful, None otherwise.
         """
-        if not self.table.loc[
-            irow, "ok_out"
-        ]:  ### for mv it's ok_out column the one to check!!!!
-            logger.warning(
-                "action on row skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
-            return None
+        # if not self.table.loc[
+        #     irow, "ok_out"
+        # ]:  ### for mv it's ok_out column the one to check!!!!
+        #     logger.warning(
+        #         "final move skipped (input disabled): %s",
+        #         self.table.loc[irow, "fname"],
+        #     )
+        #     return None
+
         # !!!!!
         # must be changed for .mono_ok_check(irow, step_name="mv_final (mono)", check_ok_out_only=True)
         # !!!!!
+
+        if not self.mono_ok_check(irow, step_name="final move", check_ok_out_only=True):
+            return None
+
 
         # definition of the output directory (after the action)
         if out_dir:
