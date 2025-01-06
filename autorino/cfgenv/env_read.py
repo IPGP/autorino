@@ -11,9 +11,8 @@ import os
 import collections.abc
 import yaml
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel("DEBUG")
-
 
 def update_recursive(d, u):
     for k, v in u.items():

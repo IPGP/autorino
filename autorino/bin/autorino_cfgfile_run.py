@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 11 18:44:52 2024
-
-@author: psakic
-"""
-
 import argparse
 import autorino.api as aroapi
 
@@ -20,43 +12,76 @@ def main():
         "-c",
         "--config",
         type=str,
-        help="cfgfiles file path or directory path containing the cfgfiles file",
+        help="The input configuration file or directory of configuration files. "
+             "If a directory is provided, all files ending with '.yml' will be used.",
+        default="",
+        required=True
+    )
+    parser.add_argument(
+        "-m",
+        "--main_config",
+        type=str,
+        help="The main configuration file to be used.",
         default="",
     )
     parser.add_argument(
-        "-m", "--main_config", type=str, help="main cfgfiles file path", default=""
+        "-s",
+        "--start",
+        type=str,
+        help="The start date for the epoch range. "
+             "Can be a list; if so, each epoch is considered separately. "
+             "Can be a file path; if so, the file contains a list of start epochs. "
+             "Default is None.",
+        default=None,
     )
-    parser.add_argument("-s", "--start", type=str, help="", default=None)
-    parser.add_argument("-e", "--end", type=str, help="", default=None)
-    parser.add_argument("-p", "--period", type=str, help="", default="1D")
+    parser.add_argument(
+        "-e",
+        "--end",
+        type=str,
+        help="The end date for the epoch range. Default is None.",
+        default=None,
+    )
+    parser.add_argument(
+        "-p",
+        "--period",
+        type=str,
+        help="The period for the epoch range. Default is '1D'.",
+        default="1D",
+    )
     parser.add_argument(
         "-ls",
         "--list_sites",
         type=str,
-        help="Comma-separated list of site identifiers",
+        help="A list of site identifiers to filter the configuration files."
+             "If provided, only configurations for sites in this list will be processed. "
+             "Default is None.",
         default="",
     )
     parser.add_argument(
         "-ss",
         "--steps_select_list",
         type=str,
-        help="Comma-separated list of selected steps to be executed."
-             " The step's names are the ones in the config file (download, convert...)",
+        help="A list of selected steps to be executed."
+             "If not provided, all steps in 'steps_lis' will be executed. "
+             "Default is None.",
         default="",
     )
     parser.add_argument(
         "-es",
         "--exclude_steps_select",
         action="store_true",
-        help="Flag to exclude the selected steps. "
-             "The step's names are the ones in the config file (download, convert...)",
+        help="If True the selected steps indicated in step_select_list are excluded. "
+             "It is the opposite behavior of the regular one using steps_select_list. "
+             "Default is False.",
         default=False,
     )
     parser.add_argument(
         "-f",
         "--force",
         action="store_true",
-        help="force the execution of the steps",
+        help="If True, the steps will be executed even if the output files already exist. "
+             "Overrides the 'force' parameters in the configuration file. "
+             "Default is False.",
         default=False,
     )
 

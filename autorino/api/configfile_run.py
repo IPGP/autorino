@@ -15,7 +15,7 @@ import autorino.common as arocmn
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -47,9 +47,10 @@ def cfgfile_run(
         A list of site identifiers to filter the configuration files.
          If provided, only configurations for sites in this list will be processed. Default is None.
     epo_srt : str, list, optional
-        The start date for the epoch range. Default is None.
-        Can be a list. If so, each epoch is considered separately
-        if it is a file path, the file contains a list of start epochs
+        The start date for the epoch range.
+        Can be a list; if so, each epoch is considered separately.
+        Can be a file path; if so, the file contains a list of start epochs
+        Default is None.
     epo_end : str, optional
         The end date for the epoch range. Default is None.
     period : str, optional

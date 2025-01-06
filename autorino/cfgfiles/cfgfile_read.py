@@ -26,7 +26,7 @@ from rinexmod import rinexmod_api
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -474,5 +474,7 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, ver
             logger.info("load table for step %s", stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+
+        ##### close the step
 
     return None

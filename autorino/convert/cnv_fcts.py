@@ -20,7 +20,7 @@ from rinexmod import rinexmod_api
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -278,9 +278,9 @@ def change_owner(file_inp, user, group):
     -------
     None
     """
-    owner_ini, group_ini = get_owner(file_inp)
+    user_ini, group_ini = get_owner(file_inp)
 
-    if owner_ini == user and group_ini == group:
+    if user_ini == user and group_ini == group:
         # Ownership of file_inp is already user:group
         pass
     else:
@@ -292,10 +292,7 @@ def change_owner(file_inp, user, group):
         try:
             os.chown(file_inp, uid, gid)
         except OSError as e:
-            logger.warning(f"Unable to change ownership of {file_inp}")
-            logger.warning(f"Exception: {e}")
-            logger.warning(f"user: {owner_ini}, group: {group_ini} will remain")
-
+            logger.warning(f"Unable to change owner {user_ini}:{group_ini} > {user}:{group}: {e}")
     return None
 
 

@@ -28,10 +28,16 @@ from rinexmod import rinexmod_api
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-logger = logging.getLogger(__name__)
+
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 import warnings
+
 warnings.simplefilter("always", UserWarning)
+
+#from logging_tree import printout
+#print("Logging Tree:", printout())
+
 
 class StepGnss:
     """
@@ -127,11 +133,18 @@ class StepGnss:
         self.inp_dir = inp_dir
 
         ### temp dirs init
+        self.tmp_dir_tables = None  # initialized in the next line
+        self.tmp_dir_unzipped = None  # initialized in the next line
+        self.tmp_dir_converted = None  # initialized in the next line
+        self.tmp_dir_rinexmoded = None  # initialized in the next line
+        self.tmp_dir_downloaded = None  # initialized in the next line
         self._init_tmp_dirs_paths()
 
-        # generic log
-        self.set_logfile()
-        # table log is on request only (for the moment9)
+        # generic log must be on request, to avoid nasty effects
+        # (missing lines in the log file, and extra lines in the console, i.e. a mess)
+        # self.set_logfile()
+
+        # table log is on request only (for the moment)
         # thus this table_log_path attribute must be initialized as none
         self.table_log_path = None
 
@@ -387,6 +400,88 @@ class StepGnss:
 
         return None
 
+    def _init_tmp_dirs_paths(
+        self,
+        tmp_subdir_dwnld="010_downloaded",
+        tmp_subdir_unzip="020_unzipped",
+        tmp_subdir_conv="030_converted",
+        tmp_subdir_rnxmod="040_rinexmoded",
+        tmp_subdir_tables="090_tables",
+    ):
+        """
+        Initializes the temporary directories paths as attribute for the StepGnss object.
+
+        This method is internal only, for the initialisation of the StepGnss object.
+
+        See set_tmp_dirs for the actual creation of the directories.
+
+        This method sets the paths for the temporary directories of the StepGnss object.
+        It creates the paths in a generic form, with placeholders and without creating the actual directories.
+        The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
+
+        Parameters
+        ----------
+        tmp_subdir_dwnld : str, optional
+            The subdirectory for downloaded files. Default is 'downloaded'.
+        tmp_subdir_unzip : str, optional
+            The subdirectory for unzipped files. Default is 'unzipped'.
+        tmp_subdir_conv : str, optional
+            The subdirectory for converted files. Default is 'converted'.
+        tmp_subdir_rnxmod : str, optional
+            The subdirectory for rinexmoded files. Default is 'rinexmoded'.
+        tmp_subdir_tables : str, optional
+            The subdirectory for logs. Default is 'logs'.
+
+        Returns
+        -------
+        None
+        """
+        # Internal versions have not been translated
+        self._tmp_dir_downloaded = os.path.join(self.tmp_dir, tmp_subdir_dwnld)
+        self._tmp_dir_unzipped = os.path.join(self.tmp_dir, tmp_subdir_unzip)
+        self._tmp_dir_converted = os.path.join(self.tmp_dir, tmp_subdir_conv)
+        self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir, tmp_subdir_rnxmod)
+        self._tmp_dir_tables = os.path.join(self.tmp_dir, tmp_subdir_tables)
+
+        # Translation of the paths
+        self.tmp_dir_downloaded = self.translate_path(self._tmp_dir_downloaded)
+        self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
+        self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
+        self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
+        self.tmp_dir_tables = self.translate_path(self._tmp_dir_tables)
+
+        return None
+
+    def _init_metadata(self, metadata):
+        """
+        Initializes the metadata attribute of the StepGnss object.
+
+        This method checks if a 'metadata' is provided. If it is, it translates the path of the metadata,
+        manages the site log input using the `metadata_input_manage` function from the `rinexmod_api` module,
+        and sets the 'metadata' attribute of the StepGnss object to the managed site log input.
+        If a 'metadata' is not provided, it sets the 'metadata' attribute to None.
+
+        Parameters
+        ----------
+        metadata : str, optional
+            The metadata for the step. If not provided, the 'metadata' attribute is set to None.
+
+        Returns
+        -------
+        None
+        """
+        if metadata:
+            if isinstance(metadata, str):  # the input is a str, i.e. a path
+                metadata_set = self.translate_path(metadata)
+            else:  # all the other cases, i.e. already some MetaData objects
+                metadata_set = metadata
+
+            self.metadata = rinexmod_api.metadata_input_manage(
+                metadata_set, force=False
+            )
+        else:
+            self.metadata = None
+
     def set_translate_dict(self):
         """
         Generates the translation dictionary based on the site and session dictionaries,
@@ -420,54 +515,6 @@ class StepGnss:
 
         return None
 
-    def _init_tmp_dirs_paths(
-        self,
-        tmp_subdir_tables="tables",
-        tmp_subdir_unzip="unzipped",
-        tmp_subdir_conv="converted",
-        tmp_subdir_rnxmod="rinexmoded",
-        tmp_subdir_dwnld="downloaded",
-    ):
-        """
-        Initializes the temporary directories paths for the StepGnss object.
-
-        This method sets the paths for the temporary directories of the StepGnss object.
-        It creates the paths in a generic form, with placeholders and without creating the actual directories.
-        The directories include logs, unzipped, converted, rinexmoded, and downloaded directories.
-
-        Parameters
-        ----------
-        tmp_subdir_tables : str, optional
-            The subdirectory for logs. Default is 'logs'.
-        tmp_subdir_unzip : str, optional
-            The subdirectory for unzipped files. Default is 'unzipped'.
-        tmp_subdir_conv : str, optional
-            The subdirectory for converted files. Default is 'converted'.
-        tmp_subdir_rnxmod : str, optional
-            The subdirectory for rinexmoded files. Default is 'rinexmoded'.
-        tmp_subdir_dwnld : str, optional
-            The subdirectory for downloaded files. Default is 'downloaded'.
-
-        Returns
-        -------
-        None
-        """
-        # Internal versions have not been translated
-        self._tmp_dir_tables = os.path.join(self.tmp_dir, tmp_subdir_tables)
-        self._tmp_dir_unzipped = os.path.join(self.tmp_dir, tmp_subdir_unzip)
-        self._tmp_dir_converted = os.path.join(self.tmp_dir, tmp_subdir_conv)
-        self._tmp_dir_rinexmoded = os.path.join(self.tmp_dir, tmp_subdir_rnxmod)
-        self._tmp_dir_downloaded = os.path.join(self.tmp_dir, tmp_subdir_dwnld)
-
-        # Translation of the paths
-        self.tmp_dir_tables = self.translate_path(self._tmp_dir_tables)
-        self.tmp_dir_unzipped = self.translate_path(self._tmp_dir_unzipped)
-        self.tmp_dir_converted = self.translate_path(self._tmp_dir_converted)
-        self.tmp_dir_rinexmoded = self.translate_path(self._tmp_dir_rinexmoded)
-        self.tmp_dir_downloaded = self.translate_path(self._tmp_dir_downloaded)
-
-        return None
-
     def set_tmp_dirs(self):
         """
         Translates and creates temporary directories.
@@ -484,31 +531,31 @@ class StepGnss:
         Returns
         -------
         tuple
-            A tuple containing the paths of the logs, unzipped, converted, rinexmoded, and downloaded directories,
+            A tuple containing the paths of the downloaded, unzipped, converted, rinexmoded, and logs directories,
             in that order.
         """
         # This translation is also done in _init_tmp_dirs_paths
         # but we redo it here, simply to be sure
-        tmp_dir_tables_set = self.translate_path(self._tmp_dir_tables, make_dir=True)
-        tmp_dir_unzipped_set = self.translate_path(
-            self._tmp_dir_unzipped, make_dir=True
-        )
-        tmp_dir_converted_set = self.translate_path(
-            self._tmp_dir_converted, make_dir=True
-        )
-        tmp_dir_rinexmoded_set = self.translate_path(
-            self._tmp_dir_rinexmoded, make_dir=True
-        )
-        tmp_dir_downloaded_set = self.translate_path(
+        self.tmp_dir_downloaded = self.translate_path(
             self._tmp_dir_downloaded, make_dir=True
         )
+        self.tmp_dir_unzipped = self.translate_path(
+            self._tmp_dir_unzipped, make_dir=True
+        )
+        self.tmp_dir_converted = self.translate_path(
+            self._tmp_dir_converted, make_dir=True
+        )
+        self.tmp_dir_rinexmoded = self.translate_path(
+            self._tmp_dir_rinexmoded, make_dir=True
+        )
+        self.tmp_dir_tables = self.translate_path(self._tmp_dir_tables, make_dir=True)
 
         return (
-            tmp_dir_tables_set,
-            tmp_dir_unzipped_set,
-            tmp_dir_converted_set,
-            tmp_dir_rinexmoded_set,
-            tmp_dir_downloaded_set,
+            self.tmp_dir_downloaded,
+            self.tmp_dir_unzipped,
+            self.tmp_dir_converted,
+            self.tmp_dir_rinexmoded,
+            self.tmp_dir_tables,
         )
 
     def clean_tmp_dirs(self, days=7, keep_table_logs=True):
@@ -542,11 +589,11 @@ class StepGnss:
 
         # Iterate through the temporary directories
         for tmp_dir in [
-            self.tmp_dir_tables,
+            self.tmp_dir_downloaded,
             self.tmp_dir_unzipped,
             self.tmp_dir_converted,
             self.tmp_dir_rinexmoded,
-            self.tmp_dir_downloaded,
+            self.tmp_dir_tables,
         ]:
             if os.path.isdir(tmp_dir):
                 for root, dirs, files in os.walk(tmp_dir):
@@ -560,36 +607,6 @@ class StepGnss:
                             logger.debug("Deleted old file: %s", file_path)
 
         return None
-
-    def _init_metadata(self, metadata):
-        """
-        Initializes the metadata attribute of the StepGnss object.
-
-        This method checks if a 'metadata' is provided. If it is, it translates the path of the metadata,
-        manages the site log input using the `metadata_input_manage` function from the `rinexmod_api` module,
-        and sets the 'metadata' attribute of the StepGnss object to the managed site log input.
-        If a 'metadata' is not provided, it sets the 'metadata' attribute to None.
-
-        Parameters
-        ----------
-        metadata : str, optional
-            The metadata for the step. If not provided, the 'metadata' attribute is set to None.
-
-        Returns
-        -------
-        None
-        """
-        if metadata:
-            if isinstance(metadata, str): # the input is a str, i.e. a path
-                metadata_set = self.translate_path(metadata)
-            else: # all the other cases, i.e. already some MetaData objects
-                metadata_set = metadata
-
-            self.metadata = rinexmod_api.metadata_input_manage(
-                metadata_set, force=False
-            )
-        else:
-            self.metadata = None
 
     #   _____                           _                  _   _               _
     #  / ____|                         | |                | | | |             | |
@@ -670,7 +687,7 @@ class StepGnss:
 
         return None
 
-    def updt_epotab_tz(self,tz='UTC'):
+    def updt_epotab_tz(self, tz="UTC"):
         """
         Updates the epoch table with the specified timezone.
 
@@ -688,7 +705,8 @@ class StepGnss:
         """
 
         for epo in ["epoch_srt", "epoch_end"]:
-            if not pd.api.types.is_datetime64tz_dtype(self.table[epo]): # not TZ aware
+            if not pd.api.types.is_datetime64tz_dtype(self.table[epo]):  # not TZ aware
+                # if not isinstance(self.table[epo].dt, pd.DatetimeTZDtype): # pycharm recommendantion does not work !!!
                 self.table[epo] = self.table[epo].dt.tz_localize(tz)
             else:
                 self.table[epo] = self.table[epo].dt.tz_convert(tz)
@@ -754,7 +772,9 @@ class StepGnss:
 
         return None
 
-    def updt_eporng_tab(self, column_srt="epoch_srt", column_end="epoch_end",round_method='none'):
+    def updt_eporng_tab(
+        self, column_srt="epoch_srt", column_end="epoch_end", round_method="none"
+    ):
         """
         Updates the EpochRange of the StepGnss object based on the min/max epochs in the object's table.
 
@@ -803,7 +823,7 @@ class StepGnss:
             epoch2,
             period_new,
             round_method=round_method,
-            #round_method=self.epoch_range.round_method,
+            # round_method=self.epoch_range.round_method,
             tz=self.epoch_range.tz,
         )
 
@@ -900,7 +920,7 @@ class StepGnss:
     #               __/ | __/ |         __/ |
     #              |___/ |___/         |___/
 
-    def set_logfile(self, log_dir_inp=None, step_suffix=''):
+    def set_logfile(self, log_dir_inp=None, step_suffix="auto"):
         """
         set logging in a file
         """
@@ -912,23 +932,31 @@ class StepGnss:
         else:
             log_dir = log_dir_inp
 
-        if not step_suffix:
+        if step_suffix == "auto":
             step_suffix_use = self.get_step_type()
         else:
             step_suffix_use = step_suffix
 
         log_dir_use = self.translate_path(log_dir)
 
-        _logger = logging.getLogger("autorino")
+        #### save the root (empty parenthesis) to catch autorino + rinexmod logs
+        _logger = logging.getLogger()
+        # this getlogger has a nasty side effect: it creates a new handler
+        # and then duplcated message pollute the console
+        # https://stackoverflow.com/questions/19561058/python-logging-module-is-printing-lines-multiple-times
+        # The easiest solution is to set propagate to False, but then nothing is writed in the log file
+        # Thus we must clear the existing handlers
+        _logger.handlers.clear()  # Clear existing handlers
+        # https://santos-k.medium.com/solving-duplicate-log-entries-issue-in-python-logging-d4b1cad8e588
 
         ts = utils.get_timestamp()
-        log_name = "_".join((ts, step_suffix_use, ".log"))
-        log_path = os.path.join(log_dir_use, log_name)
+        logfile_name = "_".join((ts, "autorino", step_suffix_use)) + ".log"
+        logfile_path = os.path.join(log_dir_use, logfile_name)
 
         log_cfg_dic = arologcfg.log_config_dict
         fmt_dic = log_cfg_dic["formatters"]["fmtgzyx_nocolor"]
 
-        logfile_handler = logging.FileHandler(log_path)
+        logfile_handler = logging.FileHandler(logfile_path)
 
         fileformatter = logging.Formatter(**fmt_dic)
 
@@ -1066,7 +1094,7 @@ class StepGnss:
 
         return None
 
-    def load_tab_datelist(self, dates_list, period ="1D"):
+    def load_tab_datelist(self, dates_list, period="1D"):
         """
         Loads the table from a list of dates.
 
@@ -1212,15 +1240,14 @@ class StepGnss:
         else:
             self.table["epoch_srt"] = epolist_all
             if len(epolist_all) > 0:
-                self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(self.epoch_range.period)
+                self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(
+                    self.epoch_range.period
+                )
                 self.updt_epotab_tz()
             else:
                 self.table["epoch_end"] = self.table["epoch_srt"]
 
-
         return None
-
-
 
     def force(self, step_name=""):
         """
@@ -2001,7 +2028,7 @@ class StepGnss:
             # "longname": True, # managed below
             "force_rnx_load": True,
             "verbose": False,
-            "filename_style": 'basic',
+            "filename_style": "basic",
             "full_history": True,
         }
 
@@ -2021,11 +2048,11 @@ class StepGnss:
             logger.debug("default options for rinexmod: %s", rimopts_def)
             logger.debug("input options for rinexmod: %s", rimopts_inp)
 
-        #+++ set #1: the metadata/sitelog
+        # +++ set #1: the metadata/sitelog
         if update_sitelog:
             rimopts_wrk["sitelog"] = self.metadata
 
-        #+++ set #2: site name/marker
+        # +++ set #2: site name/marker
         if irow is not None:
             rimopts_wrk["marker"] = self.table.loc[irow, "site"]
         elif self.site_id9:
@@ -2040,39 +2067,37 @@ class StepGnss:
         if rimopts_wrk["marker"] == "XXXX00XXX":
             rimopts_wrk.pop("marker", None)
 
-        #+++ set #3: the short/longname
-        #if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
-        if not any(k in rimopts_wrk for k in ("shortname","longname")):
+        # +++ set #3: the short/longname
+        # if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
+        if not any(k in rimopts_wrk for k in ("shortname", "longname")):
             rimopts_wrk["shortname"] = False
             rimopts_wrk["longname"] = True
-
-
 
         # DO THE UPDATE HERE
         rimopts_out.update(rimopts_wrk)
 
         if debug_print:
-            logger.debug("final options for rinexmod: %s",
-                         rimopts_wrk)
+            logger.debug("final options for rinexmod: %s", rimopts_wrk)
 
         return rimopts_out
 
+    #               _   _                   _ _                           _ _    __                                 __
+    #     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
+    #    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
+    #   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
+    #  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
+    # /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
+    #                                                                           \_\                                 /_/
 
-#               _   _                   _ _                           _ _    __                                 __
-#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
-#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |
-#   / /\ \ / __| __| |/ _ \| '_ \/ __|    | '_ ` _ \ / _ \| '_ \ / _ \     | |/ _ \| '_ \  | '__/ _ \ \ /\ / / __| |
-#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |
-# /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |
-#                                                                           \_\                                 /_/
-
-
-    def mono_ok_check(self, irow,
-                      step_name,
-                      fname_custom="",
-                      force = False,
-                      switch_ok_out_false = False,
-                      check_ok_out_only = False):
+    def mono_ok_check(
+        self,
+        irow,
+        step_name,
+        fname_custom="",
+        force=False,
+        switch_ok_out_false=False,
+        check_ok_out_only=False,
+    ):
         """
         Checks the status of the input and output files for a specific row in the table.
 
@@ -2119,7 +2144,9 @@ class StepGnss:
             bool_ok = True
         elif check_ok_out_only:
             if self.table.loc[irow, "ok_out"]:
-                logger.info("%s skipped (output already exists): %s", step_name, fout_use)
+                logger.info(
+                    "%s skipped (output already exists): %s", step_name, fout_use
+                )
                 bool_ok = False
             else:
                 bool_ok = True
@@ -2136,7 +2163,6 @@ class StepGnss:
             self.table.loc[irow, "ok_out"] = False
 
         return bool_ok
-
 
     def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
@@ -2172,7 +2198,7 @@ class StepGnss:
         """
 
         # +++ oldcheck (to be removed)
-        #if not self.table.loc[irow, "ok_inp"]:
+        # if not self.table.loc[irow, "ok_inp"]:
         #    logger.warning(
         #         "action on row skipped (input disabled): %s",
         #         self.table.loc[irow, "fname"],
@@ -2301,4 +2327,3 @@ class StepGnss:
             # raise e
 
         return frnxfin
-
