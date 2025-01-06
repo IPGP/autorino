@@ -86,7 +86,7 @@ def main():
     args = parser.parse_args()
 
     if args.list_file_input:
-        raws_inp = open(args.raws_inp, "r").readlines()
+        raws_inp = open(args.raws_inp[0], "r").readlines()
     else:
         raws_inp = args.raws_inp
 
