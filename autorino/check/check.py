@@ -20,7 +20,7 @@ from geodezyx import conv
 # geodeZYX modules
 from geodezyx import operational as opera
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 
 
 def check_rinex(rinex_dir,start,end,silent=False,return_concat_df=False):

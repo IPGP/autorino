@@ -37,7 +37,8 @@ def main():
         "-s",
         "--out_structure",
         help="The structure of the output directory."
-             "If provided, the converted files will be stored in a subdirectory of out_dir following this structure."
+             "If provided, the converted files will be "
+             "stored in a subdirectory of out_dir following this structure."
              "See README.md for more information."
              "Typical values are '<SITE_ID4>/%%Y/' or '%%Y/%%j/",
         default="<SITE_ID4>/%Y/",
