@@ -2096,7 +2096,7 @@ class StepGnss:
         fname_custom="",
         force=False,
         switch_ok_out_false=False,
-        check_ok_out_only=False,
+        check_ok_out_only_for_mv_final=False,
     ):
         """
         Checks the status of the input and output files for a specific row in the table.
@@ -2120,9 +2120,9 @@ class StepGnss:
         switch_ok_out_false : bool, optional
             If True, the 'ok_out' column of the table is set to False if the step should be skipped.
             Default is False.
-        check_ok_out_only : bool, optional
-            If True, the step is skipped if the output file already exists.
-            (no check on the ok_inp column)
+        check_ok_out_only_for_mv_final : bool, optional
+            If True, the step is skipped if the output file does not exists.
+            Designed for final move (mv_final) steps.
             Default is False.
 
         Returns
@@ -2130,6 +2130,11 @@ class StepGnss:
         bool
             False if the step should be skipped, True otherwise.
         """
+        # NB: we disable this option since it is not used (2025-01-14)
+        # check_ok_out_only : bool, optional
+        #     If True, the step is skipped if the output file already exists.
+        #     (no check on the ok_inp column)
+        #     Default is False.
 
         if fname_custom:
             finp_use = fname_custom
@@ -2142,14 +2147,17 @@ class StepGnss:
         if force:
             logger.info("%s forced: %s", step_name, finp_use)
             bool_ok = True
-        elif check_ok_out_only:
-            if self.table.loc[irow, "ok_out"]:
-                logger.info(
-                    "%s skipped (output already exists): %s", step_name, fout_use
-                )
-                bool_ok = False
-            else:
-                bool_ok = True
+        elif check_ok_out_only_for_mv_final and self.table.loc[irow, "ok_out"]:
+            bool_ok = True
+        elif check_ok_out_only_for_mv_final and not self.table.loc[irow, "ok_out"]:
+            logger.warning("%s skipped (output not found): %s", step_name, fout_use)
+            bool_ok = False
+        # NB: we disable this option since it is not used (2025-01-14)
+        # elif check_ok_out_only and self.table.loc[irow, "ok_out"]:
+        #     logger.info("%s skipped (output already exists): %s", step_name, fout_use)
+        #     bool_ok = False
+        # elif check_ok_out_only and not self.table.loc[irow, "ok_out"]:
+        #     bool_ok = True
         elif not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
             logger.info("%s skipped (output already exists): %s", step_name, fout_use)
             bool_ok = False
@@ -2196,14 +2204,6 @@ class StepGnss:
         str or None
             The path of the modified file if the operation is successful, None otherwise.
         """
-
-        # +++ oldcheck (to be removed)
-        # if not self.table.loc[irow, "ok_inp"]:
-        #    logger.warning(
-        #         "action on row skipped (input disabled): %s",
-        #         self.table.loc[irow, "fname"],
-        #     )
-        #     return None
 
         if not self.mono_ok_check(irow, step_name="rinexmod"):
             return None
@@ -2280,21 +2280,20 @@ class StepGnss:
         str or None
             The final path of the moved file if the operation is successful, None otherwise.
         """
-        if not self.table.loc[
-            irow, "ok_out"
-        ]:  ### for mv it's ok_out column the one to check!!!!
-            logger.warning(
-                "final move skipped (input disabled): %s",
-                self.table.loc[irow, "fname"],
-            )
-            return None
-        #NB: for mv it's ok_out column the one to check
+        # if not self.table.loc[
+        #     irow, "ok_out"
+        # ]:  ### for mv it's ok_out column the one to check!!!!
+        #     logger.warning(
+        #         "final move skipped (input disabled): %s",
+        #         self.table.loc[irow, "fname"],
+        #     )
+        #     return None
+        # #NB: for mv it's ok_out column the one to check
 
 
         # NB: for mv it's ok_out column the one to check
-        # 2025-01-14: This set up does not work, we come back temporarily to the old one above
-        # if not self.mono_ok_check(irow, step_name="final move", check_ok_out_only=True):
-        #    return None
+        if not self.mono_ok_check(irow, step_name="final move", check_ok_out_only_for_mv_final=True):
+           return None
 
 
         # definition of the output directory (after the action)
