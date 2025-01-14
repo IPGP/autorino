@@ -257,13 +257,13 @@ class ConvertGnss(arocmn.StepGnss):
                 # NB: converter selection for regular files is done in
                 # autorino.conv_cmd_run._convert_select
 
-                logger.info("extension/converter: %s/%s", ext, converter_name_use)
+            logger.info("extension/converter: %s/%s", ext, converter_name_use)
 
-                if not converter_name_use:
-                    logger.info("file skipped, no converter found: %s", fraw)
-                    self.table.loc[irow, "note"] = "no converter found"
-                    self.table.loc[irow, "ok_inp"] = False
-                    self.write_in_table_log(self.table.loc[irow])
+            if not converter_name_use:
+                logger.info("file skipped, no converter found: %s", fraw)
+                self.table.loc[irow, "note"] = "no converter found"
+                self.table.loc[irow, "ok_inp"] = False
+                self.write_in_table_log(self.table.loc[irow])
 
             # ++ a function to stop the docker containers running for too long
             # (for trimble conversion)
