@@ -11,7 +11,7 @@ log_config_dict = {
     "root": {
         "handlers": ["console_root"],
         "level": "ERROR",
-        # "propagate": False propagate is useless for the root logger
+        # "propagate": False # propagate is useless for the root logger
     },
     "loggers": {
         "autorino": {  # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
