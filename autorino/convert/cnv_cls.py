@@ -119,7 +119,7 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert(self, verbose=False, force=False, rinexmod_options=None):
+    def convert(self, verbose=False, force=False, rinexmod_options=None, converter='auto'):
         """
         "total action" method
 
@@ -139,6 +139,7 @@ class ConvertGnss(arocmn.StepGnss):
             If True, forces the conversion even if output files already exist. Default is False.
         rinexmod_options : dict, optional
             A dictionary containing options for the rinexmod process. If not specified, default options are used.
+
 
         Returns
         -------
@@ -246,17 +247,23 @@ class ConvertGnss(arocmn.StepGnss):
 
             self.set_translate_dict()
             ###########################################################################
+            # +++ CONVERTER SELECTION
 
-            # ++ do a first converter selection by identifying odd files
-            converter_name_use = arocnv.select_conv_odd_file(fraw)
+            if converter != 'auto':
+                converter_name_use = converter # converter is forced
+            else:
+                # ++ do a first converter selection by identifying odd files
+                converter_name_use = arocnv.select_conv_odd_file(fraw)
+                # NB: converter selection for regular files is done in
+                # autorino.conv_cmd_run._convert_select
 
-            logger.info("extension/converter: %s/%s", ext, converter_name_use)
+                logger.info("extension/converter: %s/%s", ext, converter_name_use)
 
-            if not converter_name_use:
-                logger.info("file skipped, no converter found: %s", fraw)
-                self.table.loc[irow, "note"] = "no converter found"
-                self.table.loc[irow, "ok_inp"] = False
-                self.write_in_table_log(self.table.loc[irow])
+                if not converter_name_use:
+                    logger.info("file skipped, no converter found: %s", fraw)
+                    self.table.loc[irow, "note"] = "no converter found"
+                    self.table.loc[irow, "ok_inp"] = False
+                    self.write_in_table_log(self.table.loc[irow])
 
             # ++ a function to stop the docker containers running for too long
             # (for trimble conversion)
