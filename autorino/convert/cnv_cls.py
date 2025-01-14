@@ -9,6 +9,7 @@ Created on Fri Apr  7 12:07:18 2023
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -346,8 +347,8 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, "fpath_out"] = frnxtmp
             epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
-            self.table.loc[irow, "epoch_srt"] = epo_srt_ok
-            self.table.loc[irow, "epoch_end"] = epo_end_ok
+            self.table.loc[irow, "epoch_srt"] = pd.to_datetime(epo_srt_ok, utc=True)
+            self.table.loc[irow, "epoch_end"] = pd.to_datetime(epo_end_ok, utc=True)
         else:
             ### update table if things go wrong
             self.table.loc[irow, "ok_out"] = False
