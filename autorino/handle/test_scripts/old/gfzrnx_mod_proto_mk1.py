@@ -11,8 +11,8 @@ import rinexfile
 #### Import star style
 from geodezyx import *  # Import the GeodeZYX modules
 
-#p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded/HOUE"
-#p = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded2/HOUE"
+#inpdir = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded/HOUE"
+#inpdir = "/home/sakic/031_SCRATCH_CONV/058_big_conv_GL_old_ashtech/rinexmoded2/HOUE"
 p = "/home/sakic/031_SCRATCH_CONV/075_HOUE_week_corr_ON/"  
 p = "/home/sakic/030_SCRATCH/convgnss/058_big_conv_GL_old_ashtech/"
 p = "/home/sakic/030_SCRATCH/convgnss/065_big_conv_MQ_2017_MLM0/"

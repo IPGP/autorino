@@ -225,10 +225,10 @@ def cmd_build_trm2rinex(
     Usage of `trm2rinex`
 
     docker run --rm -v ${DIR_INP}:/inp -v ${DIR_OUT}:/out trm2rinex:cli-light
-    inp/${FNAME_RAW} -p out/${SUBDIR_OUT} -n -d -s -v 3.04
+    inp/${FNAME_RAW} -inpdir out/${SUBDIR_OUT} -n -d -s -v 3.04
 
     data/MAGC320b.2021.rt27 defines the input file (relative to container filesystem root)
-    -p data/out defines the path for the conversion output (relative to container filesystem root)
+    -inpdir data/out defines the path for the conversion output (relative to container filesystem root)
     -n to NOT perform height reference point corrections
     -d to include doppler observables in the output observation file
     -co to include clock corrections in the output observation file
@@ -263,7 +263,7 @@ def cmd_build_trm2rinex(
         "-s",
         "-v",
         "3.04",
-        "-p",
+        "-inpdir",
         "out/",
     ]
 
@@ -784,7 +784,7 @@ def cmd_build_convbin(
     Hemisphere            : BIN76, BIN80, BIN94, BIN95, BIN96
     SkyTraq S1315F        : msg0xDD, msg0xE0, msg0xDC
     GW10                  : msg0x08, msg0x03, msg0x27, msg0x20
-    Javad                 : [R*],[r*],[*R],[*r],[P*],[p*],[*P],[*p],[D*],[*d],
+    Javad                 : [R*],[r*],[*R],[*r],[P*],[inpdir*],[*P],[*inpdir],[D*],[*d],
                             [E*],[*E],[F*],[TC],[GE],[NE],[EN],[QE],[UO],[IO],
                             [WD]
     NVS                   : BINR
@@ -944,7 +944,7 @@ def cmd_build_tps2rin(
     .02, 3.03, 3.04, 3.05, 4.00 versions.
                         Default version is 3.05.
       -o <output dir>    Output directory. Current directory used by default.
-      -p <Profile name>  For detailed help type 'TPS2RIN -p ?'.
+      -inpdir <Profile name>  For detailed help type 'TPS2RIN -inpdir ?'.
       -i <input file>    Specify input file name. Required if <input file> starts wit
     h '-' or '+'.
       -s <StartTime>     Start date/time. For detailed help type 'TPS2RIN -s ?'.

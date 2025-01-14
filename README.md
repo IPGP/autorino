@@ -46,11 +46,17 @@ cd autorino
 pip install .
 ```
 
+For developpers, you can install _autorino_ in [developement mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html).
+```bash
+pip install -e .
+```
+
+
 ### Setting up the environment
 
 You need to set up the environment variable `$AUTORINO_ENV` to point to the _autorino_'s configuration file.
 
-In your .bashrc or .bash_profile file, add the following lines:
+In your `.bashrc` or `.bash_profile` file, add the following lines:
 ```bash
 export AUTORINO_ENV="/home/user/path_to/autorino/configfiles/env/autorino_env.yml"
 ```
@@ -96,14 +102,20 @@ converter here: [tps2rin](https://mytopcon.topconpositioning.com/support/product
 _autorino_ will emulate it with _wine_. Be sure to have `wine` installed on your computer. Detailled precedure will be added soon.
 #### BINEX
 converter here: [convbin](https://github.com/rtklibexplorer/RTKLIB)  
-_convbin_ is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.  
-Detailled procedure will be added soon.
+_convbin_ is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.
+##### detailed procedure
+```bash
+git clone https://github.com/rtklibexplorer/RTKLIB.git
+cd RTKLIB/app/consapp/convbin/gcc
+make
+```
+The compiled binary `convbin` will be in the `RTKLIB/app/consapp/convbin/gcc` folder.
+
 #### Trimble (official Linux converter)
 Ask Trimble support for the official Linux converter _t0xConverter_.
 #### Trimble (unofficial dockerized converter)
-converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)    
+converter here: [trm2rinex-docker-ovs](https://github.com/IPGP/trm2rinex-docker-ovs)    
 This docker image is a wrapper around Trimble's official converter _trm2rinex_ which is not available for Linux.  
-A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.  
 It relies on Trimble's official converter for Windows `ConvertToRinex` available 
 [here](https://geospatial.trimble.com/en/support) & [there](https://trl.trimble.com/docushare/dsweb/Get/Document-1051259/).
 
@@ -122,15 +134,44 @@ You might also need RINEX handeling software:
 NB: GFZRNX usage is **not allowed** in _routine mode_ without a proper commercial license. Be sure to comply with it.
 
 ### Setting up external utilities
-Once the converters are installed, you need to set the converter paths in the _autorino_'s `env` configuration file.
 
-You must have set the `$AUTORINO_ENV` environment variable to point to the `env` configuration file. 
+Be sur to have set `$AUTORINO_ENV` environment variable to point to the `env` configuration file. 
 (see dedicated section above)
 
-To configure the external utilities, in the you can:
-* set the full executable's paths to the in the `env` configuration file
-* set the paths in your `$PATH` environment variable, and then simply set the executable's names in the `env` 
+Once the converters are installed, you need to set the converter paths in the _autorino_'s `env` configuration file.
+
+To configure the external utilities, you can:
+1. set the full executable's paths to the in the `env` configuration file
+1. set the paths in your `$PATH` environment variable, and then simply set the executable's names in the `env` 
 configuration file.
+
+The authors recommend the second option, as it is more flexible and easier to maintain.
+
+#### A recommended receipe for setting up the external utilities
+
+* Create a directory for the GNSS converters in your prefered location, e.g. your `$HOME`.
+```bash
+mkdir /your/favorite/location/converters_gnss
+cd /your/favorite/location/converters_gnss
+```
+* Create a subdirectory with a version name, typically the date of the download.
+```bash
+mkdir vYYYYMMDD
+```
+* Copy the GNSS converters in the version directory. Do not forget to make each of them executable with `chmod +x`
+
+
+* Create a symbolic link called `operational`, pointing to the version directory.
+```bash
+ln -s vYYYYMMDD operational
+```
+* Edit your `.bashrc` or `.bash_profile` file to add the `operationnal` virtual folder to your `$PATH`, and then make its content available in the whole environnement.
+```bash
+export PATH=$PATH:/your/favorite/location/converters_gnss/operational
+```
+
+* If you want to update some conversion software, create a new version directory, set the new software inside, and update the `operational` symbolic link.
+
 
 ## Getting started: some simple examples
 

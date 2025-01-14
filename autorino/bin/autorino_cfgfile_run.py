@@ -42,7 +42,7 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "-p",
+        "-inpdir",
         "--period",
         type=str,
         help="The period for the epoch range. Default is '1D'.",
