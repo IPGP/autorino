@@ -138,8 +138,12 @@ class ConvertGnss(arocmn.StepGnss):
         force : bool, optional
             If True, forces the conversion even if output files already exist. Default is False.
         rinexmod_options : dict, optional
-            A dictionary containing options for the rinexmod process. If not specified, default options are used.
-
+            A dictionary containing options for the rinexmod process.
+             If not specified, default options are used.
+        converter : str, optional
+            The converter to be used for the conversion.
+            If not specified, the best converter is automatically selected.
+            Default is 'auto'.
 
         Returns
         -------
@@ -210,22 +214,6 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            # +++ oldcheck (to be removed)
-            # if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-            #     logger.info("conversion skipped (output already exists): %s", fraw)
-            #     continue
-            # # +++ the test bellow conflicts the Force option
-            # # elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-            # #    logger.info(
-            # #        "conversion skipped (already converted in a previous run): %s", fraw
-            # #    )
-            # #    continue
-            # elif not self.table.loc[irow, "ok_inp"]:
-            #     logger.warning("conversion skipped (something went wrong): %s", fraw)
-            #     continue
-            # else:
-            #     pass
-            #
             if not self.mono_ok_check(irow,"conversion"):
                 continue
 
@@ -332,15 +320,6 @@ class ConvertGnss(arocmn.StepGnss):
         str
             The path of the converted file.
         """
-
-        ## +++ oldcheck (to be removed)
-        # if not self.table.loc[irow, "ok_inp"]:
-        #     logger.warning(
-        #         "action on row skipped (input disabled): %s",
-        #         self.table.loc[irow, "fname"],
-        #     )
-        #     return None
-        #
 
         if not self.mono_ok_check(irow,"conversion"):
             return None
