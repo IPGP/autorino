@@ -18,7 +18,7 @@ import warnings
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 # pd.options.mode.chained_assignment = "warn"
@@ -456,12 +456,13 @@ class DownloadGnss(arocmn.StepGnss):
         -------
         None
         """
-
+        self.set_logfile()
         logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
+
 
         # Check the remote find method, and switch to 'guess' if HTTP protocol is used
         if remote_find_method == "ask" and self.access["protocol"] == "http":
@@ -602,7 +603,7 @@ class DownloadGnss(arocmn.StepGnss):
         #     )
         #     return None
 
-        if not self.mono_ok_check(irow, "fetch (mono)"):
+        if not self.mono_ok_check(irow, "fetch"):
             return None
 
         logger.info(">>>>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])

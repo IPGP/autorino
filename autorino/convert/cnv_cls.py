@@ -18,7 +18,7 @@ from geodezyx import operational
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 BOLD_SRT = "\033[1m"
@@ -145,6 +145,7 @@ class ConvertGnss(arocmn.StepGnss):
         None
         """
 
+        self.set_logfile()
         logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()

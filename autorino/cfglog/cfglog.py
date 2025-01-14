@@ -8,22 +8,26 @@
 log_config_dict = {
     "version": 1,
     "disable_existing_loggers": False,
-    "root": {"handlers": ["console_root"], "level": "WARN", "propagate": True},
+    "root": {
+        "handlers": ["console_root"],
+        "level": "ERROR",
+        # "propagate": False # propagate is useless for the root logger
+    },
     "loggers": {
         "autorino": {  # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
             "handlers": ["console_gyxz"],
             "level": "DEBUG",
             "propagate": True,
         },
-        "rinexmod": {  # Force rinexmod to use the same logger as autorino
-            "handlers": ["console_gyxz"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
+        # "rinexmod": {  # Force rinexmod to use the same logger as autorino
+        #     "handlers": ["console_gyxz"],
+        #     "level": "DEBUG",
+        #     "propagate": True,
+        # },
     },
     "handlers": {
         "console_root": {
-            #            "formatter":"fmtgzyx1",
+            "formatter":"fmtgzyx_nocolor",
             "class": "logging.StreamHandler",
             "level": "DEBUG",
         },

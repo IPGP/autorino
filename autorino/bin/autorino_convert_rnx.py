@@ -37,7 +37,8 @@ def main():
         "-s",
         "--out_structure",
         help="The structure of the output directory."
-             "If provided, the converted files will be stored in a subdirectory of out_dir following this structure."
+             "If provided, the converted files will be "
+             "stored in a subdirectory of out_dir following this structure."
              "See README.md for more information."
              "Typical values are '<SITE_ID4>/%%Y/' or '%%Y/%%j/",
         default="<SITE_ID4>/%Y/",
@@ -45,12 +46,16 @@ def main():
     parser.add_argument(
         "-tmp",
         "--tmp_dir",
-        help="The temporary directory used during the conversion process",
+        help="The temporary directory used during the conversion process. "
+             "If not provided, it defaults to <out_dir>/tmp_convert_rnx.",
+        default=None,
     )
     parser.add_argument(
         "-log",
         "--log_dir",
-        help="The directory where logs will be stored. If not provided, it defaults to tmp_dir",
+        help="The directory where logs will be stored."
+             "If not provided, it defaults to tmp_dir",
+        default=None,
     )
     parser.add_argument(
         "-rimo",
@@ -82,7 +87,8 @@ def main():
     args = parser.parse_args()
 
     if args.list_file_input:
-        raws_inp = open(args.raws_inp, "r").readlines()
+        with open(args.raws_inp[0], "r") as f:
+            raws_inp = f.splitlines()
     else:
         raws_inp = args.raws_inp
 

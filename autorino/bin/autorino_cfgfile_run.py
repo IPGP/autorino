@@ -15,6 +15,7 @@ def main():
         help="The input configuration file or directory of configuration files. "
              "If a directory is provided, all files ending with '.yml' will be used.",
         default="",
+        required=True
     )
     parser.add_argument(
         "-m",
