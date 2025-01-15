@@ -259,7 +259,7 @@ def get_owner(file_inp):
         user = pwd.getpwuid(uid).pw_name
         group = grp.getgrgid(gid).gr_name
     except Exception as e:
-        logger.warning(f"Unable to get name for owner/grp ID ({uid}:{gid}) of {file_inp}: {e}")
+        logger.warning(f"Unable to get name for owner/grp ID ({uid}:{gid}) of {os.path.basename(file_inp)}: {e}")
         user, group = uid, gid
 
     return user, group
