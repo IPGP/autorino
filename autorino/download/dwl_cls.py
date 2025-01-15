@@ -659,7 +659,7 @@ class DownloadGnss(arocmn.StepGnss):
                 )
                 dl_ok = True
                 file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
-            except ftplib.error_perm as e:
+            except Exception as e:
                 logger.error("FTP download error: %s", str(e))
                 dl_ok = False
 

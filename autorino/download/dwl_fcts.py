@@ -281,6 +281,8 @@ def download_ftp(
     -------
     str
         The path to the downloaded file, or an empty string if the download failed.
+        If something goes wrong, the function will raise an AutorinoDownloadError
+        (no empty string or None).
 
     Raises
     ------
@@ -320,14 +322,14 @@ def download_ftp(
     # connect to the FTP server
     if not ftp_obj:
         logger.error("FTP connection failed for %s", url)
-        return ""
+        raise AutorinoDownloadError
 
     # change to the remote directory
     try:
         ftp_obj.cwd(url_dir)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
-        return ""
+        raise AutorinoDownloadError
 
     filename = url_fname
     file_size = ftp_obj.size(filename)
@@ -348,17 +350,11 @@ def download_ftp(
                 )
                 break
         # here are all the possible exceptions that can be raised
-        except (
-            ftplib.error_temp,
-            ftplib.error_reply,
-            BrokenPipeError,
-            socket.timeout,
-            EOFError,
-        ) as e:
+        except Exception as e:
             try_count += 1
             if try_count > max_try:
                 logger.error("download failed, max try exceeded: %s", str(e))
-                return ""
+                raise AutorinoDownloadError
             else:
                 logger.warning(
                     "download failed (%s), try %i/%i", str(e), try_count, max_try
