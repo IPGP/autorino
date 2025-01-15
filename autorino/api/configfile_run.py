@@ -85,7 +85,7 @@ def cfgfile_run(
         cfg_use_lis = [cfg_in]
     else:
         logger.error("%s does not exist, check input cfgfiles file/dir", cfg_in)
-        raise Exception
+        return None
 
     # Determine the epoch range based on the provided start and end dates
     if epo_srt and epo_end:
@@ -98,7 +98,7 @@ def cfgfile_run(
             start_use = epo_srt
         else:
             logger.critical("start must be a list or a file path")
-            raise Exception
+            return None
         epoch_range = arocmn.EpochRange(start_use, period=period)
     else:
         epoch_range = None
