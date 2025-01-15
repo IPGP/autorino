@@ -5,14 +5,21 @@ import autorino.api as aroapi
 def main():
     ##### Parsing Args
     parser = argparse.ArgumentParser(
-        description="Assisted Unloading, Treatment and Organization of RINEX observations"
+        description="Assisted Unloading, Treatment and Organization of RINEX observations",
+        epilog="Examples:\n"
+               "* run all the config files in the directory cfgfiles_dir, using per default epoch ranges and a main config file: \n"
+               "  autorino_cfgfile_run -c cfgfiles_dir -main_cfg.yml \n"
+               "* run the config file site_cfg.yml from the 2025-10-01 for a range of 10 days: \n"
+               "  autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e '10 days ago' \n"
+               "* run download and convert only for HOUZ00GLP & BORG00REU sites only: \n"
+               "  autorino_cfgfile_run -c cfgfiles_dir -main_cfg.yml -ls HOUZ00GLP, BORG00REU -ss download,convert"
     )
 
     parser.add_argument(
         "-c",
         "--config",
         type=str,
-        help="The input configuration file or directory of configuration files. "
+        help="The input site configuration file or directory of sites configuration files. "
              "If a directory is provided, all files ending with '.yml' will be used.",
         default="",
         required=True
@@ -22,15 +29,16 @@ def main():
         "--main_config",
         type=str,
         help="The main configuration file to be used.",
-        default="",
+        default=""
     )
     parser.add_argument(
         "-s",
         "--start",
         type=str,
         help="The start date for the epoch range. "
-             "Can be a list; if so, each epoch is considered separately. "
-             "Can be a file path; if so, the file contains a list of start epochs. "
+             "Can be a date e.g. '2025-01-01', or a litteral e.g. '2 days ago'. "
+             "Can also be a list; if so, each epoch is considered separately. "
+             "Can also be a file path; if so, the file contains a list of start epochs. "
              "Default is None.",
         default=None,
     )
@@ -38,21 +46,25 @@ def main():
         "-e",
         "--end",
         type=str,
-        help="The end date for the epoch range. Default is None.",
+        help="The end date for the epoch range. "
+        "Can be a date e.g. '2025-01-01', or a litteral e.g. '2 days ago'. "
+        "Default is None.",
         default=None,
     )
     parser.add_argument(
         "-p",
         "--period",
         type=str,
-        help="The period for the epoch range. Default is '1D'.",
+        help="The period for the epoch range i.e. the sampleing of the files: "
+        "daily = '1D', hourloy = '1H', 15 minutes = '15M'. "
+        "Default is '1D'.",
         default="1D",
     )
     parser.add_argument(
         "-ls",
         "--list_sites",
         type=str,
-        help="A list of site identifiers to filter the configuration files."
+        help="A list of site identifiers to filter the configuration files. "
              "If provided, only configurations for sites in this list will be processed. "
              "Default is None.",
         default="",
@@ -61,8 +73,9 @@ def main():
         "-ss",
         "--steps_select_list",
         type=str,
-        help="A list of selected steps to be executed."
+        help="A list of selected steps to be executed. "
              "If not provided, all steps in 'steps_lis' will be executed. "
+             "Accepted steps are: 'download', 'convert', 'splice', 'split'. "
              "Default is None.",
         default="",
     )
@@ -84,6 +97,8 @@ def main():
              "Default is False.",
         default=False,
     )
+
+
 
     args = parser.parse_args()
 
