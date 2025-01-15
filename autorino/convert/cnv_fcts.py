@@ -284,12 +284,12 @@ def change_owner(file_inp, user, group):
         # Ownership of file_inp is already user:group
         pass
     else:
-        # Get the UID and GID of the new owner/group
-        uid = pwd.getpwnam(user).pw_uid
-        gid = grp.getgrnam(group).gr_gid
-
         # Change the ownership
         try:
+            # Get the UID and GID of the new owner/group
+            uid = pwd.getpwnam(user).pw_uid
+            gid = grp.getgrnam(group).gr_gid
+
             os.chown(file_inp, uid, gid)
         except Exception as e:
             logger.warning(f"Unable to change owner {user_ini}:{group_ini} > {user}:{group}: {e}")
