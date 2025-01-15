@@ -1238,7 +1238,7 @@ class StepGnss:
         self.table["site"] = self.site_id
 
         if update_epochs:
-            self.updt_epotab_rnx()
+            self.updt_epotab_rnx(use_rnx_filename_only=True)
         else:
             self.table["epoch_srt"] = epolist_all
             if len(epolist_all) > 0:
