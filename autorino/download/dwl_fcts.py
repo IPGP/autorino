@@ -224,13 +224,16 @@ def list_remote_ftp(
         return []
 
     # Retrieve list of files
-    file_list_bulk = ftp_obj.nlst()
+    try:
+        file_list_bulk = ftp_obj.nlst()
+    except Exception as e:
+        logger.error("FTP file list failed: %s", str(e))
+        file_list_bulk = []
+
     # current directory (.) and parent directory (..) are removed anyway
     file_list_bulk = [f for f in file_list_bulk if f not in ('.', '..')]
     file_list_join = [join_url('',hostname_use, remote_dir_use, f.split()[-1]) for f in file_list_bulk]
     # split()[-1] is necessary for Trimble files, to have just the filename and not the size, owner, etc.
-    # legacy manual join (urltambouille)
-    #file_list_leg = ["/".join((hostname_use, remote_dir_use, f)) for f in file_list_bulk if f not in ('.', '..')]
 
     file_list = file_list_join
 
@@ -355,6 +358,7 @@ def download_ftp(
             if try_count > max_try:
                 logger.error("download failed, max try exceeded: %s", str(e))
                 raise AutorinoDownloadError
+                # this error will be handled by the upper function mono_fetch
             else:
                 logger.warning(
                     "download failed (%s), try %i/%i", str(e), try_count, max_try
