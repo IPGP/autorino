@@ -470,12 +470,12 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, ver
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
             logger.info("load table for step %s", stp.get_step_type())
-            stp_rnx_inp.load_tab_inpdir(update_epochs=True,inp_regex='.*\.(rnx|crx|crx\.gz)$')
+            stp_rnx_inp.load_tab_inpdir(update_epochs=True,inp_regex=r'.*\.(rnx|crx|crx\.gz)$')
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
             logger.info("load table for step %s", stp.get_step_type())
-            stp_rnx_inp.load_tab_inpdir(update_epochs=True,inp_regex='.*\.(rnx|crx|crx\.gz)$')
+            stp_rnx_inp.load_tab_inpdir(update_epochs=True,inp_regex=r'.*\.(rnx|crx|crx\.gz)$')
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
 
         ##### close the step
