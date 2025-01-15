@@ -80,7 +80,7 @@ def cfgfile_run(
 
     # Check if cfg_in is a directory or a file and get the list of configuration files
     if os.path.isdir(cfg_in):
-        cfg_use_lis = glob.glob(cfg_in + "/*yml")
+        cfg_use_lis = list(sorted(glob.glob(cfg_in + "/*yml")))
     elif os.path.isfile(cfg_in):
         cfg_use_lis = [cfg_in]
     else:
