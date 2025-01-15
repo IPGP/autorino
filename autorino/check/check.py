@@ -12,7 +12,7 @@ import os
 
 import numpy as np
 import pandas as pd
-import rinexmod_api as rma
+import rinexmod.rinexmod_api as rma
 import termcolor
 
 from geodezyx import conv
