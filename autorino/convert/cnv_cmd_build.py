@@ -259,7 +259,7 @@ def cmd_build_trm2rinex(
         bin_path,
         "inp/" + inp_raw_fpath.name,
         "-n",
-        #"-d",
+        #"-d", # doppler disabled, because can cause non standard values for RINEX format
         "-s",
         "-v",
         "3.04",
