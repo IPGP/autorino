@@ -255,8 +255,12 @@ def get_owner(file_inp):
     gid = os.stat(file_inp).st_gid
 
     # Get the username and group name
-    user = pwd.getpwuid(uid).pw_name
-    group = grp.getgrgid(gid).gr_name
+    try:
+        user = pwd.getpwuid(uid).pw_name
+        group = grp.getgrgid(gid).gr_name
+    except Exception as e:
+        logger.warning(f"Unable to get name for owner/grp ID ({uid}:{gid}) of {file_inp}: {e}")
+        user, group = uid, gid
 
     return user, group
 
@@ -284,12 +288,12 @@ def change_owner(file_inp, user, group):
         # Ownership of file_inp is already user:group
         pass
     else:
+        # Get the UID and GID of the new owner/group
+        uid = pwd.getpwnam(user).pw_uid
+        gid = grp.getgrnam(group).gr_gid
+
         # Change the ownership
         try:
-            # Get the UID and GID of the new owner/group
-            uid = pwd.getpwnam(user).pw_uid
-            gid = grp.getgrnam(group).gr_gid
-
             os.chown(file_inp, uid, gid)
         except Exception as e:
             logger.warning(f"Unable to change owner {user_ini}:{group_ini} > {user}:{group}: {e}")
