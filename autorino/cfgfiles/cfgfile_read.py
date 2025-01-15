@@ -92,7 +92,10 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         y_main = None
 
     y = update_w_main_dic(y, y_main)
-    logger.debug("Used configuration (updated with the main):\n %s", y)
+
+    print_cfg_for_debug = False
+    if print_cfg_for_debug:
+        logger.debug("Used configuration (updated with the main):\n %s", y)
 
     y_station = y["station"]
 
@@ -256,13 +259,13 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
             parent_dir_key,
         )
         raise FileNotFoundError(
-            None, parent_dir_key + " do not exists, create it first"
+            None, parent_dir_key + " do not exists, create it first manually"
         )
 
     elif not os.path.isdir(parent_dir_out):  # standard case
-        logger.error("%s do not exists, create it first", parent_dir_out)
+        logger.error("%s do not exists, create it first manually", parent_dir_out)
         raise FileNotFoundError(
-            None, parent_dir_out + " do not exists, create it first"
+            None, parent_dir_out + " do not exists, create it first manually"
         )
     else:
         return None
