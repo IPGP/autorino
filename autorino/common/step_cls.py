@@ -2137,6 +2137,10 @@ class StepGnss:
         #     If True, the step is skipped if the output file already exists.
         #     (no check on the ok_inp column)
         #     Default is False.
+        #
+        # This approach is risky =>
+        # ok_inp should be set to False before using self.filter_ok_out(),
+        # rather than this check focusing solely on ok_out.
 
         if fname_custom:
             finp_use = fname_custom
@@ -2160,6 +2164,9 @@ class StepGnss:
         #     bool_ok = False
         # elif check_ok_out_only and not self.table.loc[irow, "ok_out"]:
         #     bool_ok = True
+        # This approach is risky =>
+        # ok_inp should be set to False before using self.filter_ok_out(),
+        # rather than this check focusing solely on ok_out.
         elif not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
             logger.info("%s skipped (output already exists): %s", step_name, fout_use)
             bool_ok = False

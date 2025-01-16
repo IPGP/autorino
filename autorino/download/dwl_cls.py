@@ -501,6 +501,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Check local files and update table
         self.check_local_files()
+        # be sure ok_xxx columns are booleans
         self.table_ok_cols_bool()
         if invalidate_small_local_files:
             self.invalidate_small_local_files()
@@ -509,7 +510,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Force download if required
         if force:
-            self.force("download")
+            self.force(step_name="download")
 
         # Log the number of files to be downloaded and excluded
         n_ok_inp = (self.table["ok_inp"]).sum()
