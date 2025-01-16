@@ -1,19 +1,17 @@
 import argparse
 import autorino.api as aroapi
 
-
 def main():
     ##### Parsing Args
     parser = argparse.ArgumentParser(
         description="Assisted Unloading, Treatment and Organization of RINEX observations",
         epilog="""Examples:
   * run all the config files in the directory cfgfiles_dir, using per default epoch ranges and a main config file:
-    autorino_cfgfile_run -c cfgfiles_dir -main_cfg.yml
+    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml
   * run the config file site_cfg.yml from the 2025-10-01 for a range of 10 days:
     autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e '10 days ago'
   * run download and convert only for HOUZ00GLP & BORG00REU sites only:
-    autorino_cfgfile_run -c cfgfiles_dir -main_cfg.yml -ls HOUZ00GLP, BORG00REU -ss download,convert
-    """
+    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -ls HOUZ00GLP,BORG00REU -ss download,convert"""
     )
 
     parser.add_argument(
@@ -22,7 +20,6 @@ def main():
         type=str,
         help="The input site configuration file or directory of sites configuration files. "
              "If a directory is provided, all files ending with '.yml' will be used.",
-        default="",
         required=True
     )
     parser.add_argument(
@@ -37,7 +34,7 @@ def main():
         "--start",
         type=str,
         help="The start date for the epoch range. "
-             "Can be a date e.g. '2025-01-01', or a litteral e.g. '2 days ago'. "
+             "Can be a date e.g. '2025-01-01', or a literal e.g. '2 days ago'. "
              "Can also be a list; if so, each epoch is considered separately. "
              "Can also be a file path; if so, the file contains a list of start epochs. "
              "Default is None.",
@@ -48,17 +45,17 @@ def main():
         "--end",
         type=str,
         help="The end date for the epoch range. "
-        "Can be a date e.g. '2025-01-01', or a litteral e.g. '2 days ago'. "
-        "Default is None.",
+             "Can be a date e.g. '2025-01-01', or a literal e.g. '2 days ago'. "
+             "Default is None.",
         default=None,
     )
     parser.add_argument(
         "-p",
         "--period",
         type=str,
-        help="The period for the epoch range i.e. the sampleing of the files: "
-        "daily = '1D', hourloy = '1H', 15 minutes = '15M'. "
-        "Default is '1D'.",
+        help="The period for the epoch range i.e. the sampling of the files: "
+             "daily = '1D', hourly = '1H', 15 minutes = '15M'. "
+             "Default is '1D'.",
         default="1D",
     )
     parser.add_argument(
@@ -75,7 +72,7 @@ def main():
         "--steps_select_list",
         type=str,
         help="A list of selected steps to be executed. "
-             "If not provided, all steps in 'steps_lis' will be executed. "
+             "If not provided, all steps in 'steps_list' will be executed. "
              "Accepted steps are: 'download', 'convert', 'splice', 'split'. "
              "Default is None.",
         default="",
@@ -87,7 +84,6 @@ def main():
         help="If True the selected steps indicated in step_select_list are excluded. "
              "It is the opposite behavior of the regular one using steps_select_list. "
              "Default is False.",
-        default=False,
     )
     parser.add_argument(
         "-f",
@@ -96,10 +92,7 @@ def main():
         help="If True, the steps will be executed even if the output files already exist. "
              "Overrides the 'force' parameters in the configuration file. "
              "Default is False.",
-        default=False,
     )
-
-
 
     args = parser.parse_args()
 
@@ -126,7 +119,6 @@ def main():
         exclude_steps_select=exclude_steps_select,
         force=force,
     )
-
 
 if __name__ == "__main__":
     main()
