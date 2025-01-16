@@ -218,7 +218,6 @@ class ConvertGnss(arocmn.StepGnss):
             if not self.mono_ok_check(irow,"conversion"):
                 continue
 
-
             logger.info(">>>>>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################

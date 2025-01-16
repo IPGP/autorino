@@ -933,7 +933,7 @@ class StepGnss:
             log_dir = log_dir_inp
 
         if step_suffix == "auto":
-            step_suffix_use = self.get_step_type()
+            step_suffix_use = self.site_id + '_' + self.get_step_type()
         else:
             step_suffix_use = step_suffix
 
