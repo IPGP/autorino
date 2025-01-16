@@ -2314,7 +2314,8 @@ class StepGnss:
         try:
             ### do the move
             utils.create_dir(outdir_use)
-            frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
+            #frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
+            frnxfin = shutil.move(frnx_to_mv, outdir_use)
             logger.debug("file moved to final destination: %s", frnxfin)
         except Exception as e:
             logger.error("Error for: %s", frnx_to_mv)
