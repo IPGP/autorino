@@ -5,13 +5,13 @@ def main():
     ##### Parsing Args
     parser = argparse.ArgumentParser(
         description="Assisted Unloading, Treatment and Organization of RINEX observations",
-        epilog="""Examples: \n
-  * run all the config files in the directory cfgfiles_dir, using per default epoch ranges and a main config file:
-    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml
-  * run the config file site_cfg.yml from the 2025-10-01 for a range of 10 days:
-    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e '10 days ago'
-  * run download and convert only for HOUZ00GLP & BORG00REU sites only:
-    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -ls HOUZ00GLP,BORG00REU -ss download,convert"""
+        epilog=("Examples:\n"
+                "  * run all the config files in the directory cfgfiles_dir, using per default epoch ranges and a main config file:\n"
+                "    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml\n"
+                "  * run the config file site_cfg.yml from the 2025-10-01 for a range of 10 days:\n"
+                "    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e '10 days ago'\n"
+                "  * run download and convert only for HOUZ00GLP & BORG00REU sites only:\n"
+                "    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -ls HOUZ00GLP,BORG00REU -ss download,convert")
     )
 
     parser.add_argument(
