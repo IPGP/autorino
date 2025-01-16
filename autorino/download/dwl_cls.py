@@ -18,7 +18,7 @@ import warnings
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 # pd.options.mode.chained_assignment = "warn"
@@ -303,7 +303,11 @@ class DownloadGnss(arocmn.StepGnss):
             else:
                 rmot_fil_epo_lis = rmot_fil_epo_bulk_lis
 
-            logger.debug("remote files found on rec: %s", rmot_fil_epo_lis)
+            logger.debug(
+                "%i remote files found on rec: %s",
+                len(rmot_fil_epo_lis),
+                rmot_fil_epo_lis,
+            )
             if len(rmot_fil_epo_lis) != len(rmot_fil_epo_bulk_lis):
                 logger.warning(
                     "%i files have been filtered out (non-matching regex)",
@@ -380,7 +384,9 @@ class DownloadGnss(arocmn.StepGnss):
         count = 0
         ping_out = None
         while count < ping_max_try and not ping_out:
-            ping_out = arodwl.ping(host=self.access["hostname"], ping_timeout=ping_timeout)
+            ping_out = arodwl.ping(
+                host=self.access["hostname"], ping_timeout=ping_timeout
+            )
             count += 1
             if count > 1:
                 logger.warning(
@@ -462,7 +468,6 @@ class DownloadGnss(arocmn.StepGnss):
         # Set up and clean temporary directories
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
-
 
         # Check the remote find method, and switch to 'guess' if HTTP protocol is used
         if remote_find_method == "ask" and self.access["protocol"] == "http":
