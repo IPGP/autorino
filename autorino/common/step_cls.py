@@ -2321,8 +2321,9 @@ class StepGnss:
         try:
             ### do the move
             utils.create_dir(outdir_use)
-            #frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
-            frnxfin = shutil.move(frnx_to_mv, outdir_use)
+            # we prefer a copy rather than a move, mv can lead to some error
+            frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
+            #frnxfin = shutil.move(frnx_to_mv, outdir_use)
             logger.debug("file moved to final destination: %s", frnxfin)
         except Exception as e:
             logger.error("Error for: %s", frnx_to_mv)
@@ -2330,6 +2331,9 @@ class StepGnss:
             frnxfin = None
 
         if frnxfin:
+            ### remove the original file if it is still around (normal with a copy rather than a move)
+            if os.path.isfile(frnx_to_mv):
+                os.remove(frnx_to_mv)
             ### update table if things go well
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, table_col] = frnxfin
