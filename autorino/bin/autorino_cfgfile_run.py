@@ -1,6 +1,17 @@
 import argparse
 import autorino.api as aroapi
 
+
+class CustomFormatter(argparse.HelpFormatter):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def _format_epilog(self, epilog):
+        if epilog:
+            return epilog + "\n"
+        return ""
+
+
 def main():
     ##### Parsing Args
     parser = argparse.ArgumentParser(
@@ -12,7 +23,7 @@ def main():
                 "    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e '10 days ago'\n"
                 "  * run download and convert only for HOUZ00GLP & BORG00REU sites only:\n"
                 "    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -ls HOUZ00GLP,BORG00REU -ss download,convert"),
-        formatter_class = argparse.RawTextHelpFormatter,
+        formatter_class = CustomFormatter,
 
     )
 
