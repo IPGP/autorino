@@ -11,7 +11,9 @@ def main():
                 "  * run the config file site_cfg.yml from the 2025-10-01 for a range of 10 days:\n"
                 "    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e '10 days ago'\n"
                 "  * run download and convert only for HOUZ00GLP & BORG00REU sites only:\n"
-                "    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -ls HOUZ00GLP,BORG00REU -ss download,convert")
+                "    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -ls HOUZ00GLP,BORG00REU -ss download,convert"),
+        formatter_class = argparse.RawTextHelpFormatter,
+
     )
 
     parser.add_argument(
