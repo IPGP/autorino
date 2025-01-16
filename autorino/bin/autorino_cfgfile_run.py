@@ -5,7 +5,7 @@ def main():
     ##### Parsing Args
     parser = argparse.ArgumentParser(
         description="Assisted Unloading, Treatment and Organization of RINEX observations",
-        epilog="""Examples:
+        epilog="""Examples: \n
   * run all the config files in the directory cfgfiles_dir, using per default epoch ranges and a main config file:
     autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml
   * run the config file site_cfg.yml from the 2025-10-01 for a range of 10 days:
