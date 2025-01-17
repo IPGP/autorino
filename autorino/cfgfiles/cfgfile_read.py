@@ -26,9 +26,11 @@ from rinexmod import rinexmod_api
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+BOLD_SRT = "\033[1m"
+BOLD_END = "\033[0m"
 
 def load_cfg(configfile_path):
     """
@@ -46,7 +48,7 @@ def load_cfg(configfile_path):
     dict
         The parsed content of the configuration file.
     """
-    logger.info("start to read configfile: %s", configfile_path)
+    logger.info(BOLD_SRT + ">>>>>>>>> Read configfile:" + BOLD_END + "%s", configfile_path)
     y = yaml.safe_load(open(configfile_path))
     return y
 
@@ -107,15 +109,40 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
 
 
 def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
+    """
+    Reads and interprets session configurations from a dictionary
+    and returns lists and dictionaries of StepGnss objects.
+
+    This function processes session configurations,
+    loads metadata if available, and constructs lists and dictionaries
+    of StepGnss objects based on the provided session configurations.
+
+    Parameters
+    ----------
+    y_sessions_dict : dict
+        A dictionary containing session configurations.
+    epoch_range_inp : EpochRange, optional
+        An EpochRange object which will override the epoch ranges given
+        in the session configurations. Default is None.
+    y_station : dict, optional
+        A dictionary containing station information. Default is None.
+
+    Returns
+    -------
+    steps_lis_lis : list
+        A list of lists of StepGnss objects to be launched sequentially.
+    steps_dic_dic : dict
+        A dictionary of dictionaries of StepGnss objects.
+    """
 
     # ++++ METADATA
     if y_station["site"]["sitelog_path"]:
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
-            # we load the metadata if the path is a directory or a file
+            # Load the metadata if the path is a directory or a file
             metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
         else:
-            # if not we consider it as a string
+            # If not, consider it as a string
             # (because the path might be translated later in the object)
             metadata = slpath
     else:
@@ -123,7 +150,6 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
 
     steps_lis_lis = []
     steps_dic_dic = {}
-
     for k_ses, y_ses in y_sessions_dict.items():
 
         y_gen = y_ses["general"]
@@ -213,7 +239,7 @@ def step_cls_select(step_name):
         return None
 
 
-def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
+def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
     """
     Checks if a parent directory exists and translates it with the environment variable first.
 
@@ -349,7 +375,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
     dir_parent = y_step[dir_type + "_dir_parent"]
     structure = y_step[dir_type + "_structure"]
     if check_parent_dir_exist:
-        _check_parent_dir_existence(dir_parent, parent_dir_key=dir_type + "_dir_parent")
+        _check_parent_dir_exist(dir_parent, parent_dir_key=dir_type + "_dir_parent")
     dir_path = os.path.join(dir_parent, structure)
 
     return dir_path, dir_parent, structure
@@ -371,7 +397,13 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     return d
 
 
-def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, verbose=True, force=False):
+def run_steps(
+    steps_lis,
+    steps_select_list=None,
+    exclude_steps_select=False,
+    verbose=True,
+    force=False,
+):
     """
     Executes the steps in the provided list.
 
@@ -423,15 +455,22 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, ver
         # Check if there are selected steps to be run
         if len(steps_select_list) > 0:
             # Forced case: steps_select_list contains the steps to be run only
-            if not exclude_steps_select and stp.get_step_type() not in steps_select_list:
+            if (
+                not exclude_steps_select
+                and stp.get_step_type() not in steps_select_list
+            ):
                 logger.warning(
-                    "step %s skipped, not selected in %s", stp.get_step_type(), steps_select_list
+                    "step %s skipped, not selected in %s",
+                    stp.get_step_type(),
+                    steps_select_list,
                 )
                 continue
             # Exclusion case: steps_select_list contains steps to be excluded
             elif exclude_steps_select and stp.get_step_type() in steps_select_list:
                 logger.warning(
-                    "step %s skipped, selected in %s", stp.get_step_type(), steps_select_list
+                    "step %s skipped, selected in %s",
+                    stp.get_step_type(),
+                    steps_select_list,
                 )
                 continue
             else:
@@ -470,12 +509,16 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, ver
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
             logger.info("load table for step %s", stp.get_step_type())
-            stp_rnx_inp.load_tab_inpdir(update_epochs=True,inp_regex=r'.*\.(rnx|crx|crx\.gz)$')
+            stp_rnx_inp.load_tab_inpdir(
+                update_epochs=True, inp_regex=r".*\.(rnx|crx|crx\.gz)$"
+            )
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
             logger.info("load table for step %s", stp.get_step_type())
-            stp_rnx_inp.load_tab_inpdir(update_epochs=True,inp_regex=r'.*\.(rnx|crx|crx\.gz)$')
+            stp_rnx_inp.load_tab_inpdir(
+                update_epochs=True, inp_regex=r".*\.(rnx|crx|crx\.gz)$"
+            )
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
 
         ##### close the step

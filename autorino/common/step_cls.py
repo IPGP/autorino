@@ -1267,7 +1267,7 @@ class StepGnss:
         -------
         None
         """
-        logger.info("force %s is enabled", step_name)
+        logger.warning("force %s is enabled", step_name)
         self.table["ok_inp"] = True
         self.table["note"] = "force_" + step_name
         return None
