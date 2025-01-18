@@ -705,9 +705,11 @@ class StepGnss:
         """
 
         for epo in ["epoch_srt", "epoch_end"]:
-            if not pd.api.types.is_datetime64tz_dtype(self.table[epo]):  # not TZ aware
-                # if not isinstance(self.table[epo].dt, pd.DatetimeTZDtype): # pycharm recommendantion does not work !!!
+            # not TZ aware => we add the TZ to make it TZ aware
+            #if not pd.api.types.is_datetime64tz_dtype(self.table[epo]):
+            if not isinstance(self.table[epo].dtype, pd.DatetimeTZDtype): # pycharm recommendantion does not work !!!
                 self.table[epo] = self.table[epo].dt.tz_localize(tz)
+            # TZ aware already => we convert it to the new TZ
             else:
                 self.table[epo] = self.table[epo].dt.tz_convert(tz)
 
