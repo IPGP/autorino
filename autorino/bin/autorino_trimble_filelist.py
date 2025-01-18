@@ -13,26 +13,40 @@ import autorino.check as arochk
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 def main():
     """
     Shell function to call trimble_filelist_html with command-line arguments.
     """
-    parser = argparse.ArgumentParser(description="Generate a list of Trimble files from a remote HTML directory.")
-    parser.add_argument("site", type=str, help="The site identifier.")
+    parser = argparse.ArgumentParser(
+        description="Generate a list of Trimble files from a remote HTML directory.",
+        epilog="Example: autorino_trimble_filelist CBEZ <URL_of_CBEZ> /output/directory 2024-01-01 2024-12-31'",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("site", type=str, help="The site identifier (4 characters).")
     parser.add_argument("hostname", type=str, help="The hostname of the remote server.")
-    parser.add_argument("output_dir", type=str,
-                        help="The directory where the downloaded HTML files will be saved.")
-    parser.add_argument("start_date",
-                        help="The start date for the file search.")
-    parser.add_argument("end_date",
-                        help="The end date for the file search.")
-    parser.add_argument("--period", type=str, default="1M",
-                        help="The period for the file search. Default is '1M'.")
-    parser.add_argument("--structure", type=str, default="download/Internal/%Y%m",
-                        help="The directory structure on the remote server. Default is 'download/Internal/Ym'.")
+    parser.add_argument(
+        "output_dir",
+        type=str,
+        help="The directory where the downloaded HTML files will be saved.",
+    )
+    parser.add_argument("start_date", help="The start date for the file search.")
+    parser.add_argument("end_date", help="The end date for the file search.")
+    parser.add_argument(
+        "--period",
+        type=str,
+        default="1ME",
+        help="The period for the file search, usually a month. Default is '1ME'.",
+    )
+    parser.add_argument(
+        "--structure",
+        type=str,
+        default="download/Internal/%Y%m",
+        help=r"The directory structure on the remote server. Default is 'download/Internal/%Y%m'.",
+    )
 
     args = parser.parse_args()
 
@@ -43,8 +57,9 @@ def main():
         start_date=args.start_date,
         end_date=args.end_date,
         period=args.period,
-        structure=args.structure
+        structure=args.structure,
     )
+
 
 if __name__ == "__main__":
     main()
