@@ -45,7 +45,7 @@ def main():
         "--structure",
         type=str,
         default="download/Internal/%Y%m",
-        help=r"The directory structure on the remote server. Default is 'download/Internal/%Y%m'.",
+        help="The directory structure on the remote server. Default is 'download/Internal/Ym'.",
     )
 
     args = parser.parse_args()
