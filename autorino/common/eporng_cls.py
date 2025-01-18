@@ -19,8 +19,10 @@ import autorino.common as arocmn
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-logger = logging.getLogger('autorino')
+
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 class EpochRange:
     """
@@ -49,7 +51,9 @@ class EpochRange:
         Checks if the epoch range is valid.
     """
 
-    def __init__(self, epoch1, epoch2=None, period="1d", round_method="floor", tz="UTC"):
+    def __init__(
+        self, epoch1, epoch2=None, period="1d", round_method="floor", tz="UTC"
+    ):
         """
         Constructs all the necessary attributes for the epoch range object.
 
@@ -74,7 +78,9 @@ class EpochRange:
         self.round_method = round_method
         self.tz = tz
 
-        if self._epoch1_raw and self._epoch2_raw: # 1) historical case a start and an end are given
+        if (
+            self._epoch1_raw and self._epoch2_raw
+        ):  # 1) regular case: a start and an end are given
             _epoch1tmp = arocmn.dateparser_interpret(self._epoch1_raw)
             _epoch2tmp = arocmn.dateparser_interpret(self._epoch2_raw)
             _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
@@ -86,7 +92,9 @@ class EpochRange:
             self.manual_range = False
             self._manu_range_list = []
 
-        elif utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw: # 2) case a start is given as a list, but no end
+        elif (
+            utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw
+        ):  # 2) case a start is given as a list, but no end
             _epoch1tmp = [arocmn.dateparser_interpret(e) for e in self._epoch1_raw]
             _epoch_min_tmp = np.min(_epoch1tmp)
             _epoch_max_tmp = np.max(_epoch1tmp)
@@ -97,13 +105,13 @@ class EpochRange:
             self.manual_range = True
             self._manu_range_list = _epoch1tmp
 
-    ## NB: i think it is a bad idea to have an attribute (property) to get the list of epochs
+    ## NB: I think it is a bad idea to have an attribute (property) to get the list of epochs
 
     def __repr__(self):
         return "from {} to {}, period {}".format(
             arocmn.iso_zulu_epoch(self.epoch_start),
             arocmn.iso_zulu_epoch(self.epoch_end),
-            self.period
+            self.period,
         )
 
     ############ getters and setters
@@ -128,7 +136,7 @@ class EpochRange:
     @epoch_end.setter
     def epoch_end(self, value):
         """Sets the end of the epoch range."""
-        self._epoch_end = arocmn.dateparser_interpret(value)  # ,tz=self.tz)
+        self._epoch_end = arocmn.dateparser_interpret(value, tz=self.tz)
         self._epoch_end = arocmn.round_date(
             self._epoch_end, self.period, self.round_method
         )
@@ -188,7 +196,7 @@ class EpochRange:
         else:
             # subtract also one second for security reason
             plus_one = pd.Timedelta(self.period)
-            return list(np.array(self._manu_range_list) + plus_one - pd.Timedelta('1s'))
+            return list(np.array(self._manu_range_list) + plus_one - pd.Timedelta("1s"))
 
     def eporng_list_steady(self, end_bound=False):
         """

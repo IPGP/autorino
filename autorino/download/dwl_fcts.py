@@ -10,7 +10,7 @@ import ftplib
 import io
 
 import os
-import socket
+#import socket
 import urllib
 import urllib.request
 import time

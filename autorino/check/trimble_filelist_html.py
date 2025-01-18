@@ -124,7 +124,7 @@ def extract_trimble_filelist(
 
 def trimble_filelist_html(
     site,
-    host_name,
+    hostname,
     output_dir,
     start_date,
     end_date,
@@ -136,7 +136,7 @@ def trimble_filelist_html(
     eporng = arocmn.EpochRange(start_date, end_date, period, round_method="none")
     output_paths_ok = []
     for curr_date in eporng.eporng_list():
-        url = str(os.path.join('http://', host_name, curr_date.strftime(structure)))
+        url = str(os.path.join('http://', hostname, curr_date.strftime(structure)))
 
         #output_path_ini = os.path.join(output_dir, os.path.basename(url))
         output_fnam_ok = site + "_" + os.path.basename(url) + ".html"

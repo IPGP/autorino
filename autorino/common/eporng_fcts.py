@@ -85,6 +85,7 @@ def dateparser_interpret(date_inp, tz="UTC"):
         pass
 
     elif not date_out.tz:
+        logger.debug("date %s has no timezone. Applying tz %s",date_out,tz)
         date_out = pd.Timestamp(date_out, tz=tz)
 
     return date_out
@@ -130,7 +131,7 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
     return epo_out
 
 
-def round_date(date_in, period, round_method="round"):
+def round_date(date_in, period, round_method="floor"):
     """
     low-level function to round a Pandas Serie or a datetime-like object
     according to the "ceil", "floor", "round", "none" approach

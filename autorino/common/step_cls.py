@@ -1245,7 +1245,7 @@ class StepGnss:
                 self.table["epoch_end"] = self.table["epoch_srt"] + pd.Timedelta(
                     self.epoch_range.period
                 )
-                self.updt_epotab_tz()
+                self.updt_epotab_tz(self.epoch_range.tz)
             else:
                 self.table["epoch_end"] = self.table["epoch_srt"]
 

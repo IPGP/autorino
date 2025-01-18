@@ -38,7 +38,7 @@ def main():
 
     arochk.trimble_filelist_html(
         site=args.site,
-        host_name=args.host_name,
+        hostname=args.hostname,
         output_dir=args.output_dir,
         start_date=args.start_date,
         end_date=args.end_date,
