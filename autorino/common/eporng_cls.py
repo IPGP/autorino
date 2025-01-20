@@ -171,7 +171,7 @@ class EpochRange:
         if self.manual_range:
             return self.eporng_list_manual(end_bound=end_bound)
         else:
-            return self.eporng_list_steady(end_bound=end_bound)
+            return self.eporng_list_regular(end_bound=end_bound)
 
     def eporng_list_manual(self, end_bound=False):
         """
@@ -198,7 +198,7 @@ class EpochRange:
             plus_one = pd.Timedelta(self.period)
             return list(np.array(self._manu_range_list) + plus_one - pd.Timedelta("1s"))
 
-    def eporng_list_steady(self, end_bound=False):
+    def eporng_list_regular(self, end_bound=False):
         """
         Compute the list of epochs corresponding to the EpochRange
         if end_bound = True, give the end bound of the range
