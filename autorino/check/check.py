@@ -12,7 +12,7 @@ import os
 
 import numpy as np
 import pandas as pd
-import rinexmod.rinexmod_api as rma
+import rinexmod
 import termcolor
 
 from geodezyx import conv
@@ -145,7 +145,7 @@ def _analyze_rinex(df_in):
     df_out = df_in.copy()
 
     ### get RINEX as an rinexMod's Object
-    df_out["robj"] = df_out["fpath"].apply(rma.RinexFile)
+    df_out["robj"] = df_out["fpath"].apply(rinexmod.rinexfile.RinexFile)
     ### get RINEX site code
     df_out["site"] = df_out["robj"].apply(lambda r:r.get_site(False,True))
     #sites_all = df_out["site"].unique
