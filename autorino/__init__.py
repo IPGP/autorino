@@ -6,6 +6,8 @@ import logging.config
 import os
 from os import path
 
+__version__='1.0.0' #  changed automaticcaly with bump-my-version
+
 #### IMPORT CONFIG FOR LOGGER
 log_file_path = os.path.join(
     path.dirname(path.abspath(__file__)), "cfglog", "cfglog.py"

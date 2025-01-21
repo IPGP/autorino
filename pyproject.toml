@@ -39,7 +39,7 @@ name = "autorino"  # REQUIRED, is the only field that cannot be marked as dynami
 #
 # For a discussion on single-sourcing the version, see
 # https://packaging.python.org/guides/single-sourcing-package-version/
-version = "0.1.0"  # REQUIRED, although can be dynamic
+version = "1.0.0"  # REQUIRED, although can be dynamic
 
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
@@ -217,7 +217,7 @@ autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
 #default-tag = "1.0.0"
 
 [tool.bumpversion]
-current_version = "0.1.0"  # REQUIRED, although can be dynamic
+current_version = "1.0.0"  # REQUIRED, although can be dynamic
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
@@ -251,7 +251,7 @@ replace = "Date: {now:%Y-%m-%d}"
 regex = true
 
 [[tool.bumpversion.files]]
-filename = "rinexmod/__init__.py"
+filename = "autorino/__init__.py"
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
