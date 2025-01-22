@@ -205,6 +205,8 @@ def list_remote_ftp(
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
+        logger.critical("FTP OBJECT")
+        logger.critical(ftp_obj)
     elif username and password:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
