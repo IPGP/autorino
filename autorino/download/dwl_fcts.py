@@ -133,6 +133,7 @@ def ftp_create_obj(
             ftp = ftplib.FTP(hostname_inp, timeout=timeout)
             if username and password:
                 ftp.login(username, password)
+                logger.critical("AAAAAAAAA" , username, password)
             return ftp
         except TimeoutError as e:
             try_count += 1
