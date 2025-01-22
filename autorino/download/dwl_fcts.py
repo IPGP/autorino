@@ -214,9 +214,6 @@ def list_remote_ftp(
             timeout=timeout,
             max_try=max_try,
         )
-
-        logger.critical(ftp_obj, username)
-
     else:
         logger.error(
             "unable to create FTP object, missing username/password or input object"
