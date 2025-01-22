@@ -419,7 +419,7 @@ class DownloadGnss(arocmn.StepGnss):
             sleep_time=sleep_time,
         )
 
-        logger.critical("FTP OBJ SET")
+        logger.critical("FTP OBJ SET %s %s", self.access["login"], self.access["password"])
 
 
     def download(
