@@ -1130,7 +1130,7 @@ class StepGnss:
 
         return None
 
-    def load_tab_filelist(self, input_files, inp_regex=".*", reset_table=True):
+    def load_tab_filelist(self, input_files, reset_table=True):
         """
         Loads the table from a list of input files.
 
@@ -1147,8 +1147,6 @@ class StepGnss:
             * a text file path containing a list of files
             * a tuple containing several text files path
             * a directory path.
-        inp_regex : str, optional
-            The regular expression used to filter the input files. Default is ".*" which matches any file.
         reset_table : bool, optional
             If True, the current table is reset before loading the new data. Default is True.
 
@@ -1160,7 +1158,7 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = arocmn.import_files(input_files, inp_regex)
+        flist = arocmn.import_files(input_files, self.inp_file_regex)
 
         self.table["fpath_inp"] = flist
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
