@@ -229,7 +229,7 @@ def list_remote_ftp(
         ftp_obj.cwd(remote_dir_use)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
-        logger.error("Wished destination: %", remote_dir_use)
+        logger.error("Wished destination: %s", remote_dir_use)
         return []
 
     # Retrieve list of files
@@ -343,7 +343,7 @@ def download_ftp(
         ftp_obj.cwd(url_dir)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
-        logger.error("Wished destination: %", url_dir)
+        logger.error("Wished destination: %s", url_dir)
         raise AutorinoDownloadError
 
     filename = url_fname
