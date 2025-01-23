@@ -110,6 +110,8 @@ def import_files(inp_fil, inp_regex=".*"):
     list
         The interpreted list.
     """
+    logger.critical("2", inp_regex)
+
     if not inp_fil:
         flist = []
     elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
