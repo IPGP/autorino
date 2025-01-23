@@ -205,9 +205,7 @@ def list_remote_ftp(
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
-        logger.critical("FTP OBJECT")
-        logger.critical(ftp_obj)
-    elif username and password:
+    elif username is not None and password is not None:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
             hostname_inp=hostname_use,
@@ -319,7 +317,7 @@ def download_ftp(
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
-    elif username and password:
+    elif username is not None and password is not None:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
             url_host,
