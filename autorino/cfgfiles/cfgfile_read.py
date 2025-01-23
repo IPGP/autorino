@@ -384,7 +384,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
         the parent directory, and the structure.
     """
     dir_parent = y_step[dir_type + "_dir_parent"]
-    structure = y_step[dir_type + "_structure"]
+    structure = y_step[dir_type + "_dir_structure"]
     if check_parent_dir_exist:
         _check_parent_dir_exist(dir_parent, parent_dir_key=dir_type + "_dir_parent")
 
