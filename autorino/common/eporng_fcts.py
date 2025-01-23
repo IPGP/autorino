@@ -78,8 +78,8 @@ def datepars_intrpt(date_inp, tz="UTC"):
     """
 
     if isinstance(date_inp, str):
-        doy_pattern_1 = r"^\d{4}-\d{3}$"
-        doy_pattern_2 = r"^\d{4}/\d{3}$"
+        doy_pattern_1 = r"^\d{4}-\d{1,3}$"
+        doy_pattern_2 = r"^\d{4}/\d{1.3}$"
         ### Must handle the case of day of year separately
         if re.match(doy_pattern_1, date_inp):
             date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y-%j"))
