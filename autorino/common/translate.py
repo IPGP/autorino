@@ -117,7 +117,8 @@ def _translator_keywords(path_inp, translator_dict):
     path_translated = str(path_inp)
 
     # replace autorino variable (without a <$....>)
-    if re.search(r'<(?!.*\$).*>', path_translated):
+    # old regex (before 2025-01): r'<(?!.*\$).*>'
+    if re.search(r'<([^$][^>]*)>', path_translated):
         for k, v in translator_dict.items():
             path_translated = path_translated.replace("<"+k+">", str(v))
 
