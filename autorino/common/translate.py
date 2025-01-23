@@ -16,7 +16,8 @@ from geodezyx import utils
 
 def translator(path_inp, translator_dict=None, epoch_inp=None):
     """
-    Translates a given path using environment variables, epoch information, and a provided dictionary.
+    Frontend function to translates a given path using environment variables,
+    epoch information, and a provided dictionary.
 
     Parameters
     ----------
@@ -40,9 +41,12 @@ def translator(path_inp, translator_dict=None, epoch_inp=None):
     """
 
     path_translated = str(path_inp)
+    ### translate the environnement variables
     path_translated = _translator_env_variables(path_translated)
+    ### translate the epochs
     if epoch_inp:
         path_translated = _translator_epoch(path_translated, epoch_inp)
+    ### translate the keywords
     if translator_dict:
         path_translated = _translator_keywords(path_translated, translator_dict)
     return path_translated

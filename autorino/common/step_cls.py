@@ -857,7 +857,7 @@ class StepGnss:
         ----------
         path_inp : str
             The input path to be translated.
-        epoch_inp : str, optional
+        epoch_inp : datetime, optional
             The epoch input to be used in the translation. Default is None.
         make_dir : bool, optional
             If True, the function will create the directory corresponding to the translated path. Default is False.
@@ -876,6 +876,24 @@ class StepGnss:
             utils.create_dir(trslt_dir)
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
+
+    def translate_file_regex(self,epoch_inp=None):
+        """
+        Translates the filename regex using the object's translation dictionary and the epoch input.
+
+        Parameters
+        ----------
+        epoch_inp : datetime
+            The epoch input to be used in the translation.
+
+        Returns
+        -------
+        str
+            The translated filename regex.
+        """
+        trslt_file_regex = arocmn.translator(self.inp_file_regex, self.translate_dict, epoch_inp)
+        return trslt_file_regex
+
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
@@ -1161,7 +1179,8 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
-        flist = arocmn.import_files(input_files, self.inp_file_regex)
+        inp_file_regex_use = self.translate_file_regex()
+        flist = arocmn.import_files(input_files, inp_file_regex_use)
 
         self.table["fpath_inp"] = flist
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
@@ -1236,7 +1255,8 @@ class StepGnss:
 
         for epoch in self.epoch_range.eporng_list():
             inp_dir_epo = self.translate_path(self.inp_dir, epoch_inp=epoch)
-            flist_epo = arocmn.import_files(inp_dir_epo, inp_regex=self.inp_file_regex)
+            inp_file_regex_epo = self.translate_file_regex(epoch_inp=epoch)
+            flist_epo = arocmn.import_files(inp_dir_epo, inp_regex=inp_file_regex_epo)
             n_files_epo = len(list(flist_epo))
             flist_all.extend(flist_epo)
             epolist_all.extend([epoch] * n_files_epo)
