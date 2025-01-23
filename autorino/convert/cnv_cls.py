@@ -152,7 +152,7 @@ class ConvertGnss(arocmn.StepGnss):
         """
 
         self.set_logfile()
-        logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -222,7 +222,7 @@ class ConvertGnss(arocmn.StepGnss):
             if not self.mono_ok_check(irow,"conversion"):
                 continue
 
-            logger.info(">>>>>> input raw file for conversion: %s", fraw.name)
+            logger.info(">>>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################
             # change the site_id here is a very bad idea, it f*cks the outdir 240605

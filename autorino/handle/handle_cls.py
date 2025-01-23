@@ -237,7 +237,7 @@ class HandleGnss(arocmn.StepGnss):
             epo_end = self.table.loc[irow, "epoch_end"]
 
             logger.info(
-                ">>>>>> Feeding RINEXs for %s between %s & %s",
+                ">>>> Feeding RINEXs for %s between %s & %s",
                 site,
                 arocmn.iso_zulu_epoch(epo_srt),
                 arocmn.iso_zulu_epoch(epo_end),
@@ -521,7 +521,7 @@ class SpliceGnss(HandleGnss):
         self.set_logfile()
 
         # Log the start of the splicing operation
-        logger.info(BOLD_SRT + ">>>>>>>>> Splicing RINEX files" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>>>> Splicing RINEX files" + BOLD_END)
 
         # set ok_inp to True per default
         self.table["ok_inp"] = True
@@ -580,7 +580,7 @@ class SpliceGnss(HandleGnss):
                 continue
 
             logger.info(
-                ">>>>>> Splicing %s between %s and %s",
+                ">>>> Splicing %s between %s and %s",
                 self.table.loc[irow, "site"],
                 arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
                 arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_end"]),
@@ -806,7 +806,7 @@ class SplitGnss(HandleGnss):
 
 
         # Log the start of the splitting operation
-        logger.info(BOLD_SRT + ">>>>>>>>> Splitting RINEX files" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>>>> Splitting RINEX files" + BOLD_END)
 
         # set the ok_inp to True per default
         self.table["ok_inp"] = True

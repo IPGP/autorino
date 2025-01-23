@@ -48,7 +48,7 @@ def load_cfg(configfile_path):
     dict
         The parsed content of the configuration file.
     """
-    logger.info(BOLD_SRT + ">>>>>>>>> Read configfile:" + BOLD_END + "%s", configfile_path)
+    logger.info(BOLD_SRT + ">>>>>>>> Read configfile:" + BOLD_END + "%s", configfile_path)
     y = yaml.safe_load(open(configfile_path))
     return y
 

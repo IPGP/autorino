@@ -466,7 +466,7 @@ class DownloadGnss(arocmn.StepGnss):
         None
         """
         self.set_logfile()
-        logger.info(BOLD_SRT + ">>>>>>>>> RAW files download" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()
@@ -615,7 +615,7 @@ class DownloadGnss(arocmn.StepGnss):
         if not self.mono_ok_check(irow, "fetch"):
             return None
 
-        logger.info(">>>>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])
+        logger.info(">>>> fetch remote raw file: %s", self.table.loc[irow, "fname"])
 
         # ++++++ use the guessed local file as destination or the generic directory
         if not arocmn.is_ok(self.table.loc[irow, "fpath_out"]):
