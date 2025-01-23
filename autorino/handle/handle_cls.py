@@ -22,11 +22,12 @@ import autorino.convert as arocnv
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 BOLD_SRT = "\033[1m"
 BOLD_END = "\033[0m"
+
 
 class HandleGnss(arocmn.StepGnss):
     def __init__(
@@ -803,7 +804,6 @@ class SplitGnss(HandleGnss):
         """
 
         self.set_logfile()
-
 
         # Log the start of the splitting operation
         logger.info(BOLD_SRT + ">>>>>> Splitting RINEX files" + BOLD_END)

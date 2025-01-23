@@ -19,8 +19,10 @@ from filelock import FileLock, Timeout
 import logging
 import autorino.cfgenv.env_read as aroenv
 import autorino.common as arocmn
-logger = logging.getLogger('autorino')
+
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 def dummy_site_dic():
     """
@@ -110,7 +112,6 @@ def import_files(inp_fil, inp_regex=".*"):
     list
         The interpreted list.
     """
-    logger.critical(inp_regex)
 
     if not inp_fil:
         flist = []
@@ -167,7 +168,7 @@ def load_previous_tables(log_dir):
         tab_df_stk = []
         for t in tables_files:
             tab_df = pd.read_csv(t)
-            #if not len(tab_df) == 0:
+            # if not len(tab_df) == 0:
             tab_df_stk.append(tab_df)
 
         return pd.concat(tab_df_stk)
@@ -206,7 +207,7 @@ def is_ok(val_inp):
         return False
     elif val_inp == "":
         return False
-    elif not val_inp: # == False
+    elif not val_inp:  # == False
         return False
     else:
         return True
@@ -256,10 +257,7 @@ def rnxs2step_obj(rnxs_lis_inp):
     StepGnss
         A StepGnss object populated with data from the provided RINEX files.
     """
-    stp_obj = arocmn.StepGnss(out_dir="",
-                              tmp_dir="",
-                              log_dir="",
-                              inp_dir="")
+    stp_obj = arocmn.StepGnss(out_dir="", tmp_dir="", log_dir="", inp_dir="")
 
     stp_obj.load_tab_filelist(rnxs_lis_inp)
     stp_obj.updt_site_w_rnx_fname()

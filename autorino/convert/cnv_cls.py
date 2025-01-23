@@ -19,7 +19,7 @@ from geodezyx import operational
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 BOLD_SRT = "\033[1m"
@@ -120,7 +120,9 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert(self, verbose=False, force=False, rinexmod_options=None, converter='auto'):
+    def convert(
+        self, verbose=False, force=False, rinexmod_options=None, converter="auto"
+    ):
         """
         "total action" method
 
@@ -219,7 +221,7 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not self.mono_ok_check(irow,"conversion"):
+            if not self.mono_ok_check(irow, "conversion"):
                 continue
 
             logger.info(">>>> input raw file for conversion: %s", fraw.name)
@@ -235,14 +237,16 @@ class ConvertGnss(arocmn.StepGnss):
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate_dic (necessary for the output dir)
             self.mono_site_upd(irow, site4_list)
-            self.site_id = self.table.loc[irow, "site"]  # for translation of the output dir & rinexmod options
+            self.site_id = self.table.loc[
+                irow, "site"
+            ]  # for translation of the output dir & rinexmod options
 
             self.set_translate_dict()
             ###########################################################################
             # +++ CONVERTER SELECTION
 
-            if converter != 'auto':
-                converter_name_use = converter # converter is forced
+            if converter != "auto":
+                converter_name_use = converter  # converter is forced
             else:
                 # ++ do a first converter selection by identifying odd files
                 converter_name_use = arocnv.select_conv_odd_file(fraw)
@@ -325,7 +329,7 @@ class ConvertGnss(arocmn.StepGnss):
             The path of the converted file.
         """
 
-        if not self.mono_ok_check(irow,"conversion"):
+        if not self.mono_ok_check(irow, "conversion"):
             return None
 
         # definition of the output directory (after the action)
