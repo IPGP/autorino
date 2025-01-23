@@ -515,21 +515,22 @@ def run_steps(
         if force:
             stp.options["force"] = True
 
+        load_table_msg_str = BOLD_SRT + ">>>>>>>> Load table for step %s" + BOLD_END
         # Execute the step based on its type
         if stp.get_step_type() == "download":
             stp.download(**stp.options)
         elif stp.get_step_type() == "convert":
-            logger.info(">>>>>>>> load table for step %s", stp.get_step_type())
+            logger.info(load_table_msg_str, stp.get_step_type())
             stp.load_tab_inpdir()
             stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
-            logger.info(">>>>>>>> load table for step %s", stp.get_step_type())
+            logger.info(load_table_msg_str, stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
-            logger.info(">>>>>>>> load table for step %s", stp.get_step_type())
+            logger.info(load_table_msg_str, stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
 
