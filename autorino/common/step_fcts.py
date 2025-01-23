@@ -123,13 +123,15 @@ def import_files(inp_fil, inp_regex=".*"):
         flist = open(inp_fil, "r+").readlines()
         flist = [f.strip() for f in flist]
     elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil, inp_regex, case_sensitive=False)
+        flist = utils.find_recursive(inp_fil, ".*", case_sensitive=False)
+        # Here we find everything ".*", the regex will be filtered bellow
     else:
         flist = []
         logger.warning("the filelist is empty")
 
     if inp_regex != ".*":
-        flist = [f for f in flist if re.match(inp_regex, f)]
+        flist = [f for f in flist if re.match(inp_regex, os.path.basename(f))]
+        # os.path.basename is used to match the regex on the filename only
 
     return flist
 
