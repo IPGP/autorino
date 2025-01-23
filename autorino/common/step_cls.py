@@ -1255,6 +1255,7 @@ class StepGnss:
             inp_dir_epo = self.translate_path(self.inp_dir, epoch_inp=epoch)
             inp_file_regex_epo = self.translate_file_regex(epoch_inp=epoch)
             logger.critical(inp_file_regex_epo)
+            logger.critical(self.site_id)
             flist_epo = arocmn.import_files(inp_dir_epo, inp_regex=inp_file_regex_epo)
             n_files_epo = len(list(flist_epo))
             flist_all.extend(flist_epo)
