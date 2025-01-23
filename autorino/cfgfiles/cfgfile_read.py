@@ -146,6 +146,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             # (because the path might be translated later in the object)
             metadata = slpath
     else:
+        ###### MUST BE IMPLEMENTED WITH MANUAL VALUES
         metadata = None
 
     steps_lis_lis = []
@@ -179,11 +180,11 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             # y_step_main = y_workflow_main[k_stp]
             # y_step = update_w_main_dic(y_step, y_step_main)
 
-            # ++++ EPOCH RANGE AT THE STEP LEVEL
 
             if not _is_cfg_bloc_active(y_stp):
                 continue
 
+            # ++++ EPOCH RANGE AT THE STEP LEVEL
             step_cls = step_cls_select(k_stp)
             if not step_cls:
                 logger.warning("unknown step %s, skip", k_stp)
@@ -195,14 +196,24 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             else:
                 epo_obj_stp = _epoch_range_from_cfg_bloc(y_stp["epoch_range"])
 
+            ## concatenate the dir_parent and the structure
+            # (but not the file_regex, it is just about the directory)
             out_dir, _, _ = _get_dir_path(y_stp, "out")
             inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
+
+            if "inp_file_regex" in y_stp.keys():
+                inp_file_regex = y_stp["inp_file_regex"]
+            else:
+                logger.warning("Compatibility Warning: inp_file_regex not defined in the cfg files, set to .*")
+                logger.warning("Compatibility Warning: you should upgrade your config file to >v15")
+                inp_file_regex = ".*"
 
             kwargs_for_step = {
                 "out_dir": out_dir,
                 "tmp_dir": tmp_dir,
                 "log_dir": log_dir,
                 "inp_dir": inp_dir,
+                "inp_file_regex": inp_file_regex,
                 "epoch_range": epo_obj_stp,
                 "site": y_station["site"],
                 "session": y_ses["general"],
@@ -210,11 +221,12 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
                 "metadata": metadata,
             }
 
-            if k_stp in "download":
+            if k_stp == "download":
                 kwargs_for_step["access"] = y_station["access"]
 
+            ### +++ CREATION OF THE OBJECT ###########
             step_obj = step_cls(**kwargs_for_step)
-
+            ##########################################
             # appended in lis and dic at the end of the k_stp tests
             steps_lis.append(step_obj)
             steps_dic[k_stp] = step_obj
@@ -285,13 +297,13 @@ def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
             parent_dir_key,
         )
         raise FileNotFoundError(
-            None, parent_dir_key + " do not exists, create it first manually"
+            None, parent_dir_key + " do not exists, create it manually first (mkdir -p ...)"
         )
 
     elif not os.path.isdir(parent_dir_out):  # standard case
-        logger.error("%s do not exists, create it first manually", parent_dir_out)
+        logger.error("%s do not exists, create it first manually (mkdir -p ...)", parent_dir_out)
         raise FileNotFoundError(
-            None, parent_dir_out + " do not exists, create it first manually"
+            None, parent_dir_out + " do not exists, create it manually first (mkdir -p ...)"
         )
     else:
         return None
@@ -334,7 +346,6 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
     """
     get an EpochRange object from epoch_range dictionary bloc
     internal function for read_cfg
-
     """
     return arocmn.EpochRange(
         epoch_range_dic["epoch1"],
@@ -376,12 +387,33 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
     structure = y_step[dir_type + "_structure"]
     if check_parent_dir_exist:
         _check_parent_dir_exist(dir_parent, parent_dir_key=dir_type + "_dir_parent")
+
+    dir_parent, structure = format_dir_path(dir_parent, structure)
+
     dir_path = os.path.join(dir_parent, structure)
 
     return dir_path, dir_parent, structure
 
+def format_dir_path(dir_parent, structure):
+    """
+    Formats a directory path by adding or removing a leading slash.
+    """
+
+    if dir_parent[0] != "/":
+        logger.warning("dir_parent %s should start with /, we add it automatically", dir_parent)
+        dir_parent = "/" + dir_parent
+
+    if structure[0] == "/":
+        logger.warning("structure %s should not start with /, we remove it automatically", structure)
+        structure = structure[1:]
+
+    return dir_parent , structure
+
 
 def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
+    """
+    Updates a dictionary with another dictionary.
+    """
     if u is None:
         return d
     for k, v in u.items():

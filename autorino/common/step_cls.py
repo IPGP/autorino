@@ -77,6 +77,7 @@ class StepGnss:
         tmp_dir,
         log_dir,
         inp_dir,
+        inp_file_regex=".*",
         epoch_range=None,
         site=None,
         session=None,
@@ -94,6 +95,10 @@ class StepGnss:
             The temporary directory for the step.
         log_dir : str
             The log directory for the step.
+        inp_dir : str
+            The input directory for the step.
+        inp_file_regex : str
+            The regular expression pattern for the input files. Default is '.*' (everything).
         epoch_range : EpochRange, optional
             The epoch range for the step. If not provided, a dummy epoch range is created.
         site : dict, optional
@@ -131,6 +136,8 @@ class StepGnss:
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
         self.inp_dir = inp_dir
+
+        self.inp_file_regex = inp_file_regex
 
         ### temp dirs init
         self.tmp_dir_tables = None  # initialized in the next line
