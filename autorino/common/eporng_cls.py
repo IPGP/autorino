@@ -81,8 +81,8 @@ class EpochRange:
         if (
             self._epoch1_raw and self._epoch2_raw
         ):  # 1) regular case: a start and an end are given
-            _epoch1tmp = arocmn.dateparser_interpret(self._epoch1_raw)
-            _epoch2tmp = arocmn.dateparser_interpret(self._epoch2_raw)
+            _epoch1tmp = arocmn.datepars_intrpt(self._epoch1_raw)
+            _epoch2tmp = arocmn.datepars_intrpt(self._epoch2_raw)
             _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
             _epoch_max_tmp = np.max((_epoch1tmp, _epoch2tmp))
 
@@ -95,7 +95,7 @@ class EpochRange:
         elif (
             utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw
         ):  # 2) case a start is given as a list, but no end
-            _epoch1tmp = [arocmn.dateparser_interpret(e) for e in self._epoch1_raw]
+            _epoch1tmp = [arocmn.datepars_intrpt(e) for e in self._epoch1_raw]
             _epoch_min_tmp = np.min(_epoch1tmp)
             _epoch_max_tmp = np.max(_epoch1tmp)
 
@@ -123,7 +123,7 @@ class EpochRange:
     @epoch_start.setter
     def epoch_start(self, value):
         """Sets the start of the epoch range."""
-        self._epoch_start = arocmn.dateparser_interpret(value, tz=self.tz)
+        self._epoch_start = arocmn.datepars_intrpt(value, tz=self.tz)
         self._epoch_start = arocmn.round_date(
             self._epoch_start, self.period, self.round_method
         )
@@ -136,7 +136,7 @@ class EpochRange:
     @epoch_end.setter
     def epoch_end(self, value):
         """Sets the end of the epoch range."""
-        self._epoch_end = arocmn.dateparser_interpret(value, tz=self.tz)
+        self._epoch_end = arocmn.datepars_intrpt(value, tz=self.tz)
         self._epoch_end = arocmn.round_date(
             self._epoch_end, self.period, self.round_method
         )

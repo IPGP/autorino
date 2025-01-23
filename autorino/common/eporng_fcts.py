@@ -6,11 +6,13 @@ Created on Mon Jan  8 15:47:58 2024
 @author: psakic
 """
 import logging
+import re
 
 import dateparser
 import numpy as np
 import pandas as pd
 from pandas.tseries.frequencies import to_offset
+import datetime as dt
 
 import autorino.common as arocmn
 import autorino.cfgenv.env_read as aroenv
@@ -49,7 +51,7 @@ def epoch_range_interpret(epo_inp):
     return epo_range_out
 
 
-def dateparser_interpret(date_inp, tz="UTC"):
+def datepars_intrpt(date_inp, tz="UTC"):
     """
     This function interprets a string or datetime-like object to a Pandas Timestamp.
     It also applies a timezone (UTC by default). Note that rounding does not take place here
@@ -76,17 +78,29 @@ def dateparser_interpret(date_inp, tz="UTC"):
     """
 
     if isinstance(date_inp, str):
-        date_out = pd.Timestamp(dateparser.parse(date_inp))
+        doy_pattern_1 = r"^\d{4}-\d{3}$"
+        doy_pattern_2 = r"^\d{4}/\d{3}$"
+        ### Must handle the case of day of year separately
+        if re.match(doy_pattern_1, date_inp):
+            date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y-%j"))
+        elif re.match(doy_pattern_2, date_inp):
+            date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y/%j"))
+        #regular case
+        else:
+            date_out = pd.Timestamp(dateparser.parse(date_inp))
     else:
         date_out = pd.Timestamp(date_inp)
 
+
+    ### ADD THE TIMEZONE
     if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
         ### NaT case. can not support tz
         pass
-
     elif not date_out.tz:
         logger.debug("date %s has no timezone. Applying tz %s", date_out, tz)
         date_out = pd.Timestamp(date_out, tz=tz)
+    else:
+        pass
 
     return date_out
 
