@@ -29,14 +29,14 @@ from rinexmod import rinexmod_api
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 import warnings
 
 warnings.simplefilter("always", UserWarning)
 
-#from logging_tree import printout
-#print("Logging Tree:", printout())
+# from logging_tree import printout
+# print("Logging Tree:", printout())
 
 
 class StepGnss:
@@ -716,7 +716,7 @@ class StepGnss:
 
         for epo in ["epoch_srt", "epoch_end"]:
             # not TZ aware => we add the TZ to make it TZ aware
-            #if not pd.api.types.is_datetime64tz_dtype(self.table[epo]): ### old test
+            # if not pd.api.types.is_datetime64tz_dtype(self.table[epo]): ### old test
             if not isinstance(self.table[epo].dtype, pd.DatetimeTZDtype):
                 self.table[epo] = self.table[epo].dt.tz_localize(tz)
             # TZ aware already => we convert it to the new TZ
@@ -877,7 +877,7 @@ class StepGnss:
             logger.debug("directory created: %s", trslt_dir)
         return trslt_dir
 
-    def translate_file_regex(self,epoch_inp=None):
+    def translate_file_regex(self, epoch_inp=None):
         """
         Translates the filename regex using the object's translation dictionary and the epoch input.
 
@@ -891,9 +891,10 @@ class StepGnss:
         str
             The translated filename regex.
         """
-        trslt_file_regex = arocmn.translator(self.inp_file_regex, self.translate_dict, epoch_inp)
+        trslt_file_regex = arocmn.translator(
+            self.inp_file_regex, self.translate_dict, epoch_inp
+        )
         return trslt_file_regex
-
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
@@ -963,7 +964,7 @@ class StepGnss:
             log_dir = log_dir_inp
 
         if step_suffix == "auto":
-            step_suffix_use = self.site_id + '_' + self.get_step_type()
+            step_suffix_use = self.site_id + "_" + self.get_step_type()
         else:
             step_suffix_use = step_suffix
 
@@ -1258,7 +1259,12 @@ class StepGnss:
             n_files_epo = len(list(flist_epo))
             flist_all.extend(flist_epo)
             epolist_all.extend([epoch] * n_files_epo)
-            logger.debug("%i files found in %s, regex: %s", n_files_epo, inp_dir_epo, inp_file_regex_epo)
+            logger.debug(
+                "%i files found in %s, regex: %s",
+                n_files_epo,
+                inp_dir_epo,
+                inp_file_regex_epo,
+            )
 
         self.table["fpath_inp"] = flist_all
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
@@ -2327,11 +2333,11 @@ class StepGnss:
         #     return None
         # #NB: for mv it's ok_out column the one to check
 
-
         # NB: for mv it's ok_out column the one to check
-        if not self.mono_ok_check(irow, step_name="final move", check_ok_out_only_for_mv_final=True):
-           return None
-
+        if not self.mono_ok_check(
+            irow, step_name="final move", check_ok_out_only_for_mv_final=True
+        ):
+            return None
 
         # definition of the output directory (after the action)
         if out_dir:
@@ -2351,7 +2357,7 @@ class StepGnss:
             utils.create_dir(outdir_use)
             # we prefer a copy rather than a move, mv can lead to some error
             frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
-            #frnxfin = shutil.move(frnx_to_mv, outdir_use)
+            # frnxfin = shutil.move(frnx_to_mv, outdir_use)
             logger.debug("file moved to final destination: %s", frnxfin)
         except Exception as e:
             logger.error("Error for: %s", frnx_to_mv)

@@ -32,6 +32,7 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 BOLD_SRT = "\033[1m"
 BOLD_END = "\033[0m"
 
+
 def load_cfg(configfile_path):
     """
     Loads quickly a configuration file (YAML format) without interpretation.
@@ -48,7 +49,9 @@ def load_cfg(configfile_path):
     dict
         The parsed content of the configuration file.
     """
-    logger.info(BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", configfile_path)
+    logger.info(
+        BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", configfile_path
+    )
     y = yaml.safe_load(open(configfile_path))
     return y
 
@@ -180,7 +183,6 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             # y_step_main = y_workflow_main[k_stp]
             # y_step = update_w_main_dic(y_step, y_step_main)
 
-
             if not _is_cfg_bloc_active(y_stp):
                 continue
 
@@ -204,8 +206,12 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             if "inp_file_regex" in y_stp.keys():
                 inp_file_regex = y_stp["inp_file_regex"]
             else:
-                logger.warning("Compatibility Warning: inp_file_regex not defined in the cfg files, set to .*")
-                logger.warning("Compatibility Warning: you should upgrade your config file to >v15")
+                logger.warning(
+                    "Compatibility Warning: inp_file_regex not defined in the cfg files, set to .*"
+                )
+                logger.warning(
+                    "Compatibility Warning: you should upgrade your config file to >v15"
+                )
                 inp_file_regex = ".*"
 
             kwargs_for_step = {
@@ -297,13 +303,17 @@ def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
             parent_dir_key,
         )
         raise FileNotFoundError(
-            None, parent_dir_key + " do not exists, create it manually first (mkdir -p ...)"
+            None,
+            parent_dir_key + " do not exists, create it manually first (mkdir -p ...)",
         )
 
     elif not os.path.isdir(parent_dir_out):  # standard case
-        logger.error("%s do not exists, create it first manually (mkdir -p ...)", parent_dir_out)
+        logger.error(
+            "%s do not exists, create it first manually (mkdir -p ...)", parent_dir_out
+        )
         raise FileNotFoundError(
-            None, parent_dir_out + " do not exists, create it manually first (mkdir -p ...)"
+            None,
+            parent_dir_out + " do not exists, create it manually first (mkdir -p ...)",
         )
     else:
         return None
@@ -394,20 +404,26 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
 
     return dir_path, dir_parent, structure
 
+
 def format_dir_path(dir_parent, structure):
     """
     Formats a directory path by adding or removing a leading slash.
     """
 
     if dir_parent[0] != "/":
-        logger.warning("dir_parent %s should start with /, we add it automatically", dir_parent)
+        logger.warning(
+            "dir_parent %s should start with /, we add it automatically", dir_parent
+        )
         dir_parent = "/" + dir_parent
 
     if structure and structure[0] == "/":
-        logger.warning("structure %s should not start with /, we remove it automatically", structure)
+        logger.warning(
+            "structure %s should not start with /, we remove it automatically",
+            structure,
+        )
         structure = structure[1:]
 
-    return dir_parent , structure
+    return dir_parent, structure
 
 
 def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):

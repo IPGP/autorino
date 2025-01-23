@@ -15,7 +15,7 @@ from pandas.tseries.frequencies import to_offset
 import autorino.common as arocmn
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -85,7 +85,7 @@ def dateparser_interpret(date_inp, tz="UTC"):
         pass
 
     elif not date_out.tz:
-        logger.debug("date %s has no timezone. Applying tz %s",date_out,tz)
+        logger.debug("date %s has no timezone. Applying tz %s", date_out, tz)
         date_out = pd.Timestamp(date_out, tz=tz)
 
     return date_out
@@ -312,6 +312,7 @@ def create_dummy_epochrange():
     epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period="15min")
     return epo
 
+
 def iso_zulu_epoch(epo_in):
     """
     Convert an input epoch to ISO 8601 format with Zulu time (UTC).
@@ -326,5 +327,4 @@ def iso_zulu_epoch(epo_in):
     str
         The epoch in ISO 8601 format with Zulu time (UTC).
     """
-    return pd.Timestamp(epo_in).isoformat().replace('+00:00', 'Z')
-
+    return pd.Timestamp(epo_in).isoformat().replace("+00:00", "Z")

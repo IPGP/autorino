@@ -14,6 +14,7 @@ from geodezyx import utils
 
 ##### Frontend function
 
+
 def translator(path_inp, translator_dict=None, epoch_inp=None):
     """
     Frontend function to translates a given path using environment variables,
@@ -51,6 +52,7 @@ def translator(path_inp, translator_dict=None, epoch_inp=None):
         path_translated = _translator_keywords(path_translated, translator_dict)
     return path_translated
 
+
 ##### Internal functions
 
 
@@ -85,10 +87,15 @@ def _translator_epoch(path_inp, epoch_inp):
     # the <HOURCHAR> and <hourchar> alias in a time information,
     # thus must be managed here
     ichar = epoch_inp.hour
-    path_translated = path_translated.replace('<HOURCHAR>', utils.alphabet(ichar).upper())
-    path_translated = path_translated.replace('<hourchar>', utils.alphabet(ichar).lower())
+    path_translated = path_translated.replace(
+        "<HOURCHAR>", utils.alphabet(ichar).upper()
+    )
+    path_translated = path_translated.replace(
+        "<hourchar>", utils.alphabet(ichar).lower()
+    )
 
     return path_translated
+
 
 def _translator_keywords(path_inp, translator_dict):
     """
@@ -118,11 +125,12 @@ def _translator_keywords(path_inp, translator_dict):
 
     # replace autorino variable (without a <$....>)
     # old regex (before 2025-01): r'<(?!.*\$).*>'
-    if re.search(r'<([^$][^>]*)>', path_translated):
+    if re.search(r"<([^$][^>]*)>", path_translated):
         for k, v in translator_dict.items():
-            path_translated = path_translated.replace("<"+k+">", str(v))
+            path_translated = path_translated.replace("<" + k + ">", str(v))
 
     return path_translated
+
 
 def _translator_env_variables(path_inp):
     """
@@ -149,10 +157,8 @@ def _translator_env_variables(path_inp):
     path_translated = str(path_inp)
 
     # replace system environment variables
-    if re.search(r'<\$.*>', path_translated):
+    if re.search(r"<\$.*>", path_translated):
         for k, v in os.environ.items():
-            path_translated = path_translated.replace("<$"+k+">", str(v))
+            path_translated = path_translated.replace("<$" + k + ">", str(v))
 
     return path_translated
-
-
