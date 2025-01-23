@@ -228,8 +228,8 @@ def list_remote_ftp(
 
     # Change to remote directory
     try:
-        ftp_obj.cwd(remote_dir_use)
         logger.critical(remote_dir_use)
+        ftp_obj.cwd(remote_dir_use)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
         return []
