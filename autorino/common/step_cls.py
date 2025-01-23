@@ -1202,7 +1202,7 @@ class StepGnss:
 
         return None
 
-    def load_tab_inpdir(self, reset_table=True, update_epochs=False, inp_regex=".*"):
+    def load_tab_inpdir(self, reset_table=True, update_epochs=False):
         """
         Loads the table with input files from the input directory for each epoch.
 
@@ -1233,7 +1233,7 @@ class StepGnss:
 
         for epoch in self.epoch_range.eporng_list():
             inp_dir_epo = self.translate_path(self.inp_dir, epoch_inp=epoch)
-            flist_epo = arocmn.import_files(inp_dir_epo, inp_regex=inp_regex)
+            flist_epo = arocmn.import_files(inp_dir_epo, inp_regex=self.inp_file_regex)
             n_files_epo = len(list(flist_epo))
             flist_all.extend(flist_epo)
             epolist_all.extend([epoch] * n_files_epo)
