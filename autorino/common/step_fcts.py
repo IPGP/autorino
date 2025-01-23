@@ -110,7 +110,7 @@ def import_files(inp_fil, inp_regex=".*"):
     list
         The interpreted list.
     """
-    logger.critical("2", inp_regex)
+    logger.critical(inp_regex)
 
     if not inp_fil:
         flist = []
