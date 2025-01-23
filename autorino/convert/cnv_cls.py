@@ -152,7 +152,7 @@ class ConvertGnss(arocmn.StepGnss):
         """
 
         self.set_logfile()
-        logger.info(BOLD_SRT + ">>>>>>>> RAW > RINEX files conversion" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()

@@ -48,7 +48,7 @@ def load_cfg(configfile_path):
     dict
         The parsed content of the configuration file.
     """
-    logger.info(BOLD_SRT + ">>>>>>>> Read configfile:" + BOLD_END + "%s", configfile_path)
+    logger.info(BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", configfile_path)
     y = yaml.safe_load(open(configfile_path))
     return y
 
@@ -515,22 +515,21 @@ def run_steps(
         if force:
             stp.options["force"] = True
 
-
         # Execute the step based on its type
         if stp.get_step_type() == "download":
             stp.download(**stp.options)
         elif stp.get_step_type() == "convert":
-            logger.info("load table for step %s", stp.get_step_type())
+            logger.info(">>>>>>>> load table for step %s", stp.get_step_type())
             stp.load_tab_inpdir()
             stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
-            logger.info("load table for step %s", stp.get_step_type())
+            logger.info(">>>>>>>> load table for step %s", stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
-            logger.info("load table for step %s", stp.get_step_type())
+            logger.info(">>>>>>>> load table for step %s", stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
 

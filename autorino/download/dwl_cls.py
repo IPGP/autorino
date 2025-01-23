@@ -466,7 +466,7 @@ class DownloadGnss(arocmn.StepGnss):
         None
         """
         self.set_logfile()
-        logger.info(BOLD_SRT + ">>>>>>>> RAW files download" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>> RAW files download" + BOLD_END)
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()
