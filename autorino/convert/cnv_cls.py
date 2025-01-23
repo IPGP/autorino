@@ -70,9 +70,8 @@ class ConvertGnss(arocmn.StepGnss):
         tmp_dir,
         log_dir,
         inp_dir=None,
+        inp_file_regex=None,
         epoch_range=None,
-        inp_dir_parent=None,
-        inp_structure=None,
         site=None,
         session=None,
         options=None,
@@ -111,6 +110,7 @@ class ConvertGnss(arocmn.StepGnss):
             tmp_dir=tmp_dir,
             log_dir=log_dir,
             inp_dir=inp_dir,
+            inp_file_regex=inp_file_regex,
             epoch_range=epoch_range,
             site=site,
             session=session,
@@ -338,7 +338,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         try:
             frnxtmp, _ = arocnv.converter_run(
-                self.table.loc[irow, table_col], out_dir, converter=converter_inp
+                self.table.loc[irow, table_col], out_dir_use, converter=converter_inp
             )
         except Exception as e:
             logger.error("Error for: %s", self.table.loc[irow, table_col])

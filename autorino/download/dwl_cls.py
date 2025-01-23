@@ -69,6 +69,7 @@ class DownloadGnss(arocmn.StepGnss):
         tmp_dir,
         log_dir,
         inp_dir,
+        inp_file_regex,
         epoch_range,
         access,
         site=None,
@@ -111,6 +112,7 @@ class DownloadGnss(arocmn.StepGnss):
             tmp_dir=tmp_dir,
             log_dir=log_dir,
             inp_dir=inp_dir,
+            inp_file_regex=inp_file_regex,
             epoch_range=epoch_range,
             site=site,
             session=session,
@@ -125,6 +127,7 @@ class DownloadGnss(arocmn.StepGnss):
         self.ftp_obj = None
 
     # legacy properties, specific to the DownloadGnss class
+    #### They become more or less useless since the implementation of self.inp_file_regex (2025-01)
     @property
     def inp_dirname(self):
         return os.path.dirname(self.inp_dir)
@@ -141,7 +144,7 @@ class DownloadGnss(arocmn.StepGnss):
         see also method ``guess_local_raw()``
         """
 
-        if not self.inp_basename:
+        if not self.inp_file_regex:
             logger.warning(
                 "generic filename empty for %s, the guessed remote filepaths will be wrong",
                 self.session,
@@ -153,8 +156,8 @@ class DownloadGnss(arocmn.StepGnss):
 
         for epoch in self.epoch_range.eporng_list():  ### go for irow !
             ### guess the potential remote files
-            rmot_dir_use = str(self.inp_dirname)
-            rmot_fname_use = str(self.inp_basename)
+            rmot_dir_use = str(self.inp_dir)
+            rmot_fname_use = str(self.inp_file_regex)
 
             rmot_path_use = arodwl.join_url(
                 self.access["protocol"], hostname_use, rmot_dir_use, rmot_fname_use
@@ -184,7 +187,7 @@ class DownloadGnss(arocmn.StepGnss):
     def guess_local_raw(self):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_basename` attributes of the DownloadGnss object
+        EpochRange and `inp_file_regex` attributes of the DownloadGnss object
 
         see also method ``guess_remot_raw()``,
         """
@@ -194,7 +197,7 @@ class DownloadGnss(arocmn.StepGnss):
         for epoch in self.epoch_range.eporng_list():  # go for irow !
             # guess the potential local files
             local_dir_use = str(self.out_dir)
-            local_fname_use = str(self.inp_basename)
+            local_fname_use = str(self.inp_file_regex)
             local_path_use = os.path.join(local_dir_use, local_fname_use)
 
             local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
@@ -255,9 +258,9 @@ class DownloadGnss(arocmn.StepGnss):
         rmot_fil_epo_lis = []
         epo_lis = []
 
-        if self.inp_basename:
+        if self.inp_file_regex:
             logger.debug(
-                "remote files will be filtered with regex: %s", self.inp_basename
+                "remote files will be filtered with regex: %s", self.inp_file_regex
             )
         else:
             logger.debug("no regex filtering will be applied to remote files")
@@ -290,9 +293,9 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
 
             ### match the right input structure, if a regex input is provided
-            if self.inp_basename:
+            if self.inp_file_regex:
                 rmot_fname_theo = re.compile(
-                    self.translate_path(self.inp_basename, epoch, make_dir=False)
+                    self.translate_path(self.inp_file_regex, epoch, make_dir=False)
                 )
                 rmot_fil_epo_lis = [
                     f
@@ -350,7 +353,8 @@ class DownloadGnss(arocmn.StepGnss):
     def ask_local_raw(self):
         """
         Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_basename` attributes of the DownloadGnss object
+        EpochRange and  table's fpath_inp basename i.e. the theoretical remote file name
+        generated with `guess_remot_raw()`.
 
         see also method ``guess_remot_raw()``,
         """

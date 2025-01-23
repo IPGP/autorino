@@ -77,7 +77,7 @@ class StepGnss:
         tmp_dir,
         log_dir,
         inp_dir,
-        inp_file_regex=".*",
+        inp_file_regex=None,
         epoch_range=None,
         site=None,
         session=None,
@@ -137,7 +137,10 @@ class StepGnss:
         self.log_dir = log_dir
         self.inp_dir = inp_dir
 
-        self.inp_file_regex = inp_file_regex
+        if not inp_file_regex:
+            self.inp_file_regex = ".*"
+        else:
+            self.inp_file_regex = inp_file_regex
 
         ### temp dirs init
         self.tmp_dir_tables = None  # initialized in the next line
