@@ -320,9 +320,11 @@ class HandleGnss(arocmn.StepGnss):
         Parameters
         ----------
         return_as_step_obj : bool, optional
-            If True, returns the result as a StepGnss object. If False, returns a list of file paths. Default is True.
+            If True, returns the result as a StepGnss object.
+            If False, returns a list of file paths. Default is True.
         rnx3_regex : bool, optional
-            If True, uses a regex pattern for RINEX 3 filenames. If False, uses a wildcard pattern. Default is False.
+            If True, uses a regex pattern for RINEX 3 filenames.
+            If False, uses a wildcard pattern. Default is False.
 
         Returns
         -------
@@ -452,6 +454,8 @@ class SpliceGnss(HandleGnss):
             The directory for log files.
         inp_dir : str, optional
             The input directory for raw files. Default is None.
+        inp_file_regex : str, optional
+            The regular expression for filtering input files. Default is None.
         epoch_range : EpochRange, optional
             The range of epochs to be processed. Default is None.
         site : dict, optional
@@ -712,6 +716,7 @@ class SplitGnss(HandleGnss):
         tmp_dir,
         log_dir,
         inp_dir=None,
+        inp_file_regex=None,
         epoch_range=None,
         site=None,
         session=None,
@@ -734,12 +739,10 @@ class SplitGnss(HandleGnss):
             The directory for log files.
         inp_dir : str, optional
             The input directory for raw files. Default is None.
+        inp_file_regex : str, optional
+            The regular expression for filtering input files. Default is None.
         epoch_range : EpochRange, optional
             The range of epochs to be processed. Default is None.
-        inp_dir_parent : str, optional
-            The parent directory of the input directory. Default is None.
-        inp_basename : dict, optional
-            The structure of the input files. Default is None.
         site : dict, optional
             Information about the site. Default is None.
         session : dict, optional
@@ -754,6 +757,7 @@ class SplitGnss(HandleGnss):
             tmp_dir=tmp_dir,
             log_dir=log_dir,
             inp_dir=inp_dir,
+            inp_file_regex=inp_file_regex,
             epoch_range=epoch_range,
             site=site,
             session=session,

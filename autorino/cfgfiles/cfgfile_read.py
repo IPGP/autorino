@@ -412,13 +412,13 @@ def format_dir_path(dir_parent, structure):
 
     if dir_parent[0] != "/":
         logger.warning(
-            "dir_parent %s should start with /, we add it automatically", dir_parent
+            "dir_parent %s should start with slash (/), we add it automatically", dir_parent
         )
         dir_parent = "/" + dir_parent
 
     if structure and structure[0] == "/":
         logger.warning(
-            "structure %s should not start with /, we remove it automatically",
+            "structure %s should not start with slash (/), we remove it automatically",
             structure,
         )
         structure = structure[1:]
