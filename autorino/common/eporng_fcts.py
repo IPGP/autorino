@@ -77,20 +77,22 @@ def datepars_intrpt(date_inp, tz="UTC"):
     If the resulting date does not have a timezone, the specified timezone is applied.
     """
 
-    if isinstance(date_inp, str):
+    if not isinstance(date_inp, str):
+        date_out = pd.Timestamp(date_inp)
+    ## date_inp is a str
+    else:
+        ### Must handle the case of day of year separately
         doy_pattern_1 = r"^\d{4}-\d{1,3}$"
         doy_pattern_2 = r"^\d{4}/\d{1.3}$"
-        ### Must handle the case of day of year separately
+        # YYYY-DDD
         if re.match(doy_pattern_1, date_inp):
             date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y-%j"))
+        # YYYY/DDD
         elif re.match(doy_pattern_2, date_inp):
             date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y/%j"))
-        #regular case
+        ###regular case
         else:
             date_out = pd.Timestamp(dateparser.parse(date_inp))
-    else:
-        date_out = pd.Timestamp(date_inp)
-
 
     ### ADD THE TIMEZONE
     if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
