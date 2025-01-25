@@ -245,7 +245,9 @@ class HandleGnss(arocmn.StepGnss):
             )
             if mode == "splice":
                 epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
-                epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
+                # For Leica, the end epoch can be after
+                #epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
+                epoch_end_bol = np.array([True] * len(epo_end))
             elif mode == "split":
                 epoch_srt_bol = step_obj_store.table["epoch_srt"] <= epo_srt
                 epoch_end_bol = step_obj_store.table["epoch_end"] >= epo_end
@@ -649,6 +651,11 @@ class SpliceGnss(HandleGnss):
             out_dir_main_use = self.tmp_dir
 
         spc_row = self.table.loc[irow, "fpath_inp"]
+        start_row = self.table.loc[irow, "epoch_srt"]
+        end_row = self.table.loc[irow, "epoch_end"]
+
+        start_str = start_row.strftime('%Y%m%d%H%M%S')
+        end_str = end_row.strftime('%Y%m%d%H%M%S')
 
         if not isinstance(spc_row, HandleGnss):
             logger.error(
@@ -667,7 +674,7 @@ class SpliceGnss(HandleGnss):
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
             if handle_software == "converto":
-                bin_options = ["-cat"]
+                bin_options = ["-cat","-st",start_str,"-e",end_str]
             elif handle_software == "gfzrnx":
                 bin_options = ["-f"]
             else:
