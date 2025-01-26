@@ -246,8 +246,9 @@ class HandleGnss(arocmn.StepGnss):
             if mode == "splice":
                 epoch_srt_bol = epo_srt_to_feed <= step_obj_feeder.table["epoch_srt"]
                 # For Leica, the end epoch of the RINEX can be after the theoretical one...
-                # epoch_end_bol = epo_end_to_feed >= step_obj_feeder.table["epoch_end"]
-                epoch_end_bol = np.array([True] * len(epo_end_to_feed))
+                # we add one hour as margin, the splice software integrates the option to stop at the right epoch
+                epoch_end_bol = epo_end_to_feed >= step_obj_feeder.table["epoch_end"] + pd.Timedelta("1 hour")
+                #epoch_end_bol = np.array([True] * len(epo_end_to_feed))
             elif mode == "split":
                 epoch_srt_bol = step_obj_feeder.table["epoch_srt"] <= epo_srt_to_feed
                 epoch_end_bol = step_obj_feeder.table["epoch_end"] >= epo_end_to_feed
