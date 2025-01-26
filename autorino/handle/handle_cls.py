@@ -244,24 +244,26 @@ class HandleGnss(arocmn.StepGnss):
                 arocmn.iso_zulu_epoch(epo_end_to_feed),
             )
             if mode == "splice":
-                epoch_srt_bol = epo_srt_to_feed <= step_obj_feeder.table["epoch_srt"]
+                epo_srt_bol = epo_srt_to_feed <= step_obj_feeder.table["epoch_srt"]
                 # For Leica, the end epoch of the RINEX can be after the theoretical one...
                 # we add one hour as margin, the splice software integrates the option to stop at the right epoch
-                epoch_end_bol = epo_end_to_feed >= step_obj_feeder.table["epoch_end"] + pd.Timedelta("1 hour")
-                #epoch_end_bol = np.array([True] * len(epo_end_to_feed))
+                m = self.epoch_range.extra_margin_splice()
+                epo_end_bol = epo_end_to_feed >= step_obj_feeder.table["epoch_end"] + m
+
+                # epo_end_bol = np.array([True] * len(epo_end_to_feed))
             elif mode == "split":
-                epoch_srt_bol = step_obj_feeder.table["epoch_srt"] <= epo_srt_to_feed
-                epoch_end_bol = step_obj_feeder.table["epoch_end"] >= epo_end_to_feed
+                epo_srt_bol = step_obj_feeder.table["epoch_srt"] <= epo_srt_to_feed
+                epo_end_bol = step_obj_feeder.table["epoch_end"] >= epo_end_to_feed
             else:
                 logger.error("wrong mode value (accept 'splice' or 'split'): %s", mode)
                 raise ValueError
 
-            epoch_bol = epoch_srt_bol & epoch_end_bol
+            epoch_bol = epo_srt_bol & epo_end_bol
 
             debug = False
             if debug:
                 bol_stk = pd.DataFrame(
-                    np.column_stack((epoch_srt_bol, epoch_end_bol, epoch_bol))
+                    np.column_stack((epo_srt_bol, epo_end_bol, epoch_bol))
                 )
                 print(bol_stk.to_string())
 

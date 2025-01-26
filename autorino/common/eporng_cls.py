@@ -153,6 +153,14 @@ class EpochRange:
         unit = str("".join(*alphabets))
         return val, unit
 
+    @property
+    def period_as_timedelta(self):
+        """
+        For a period, e.g. 15min, 1H...
+        return in as a pandas Timedelta
+        """
+        return pd.Timedelta(self.period)
+
     ########### methods
     def eporng_list(self, end_bound=False):
         """
@@ -245,3 +253,20 @@ class EpochRange:
             return False
         else:
             return True
+
+
+    def extra_margin_splice(self):
+        """
+        Returns the extra margin for splicing operations.
+
+        Leica raw files  can be a bit over their nominal end,
+        so we need to add a margin to the splicing operation.
+
+        Returns
+        -------
+
+        """
+        if self.period_as_timedelta >= pd.Timedelta("1 day"):
+            return pd.Timedelta("1 hour")
+        else:
+            return pd.Timedelta("1 minute")

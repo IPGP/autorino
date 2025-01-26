@@ -21,7 +21,7 @@ logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def epoch_range_interpret(epo_inp):
+def epoch_range_intrpt(epo_inp):
     """
     This function interprets an input to get an output EpochRange object. The input can either be a tuple,
     typically in the form of (epo1, epo2, period), or an instance of the EpochRange class. If the input is

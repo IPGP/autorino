@@ -389,7 +389,7 @@ class StepGnss:
         Initializes the epoch range of the StepGnss object.
 
         This method sets the epoch range of the StepGnss object.
-        If an epoch range is provided, it interprets the epoch range using the `epoch_range_interpret` function
+        If an epoch range is provided, it interprets the epoch range using the `epoch_range_intrpt` function
         from the `arocmn` module.
         If an epoch range is not provided, it creates a dummy epoch range between 'NaT' (not a time) using
         the `EpochRange` function from the `arocmn` module.
@@ -404,7 +404,7 @@ class StepGnss:
         None
         """
         if epoch_range:
-            self.epoch_range = arocmn.epoch_range_interpret(epoch_range)
+            self.epoch_range = arocmn.epoch_range_intrpt(epoch_range)
         else:
             self.epoch_range = arocmn.EpochRange(pd.NaT, pd.NaT)
 
