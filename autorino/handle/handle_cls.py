@@ -181,15 +181,15 @@ class HandleGnss(arocmn.StepGnss):
 
         return spc_main_obj, spc_obj_lis_out
 
-    def feed_by_epochs(self, step_obj_store, mode="split", print_table=False):
+    def feed_by_epochs(self, step_obj_feeder, mode="split", print_table=False):
         """
         For a HandleGnss object, with a predefined epoch range
-        find the corresponding RINEX for splice/split in the step_obj_store StepGnss,
+        find the corresponding RINEX for splice/split in the step_obj_feeder StepGnss,
         which a list of possible RINEXs candidates for the splice/split operation
 
         Parameters
         ----------
-        step_obj_store : StepGnss
+        step_obj_feeder : StepGnss
             StepGnss object, which a list of possible RINEXs candidates
             for the splice/split operation
 
@@ -218,7 +218,7 @@ class HandleGnss(arocmn.StepGnss):
 
         if print_table:
             logger.info("> Feeding table:")
-            step_obj_store.print_table()
+            step_obj_feeder.print_table()
             logger.info("> Table to be feeded:")
             self.print_table()
 
@@ -234,23 +234,23 @@ class HandleGnss(arocmn.StepGnss):
                 continue
 
             site = self.table.loc[irow, "site"]
-            epo_srt = self.table.loc[irow, "epoch_srt"]
-            epo_end = self.table.loc[irow, "epoch_end"]
+            epo_srt_to_feed = self.table.loc[irow, "epoch_srt"]
+            epo_end_to_feed = self.table.loc[irow, "epoch_end"]
 
             logger.info(
                 ">>>> Feeding RINEXs for %s between %s & %s",
                 site,
-                arocmn.iso_zulu_epoch(epo_srt),
-                arocmn.iso_zulu_epoch(epo_end),
+                arocmn.iso_zulu_epoch(epo_srt_to_feed),
+                arocmn.iso_zulu_epoch(epo_end_to_feed),
             )
             if mode == "splice":
-                epoch_srt_bol = epo_srt <= step_obj_store.table["epoch_srt"]
-                # For Leica, the end epoch can be after
-                #epoch_end_bol = epo_end >= step_obj_store.table["epoch_end"]
-                epoch_end_bol = np.array([True] * len(epo_end))
+                epoch_srt_bol = epo_srt_to_feed <= step_obj_feeder.table["epoch_srt"]
+                # For Leica, the end epoch of the RINEX can be after the theoretical one...
+                # epoch_end_bol = epo_end_to_feed >= step_obj_feeder.table["epoch_end"]
+                epoch_end_bol = np.array([True] * len(epo_end_to_feed))
             elif mode == "split":
-                epoch_srt_bol = step_obj_store.table["epoch_srt"] <= epo_srt
-                epoch_end_bol = step_obj_store.table["epoch_end"] >= epo_end
+                epoch_srt_bol = step_obj_feeder.table["epoch_srt"] <= epo_srt_to_feed
+                epoch_end_bol = step_obj_feeder.table["epoch_end"] >= epo_end_to_feed
             else:
                 logger.error("wrong mode value (accept 'splice' or 'split'): %s", mode)
                 raise ValueError
@@ -271,15 +271,15 @@ class HandleGnss(arocmn.StepGnss):
                 self.table.loc[irow, "fpath_inp"] = None
                 logger.warning(
                     "no valid input RINEX between %s & %s",
-                    arocmn.iso_zulu_epoch(epo_srt),
-                    arocmn.iso_zulu_epoch(epo_end),
+                    arocmn.iso_zulu_epoch(epo_srt_to_feed),
+                    arocmn.iso_zulu_epoch(epo_end_to_feed),
                 )
 
             elif mode == "split":
                 if bol_sum > 1:
                     logger.warning("%i (>1) RINEX found for feed: %s", bol_sum)
 
-                rnxinp_row = step_obj_store.table.loc[epoch_bol].iloc[0]
+                rnxinp_row = step_obj_feeder.table.loc[epoch_bol].iloc[0]
                 ###### can be improved !
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
@@ -295,7 +295,7 @@ class HandleGnss(arocmn.StepGnss):
                     session=self.session,
                 )
 
-                spc_obj.table = step_obj_store.table.loc[epoch_bol].copy()
+                spc_obj.table = step_obj_feeder.table.loc[epoch_bol].copy()
                 spc_obj.updt_eporng_tab()
                 spc_obj.updt_site_w_rnx_fname()
 
@@ -308,8 +308,8 @@ class HandleGnss(arocmn.StepGnss):
                 self.table.loc[irow, "fpath_inp"] = None
                 logger.warning(
                     "no valid input RINEX between %s & %s",
-                    arocmn.iso_zulu_epoch(epo_srt),
-                    arocmn.iso_zulu_epoch(epo_end),
+                    arocmn.iso_zulu_epoch(epo_srt_to_feed),
+                    arocmn.iso_zulu_epoch(epo_end_to_feed),
                 )
 
         return None
@@ -651,11 +651,8 @@ class SpliceGnss(HandleGnss):
             out_dir_main_use = self.tmp_dir
 
         spc_row = self.table.loc[irow, "fpath_inp"]
-        start_row = self.table.loc[irow, "epoch_srt"]
-        end_row = self.table.loc[irow, "epoch_end"]
-
-        start_str = start_row.strftime('%Y%m%d%H%M%S')
-        end_str = end_row.strftime('%Y%m%d%H%M%S')
+        epo_srt_row = self.table.loc[irow, "epoch_srt"]
+        epo_end_row = self.table.loc[irow, "epoch_end"]
 
         if not isinstance(spc_row, HandleGnss):
             logger.error(
@@ -674,9 +671,13 @@ class SpliceGnss(HandleGnss):
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
             if handle_software == "converto":
-                bin_options = ["-cat","-st",start_str,"-e",end_str]
+                epo_srt_str = epo_srt_row.strftime("%Y%m%d%H%M%S")
+                epo_end_str = epo_end_row.strftime("%Y%m%d%H%M%S")
+                bin_options = ["-cat", "-st", epo_srt_str, "-e", epo_end_str]
             elif handle_software == "gfzrnx":
-                bin_options = ["-f"]
+                epo_srt_str = epo_srt_row.strftime("%Y-%m-%d_%H%M%S")
+                duration = str((epo_end_row - epo_srt_row).seconds)
+                bin_options = ["-f", "-epo_beg", epo_srt_str, "-d", duration]
             else:
                 logger.critical("wrong handle_software value: %s", handle_software)
                 raise ValueError
