@@ -288,7 +288,6 @@ class HandleGnss(arocmn.StepGnss):
                 logger.info("found for feed: %s", rnxinp_row["fpath_inp"])
 
             elif mode == "splice":
-                logger.critical("10")
                 spc_obj = HandleGnss(
                     out_dir=self.out_dir,
                     tmp_dir=self.tmp_dir,
@@ -297,16 +296,10 @@ class HandleGnss(arocmn.StepGnss):
                     site={"site_id": site},
                     session=self.session,
                 )
-                logger.critical("20")
 
                 spc_obj.table = step_obj_feeder.table.loc[epoch_bol].copy()
-                logger.critical("30")
-
                 spc_obj.updt_eporng_tab()
-                logger.critical("40")
-
                 spc_obj.updt_site_w_rnx_fname()
-                logger.critical("50")
 
                 logger.info("found for feed: %s", str(spc_obj))
 
