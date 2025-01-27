@@ -418,6 +418,34 @@ class HandleGnss(arocmn.StepGnss):
 
         return stp_obj_rnxs_inp
 
+    def conv_softs_opts(self, irow, handle_software, conv_options_sup=[], conv_kwoptions_sup=dict()):
+        if handle_software == "converto":
+            conv_kwoptions_basis = {
+                "-st": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d%H%M%S"),
+                "-e": self.table.loc[irow, "epoch_end"].strftime("%Y%m%d%H%M%S"),
+            }
+            conv_options_basis = ["-cat"]
+        elif handle_software == "gfzrnx":
+            duration = int(
+                (
+                        self.table.loc[irow, "epoch_end"]
+                        - self.table.loc[irow, "epoch_srt"]
+                ).total_seconds()
+            )
+            conv_kwoptions_basis = {
+                "-epo_beg": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d_%H%M%S"),
+                "-d": duration,
+            }
+            conv_options_basis = ["-f"]
+        else:
+            logger.critical("wrong handle_software value: %s", handle_software)
+            raise ValueError
+
+        conv_option_out = conv_options_basis + conv_options_sup
+        conv_kwoption_out = {**conv_kwoptions_basis, **conv_kwoptions_sup}
+
+        return conv_option_out , conv_kwoption_out
+
     #   _____       _ _
     #  / ____|     | (_)
     # | (___  _ __ | |_  ___ ___
@@ -672,28 +700,9 @@ class SpliceGnss(HandleGnss):
 
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
-            if handle_software == "converto":
-                conv_kwoptions = {
-                    "-st": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d%H%M%S"),
-                    "-e": self.table.loc[irow, "epoch_end"].strftime("%Y%m%d%H%M%S"),
-                }
-                conv_options = ["-cat"]
-            elif handle_software == "gfzrnx":
-                duration = int(
-                    (
-                            self.table.loc[irow, "epoch_end"]
-                            - self.table.loc[irow, "epoch_srt"]
-                    ).total_seconds()
-                )
-                conv_kwoptions = {
-                    "-epo_beg": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d_%H%M%S"),
-                    "-d": duration,
-                }
-                conv_options = ["-f"]
-            else:
-                logger.critical("wrong handle_software value: %s", handle_software)
-                raise ValueError
-
+            conv_options, conv_kwoptions = self.conv_softs_opts(irow,
+                                                                handle_software=handle_software,
+                                                                conv_options_sup=["-cat"])
             try:
                 time.sleep(1)
                 frnx_spliced, _ = arocnv.converter_run(
@@ -956,28 +965,8 @@ class SplitGnss(HandleGnss):
 
         frnx_inp = self.table.loc[irow, table_col]
 
-        if handle_software == "converto":
-            conv_kwoptions = {
-                "-st": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d%H%M%S"),
-                "-e": self.table.loc[irow, "epoch_end"].strftime("%Y%m%d%H%M%S"),
-            }
-            conv_options = []
-        elif handle_software == "gfzrnx":
-            duration = int(
-                (
-                    self.table.loc[irow, "epoch_end"]
-                    - self.table.loc[irow, "epoch_srt"]
-                ).total_seconds()
-            )
-            conv_kwoptions = {
-                "-epo_beg": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d_%H%M%S"),
-                "-d": duration,
-            }
-            conv_options = ["-f"]
-        else:
-            logger.critical("wrong handle_software value: %s", handle_software)
-            raise ValueError
-
+        conv_options, conv_kwoptions = self.conv_softs_opts(irow,
+                                                            handle_software=handle_software)
         try:
             frnxtmp, _ = arocnv.converter_run(
                 frnx_inp,
