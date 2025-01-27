@@ -815,7 +815,7 @@ class StepGnss:
 
         tdelta = self.table[column_end] - self.table[column_srt]
 
-        n_tdelta = tdelta.value_counts().to_frame()
+        n_tdelta = tdelta.value_counts().to_series()
         v_tdelta = tdelta.mode()[0]
 
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
