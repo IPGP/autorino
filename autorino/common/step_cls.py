@@ -815,8 +815,12 @@ class StepGnss:
 
         tdelta = self.table[column_end] - self.table[column_srt]
 
+        logger.critical("A1")
         n_tdelta = tdelta.value_counts().to_frame()
+        logger.critical("A2")
         v_tdelta = tdelta.mode()[0]
+        logger.critical("A3")
+
 
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
         # logger.debug("new period, %s, %s", v_tdelta, period_new)
