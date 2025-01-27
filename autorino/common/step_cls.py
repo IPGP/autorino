@@ -815,7 +815,7 @@ class StepGnss:
 
         tdelta = self.table[column_end] - self.table[column_srt]
 
-        n_tdelta = pd.Series(tdelta.value_counts())
+        n_tdelta = tdelta.value_counts()
         v_tdelta = tdelta.mode()[0]
 
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
@@ -842,6 +842,8 @@ class StepGnss:
         logger.debug(
             "new epoch range %s for %s", self.epoch_range, str(self).split("/")[0]
         )
+
+        return None
 
     def translate_path(
         self, path_inp: str, epoch_inp=None, make_dir: bool = False
