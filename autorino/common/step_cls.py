@@ -821,10 +821,10 @@ class StepGnss:
         v_tdelta = tdelta.mode()[0]
         logger.critical("A3")
 
-
         period_new = arocmn.timedelta2freq_alias(v_tdelta)
         # logger.debug("new period, %s, %s", v_tdelta, period_new)
 
+        logger.critical("A4")
         if len(n_tdelta) > 1:
             logger.warning(
                 "not uniform period spacing of %s (%i val.), keep the most common: %s (%i occur.)",
@@ -834,6 +834,7 @@ class StepGnss:
                 n_tdelta.iloc[0],
             )
 
+        logger.critical("A5")
         self.epoch_range = arocmn.EpochRange(
             epoch1,
             epoch2,
