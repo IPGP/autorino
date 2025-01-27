@@ -344,11 +344,11 @@ class HandleGnss(arocmn.StepGnss):
             local_dir_use = self.translate_path(self.inp_dir, epoch, make_dir=False)
 
             if rnx3_regex:
-                patrn = self.site_id9 + conv.rinex_regex_long_name()[9:]
+                patrn = self.site_id9 + conv.rinex_regex_long_name()[17:]
             else:
-                patrn = "*"
+                patrn = ".*"
 
-            local_paths_list_epo = utils.find_recursive(local_dir_use, pattern=patrn)
+            local_paths_list_epo = utils.find_recursive(local_dir_use, pattern=patrn, regex=True)
             local_paths_list.extend(local_paths_list_epo)
 
         logger.info("nbr local files found: %s", len(local_paths_list))
@@ -357,7 +357,7 @@ class HandleGnss(arocmn.StepGnss):
         else:
             return local_paths_list
 
-    def get_input_rnxs(self, input_mode, input_rinexs):
+    def load_input_rnxs(self, input_mode, input_rinexs=None):
         """
         Get the input RINEX files for handeling (splice or split).
 
@@ -371,7 +371,9 @@ class HandleGnss(arocmn.StepGnss):
             - "find": to find local input files.
             - "given": to use provided input RINEX files.
         input_rinexs : str or list or StepGnss
-            The input RINEX files. It can be:
+            The input RINEX files.
+            Only useful for "given" mode.
+            It can be:
             - A list of RINEX file paths.
             - An existing StepGnss object.
 
@@ -381,14 +383,18 @@ class HandleGnss(arocmn.StepGnss):
             A StepGnss object containing the input RINEX files, or None if an error occurs.
         """
         method_msg = "input method to handle RINEXs: "
+
         if input_mode == "find":
             # Find local RINEX files and convert them to a StepGnss object
             logger.debug(
                 method_msg
                 + "find local RINEX files and convert them to a StepGnss object"
             )
-            stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True)
+            stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True, rnx3_regex=True)
         elif input_mode == "given":
+            if not input_rinexs:
+                logger.error("input mode is 'given' but no input_rinexs provided")
+
             if utils.is_iterable(input_rinexs):
                 # Convert a list of RINEX files to a StepGnss object
                 logger.debug(
@@ -575,7 +581,7 @@ class SpliceGnss(HandleGnss):
             self.force("splice")
 
         # Find the input RINEX files
-        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
+        stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
         # Feed the epochs for splicing
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
 
@@ -847,7 +853,7 @@ class SplitGnss(HandleGnss):
             self.force("split")
 
         # Find the input RINEX files
-        stp_obj_rnxs_inp = self.get_input_rnxs(input_mode, input_rinexs)
+        stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
 
         # Feed the epochs for splitting
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose)

@@ -1312,13 +1312,13 @@ class StepGnss:
         self.table["note"] = "force_" + step_name
         return None
 
-    def guess_local_rnx(self):
+    def guess_local_rnx(self, io="out"):
         """
         For a given site name and date in a table, guess the potential local RINEX files
         and write it as 'fpath_out' value in the table
         """
 
-        #### to do: split it as a in_row fct
+        #### to do: split it as a mono fct
 
         local_paths_list = []
 
@@ -1338,7 +1338,14 @@ class StepGnss:
 
         for iepoch, epoch in self.table["epoch_srt"].items():
             # guess the potential local files
-            local_dir_use = str(self.out_dir)
+            if io == "out":
+                local_dir_use = str(self.out_dir)
+            elif io == "inp":
+                local_dir_use = str(self.inp_dir)
+            else:
+                logging.error("io must be 'inp' or 'out'")
+                raise Exception
+
             # local_fname_use = str(self.inp_basename)
 
             epo_dt_srt = epoch.to_pydatetime()
@@ -1356,7 +1363,7 @@ class StepGnss:
             local_fname_use = conv.statname_dt2rinexname_long(
                 self.site_id9,
                 epoch,
-                country="XXX",
+                country="XXX", ### site_id9 has the country
                 data_source="R",  ### always will be with autorino
                 file_period=prd_str,
                 data_freq=self.session["data_frequency"],
@@ -1374,9 +1381,8 @@ class StepGnss:
             local_paths_list.append(local_path_use)
 
             # iepoch = self.table[self.table['epoch_srt'] == epoch].index
-
             # self.table.loc[iepoch, 'fname'] = local_fname_use
-            self.table.loc[iepoch, "fpath_out"] = local_path_use
+            self.table.loc[iepoch, "fpath_" + io] = local_path_use
             logger.debug("local RINEX file guessed: %s", local_path_use)
 
         logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))

@@ -12,7 +12,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from geodezyx import utils
+from geodezyx import utils, conv
 from filelock import FileLock, Timeout
 
 #### Import the logger
@@ -124,7 +124,7 @@ def import_files(inp_fil, inp_regex=".*"):
         flist = open(inp_fil, "r+").readlines()
         flist = [f.strip() for f in flist]
     elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil, ".*", case_sensitive=False)
+        flist = utils.find_recursive(inp_fil, ".*", regex=True)
         # Here we find everything ".*", the regex will be filtered bellow
     else:
         flist = []
@@ -264,3 +264,37 @@ def rnxs2step_obj(rnxs_lis_inp):
     stp_obj.updt_epotab_rnx(use_rnx_filename_only=True, update_epoch_range=True)
 
     return stp_obj
+
+
+def guess_sites_list(inp_fil):
+    """
+    Guess the list of sites from the input list.
+
+    This function guesses the list of sites from the input list.
+    
+    It extracts the site identifier from the input list
+    and returns a list of unique site identifiers.
+
+    Parameters
+    ----------
+    inp_fil : list
+        The input list to extract the site identifiers from.
+        See `import_files` for details.
+        
+    Returns
+    -------
+    list
+        A list of unique site identifiers extracted from the input list.
+    """
+    inp_list = import_files(inp_fil)
+
+    sites_list = []
+
+    for f in inp_list:
+        if conv.rinex_regex_search_tester(f, short_name=False):
+            site = os.path.basename(f)[:9]
+            sites_list.append(site)
+
+    sites_list = list(set(sites_list))
+
+    return sites_list

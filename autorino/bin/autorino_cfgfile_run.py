@@ -64,7 +64,7 @@ def main():
         "-ls",
         "--list_sites",
         type=str,
-        help="A comma-separated list of site identifiers ('site_id') in the config file"
+        help="A comma-separated (,) list of site identifiers ('site_id') in the config file"
              "to filter the configuration files. "
              "If provided, only configurations for sites in this list will be processed. "
              "Default is None.",

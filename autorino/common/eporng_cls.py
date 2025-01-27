@@ -230,7 +230,7 @@ class EpochRange:
             )
             eporng = eprrng_srt
         else:  ### end bound
-            plus_one = pd.Timedelta(self.period)
+            plus_one = self.period_as_timedelta
             eprrng_end = pd.date_range(
                 self.epoch_start, self.epoch_end + plus_one, freq=self.period
             )
