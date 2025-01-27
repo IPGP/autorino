@@ -830,8 +830,8 @@ class StepGnss:
                 "not uniform period spacing of %s (%i val.), keep the most common: %s (%i occur.)",
                 str(self).split("/")[0],
                 len(n_tdelta),
-                v_tdelta,
-                n_tdelta.iloc[0],
+                str(v_tdelta),
+                int(n_tdelta.iloc[0]),
             )
 
         logger.critical("A5")
