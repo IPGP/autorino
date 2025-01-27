@@ -22,7 +22,7 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 def cfgfile_run(
     cfg_in,
     main_cfg_in,
-    sites_list=None,
+    list_sites=None,
     ignore_sites=False,
     epo_srt=None,
     epo_end=None,
@@ -44,7 +44,7 @@ def cfgfile_run(
         If a directory is provided, all files ending with '.yml' will be used.
     main_cfg_in : str
         The main configuration file to be used.
-    sites_list : list, optional
+    list_sites : list, optional
         A list of site identifiers to filter the configuration files.
          If provided, only configurations for sites in this list will be processed.
          Default is None.
@@ -113,16 +113,16 @@ def cfgfile_run(
 
     # Process each configuration file
     for cfg_use in cfg_use_lis:
-        if sites_list:
+        if list_sites:
             # Quick load to check if the site is in the list or not
             y_quick = arocfg.load_cfg(configfile_path=cfg_use)
             site_quick = y_quick["station"]["site"]["site_id"]
-            ### case 1: sites_list are the sites we want
-            if not ignore_sites and (site_quick not in sites_list):
+            ### case 1: list_sites are the sites we want
+            if not ignore_sites and (site_quick not in list_sites):
                 logger.info("Skipping site %s (not in sites list)", site_quick)
                 continue
-            ### case 2: sites_list are the sites we ignore
-            elif ignore_sites and (site_quick in sites_list):
+            ### case 2: list_sites are the sites we ignore
+            elif ignore_sites and (site_quick in list_sites):
                 logger.info("Skipping site %s (in ignored sites list)", site_quick)
                 continue
             ### case 3: regular case

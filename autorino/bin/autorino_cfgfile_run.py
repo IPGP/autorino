@@ -74,8 +74,8 @@ def main():
         "-is",
         "--ignore_sites",
         action="store_true",
-        help="If True, the site in sites_list will be ignored."
-             "It is the opposed behavior of the regular one using sites_list."
+        help="If True, the sites in --list_sites will be ignored."
+             "It is the opposed behavior of the regular one using list_sites."
              "Default is False.",
     )
     parser.add_argument(
@@ -123,7 +123,7 @@ def main():
     aroapi.cfgfile_run(
         cfg_in=config,
         main_cfg_in=main_config,
-        sites_list=list_sites,
+        list_sites=list_sites,
         ignore_sites=ignore_sites,
         epo_srt=start,
         epo_end=end,
