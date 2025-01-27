@@ -826,14 +826,13 @@ class StepGnss:
 
         logger.critical("A4")
         if len(n_tdelta) > 1:
-            pass
-            # logger.warning(
-            #     "not uniform period spacing of %s (%i val.), keep the most common: %s (%i occur.)",
-            #     str(self).split("/")[0],
-            #     len(n_tdelta),
-            #     str(v_tdelta),
-            #     int(n_tdelta.iloc[0]),
-            # )
+            logger.warning(
+                "not uniform period spacing of %s (%i val.), keep the most common: %s (%i occur.)",
+                str(self).split("/")[0],
+                len(n_tdelta),
+                str(v_tdelta),
+                int(n_tdelta.iloc[0]),
+            )
 
         logger.critical("A5")
         self.epoch_range = arocmn.EpochRange(
