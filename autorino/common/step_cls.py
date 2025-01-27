@@ -987,6 +987,17 @@ class StepGnss:
 
         return logfile_handler
 
+    def close_logfile(self):
+        """
+        close the file handler of the logger
+        """
+        _logger = logging.getLogger()
+        for handler in _logger.handlers[:]:
+            if isinstance(handler, logging.FileHandler):
+                handler.close()
+                _logger.removeHandler(handler)
+        return None
+
     def set_table_log(self, out_dir=None, step_suffix=""):
         if not out_dir:
             out_dir = self.tmp_dir

@@ -558,6 +558,10 @@ class DownloadGnss(arocmn.StepGnss):
         # Print the table if verbose is enabled
         if verbose:
             self.print_table()
+
+        # close the log file
+        self.close_logfile()
+
         return None
 
     def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):

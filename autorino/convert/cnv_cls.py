@@ -287,6 +287,9 @@ class ConvertGnss(arocmn.StepGnss):
         # ++++ remove temporary files
         self.remov_tmp_files()
 
+        # close the log file
+        self.close_logfile()
+
         return None
 
     #               _   _

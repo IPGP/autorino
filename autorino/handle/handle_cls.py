@@ -557,6 +557,9 @@ class SpliceGnss(HandleGnss):
             handle_software=handle_software, rinexmod_options=rinexmod_options
         )
 
+        # close the log file
+        self.close_logfile()
+
         return None
 
     def splice_core(self, handle_software="converto", rinexmod_options=None):
@@ -846,6 +849,9 @@ class SplitGnss(HandleGnss):
         self.split_core(
             handle_software=handle_software, rinexmod_options=rinexmod_options
         )
+
+        # close the log file
+        self.close_logfile()
 
         return None
 
