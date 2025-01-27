@@ -23,6 +23,7 @@ def cfgfile_run(
     cfg_in,
     main_cfg_in,
     sites_list=None,
+    ignore_sites=False,
     epo_srt=None,
     epo_end=None,
     period="1D",
@@ -45,7 +46,12 @@ def cfgfile_run(
         The main configuration file to be used.
     sites_list : list, optional
         A list of site identifiers to filter the configuration files.
-         If provided, only configurations for sites in this list will be processed. Default is None.
+         If provided, only configurations for sites in this list will be processed.
+         Default is None.
+    ignore_sites : bool, optional
+        If True, the site in sites_list will be ignored.
+        It is the opposed behavior of the regular one using sites_list.
+        Default is False.
     epo_srt : str, list, optional
         The start date for the epoch range.
         Can be a list; if so, each epoch is considered separately.
@@ -111,9 +117,18 @@ def cfgfile_run(
             # Quick load to check if the site is in the list or not
             y_quick = arocfg.load_cfg(configfile_path=cfg_use)
             site_quick = y_quick["station"]["site"]["site_id"]
-            if site_quick not in sites_list:
+            ### case 1: sites_list are the sites we want
+            if not ignore_sites and (site_quick not in sites_list):
                 logger.info("Skipping site %s (not in sites list)", site_quick)
                 continue
+            ### case 2: sites_list are the sites we ignore
+            elif ignore_sites and (site_quick in sites_list):
+                logger.info("Skipping site %s (in ignored sites list)", site_quick)
+                continue
+            ### case 3: regular case
+            else:
+                pass
+
 
         # Read the configuration and run the steps
         # step_lis_lis is a list of list because you can have several sessions in the same configuration file
