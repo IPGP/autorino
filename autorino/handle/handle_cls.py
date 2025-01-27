@@ -657,9 +657,6 @@ class SpliceGnss(HandleGnss):
             out_dir_main_use = self.tmp_dir
 
         spc_row = self.table.loc[irow, "fpath_inp"]
-        epo_srt_row = self.table.loc[irow, "epoch_srt"]
-        epo_end_row = self.table.loc[irow, "epoch_end"]
-
         if not isinstance(spc_row, HandleGnss):
             logger.error(
                 "the fpath_inp is not a HandleGnss object: %s", self.table.loc[irow]
@@ -677,13 +674,23 @@ class SpliceGnss(HandleGnss):
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
             if handle_software == "converto":
-                epo_srt_str = epo_srt_row.strftime("%Y%m%d%H%M%S")
-                epo_end_str = epo_end_row.strftime("%Y%m%d%H%M%S")
-                bin_options = ["-cat", "-st", epo_srt_str, "-e", epo_end_str]
+                conv_kwoptions = {
+                    "-st": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d%H%M%S"),
+                    "-e": self.table.loc[irow, "epoch_end"].strftime("%Y%m%d%H%M%S"),
+                }
+                conv_options = ["-cat"]
             elif handle_software == "gfzrnx":
-                epo_srt_str = epo_srt_row.strftime("%Y-%m-%d_%H%M%S")
-                duration = str((epo_end_row - epo_srt_row).seconds)
-                bin_options = ["-f", "-epo_beg", epo_srt_str, "-d", duration]
+                duration = int(
+                    (
+                            self.table.loc[irow, "epoch_end"]
+                            - self.table.loc[irow, "epoch_srt"]
+                    ).total_seconds()
+                )
+                conv_kwoptions = {
+                    "-epo_beg": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d_%H%M%S"),
+                    "-d": duration,
+                }
+                conv_options = ["-f"]
             else:
                 logger.critical("wrong handle_software value: %s", handle_software)
                 raise ValueError
@@ -694,7 +701,8 @@ class SpliceGnss(HandleGnss):
                     fpath_inp_lst,
                     out_dir_use,
                     converter=handle_software,
-                    bin_options=bin_options,
+                    bin_options=conv_options,
+                    bin_kwoptions=conv_kwoptions,
                 )
             except Exception as e:
                 logger.error("Error for: %s", fpath_inp_lst)
