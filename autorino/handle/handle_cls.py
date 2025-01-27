@@ -658,15 +658,6 @@ class SpliceGnss(HandleGnss):
         containing the RINEXs to splice
         """
 
-        # +++ oldcheck (to be removed)
-        # if not self.table.loc[irow, "ok_inp"]:
-        #     logger.warning(
-        #         "action on row skipped (input disabled): %s",
-        #         arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-        #     )
-        #     self.table.loc[irow, "ok_out"] = False
-        #     return None
-
         if not self.mono_ok_check(
             irow,
             "splice (mono)",
@@ -933,15 +924,6 @@ class SplitGnss(HandleGnss):
         for each row of the table, split the 'table_col' entry,
         typically 'fpath_inp' file
         """
-
-        # +++ oldcheck (to be removed)
-        # if not self.table.loc[irow, "ok_inp"]:
-        #     logger.warning(
-        #         "action on row skipped (input disabled): %s",
-        #         arocmn.iso_zulu_epoch(self.table.loc[irow, "epoch_srt"]),
-        #     )
-        #     self.table.loc[irow, "ok_out"] = False
-        #     return None
 
         if not self.mono_ok_check(
             irow,
