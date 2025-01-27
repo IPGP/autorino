@@ -222,8 +222,6 @@ class HandleGnss(arocmn.StepGnss):
             logger.info("> Table to be feeded:")
             self.print_table()
 
-        # self.table["ok_inp"] = True # this is dangerous !!
-
         for irow, row in self.table.iterrows():
 
             if not self.mono_ok_check(
@@ -246,7 +244,8 @@ class HandleGnss(arocmn.StepGnss):
             if mode == "splice":
                 epo_srt_bol = epo_srt_to_feed <= step_obj_feeder.table["epoch_srt"]
                 # For Leica, the end epoch of the RINEX can be after the theoretical one...
-                # we add one hour as margin, the splice software integrates the option to stop at the right epoch
+                # we add one hour as margin, the splice software integrates the option
+                # to stop at the right epoch
                 m = self.epoch_range.extra_margin_splice()
                 epo_end_bol = epo_end_to_feed + m >= step_obj_feeder.table["epoch_end"]
 
@@ -289,6 +288,7 @@ class HandleGnss(arocmn.StepGnss):
                 logger.info("found for feed: %s", rnxinp_row["fpath_inp"])
 
             elif mode == "splice":
+                logger.critical("10")
                 spc_obj = HandleGnss(
                     out_dir=self.out_dir,
                     tmp_dir=self.tmp_dir,
@@ -297,10 +297,16 @@ class HandleGnss(arocmn.StepGnss):
                     site={"site_id": site},
                     session=self.session,
                 )
+                logger.critical("20")
 
                 spc_obj.table = step_obj_feeder.table.loc[epoch_bol].copy()
+                logger.critical("30")
+
                 spc_obj.updt_eporng_tab()
+                logger.critical("40")
+
                 spc_obj.updt_site_w_rnx_fname()
+                logger.critical("50")
 
                 logger.info("found for feed: %s", str(spc_obj))
 
