@@ -72,7 +72,7 @@ def download_html_page(url_inp, output_file_inp):
 
 
 def extract_trimble_filelist(
-    html_files, pattern=".{4}______[0-9]{12}A\.T02", output_csv_dir=None
+    html_files, pattern=r".{4}______[0-9]{12}A\.T02", output_csv_dir=None
 ):
     """
     Extract the list of Trimble files from an HTML file.

@@ -73,10 +73,10 @@ class StepGnss:
 
     def __init__(
         self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        inp_dir,
+        out_dir=None,
+        tmp_dir=None,
+        log_dir=None,
+        inp_dir=None,
         inp_file_regex=None,
         epoch_range=None,
         site=None,
@@ -178,6 +178,8 @@ class StepGnss:
 
     @out_dir.setter
     def out_dir(self, value):
+        if not value:
+            logger.warning("output directory is not defined (%s)", value)
         self._out_dir = value
 
     @property
@@ -186,6 +188,8 @@ class StepGnss:
 
     @tmp_dir.setter
     def tmp_dir(self, value):
+        if not value:
+            logger.warning("temp directory is not defined (%s)", value)
         self._tmp_dir = value
 
     @property
@@ -194,6 +198,8 @@ class StepGnss:
 
     @log_dir.setter
     def log_dir(self, value):
+        if not value:
+            logger.warning("log directory is not defined (%s)", value)
         self._log_dir = value
 
     @property
@@ -202,6 +208,8 @@ class StepGnss:
 
     @inp_dir.setter
     def inp_dir(self, value):
+        if not value:
+            logger.warning("input directory is not defined (%s)", value)
         self._inp_dir = value
 
     ### site
