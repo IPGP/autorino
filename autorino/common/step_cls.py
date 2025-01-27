@@ -826,6 +826,7 @@ class StepGnss:
 
         logger.critical("A4")
         if len(n_tdelta) > 1:
+            pass
             # logger.warning(
             #     "not uniform period spacing of %s (%i val.), keep the most common: %s (%i occur.)",
             #     str(self).split("/")[0],
