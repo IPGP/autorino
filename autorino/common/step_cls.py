@@ -2364,8 +2364,8 @@ class StepGnss:
 
         if frnxfin:
             ### remove the original file if it is still around (normal with a copy rather than a move)
-            if os.path.isfile(frnx_to_mv):
-                os.remove(frnx_to_mv)
+            if os.path.isfile(frnxfin):
+                os.remove(frnxfin)
             ### update table if things go well
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, table_col] = frnxfin
