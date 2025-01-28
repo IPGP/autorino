@@ -48,38 +48,56 @@ def check_rnx(
         chk_tab_stk.append(chk.table)
         chk_tab_stats_stk.append(chk.table_stats)
 
-    chk_table_cat = pd.concat(chk_tab_stk)
-    chk_table_stats = pd.concat(chk_tab_stats_stk)
+    df_chk_table_cat = pd.concat(chk_tab_stk)
+    df_chk_full_stats = pd.concat(chk_tab_stats_stk)
 
-    tabu_chk_col, tabu_chk_bnw, df_chk = arochk.get_tabult_raw(
-        chk_table_cat, short_label=True
+    tabu_chk_col, tabu_chk_bnw, df_chk_sum = arochk.get_tabult_raw(
+        df_chk_table_cat, short_label=True
     )
 
     logger.info("Check: \n" + tabu_chk_col)
 
     if output_dir:
-        checkrnx_output(output_dir, eporng, df_chk, tabu_chk_col, tabu_chk_bnw)
+        checkrnx_output(
+            output_dir,
+            eporng,
+            tabu_chk_col,
+            tabu_chk_bnw,
+            df_chk_sum,
+            df_chk_full_stats,
+        )
 
-    return tabu_chk_col, tabu_chk_bnw, df_chk, chk_table_stats
+    return tabu_chk_col, tabu_chk_bnw, df_chk_sum, df_chk_full_stats
 
 
 # defcheckrnx_analyz
 # checkrnx_format
-def checkrnx_output(output_dir, eporng, df_chk, tabu_chk_col, tabu_chk_bnw):
+def checkrnx_output(
+    output_dir, eporng, tabu_chk_col, tabu_chk_bnw, df_chk_sum, df_chk_full_stats
+):
 
-    prefix = "_".join((utils.get_timestamp(),
-                      eporng.epoch_start.strftime("%Y-%j"),
-                      eporng.epoch_end.strftime("%Y-%j")))
+    prefix = "_".join(
+        (
+            utils.get_timestamp(),
+            eporng.epoch_start.strftime("%Y-%j"),
+            eporng.epoch_end.strftime("%Y-%j"),
+        )
+    )
 
     output_dir_use = utils.create_dir(os.path.join(output_dir, prefix))
+    ### csv
+    summ_csv = os.path.join(output_dir_use, prefix + "_check_rnx_summ.csv")
+    full_csv = os.path.join(output_dir_use, prefix + "_check_rnx_full.csv")
+    df_chk_sum.to_csv(summ_csv)
+    df_chk_full_stats.to_csv(full_csv)
 
-    df_chk.to_csv(os.path.join(output_dir_use, prefix + "_check_rnx.csv"))
-    df_chk.plot()
+    ### plot
+    df_chk_sum.plot()
     fig = plt.gcf()
     utils.figure_saver(
         fig, output_dir_use, prefix + "_check_rnx_plot", outtype=(".png", ".pdf")
     )
-
+    ### pretty print tabulate
     tabu_col_txt = os.path.join(output_dir_use, prefix + "_check_rnx_tabu_col.txt")
     tabu_bnw_txt = os.path.join(output_dir_use, prefix + "_check_rnx_tabu_bnw.txt")
     utils.write_in_file(tabu_chk_col, tabu_col_txt)
