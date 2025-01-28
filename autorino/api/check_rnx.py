@@ -6,19 +6,25 @@ Created on 27/01/2025 09:50:23
 @author: psakic
 """
 
+import autorino.cfgenv as aroenv
 import autorino.check as arochk
 import autorino.common as arocmn
 import timeit
 import pandas as pd
 import os
 import tabulate
+import logging
+from geodezyx import utils
+
+logger = logging.getLogger('autorino')
+logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 def check_rnx(inp_dir_parent,
               inp_dir_structure,
               epoch_start,
               epoch_end,
-              print_check_tabulate=False,
-              sites_list=[]):
+              sites_list=[],
+              output_dir=None):
 
     inp_dir = os.path.join(inp_dir_parent, inp_dir_structure)
 
@@ -44,15 +50,24 @@ def check_rnx(inp_dir_parent,
     tabu_chk = tabulate.tabulate(t_l_str_stk,
                                  headers="firstrow",
                                  tablefmt="fancy_grid")
-    if print_check_tabulate:
-        print(tabu_chk)
+    logger.info("Check: \n" + tabu_chk)
+
+    if output_dir:
+        df_chk.to_csv(os.path.join(output_dir, "check_rnx_df.csv"))
+        utils.figure_saver(df_chk.plot(),
+                           output_dir,
+                           "check_rnx_plot.png",
+                           outtype=(".png", ".pdf"))
+        with open(os.path.join(output_dir, "check_rnx_tabu.txt"), "w") as f:
+            f.write(tabu_chk)
 
     return tabu_chk, df_chk
 
-dir_parent = "/home/psakicki/aaa_FOURBI/OVSM/"
-dir_struct = "%Y/%j/rinex"
-tabu_chk0, df_chk0 = check_rnx(dir_parent, dir_struct,
-                               "2025-01-01", "2025-01-15",
-                               print_check_tabulate=True)
 
-df_chk0.plot(marker='.')
+# dir_parent = "/home/psakicki/aaa_FOURBI/OVSM/"
+# dir_struct = "%Y/%j/rinex"
+# tabu_chk0, df_chk0 = check_rnx(dir_parent, dir_struct,
+#                                "2025-01-01", "2025-01-15",
+#                                print_check_tabulate=True)
+#
+# df_chk0.plot(marker='.')
