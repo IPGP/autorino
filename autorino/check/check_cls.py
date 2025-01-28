@@ -126,7 +126,8 @@ class CheckGnss(arohdl.HandleGnss):
                 ds["%"] = 0
             else:
                 ### get RINEX as an rinexMod's Object
-                rnxobj = rinexmod.rinexfile.RinexFile(self.table.loc[irow, "fpath"])
+                ds["fpath"] = self.table.loc[irow, "fpath_inp"]
+                rnxobj = rinexmod.rinexfile.RinexFile(ds["fpath"])
                 ds["robj"] = rnxobj
                 ### get RINEX site code
                 ds["site"] = rnxobj.get_site(False, True)
