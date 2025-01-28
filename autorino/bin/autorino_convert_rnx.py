@@ -85,6 +85,13 @@ def main():
         default=False,
     )
 
+    parser.add_argument(
+        "-srs"
+        "--store_raw_structure",
+        help="WRITE ME",
+        default=None,
+    )
+
     args = parser.parse_args()
 
     raws_inp = _prep_raws_inp(args)
@@ -98,6 +105,7 @@ def main():
         rinexmod_options=args.rinexmod_options,
         metadata=args.metadata,
         force=args.force,
+        store_raw_structure=args.store_raw_structure,
     )
 
 

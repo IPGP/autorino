@@ -1654,6 +1654,14 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
+    def copy(self):
+        for irow, row in self.table.iterrows():
+            self.mono_mv_final(irow, copy_only=True)
+
+    def move(self):
+        for irow, row in self.table.iterrows():
+            self.mono_mv_final(irow)
+
     def remov_tmp_files(self):
         """
         Removes the temporary files which have been stored in the two lists
@@ -2309,7 +2317,7 @@ class StepGnss:
 
         return frnxmod
 
-    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out"):
+    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out", copy_only=False):
         """
         "on row" method
 
@@ -2346,9 +2354,14 @@ class StepGnss:
         #     return None
         # #NB: for mv it's ok_out column the one to check
 
+        if copy_only:
+            mvorcp = "copy"
+        else:
+            mvorcp = "move"
+
         # NB: for mv it's ok_out column the one to check
         if not self.mono_ok_check(
-            irow, step_name="final move", check_ok_out_only_for_mv_final=True
+            irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=True
         ):
             return None
 
@@ -2363,32 +2376,32 @@ class StepGnss:
             out_dir_use, epoch_inp=self.table.loc[irow, "epoch_srt"]
         )
 
-        frnx_to_mv = self.table.loc[irow, table_col]
+        file_to_mv = self.table.loc[irow, table_col]
 
         try:
             ### do the move
             utils.create_dir(outdir_use)
             # we prefer a copy rather than a move, mv can lead to some error
-            frnxfin = shutil.copy2(frnx_to_mv, outdir_use)
-            # frnxfin = shutil.move(frnx_to_mv, outdir_use)
-            logger.debug("file moved to final destination: %s", frnxfin)
+            file_moved = shutil.copy2(file_to_mv, outdir_use)
+            # file_moved = shutil.move(file_to_mv, outdir_use)
+            logger.debug("file " + mvorcp + "ed to final destination: %s", file_moved)
         except Exception as e:
-            logger.error("Error for: %s", frnx_to_mv)
+            logger.error("Error for: %s", file_to_mv)
             logger.error("Exception raised: %s", e)
-            frnxfin = None
+            file_moved = None
 
-        if frnxfin:
+        if file_moved:
             ### remove the original file if it is still around (normal with a copy rather than a move)
-            if os.path.isfile(frnx_to_mv):
-                os.remove(frnx_to_mv)
+            if (not copy_only) and os.path.isfile(file_to_mv):
+                os.remove(file_to_mv)
             ### update table if things go well
             self.table.loc[irow, "ok_out"] = True
-            self.table.loc[irow, table_col] = frnxfin
-            self.table.loc[irow, "size_out"] = os.path.getsize(frnxfin)
+            self.table.loc[irow, table_col] = file_moved
+            self.table.loc[irow, "size_out"] = os.path.getsize(file_moved)
         else:
             ### update table if things go wrong
             self.table.loc[irow, "ok_out"] = False
             self.write_in_table_log(self.table.loc[irow])
             # raise e
 
-        return frnxfin
+        return file_moved
