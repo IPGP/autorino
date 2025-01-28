@@ -157,7 +157,7 @@ class CheckGnss(arohdl.HandleGnss):
 
             ds_stk.append(ds)
 
-        dfts = pd.concat(ds_stk)
+        dfts = pd.DataFrame(ds_stk)
         self.table_stats = dfts
 
         return dfts
