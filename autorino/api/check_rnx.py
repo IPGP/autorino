@@ -42,9 +42,7 @@ def check_rnx(
     chk_tab_stats_stk = []
     for site in sites_use:
         chk = arochk.CheckGnss(
-            inp_dir=str(inp_dir),
-            site={"site_id": site},
-            epoch_range=eporng
+            inp_dir=str(inp_dir), site={"site_id": site}, epoch_range=eporng
         )
         chk.check()
         chk_tab_stk.append(chk.table)
@@ -60,31 +58,29 @@ def check_rnx(
     logger.info("Check: \n" + tabu_chk_col)
 
     if output_dir:
-        prefix = (
-            utils.get_timestamp()
-            + "_"
-            + eporng.epoch_start.strftime("%Y-%j")
-            + "_"
-            + eporng.epoch_end.strftime("%Y-%j")
-        )
-        df_chk.to_csv(os.path.join(output_dir, prefix + "_check_rnx_df.csv"))
-        df_chk.plot()
-        fig = plt.gcf()
-        utils.figure_saver(
-            fig, output_dir, prefix + "_check_rnx_plot", outtype=(".png", ".pdf")
-        )
-
-        with open(
-            os.path.join(output_dir, prefix + "_check_rnx_tabu_col.txt"), "w"
-        ) as f:
-            f.write(tabu_chk_col)
-        with open(
-            os.path.join(output_dir, prefix + "_check_rnx_tabu_bnw.txt"), "w"
-        ) as f:
-            f.write(tabu_chk_bnw)
+        checkrnx_output(output_dir, eporng, df_chk, tabu_chk_col, tabu_chk_bnw)
 
     return tabu_chk_col, tabu_chk_bnw, df_chk, chk_table_stats
 
-#checkrnx_analyz
-#checkrnx_format
-#checkrnx_output
+
+# defcheckrnx_analyz
+# checkrnx_format
+def checkrnx_output(output_dir, eporng, df_chk, tabu_chk_col, tabu_chk_bnw):
+
+    prefix = "_".join((utils.get_timestamp(),
+                      eporng.epoch_start.strftime("%Y-%j"),
+                      eporng.epoch_end.strftime("%Y-%j")))
+
+    output_dir_use = utils.create_dir(os.path.join(output_dir, prefix))
+
+    df_chk.to_csv(os.path.join(output_dir_use, prefix + "_check_rnx.csv"))
+    df_chk.plot()
+    fig = plt.gcf()
+    utils.figure_saver(
+        fig, output_dir_use, prefix + "_check_rnx_plot", outtype=(".png", ".pdf")
+    )
+
+    tabu_col_txt = os.path.join(output_dir_use, prefix + "_check_rnx_tabu_col.txt")
+    tabu_bnw_txt = os.path.join(output_dir_use, prefix + "_check_rnx_tabu_bnw.txt")
+    utils.write_in_file(tabu_chk_col, tabu_col_txt)
+    utils.write_in_file(tabu_chk_bnw, tabu_bnw_txt)
