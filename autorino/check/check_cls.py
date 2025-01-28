@@ -122,11 +122,13 @@ class CheckGnss(arohdl.HandleGnss):
                                    desc="Analyzing RINEX files for " + self.site_id):
 
             ds = dict()
+            ds["fpath"] = self.table.loc[irow, "fpath_inp"]
+            ds["site"] = self.table.loc[irow, "site_id"]
+
             if not self.mono_ok_check(int(irow), 'check'):
                 ds["%"] = 0
             else:
                 ### get RINEX as an rinexMod's Object
-                ds["fpath"] = self.table.loc[irow, "fpath_inp"]
                 rnxobj = rinexmod.rinexfile.RinexFile(ds["fpath"])
                 #ds["robj"] = rnxobj
                 ### get RINEX site code
