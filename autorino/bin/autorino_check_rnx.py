@@ -53,6 +53,5 @@ def main():
                                  sites_list=args.sites_list,
                                  output_dir=args.output)
 
-
 if __name__ == "__main__":
     main()

@@ -40,7 +40,6 @@ def check_rnx(inp_dir_parent,
         chk = arochk.CheckGnss(inp_dir=str(inp_dir),
                                 site={'site_id': site},
                                 epoch_range=eporng)
-        chk.site_id = site
         chk.check()
         chk_stk.append(chk)
 
