@@ -26,18 +26,24 @@ from autorino.api.check_rnx import check_rnx
 def main():
     parser = argparse.ArgumentParser(description="Call the check_rnx function.")
     parser.add_argument(
-        "--input_dir_parent", required=True, help="Path to the parent input directory."
+        "-i",
+        "--input_dir_parent",
+        required=True,
+        help="Path to the parent input directory.",
     )
     parser.add_argument(
-        "--input_dir_structure", required=True, help="Input directory structure."
+        "-t",
+        "--input_dir_structure",
+        required=False,
+        help="Input directory structure.",
+        default="",
     )
-    parser.add_argument("--epoch_start", required=True, help="Start epoch.")
-    parser.add_argument("--epoch_end", required=True, help="End epoch.")
-    parser.add_argument("--output", help="Path to the output files. (csv, plot, etc.)")
+    parser.add_argument("-s", "--epoch_start", required=True, help="Start epoch.")
+    parser.add_argument("-e", "--epoch_end", required=True, help="End epoch.")
     parser.add_argument(
-        "--print_check_tabulate", action="store_true", help="Print the check tabulate."
+        "-o", "--output", help="Path to the output files. (csv, plot, etc.)"
     )
-    parser.add_argument("--sites_list", help="Comma-separated list of sites.")
+    parser.add_argument("-l", "--sites_list", help="Comma-separated list of sites.")
 
     args = parser.parse_args()
 
