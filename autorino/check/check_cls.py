@@ -118,7 +118,7 @@ class CheckGnss(arohdl.HandleGnss):
 
         ds_stk = []
 
-        for irow, row in tqdm.tqdm(self.table.iterrows(), total=dfts.shape[0],
+        for irow, row in tqdm.tqdm(self.table.iterrows(), total=len(self.table),
                                    desc="Analyzing RINEX files for " + self.site_id):
 
             ds = dict()
