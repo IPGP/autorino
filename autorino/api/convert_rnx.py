@@ -97,7 +97,7 @@ def convert_rnx(
 
         cpy_raw = arocmn.StepGnss(store_raw_stru_use, tmp_dir, log_dir, metadata=metadata)
         cpy_raw.load_tab_filelist(raws_use)
-        cpy_raw.copy()
+        cpy_raw.copy_files()
 
 
 
