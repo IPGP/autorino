@@ -40,7 +40,8 @@ def get_tabult_raw(chk_tab, short_label=False):
     chk_tab = chk_tab.sort_values(["epoch_srt", "site"])
     sites = list(chk_tab["site"].unique())
 
-    if short_label:
+    if short_label
+        print(sites)
         sites = [s[:4] for s in sites]
         fmt_time = "%Y-%j"
     else:
