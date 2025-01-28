@@ -121,9 +121,11 @@ def import_files(inp_fil, inp_regex=".*"):
     elif isinstance(inp_fil, list):
         flist = inp_fil
     elif os.path.isfile(inp_fil):
+        logger.critical("IS FILE")
         flist = open(inp_fil, "r+").readlines()
         flist = [f.strip() for f in flist]
     elif os.path.isdir(inp_fil):
+        logger.critical("IS DIR")
         flist = utils.find_recursive(inp_fil, ".*", regex=True)
         # Here we find everything ".*", the regex will be filtered bellow
     else:
