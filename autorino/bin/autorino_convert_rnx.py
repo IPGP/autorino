@@ -34,7 +34,7 @@ def main():
         default=False,
     )
     parser.add_argument(
-        "-s",
+        "-t",
         "--out_structure",
         help="The structure of the output directory. "
              "If provided, the converted files will be "
