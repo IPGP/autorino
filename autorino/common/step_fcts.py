@@ -295,6 +295,6 @@ def guess_sites_list(inp_fil):
             site = os.path.basename(f)[:9]
             sites_list.append(site)
 
-    sites_list = list(set(sites_list))
+    sites_list = list(sorted(list(set(sites_list))))
 
     return sites_list

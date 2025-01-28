@@ -155,6 +155,8 @@ class CheckGnss(arohdl.HandleGnss):
                 ds["%"] = (ds["itrvl"] * ds["nepochs"] / ds["td_int"]) * 100
                 ds["%"] = np.round(ds["%"], 0)
 
+                del rnxobj
+
             ds_stk.append(ds)
 
         dfts = pd.concat(ds_stk)
