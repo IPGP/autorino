@@ -1654,11 +1654,11 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
-    def copy(self):
+    def copy_files(self):
         for irow, row in self.table.iterrows():
             self.mono_mv_final(irow, copy_only=True)
 
-    def move(self):
+    def move_files(self):
         for irow, row in self.table.iterrows():
             self.mono_mv_final(irow)
 
