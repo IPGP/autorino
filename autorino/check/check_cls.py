@@ -132,12 +132,13 @@ class CheckGnss(arohdl.HandleGnss):
                 ### get RINEX site code
                 ds["site"] = rnxobj.get_site(False, True)
 
-                ### get RINEX start/end in the data
-                ds["start"] = rnxobj.start_date
-                ds["start"] = pd.to_datetime(ds["start"], format='%H:%M:%S')
+                ### theoretical epochs
+                ds["epoch_srt"] = self.table.loc[irow, "epoch_srt"]
+                ds["epoch_end"] = self.table.loc[irow, "epoch_end"]
 
-                ds["end"] = rnxobj.end_date
-                ds["end"] = pd.to_datetime(ds["end"], format='%H:%M:%S')
+                ### get RINEX start/end in the data
+                ds["epoch_srt_data"] = pd.to_datetime(rnxobj.start_date, format='%H:%M:%S')
+                ds["epoch_end_data"] = pd.to_datetime(rnxobj.end_date, format='%H:%M:%S')
                 ### get RINEX nominal interval
                 ds["itrvl"] = rnxobj.sample_rate_numeric
                 ### get RINEX number of epochs
@@ -145,6 +146,7 @@ class CheckGnss(arohdl.HandleGnss):
                 ### get completness
                 ds["td_str"] = rnxobj.get_file_period_from_filename()[0]
 
+                # improve with right fct !!!!
                 if ds["td_str"] == "01H":
                     ds["td_int"] = 3600
                 elif ds["td_str"] == "01D":

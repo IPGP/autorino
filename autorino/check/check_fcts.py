@@ -8,6 +8,7 @@ Created on 27/01/2025 18:53:22
 
 import termcolor
 import pandas as pd
+import tabulate
 
 
 def color(val):
@@ -32,55 +33,41 @@ def color(val):
 
 
 def colorize_list(list_inp):
-    """
-    This function colors the elements of a list according to the value of the element.
-
-    Parameters
-    ----------
-    list_inp
-
-    Returns
-    -------
-    list
-    """
     return [termcolor.colored(str(e), color(e)) for e in list_inp]
 
 
-def get_tabult_raw(chk_tab):
-    """
-    This function returns a check table in tabulate format and a pandas DataFrame
-    from the CheckGnss table.
-
-    Parameters
-    ----------
-    chk_tab : pd.DataFrame
-        The table of CheckGnss.
-
-    Returns
-    -------
-    t_l_str_col_stk : list
-        The table in tabulate-ready list of string.
-    t_l_str_bnw_stk : list
-        The table in tabulate-ready list of string without colors.
-    df_chk : pd.DataFrame
-        The table in DataFrame format.
-    """
+def get_tabult_raw(chk_tab, short_label=False):
     chk_tab = chk_tab.sort_values(["epoch_srt", "site"])
-    sites = chk_tab["site"].unique()
-    t_l_str_col_stk = [["epoch_srt"] + list(sites)]
-    t_l_str_bnw_stk = [["epoch_srt"] + list(sites)]
-    t_l_flt_stk = []
+    sites = list(chk_tab["site"].unique())
+
+    if short_label:
+        sites = [s[:4] for s in sites]
+        fmt_time = "%Y-%j"
+    else:
+        fmt_time = "%Y-%j %H:%M"
+
+    tab_chk_raw_col = [["epoch_srt"] + sites]
+    tab_chk_raw_bnw = [["epoch_srt"] + sites]
+    flt_data_stk = []
 
     for epo, chk_epo in reversed(list(chk_tab.groupby("epoch_srt"))):
         epo = pd.Timestamp(epo)
         l_flt = [epo] + list(chk_epo["%"].tolist())
-        l_str_col = [epo.strftime("%Y-%j %H:%M")] + colorize_list(chk_epo["%"].tolist())
-        l_str_bnw = [epo.strftime("%Y-%j %H:%M")] + chk_epo["%"].tolist()
-        t_l_str_col_stk.append(l_str_col)
-        t_l_str_bnw_stk.append(l_str_bnw)
-        t_l_flt_stk.append(l_flt)
+        l_str_col = [epo.strftime(fmt_time)] + list(colorize_list(chk_epo["%"].tolist()))
+        l_str_bnw = [epo.strftime(fmt_time)] + chk_epo["%"].tolist()
+        flt_data_stk.append(l_flt)
+        tab_chk_raw_col.append(l_str_col)
+        tab_chk_raw_bnw.append(l_str_bnw)
 
-    df_chk = pd.DataFrame(t_l_flt_stk, columns=t_l_str_col_stk[0])
-    df_chk.set_index("epoch_srt", inplace=True)
 
-    return t_l_str_col_stk, t_l_str_bnw_stk, df_chk
+    tabu_chk_col = tabulate.tabulate(tab_chk_raw_col,
+                                     headers="firstrow",
+                                     tablefmt="grid")
+    tabu_chk_bnw = tabulate.tabulate(tab_chk_raw_bnw,
+                                    headers="firstrow",
+                                    tablefmt="grid")
+
+    df_chk_sum = pd.DataFrame(flt_data_stk, columns=tab_chk_raw_col[0])
+    df_chk_sum.set_index("epoch_srt", inplace=True)
+
+    return tabu_chk_col, tabu_chk_bnw, df_chk_sum
