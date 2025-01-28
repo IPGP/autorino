@@ -87,14 +87,7 @@ def main():
 
     args = parser.parse_args()
 
-    if args.list_file_input:
-        with open(args.raws_inp[0], "r") as f:
-            raws_inp = f.read().splitlines()
-    else:
-        if len(args.raws_inp) == 1:
-            raws_inp = args.raws_inp[0]
-        else:
-            raws_inp = args.raws_inp
+    raws_inp = _prep_raws_inp(args)
 
     aroapi.convert_rnx(
         raws_inp=raws_inp,
@@ -106,6 +99,19 @@ def main():
         metadata=args.metadata,
         force=args.force,
     )
+
+
+def _prep_raws_inp(args):
+    if args.list_file_input:
+        with open(args.raws_inp[0], "r") as f:
+            raws_inp = f.read().splitlines()
+    else:
+        if len(args.raws_inp) == 1:
+            raws_inp = args.raws_inp[0]
+        else:
+            raws_inp = args.raws_inp
+    return raws_inp
+
 
 if __name__ == "__main__":
     main()

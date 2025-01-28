@@ -41,6 +41,7 @@ def check_rnx(
     chk_tab_stk = []
     chk_tab_stats_stk = []
     for site in sites_use:
+        logger.critical(site)
         chk = arochk.CheckGnss(
             inp_dir=str(inp_dir), site={"site_id": site}, epoch_range=eporng
         )
