@@ -130,9 +130,8 @@ class CheckGnss(arohdl.HandleGnss):
             else:
                 ### get RINEX as an rinexMod's Object
                 rnxobj = rinexmod.rinexfile.RinexFile(ds["fpath"])
-                #ds["robj"] = rnxobj
                 ### get RINEX site code
-                ds["site"] = rnxobj.get_site(False, True)
+                ds["site"] = rnxobj.get_site(lower_case=False, only_4char=False)
 
                 ### theoretical epochs
                 ds["epoch_srt"] = self.table.loc[irow, "epoch_srt"]
