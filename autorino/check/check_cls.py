@@ -123,7 +123,7 @@ class CheckGnss(arohdl.HandleGnss):
 
             ds = dict()
             ds["fpath"] = self.table.loc[irow, "fpath_inp"]
-            ds["site"] = self.table.loc[irow, "site_id"]
+            ds["site"] = self.table.loc[irow, "site"]
 
             if not self.mono_ok_check(int(irow), 'check'):
                 ds["%"] = 0
