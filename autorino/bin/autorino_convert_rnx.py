@@ -91,7 +91,10 @@ def main():
         with open(args.raws_inp[0], "r") as f:
             raws_inp = f.read().splitlines()
     else:
-        raws_inp = args.raws_inp
+        if len(args.raws_inp) == 1:
+            raws_inp = args.raws_inp[0]
+        else:
+            raws_inp = args.raws_inp
 
     aroapi.convert_rnx(
         raws_inp=raws_inp,
