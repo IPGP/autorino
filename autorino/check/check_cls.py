@@ -128,7 +128,7 @@ class CheckGnss(arohdl.HandleGnss):
                 ### get RINEX as an rinexMod's Object
                 ds["fpath"] = self.table.loc[irow, "fpath_inp"]
                 rnxobj = rinexmod.rinexfile.RinexFile(ds["fpath"])
-                ds["robj"] = rnxobj
+                #ds["robj"] = rnxobj
                 ### get RINEX site code
                 ds["site"] = rnxobj.get_site(False, True)
 
@@ -154,8 +154,6 @@ class CheckGnss(arohdl.HandleGnss):
 
                 ds["%"] = (ds["itrvl"] * ds["nepochs"] / ds["td_int"]) * 100
                 ds["%"] = np.round(ds["%"], 0)
-
-                del rnxobj
 
             ds_stk.append(ds)
 
