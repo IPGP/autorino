@@ -76,11 +76,11 @@ def dummy_sess_dic():
 
     d["name"] = "NA"
     d["data_frequency"] = "30S"
-    d["tmp_dir_parent"] = "<$HOME>/autorino_workflow_tests/tmp"
+    d["tmp_dir_parent"] = "/tmp/"
     d["tmp_dir_structure"] = "<site_id9>/%Y/%j"
-    d["log_parent_dir"] = "<$HOME>/autorino_workflow_tests/log"
+    d["log_parent_dir"] = "/tmp/"
     d["log_dir_structure"] = "<site_id9>/%Y/%j"
-    d["out_dir_parent"] = "<$HOME>/autorino_workflow_tests/out"
+    d["out_dir_parent"] = "/tmp/"
     d["out_structure"] = "<site_id9>/%Y/%j"
 
     return d

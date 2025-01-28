@@ -318,7 +318,7 @@ class StepGnss:
         None
         """
         if not site:
-            logger.warning("no site dict given, a dummy one will be created")
+            #logger.warning("no site dict given, a dummy one will be created")
             self.site = arocmn.dummy_site_dic()
         else:
             self.site = site
@@ -343,7 +343,7 @@ class StepGnss:
         None
         """
         if not session:
-            logger.warning("no session dict given, a dummy one will be created")
+            #logger.warning("no session dict given, a dummy one will be created")
             self.session = arocmn.dummy_sess_dic()
         else:
             self.session = session
