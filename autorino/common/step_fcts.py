@@ -116,9 +116,11 @@ def import_files(inp_fil, inp_regex=".*"):
     if not inp_fil:
         flist = []
     elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
+        logger.critical("IS TUPLE")
         flist = list(np.hstack([open(f, "r+").readlines() for f in inp_fil]))
         flist = [f.strip() for f in flist]
     elif isinstance(inp_fil, list):
+        logger.critical("IS LIST")
         flist = inp_fil
     elif os.path.isfile(inp_fil):
         logger.critical("IS FILE")
