@@ -997,7 +997,8 @@ class StepGnss:
 
         return logfile_handler
 
-    def close_logfile(self):
+    @staticmethod
+    def close_logfile():
         """
         close the file handler of the logger
         """

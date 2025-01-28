@@ -7,27 +7,75 @@ Created on 27/01/2025 18:53:22
 """
 
 import termcolor
+import pandas as pd
+
 
 def color(val):
-    if val >= 99.:
+    """
+    This function returns a color according to the value of the input.
+
+    Parameters
+    ----------
+    val: float
+        The value to be colored.
+
+    Returns
+    -------
+    str: color
+    """
+    if val >= 99.0:
         return "cyan"
-    elif val <= 1.:
+    elif val <= 1.0:
         return "red"
     else:
         return "yellow"
 
+
 def colorize_list(list_inp):
+    """
+    This function colors the elements of a list according to the value of the element.
+
+    Parameters
+    ----------
+    list_inp
+
+    Returns
+    -------
+    list
+    """
     return [termcolor.colored(str(e), color(e)) for e in list_inp]
 
 
-def tabulate_check(chk_tab):
-    chk_tab = chk_tab.sort_values(["epoch_srt","site_id"])
-    sites = chk_tab["site_id"].unique()
-    tab_lines_stk = [['dates'] + list(sites)]
-    for epo, chk_epo in chk_tab.groupby("epoch_srt"):
+def get_tabult_raw(chk_tab):
+    """
+    This function returns a check table in tabulate format and a pandas DataFrame
+    from the CheckGnss table.
+
+    Parameters
+    ----------
+    chk_tab : pd.DataFrame
+        The table of CheckGnss.
+
+    Returns
+    -------
+    t_l_str_stk : list
+        The table in tabulate-ready list of string.
+    df_chk : pd.DataFrame
+        The table in DataFrame format.
+    """
+    chk_tab = chk_tab.sort_values(["epoch_srt", "site"])
+    sites = chk_tab["site"].unique()
+    t_l_str_stk = [["epoch_srt"] + list(sites)]
+    t_l_flt_stk = []
+
+    for epo, chk_epo in reversed(list(chk_tab.groupby("epoch_srt"))):
         epo = pd.Timestamp(epo)
-        l = [ epo.strftime("%Y-%j %H:%M") ] + arochk.colorize_list(chk_epo["%"].tolist())
-        tab_lines_stk.append(l)
-    return tab_lines_stk
+        l_flt = [epo] + list(chk_epo["%"].tolist())
+        l_str = [epo.strftime("%Y-%j %H:%M")] + colorize_list(chk_epo["%"].tolist())
+        t_l_str_stk.append(l_str)
+        t_l_flt_stk.append(l_flt)
 
+    df_chk = pd.DataFrame(t_l_flt_stk, columns=t_l_str_stk[0])
+    df_chk.set_index("epoch_srt", inplace=True)
 
+    return t_l_str_stk, df_chk
