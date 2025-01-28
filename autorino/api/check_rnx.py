@@ -54,7 +54,7 @@ def check_rnx(
     chk_table_stats = pd.concat(chk_tab_stats_stk)
 
     tabu_chk_col, tabu_chk_bnw, df_chk = arochk.get_tabult_raw(
-        chk_table_stats, short_label=True
+        chk_table_cat, short_label=True
     )
 
     logger.info("Check: \n" + tabu_chk_col)
