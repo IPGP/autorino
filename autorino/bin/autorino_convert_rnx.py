@@ -86,7 +86,7 @@ def main():
     )
 
     parser.add_argument(
-        "-srs"
+        "-tr",
         "--store_raw_structure",
         help="WRITE ME",
         default=None,
