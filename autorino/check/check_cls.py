@@ -165,7 +165,7 @@ class CheckGnss(arohdl.HandleGnss):
     def check(self):
         self.guess_local_rnx(io="inp")
         self.check_local_files(io="inp")
-        self.analyze_rnxs2()
+        self.analyze_rnxs()
         self.table["%"] = self.table_stats["%"]
 
 
