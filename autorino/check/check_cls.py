@@ -116,42 +116,48 @@ class CheckGnss(arohdl.HandleGnss):
 
         self.table_stats = pd.DataFrame()
 
-        dfts = self.table_stats
-        dfts["fpath"] = self.table["fpath_inp"]
+        ds_stk = []
 
-        for irow, row in tqdm.tqdm(dfts.iterrows(), total=dfts.shape[0],
+        for irow, row in tqdm.tqdm(self.table["fpath_inp"].iterrows(), total=dfts.shape[0],
                                    desc="Analyzing RINEX files for " + self.site_id):
 
+            ds = dict()
             if not self.mono_ok_check(int(irow), 'check'):
-                dfts.loc[irow, "%"] = 0
+                ds["%"] = 0
             else:
                 ### get RINEX as an rinexMod's Object
                 rnxobj = rinexmod.rinexfile.RinexFile(dfts.loc[irow, "fpath"])
-                dfts.loc["robj", irow] = rnxobj
+                ds["robj"] = rnxobj
                 ### get RINEX site code
-                dfts.loc[irow, "site"] = rnxobj.get_site(False, True)
+                ds["site"] = rnxobj.get_site(False, True)
 
                 ### get RINEX start/end in the data
-                dfts.loc[irow, "start"] = rnxobj.start_date
-                dfts.loc[irow, "start"] = pd.to_datetime(dfts.loc[irow, "start"], format='%H:%M:%S')
+                ds["start"] = rnxobj.start_date
+                ds["start"] = pd.to_datetime(dfts.loc[irow, "start"], format='%H:%M:%S')
 
-                dfts.loc[irow, "end"] = rnxobj.end_date
-                dfts.loc[irow, "end"] = pd.to_datetime(dfts.loc[irow, "end"], format='%H:%M:%S')
+                ds["end"] = rnxobj.end_date
+                ds["end"] = pd.to_datetime(dfts.loc[irow, "end"], format='%H:%M:%S')
                 ### get RINEX nominal interval
-                dfts.loc[irow, "itrvl"] = rnxobj.sample_rate_numeric
+                ds["itrvl"] = rnxobj.sample_rate_numeric
                 ### get RINEX number of epochs
-                dfts.loc[irow, "nepochs"] = len(rnxobj.get_dates_all())
+                ds["nepochs"] = len(rnxobj.get_dates_all())
                 ### get completness
-                dfts.loc[irow, "td_str"] = rnxobj.get_file_period_from_filename()[0]
+                ds["td_str"] = rnxobj.get_file_period_from_filename()[0]
 
-                dfts["td_int"] = np.nan
-                mask_hour = dfts["td_str"] == "01H"
-                dfts.loc[mask_hour, "td_int"] = 3600
-                mask_day = dfts["td_str"] == "01D"
-                dfts.loc[mask_day, "td_int"] = 86400
+                if ds["td_str"] == "01H":
+                    ds["td_int"] = 3600
+                elif ds["td_str"] == "01D":
+                    ds["td_int"] = 86400
+                else:
+                    ds["td_int"] = np.nan
 
-                dfts["%"] = (dfts["itrvl"] * dfts["nepochs"] / dfts["td_int"]) * 100
-                dfts["%"] = np.round(dfts["%"], 0)
+                ds["%"] = (ds["itrvl"] * ds["nepochs"] / ds["td_int"]) * 100
+                ds["%"] = np.round(ds["%"], 0)
+
+                ds_stk.append(ds)
+
+            dfts = pd.concat(ds_stk)
+            self.table_stats = dfts
 
         return dfts
 
