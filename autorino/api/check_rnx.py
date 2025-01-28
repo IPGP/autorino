@@ -5,6 +5,7 @@ Created on 27/01/2025 09:50:23
 
 @author: psakic
 """
+import matplotlib.pyplot as plt
 
 import autorino.cfgenv as aroenv
 import autorino.check as arochk
@@ -54,7 +55,9 @@ def check_rnx(inp_dir_parent,
 
     if output_dir:
         df_chk.to_csv(os.path.join(output_dir, "check_rnx_df.csv"))
-        utils.figure_saver(df_chk.plot(),
+        df_chk.plot()
+        fig = plt.gcf()
+        utils.figure_saver(fig,
                            output_dir,
                            "check_rnx_plot.png",
                            outtype=(".png", ".pdf"))
