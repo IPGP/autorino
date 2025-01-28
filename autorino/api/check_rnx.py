@@ -47,10 +47,14 @@ def check_rnx(inp_dir_parent,
     #chk_table_cat = pd.concat([c.table for c in chk_stk])
     chk_table_cat = pd.concat(chk_stk)
 
-    t_l_str_stk, df_chk = arochk.get_tabult_raw(chk_table_cat)
-    tabu_chk = tabulate.tabulate(t_l_str_stk,
-                                 headers="firstrow",
-                                 tablefmt="grid")
+    t_l_str_col_stk, t_l_str_bnw_stk, df_chk = arochk.get_tabult_raw(chk_table_cat)
+    tabu_chk_col = tabulate.tabulate(t_l_str_col_stk,
+                                     headers="firstrow",
+                                     tablefmt="grid")
+    tabu_chk_bnw = tabulate.tabulate(t_l_str_bnw_stk,
+                                    headers="firstrow",
+                                    tablefmt="grid")
+
     logger.info("Check: \n" + tabu_chk)
 
     if output_dir:
@@ -61,10 +65,12 @@ def check_rnx(inp_dir_parent,
                            output_dir,
                            "check_rnx_plot",
                            outtype=(".png", ".pdf"))
-        with open(os.path.join(output_dir, "check_rnx_tabu.txt"), "w") as f:
-            f.write(tabu_chk)
+        with open(os.path.join(output_dir, "check_rnx_tabu_col.txt"), "w") as f:
+            f.write(tabu_chk_col)
+        with open(os.path.join(output_dir, "check_rnx_tabu_bnw.txt"), "w") as f:
+            f.write(tabu_chk_bnw)
 
-    return tabu_chk, df_chk
+    return tabu_chk_col, tabu_chk_bnw , df_chk
 
 
 # dir_parent = "/home/psakicki/aaa_FOURBI/OVSM/"

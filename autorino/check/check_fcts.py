@@ -58,24 +58,29 @@ def get_tabult_raw(chk_tab):
 
     Returns
     -------
-    t_l_str_stk : list
+    t_l_str_col_stk : list
         The table in tabulate-ready list of string.
+    t_l_str_bnw_stk : list
+        The table in tabulate-ready list of string without colors.
     df_chk : pd.DataFrame
         The table in DataFrame format.
     """
     chk_tab = chk_tab.sort_values(["epoch_srt", "site"])
     sites = chk_tab["site"].unique()
-    t_l_str_stk = [["epoch_srt"] + list(sites)]
+    t_l_str_col_stk = [["epoch_srt"] + list(sites)]
+    t_l_str_bnw_stk = [["epoch_srt"] + list(sites)]
     t_l_flt_stk = []
 
     for epo, chk_epo in reversed(list(chk_tab.groupby("epoch_srt"))):
         epo = pd.Timestamp(epo)
         l_flt = [epo] + list(chk_epo["%"].tolist())
-        l_str = [epo.strftime("%Y-%j %H:%M")] + colorize_list(chk_epo["%"].tolist())
-        t_l_str_stk.append(l_str)
+        l_str_col = [epo.strftime("%Y-%j %H:%M")] + colorize_list(chk_epo["%"].tolist())
+        l_str_bnw = [epo.strftime("%Y-%j %H:%M")] + chk_epo["%"].tolist()
+        t_l_str_col_stk.append(l_str_col)
+        t_l_str_bnw_stk.append(l_str_bnw)
         t_l_flt_stk.append(l_flt)
 
-    df_chk = pd.DataFrame(t_l_flt_stk, columns=t_l_str_stk[0])
+    df_chk = pd.DataFrame(t_l_flt_stk, columns=t_l_str_col_stk[0])
     df_chk.set_index("epoch_srt", inplace=True)
 
-    return t_l_str_stk, df_chk
+    return t_l_str_col_stk, t_l_str_bnw_stk, df_chk
