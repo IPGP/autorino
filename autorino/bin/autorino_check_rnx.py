@@ -55,7 +55,7 @@ def main():
         inp_dir_structure=args.input_dir_structure,
         epoch_start=args.epoch_start,
         epoch_end=args.epoch_end,
-        sites_list=args.sites_list,
+        sites_list=sites_list,
         output_dir=args.output,
     )
 
