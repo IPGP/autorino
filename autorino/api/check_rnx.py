@@ -50,7 +50,7 @@ def check_rnx(inp_dir_parent,
     t_l_str_stk, df_chk = arochk.get_tabult_raw(chk_table_cat)
     tabu_chk = tabulate.tabulate(t_l_str_stk,
                                  headers="firstrow",
-                                 tablefmt="fancy_grid")
+                                 tablefmt="grid")
     logger.info("Check: \n" + tabu_chk)
 
     if output_dir:
