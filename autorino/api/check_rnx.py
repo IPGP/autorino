@@ -59,7 +59,7 @@ def check_rnx(inp_dir_parent,
         fig = plt.gcf()
         utils.figure_saver(fig,
                            output_dir,
-                           "check_rnx_plot.png",
+                           "check_rnx_plot",
                            outtype=(".png", ".pdf"))
         with open(os.path.join(output_dir, "check_rnx_tabu.txt"), "w") as f:
             f.write(tabu_chk)
