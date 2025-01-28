@@ -2214,7 +2214,7 @@ class StepGnss:
         # This approach is risky =>
         # ok_inp should be set to False before using self.filter_ok_out(),
         # rather than this check focusing solely on ok_out.
-        elif not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
+        elif (not self.table.loc[irow, "ok_inp"]) and self.table.loc[irow, "ok_out"]:
             logger.info("%s skipped (output already exists): %s", step_name, fout_use)
             bool_ok = False
         elif not self.table.loc[irow, "ok_inp"]:
