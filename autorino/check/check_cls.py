@@ -118,7 +118,7 @@ class CheckGnss(arohdl.HandleGnss):
 
         ds_stk = []
 
-        for irow, row in tqdm.tqdm(self.table["fpath_inp"].iterrows(), total=dfts.shape[0],
+        for irow, row in tqdm.tqdm(self.table.iterrows(), total=dfts.shape[0],
                                    desc="Analyzing RINEX files for " + self.site_id):
 
             ds = dict()
@@ -126,17 +126,17 @@ class CheckGnss(arohdl.HandleGnss):
                 ds["%"] = 0
             else:
                 ### get RINEX as an rinexMod's Object
-                rnxobj = rinexmod.rinexfile.RinexFile(dfts.loc[irow, "fpath"])
+                rnxobj = rinexmod.rinexfile.RinexFile(self.table.loc[irow, "fpath"])
                 ds["robj"] = rnxobj
                 ### get RINEX site code
                 ds["site"] = rnxobj.get_site(False, True)
 
                 ### get RINEX start/end in the data
                 ds["start"] = rnxobj.start_date
-                ds["start"] = pd.to_datetime(dfts.loc[irow, "start"], format='%H:%M:%S')
+                ds["start"] = pd.to_datetime(ds["start"], format='%H:%M:%S')
 
                 ds["end"] = rnxobj.end_date
-                ds["end"] = pd.to_datetime(dfts.loc[irow, "end"], format='%H:%M:%S')
+                ds["end"] = pd.to_datetime(ds["end"], format='%H:%M:%S')
                 ### get RINEX nominal interval
                 ds["itrvl"] = rnxobj.sample_rate_numeric
                 ### get RINEX number of epochs
