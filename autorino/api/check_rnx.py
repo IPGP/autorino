@@ -41,9 +41,10 @@ def check_rnx(inp_dir_parent,
                                 site={'site_id': site},
                                 epoch_range=eporng)
         chk.check()
-        chk_stk.append(chk)
+        chk_stk.append(chk.table)
 
-    chk_table_cat = pd.concat([c.table for c in chk_stk])
+    #chk_table_cat = pd.concat([c.table for c in chk_stk])
+    chk_table_cat = pd.concat(chk_stk)
 
     t_l_str_stk, df_chk = arochk.get_tabult_raw(chk_table_cat)
     tabu_chk = tabulate.tabulate(t_l_str_stk,
