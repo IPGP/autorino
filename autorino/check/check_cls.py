@@ -44,62 +44,6 @@ class CheckGnss(arohdl.HandleGnss):
 
         self.table_stats = pd.DataFrame()
 
-    def analyze_rnxs2(self):
-        """
-        this function do the basic analysis of the table of RINEXs
-
-        Note
-        ----
-        Flags meaning
-
-        * 0 = OK
-        * 1 = missing RINEX or critical content
-        * 2 = incomplete RINEX
-        """
-
-
-        self.table_stats = pd.DataFrame()
-
-        dfts = self.table_stats
-        dfts["fpath"] = self.table["fpath_inp"]
-
-        ### get RINEX as an rinexMod's Object
-        dfts["robj"] = dfts["fpath"].apply(rinexmod.rinexfile.RinexFile)
-        ### get RINEX site code
-        dfts["site"] = dfts["robj"].apply(lambda r: r.get_site(False, True))
-        # sites_all = dfts["site"].unique
-        ### get RINEX start/end in the data
-        dfts["start"] = dfts["robj"].apply(lambda r: r.start_date)
-        dfts["start"] = pd.to_datetime(dfts["start"], format='%H:%M:%S')
-        dfts["end"] = dfts["robj"].apply(lambda r: r.end_date)
-        dfts["end"] = pd.to_datetime(dfts["end"], format='%H:%M:%S')
-        ### get RINEX nominal interval
-        dfts["itrvl"] = dfts["robj"].apply(lambda r: r.sample_rate_numeric)
-        ### get RINEX number of epochs
-        dfts["nepochs"] = dfts["robj"].apply(lambda r: len(r.get_dates_all()))
-        ### get completness
-        dfts["td_str"] = dfts["robj"].apply(lambda r: r.get_file_period_from_filename()[0])
-
-
-        dfts["td_int"] = np.nan
-        mask_hour = dfts["td_str"] == "01H"
-        dfts.loc[mask_hour, "td_int"] = 3600
-        mask_day = dfts["td_str"] == "01D"
-        dfts.loc[mask_day, "td_int"] = 86400
-
-        dfts["%"] = (dfts["itrvl"] * dfts["nepochs"] / dfts["td_int"]) * 100
-        dfts["%"] = np.round(dfts["%"], 0)
-
-        ### set flag
-        # 0 = OK
-        # 1 = missing or critical
-        # 2 = incomplete
-        dfts["flag"] = np.nan
-        dfts.loc[dfts["%"] >= 99., "flag"] = 0
-        dfts.loc[dfts["%"] <= 1., "flag"] = 1
-        dfts.loc[(dfts["%"] > 1.) & (dfts["%"] < 99.), "flag"] = 2
-
-        return dfts
 
     def analyze_rnxs(self):
         """
