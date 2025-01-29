@@ -15,7 +15,7 @@ import autorino.common as arocmn
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -28,7 +28,7 @@ def convert_rnx(
     rinexmod_options=None,
     metadata=None,
     force=False,
-    store_raw_structure=None
+    store_raw_structure=None,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -95,11 +95,11 @@ def convert_rnx(
     if store_raw_structure:
         store_raw_stru_use = os.path.join(out_dir, store_raw_structure)
 
-        cpy_raw = arocmn.StepGnss(store_raw_stru_use, tmp_dir, log_dir, metadata=metadata)
+        cpy_raw = arocmn.StepGnss(store_raw_stru_use,
+                                  tmp_dir, log_dir,
+                                  metadata=metadata)
+
         cpy_raw.load_tab_filelist(raws_use)
         cpy_raw.copy_files()
-
-
-
 
     return cnv

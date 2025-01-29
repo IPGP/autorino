@@ -12,8 +12,9 @@ import autorino.api as aroapi
 
 def main():
     parser = argparse.ArgumentParser(description="Convert RAW files to RINEX.")
-    parser.add_argument(
+    parser.add_argument("-i",
         "raws_inp",
+        required=True,
         nargs="+",
         help="The input RAW files to be converted "
         "Possible inputs are: \n"
@@ -23,8 +24,10 @@ def main():
         "(then --list_file_input must be activated) \n"
         "* a directory containing RAW files \n",
     )
-    parser.add_argument(
-        "out_dir", help="The output directory where the converted files will be stored"
+    parser.add_argument("-o",
+        "out_dir",
+        help="The output directory where the converted files will be stored",
+        required=True
     )
     parser.add_argument(
         "-l",
@@ -47,8 +50,8 @@ def main():
         "-tmp",
         "--tmp_dir",
         help="The temporary directory used during the conversion process. "
-             "If not provided, it defaults to <out_dir>/tmp_convert_rnx. ",
-        default=None,
+             "If not provided, it defaults to <$HOME>/tmp_convert_rnx. ",
+        default='<$HOME>/tmp_convert_rnx',
     )
     parser.add_argument(
         "-log",
