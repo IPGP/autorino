@@ -97,10 +97,8 @@ def main():
 
     args = parser.parse_args()
 
-    raws_inp = _prep_raws_inp(args)
-
     aroapi.convert_rnx(
-        raws_inp=raws_inp,
+        raws_inp=_prep_raws_inp(args),
         out_dir=args.out_dir,
         out_structure=args.out_structure,
         tmp_dir=args.tmp_dir,

@@ -24,7 +24,7 @@ def color(val):
     -------
     str: color
     """
-    if val >= 99.0:
+    if val > 96.0:
         return "cyan"
     elif val <= 1.0:
         return "red"
