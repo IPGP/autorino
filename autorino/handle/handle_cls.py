@@ -645,7 +645,8 @@ class SpliceGnss(HandleGnss):
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
 
-            if rm_inp_files:
+            #if rm_inp_files:
+            #IMPLEMENT ME !!!!!!
 
 
             if self.tmp_dir_rinexmoded != self.out_dir:
