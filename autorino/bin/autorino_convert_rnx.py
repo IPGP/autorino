@@ -29,13 +29,7 @@ def main():
         help="The output directory where the converted files will be stored",
         required=True
     )
-    parser.add_argument(
-        "-l",
-        "--list_file_input",
-        action="store_true",
-        help="If set to True, the input RAW files are provided as a list in a text file",
-        default=False,
-    )
+
     parser.add_argument(
         "-t",
         "--out_structure",
@@ -46,6 +40,35 @@ def main():
              "Typical values are '<SITE_ID4>/%%Y/' or '%%Y/%%j/.",
         default="<SITE_ID4>/%Y/",
     )
+
+    parser.add_argument(
+        "-m",
+        "--metadata",
+        help="""
+        The metadata to be included in the converted RINEX files. \n 
+        Possible inputs are: \n 
+        * list of string (sitelog file paths)  
+        * single string (single sitelog file path) 
+        * single string (directory containing the sitelogs)
+        """,
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Force the conversion even if the output files already exist",
+        default=False,
+    )
+
+
+    parser.add_argument(
+        "-l",
+        "--list_file_input",
+        action="store_true",
+        help="If set to True, the input RAW files are provided as a list in a text file",
+        default=False,
+    )
+
     parser.add_argument(
         "-tmp",
         "--tmp_dir",
@@ -69,29 +92,11 @@ def main():
              "e.g. '{longname: False, filename_style: basic}' "
              "Defaults to None",
     )
-    parser.add_argument(
-        "-m",
-        "--metadata",
-        help="""
-        The metadata to be included in the converted RINEX files. \n 
-        Possible inputs are: \n 
-        * list of string (sitelog file paths)  
-        * single string (single sitelog file path) 
-        * single string (directory containing the sitelogs)
-        """,
-    )
-    parser.add_argument(
-        "-f",
-        "--force",
-        action="store_true",
-        help="Force the conversion even if the output files already exist",
-        default=False,
-    )
 
     parser.add_argument(
         "-tr",
         "--store_raw_structure",
-        help="WRITE ME",
+        help="NOT IMPLEMENTED YET",
         default=None,
     )
 
