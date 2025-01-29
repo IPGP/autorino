@@ -1573,87 +1573,6 @@ class StepGnss:
 
         return files_decmp_list
 
-    def mono_decompress(
-        self, irow, out_dir=None, table_col="fpath_inp", table_ok_col="ok_inp"
-    ):
-        """
-        "on row" method
-
-        Decompresses the file specified in the 'table_col' entry of a given row in the table.
-
-        This method checks if the file specified in the 'table_col' entry of the given row is compressed.
-        If it is, the method decompresses the file and updates the 'table_col' entry with the path
-        of the decompressed file.
-        It also updates the 'ok_inp' entry with the existence of the decompressed file and the 'fname'
-        entry with the basename of the decompressed file.
-        If the file is not compressed or the 'ok_inp' entry is False, the method does nothing.
-
-        Parameters
-        ----------
-        irow : int
-            The index of the row in the table.
-        out_dir : str, optional
-            The output directory where the decompressed file will be stored. If not provided, the method
-             uses the 'tmp_dir_unzipped' attribute if it exists, otherwise it uses the 'tmp_dir' attribute.
-        table_col : str, optional
-            The column in the table where the path of the file is stored. Default is 'fpath_inp'.
-        table_ok_col : str, optional
-            The column in the table where the boolean indicating the existence of the file is stored.
-            Default is 'ok_inp'.
-
-        Returns
-        -------
-        str, bool
-            The path of the decompressed file and a boolean indicating whether the file was decompressed.
-        """
-        if not self.table.loc[irow, "ok_inp"]:
-            # logger.warning(
-            #    "action on row skipped (input disabled): %s",
-            #    self.table.loc[irow, "fname"],
-            # )
-            # for decompress the warning message is not necessary and spams the log
-            # (most of the files are not compressed in fact)
-            file_decomp_out = None
-            bool_decomp_out = False
-
-            return file_decomp_out, bool_decomp_out
-
-        # definition of the output directory (after the action)
-        if out_dir:
-            out_dir_use = out_dir
-        elif hasattr(self, "tmp_dir_unzipped"):
-            out_dir_use = self.tmp_dir_unzipped
-        else:
-            out_dir_use = self.tmp_dir
-
-        bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
-        bool_ok = self.table.loc[irow, table_ok_col]
-        bool_wrk = np.logical_and(bool_comp, bool_ok)
-
-        if bool_wrk:
-            if "fpath_ori" not in self.table.columns:
-                # a 'fpath_ori' column must be created first
-                self.table["fpath_ori"] = None
-
-            self.table.loc[irow, "fpath_ori"] = self.table.loc[irow, table_col]
-
-            file_decomp_out, bool_decomp_out = arocmn.decompress_file(
-                self.table.loc[irow, table_col], out_dir_use
-            )
-            self.table.loc[irow, table_col] = file_decomp_out
-            self.table.loc[irow, "ok_inp"] = os.path.isfile(
-                self.table.loc[irow, table_col]
-            )
-            self.table.loc[irow, "fname"] = os.path.basename(
-                self.table.loc[irow, table_col]
-            )
-
-        else:
-            file_decomp_out = None
-            bool_decomp_out = False
-
-        return file_decomp_out, bool_decomp_out
-
     def copy_files(self):
         for irow, row in self.table.iterrows():
             self.mono_mv_final(irow, copy_only=True)
@@ -2405,3 +2324,84 @@ class StepGnss:
             # raise e
 
         return file_moved
+
+    def mono_decompress(
+        self, irow, out_dir=None, table_col="fpath_inp", table_ok_col="ok_inp"
+    ):
+        """
+        "on row" method
+
+        Decompresses the file specified in the 'table_col' entry of a given row in the table.
+
+        This method checks if the file specified in the 'table_col' entry of the given row is compressed.
+        If it is, the method decompresses the file and updates the 'table_col' entry with the path
+        of the decompressed file.
+        It also updates the 'ok_inp' entry with the existence of the decompressed file and the 'fname'
+        entry with the basename of the decompressed file.
+        If the file is not compressed or the 'ok_inp' entry is False, the method does nothing.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table.
+        out_dir : str, optional
+            The output directory where the decompressed file will be stored. If not provided, the method
+             uses the 'tmp_dir_unzipped' attribute if it exists, otherwise it uses the 'tmp_dir' attribute.
+        table_col : str, optional
+            The column in the table where the path of the file is stored. Default is 'fpath_inp'.
+        table_ok_col : str, optional
+            The column in the table where the boolean indicating the existence of the file is stored.
+            Default is 'ok_inp'.
+
+        Returns
+        -------
+        str, bool
+            The path of the decompressed file and a boolean indicating whether the file was decompressed.
+        """
+        if not self.table.loc[irow, "ok_inp"]:
+            # logger.warning(
+            #    "action on row skipped (input disabled): %s",
+            #    self.table.loc[irow, "fname"],
+            # )
+            # for decompress the warning message is not necessary and spams the log
+            # (most of the files are not compressed in fact)
+            file_decomp_out = None
+            bool_decomp_out = False
+
+            return file_decomp_out, bool_decomp_out
+
+        # definition of the output directory (after the action)
+        if out_dir:
+            out_dir_use = out_dir
+        elif hasattr(self, "tmp_dir_unzipped"):
+            out_dir_use = self.tmp_dir_unzipped
+        else:
+            out_dir_use = self.tmp_dir
+
+        bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
+        bool_ok = self.table.loc[irow, table_ok_col]
+        bool_wrk = np.logical_and(bool_comp, bool_ok)
+
+        if bool_wrk:
+            if "fpath_ori" not in self.table.columns:
+                # a 'fpath_ori' column must be created first
+                self.table["fpath_ori"] = None
+
+            self.table.loc[irow, "fpath_ori"] = self.table.loc[irow, table_col]
+
+            file_decomp_out, bool_decomp_out = arocmn.decompress_file(
+                self.table.loc[irow, table_col], out_dir_use
+            )
+            self.table.loc[irow, table_col] = file_decomp_out
+            self.table.loc[irow, "ok_inp"] = os.path.isfile(
+                self.table.loc[irow, table_col]
+            )
+            self.table.loc[irow, "fname"] = os.path.basename(
+                self.table.loc[irow, table_col]
+            )
+
+        else:
+            file_decomp_out = None
+            bool_decomp_out = False
+
+        return file_decomp_out, bool_decomp_out

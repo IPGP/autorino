@@ -20,7 +20,7 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def convert_rnx(
-    raws_inp,
+    inp_raws,
     out_dir,
     out_structure="<SITE_ID4>/%Y/",
     tmp_dir=None,
@@ -35,7 +35,7 @@ def convert_rnx(
 
     Parameters
     ----------
-    raws_inp : list
+    inp_raws : list
         The input RAW files to be converted.
         The input can be:
         * a python list
@@ -86,7 +86,7 @@ def convert_rnx(
     else:
         out_dir_use = out_dir
 
-    raws_use = raws_inp
+    raws_use = inp_raws
 
     cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
     cnv.load_tab_filelist(raws_use)

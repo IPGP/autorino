@@ -595,7 +595,7 @@ class SpliceGnss(HandleGnss):
 
         return None
 
-    def splice_core(self, handle_software="converto", rinexmod_options=None):
+    def splice_core(self, handle_software="converto", rinexmod_options=None, rm_inp_files=False):
         """
         Perform the core splicing operation.
 
@@ -644,6 +644,9 @@ class SpliceGnss(HandleGnss):
             self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
+
+            if rm_inp_files:
+
 
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
