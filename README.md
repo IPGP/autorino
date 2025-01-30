@@ -3,7 +3,7 @@
 # autorino
 autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
-**Version: 1.1.0**
+**Version: 1.1.0**  
 **Date: 2025-01-30**
 
 **Authors & Contributors:**
