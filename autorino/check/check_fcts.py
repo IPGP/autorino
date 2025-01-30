@@ -29,7 +29,7 @@ def color(val):
     elif val <= 1.0:
         return "red"
     elif 50. >= val > 1.0:
-        return "orange"
+        return "magenta"
     else:
         return "yellow"
 
