@@ -81,8 +81,8 @@ class EpochRange:
         if (
             self._epoch1_raw and self._epoch2_raw
         ):  # 1) regular case: a start and an end are given
-            _epoch1tmp = arocmn.dateparser_interpret(self._epoch1_raw)
-            _epoch2tmp = arocmn.dateparser_interpret(self._epoch2_raw)
+            _epoch1tmp = arocmn.datepars_intrpt(self._epoch1_raw)
+            _epoch2tmp = arocmn.datepars_intrpt(self._epoch2_raw)
             _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
             _epoch_max_tmp = np.max((_epoch1tmp, _epoch2tmp))
 
@@ -95,7 +95,7 @@ class EpochRange:
         elif (
             utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw
         ):  # 2) case a start is given as a list, but no end
-            _epoch1tmp = [arocmn.dateparser_interpret(e) for e in self._epoch1_raw]
+            _epoch1tmp = [arocmn.datepars_intrpt(e) for e in self._epoch1_raw]
             _epoch_min_tmp = np.min(_epoch1tmp)
             _epoch_max_tmp = np.max(_epoch1tmp)
 
@@ -123,7 +123,7 @@ class EpochRange:
     @epoch_start.setter
     def epoch_start(self, value):
         """Sets the start of the epoch range."""
-        self._epoch_start = arocmn.dateparser_interpret(value, tz=self.tz)
+        self._epoch_start = arocmn.datepars_intrpt(value, tz=self.tz)
         self._epoch_start = arocmn.round_date(
             self._epoch_start, self.period, self.round_method
         )
@@ -136,7 +136,7 @@ class EpochRange:
     @epoch_end.setter
     def epoch_end(self, value):
         """Sets the end of the epoch range."""
-        self._epoch_end = arocmn.dateparser_interpret(value, tz=self.tz)
+        self._epoch_end = arocmn.datepars_intrpt(value, tz=self.tz)
         self._epoch_end = arocmn.round_date(
             self._epoch_end, self.period, self.round_method
         )
@@ -152,6 +152,14 @@ class EpochRange:
         val = int("".join(*numbers))
         unit = str("".join(*alphabets))
         return val, unit
+
+    @property
+    def period_as_timedelta(self):
+        """
+        For a period, e.g. 15min, 1H...
+        return in as a pandas Timedelta
+        """
+        return pd.Timedelta(self.period)
 
     ########### methods
     def eporng_list(self, end_bound=False):
@@ -222,7 +230,7 @@ class EpochRange:
             )
             eporng = eprrng_srt
         else:  ### end bound
-            plus_one = pd.Timedelta(self.period)
+            plus_one = self.period_as_timedelta
             eprrng_end = pd.date_range(
                 self.epoch_start, self.epoch_end + plus_one, freq=self.period
             )
@@ -245,3 +253,20 @@ class EpochRange:
             return False
         else:
             return True
+
+
+    def extra_margin_splice(self):
+        """
+        Returns the extra margin for splicing operations.
+
+        Leica raw files  can be a bit over their nominal end,
+        so we need to add a margin to the splicing operation.
+
+        Returns
+        -------
+
+        """
+        if self.period_as_timedelta >= pd.Timedelta("1 day"):
+            return pd.Timedelta("1 hour")
+        else:
+            return pd.Timedelta("1 minute")

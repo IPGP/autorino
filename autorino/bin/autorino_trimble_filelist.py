@@ -35,13 +35,13 @@ def main():
     )
     parser.add_argument("start_date", help="The start date for the file search.")
     parser.add_argument("end_date", help="The end date for the file search.")
-    parser.add_argument(
+    parser.add_argument("-p",
         "--period",
         type=str,
         default="1ME",
         help="The period for the file search, usually a month. Default is '1ME'.",
     )
-    parser.add_argument(
+    parser.add_argument("-t",
         "--structure",
         type=str,
         default="download/Internal/%Y%m",

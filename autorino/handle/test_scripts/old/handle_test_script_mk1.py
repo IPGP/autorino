@@ -19,10 +19,10 @@ import autorino.handle as arohdl
 epo = arogen.create_dummy_epochrange()
 ses = arogen.create_dummy_session()
 
-H = arohdl.HandleGnss(ses, epo, out_dir='/tmp/')
+H = arohdl.HandleGnss(ses, epo, out_dir="/tmp/")
 
-H.guess_local_files()   
-wrkflw_grp_lis = H.group_epochs() 
+H.guess_local_files()
+wrkflw_grp_lis = H.group_epochs()
 
 W = wrkflw_grp_lis[0]
 W.updt_eporng_tab()

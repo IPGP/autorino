@@ -298,7 +298,7 @@ def _row_color_formater(df_simple_in,
         for site, cplt in site_row.items(): 
             flag = df_full_wrk.loc[(date,site)].flag
             color = color_map[flag]
-            cplt_color = termcolor.colored(str(cplt),color)
+            cplt_color = termcolor.colored(str(cplt), color)
             df_simple_out.loc[date,site] = cplt_color
             
     df_simple_out.columns = [termcolor.colored(x, 'light_grey' , None) for x in df_simple_out.columns]
