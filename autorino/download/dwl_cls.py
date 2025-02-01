@@ -126,7 +126,7 @@ class DownloadGnss(arocmn.StepGnss):
         # initialize the ftp object
         self.ftp_obj = None
 
-    # legacy properties, specific to the DownloadGnss class
+    # generate_cfgfiles properties, specific to the DownloadGnss class
     #### They become more or less useless since the implementation of self.inp_file_regex (2025-01)
     @property
     def inp_dirname(self):
@@ -324,7 +324,7 @@ class DownloadGnss(arocmn.StepGnss):
                 arodwl.join_url(self.access["protocol"], "", "", f)
                 for f in rmot_fil_epo_lis
             ]
-            # legacy readd
+            # generate_cfgfiles readd
             # rmot_fil_epo_lis = [
             #    self.access["protocol"] + "://" + f for f in rmot_fil_epo_lis
             # ]

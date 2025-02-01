@@ -7,7 +7,7 @@ conv_software_paths:
   ### Trimble
   t0xconvert : "t0xConvert" # Trimble official (NB: key is t0xconvert in lower case, value is t0xConvert, upper case C)
   trm2rinex : "trm2rinex:cli-light" # Trimble unofficial docker
-  runpkr00 : "runpkr00" # Trimble legacy
+  runpkr00 : "runpkr00" # Trimble generate_cfgfiles
   ### RINEX handeling
   converto : "ConvertoCPP"
   gfzrnx : "gfzrnx"

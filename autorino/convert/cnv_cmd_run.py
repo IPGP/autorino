@@ -118,7 +118,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
 
     elif ext == (".T00", ".T01", ".T02", ".T04") and converter_inp == "runpkr00":
         converter_name = "runpkr00"
-        brand = "Trimble (legacy converter)"
+        brand = "Trimble (generate_cfgfiles converter)"
         cmd_build_fct = arocnv.cmd_build_runpkr00
         conv_regex_fct = arocnv.conv_regex_runpkr00
         bin_options = []
@@ -253,8 +253,8 @@ def converter_run(
             * 'auto' (automatic choice based on the extension),
             * 'trm2rnx' (Trimble unofficial),
             * 't0xconvert' (Trimble official),
-            * 'runpkr00' (Trimble legacy),
-            * 'teqc' (legacy conversion & RINEX Handeling),
+            * 'runpkr00' (Trimble generate_cfgfiles),
+            * 'teqc' (generate_cfgfiles conversion & RINEX Handeling),
             * 'mdb2rinex' (Leica),
             * 'sbf2rin' (Septentrio),
             * 'convbin' (BINEX),

@@ -10,7 +10,7 @@
 # A list of packages that are needed to build your package:
 requires = ["setuptools"]  # REQUIRED if [build-system] table is used
 # The name of the Python object that frontends will use to perform the build:
-build-backend = "setuptools.build_meta"  # If not defined, then legacy behavior can happen.
+build-backend = "setuptools.build_meta"  # If not defined, then generate_cfgfiles behavior can happen.
 
 # This is configuration specific to the `setuptools` build backend.
 # If you are using a different build backend, you will need to change this.

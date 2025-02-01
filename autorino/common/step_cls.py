@@ -1805,7 +1805,7 @@ class StepGnss:
                 ok_inp_bool_stk.append(False)
                 if not message_manu_exclu:
                     logger.debug(
-                        "file filtered, was OK during a previous run (legacy simple list): %s",
+                        "file filtered, was OK during a previous run (generate_cfgfiles simple list): %s",
                         f,
                     )
                 else:
@@ -1819,7 +1819,7 @@ class StepGnss:
 
         if not message_manu_exclu:
             logger.info(
-                "%6i files filtered, were OK during a previous run (legacy simple OK list)",
+                "%6i files filtered, were OK during a previous run (generate_cfgfiles simple OK list)",
                 nfil,
             )
         else:
@@ -2091,7 +2091,7 @@ class StepGnss:
         force : bool, optional
             If True, the step is forced and the input file is processed regardless of its status.
             Default is False.
-            Usage of this option is discouraged, and kept manily for legacy reasons.
+            Usage of this option is discouraged, and kept manily for generate_cfgfiles reasons.
             It is better to set all the ok_inp boolean in the table to True with the .force() method.
         switch_ok_out_false : bool, optional
             If True, the 'ok_out' column of the table is set to False if the step should be skipped.
