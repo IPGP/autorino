@@ -12,15 +12,17 @@ import re
 import numpy as np
 import pandas as pd
 
-from geodezyx import utils
+from geodezyx import utils, conv
 from filelock import FileLock, Timeout
 
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
 import autorino.common as arocmn
-logger = logging.getLogger('autorino')
+
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 def dummy_site_dic():
     """
@@ -74,11 +76,11 @@ def dummy_sess_dic():
 
     d["name"] = "NA"
     d["data_frequency"] = "30S"
-    d["tmp_dir_parent"] = "<$HOME>/autorino_workflow_tests/tmp"
+    d["tmp_dir_parent"] = "/tmp/"
     d["tmp_dir_structure"] = "<site_id9>/%Y/%j"
-    d["log_parent_dir"] = "<$HOME>/autorino_workflow_tests/log"
+    d["log_parent_dir"] = "/tmp/"
     d["log_dir_structure"] = "<site_id9>/%Y/%j"
-    d["out_dir_parent"] = "<$HOME>/autorino_workflow_tests/out"
+    d["out_dir_parent"] = "/tmp/"
     d["out_structure"] = "<site_id9>/%Y/%j"
 
     return d
@@ -110,6 +112,7 @@ def import_files(inp_fil, inp_regex=".*"):
     list
         The interpreted list.
     """
+
     if not inp_fil:
         flist = []
     elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
@@ -121,13 +124,15 @@ def import_files(inp_fil, inp_regex=".*"):
         flist = open(inp_fil, "r+").readlines()
         flist = [f.strip() for f in flist]
     elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil, inp_regex, case_sensitive=False)
+        flist = utils.find_recursive(inp_fil, ".*", regex=True)
+        # Here we find everything ".*", the regex will be filtered bellow
     else:
         flist = []
         logger.warning("the filelist is empty")
 
     if inp_regex != ".*":
-        flist = [f for f in flist if re.match(inp_regex, f)]
+        flist = [f for f in flist if re.match(inp_regex, os.path.basename(f))]
+        # os.path.basename is used to match the regex on the filename only
 
     return flist
 
@@ -163,7 +168,7 @@ def load_previous_tables(log_dir):
         tab_df_stk = []
         for t in tables_files:
             tab_df = pd.read_csv(t)
-            #if not len(tab_df) == 0:
+            # if not len(tab_df) == 0:
             tab_df_stk.append(tab_df)
 
         return pd.concat(tab_df_stk)
@@ -202,7 +207,7 @@ def is_ok(val_inp):
         return False
     elif val_inp == "":
         return False
-    elif not val_inp: # == False
+    elif not val_inp:  # == False
         return False
     else:
         return True
@@ -252,13 +257,44 @@ def rnxs2step_obj(rnxs_lis_inp):
     StepGnss
         A StepGnss object populated with data from the provided RINEX files.
     """
-    stp_obj = arocmn.StepGnss(out_dir="",
-                              tmp_dir="",
-                              log_dir="",
-                              inp_dir="")
+    stp_obj = arocmn.StepGnss(out_dir="", tmp_dir="", log_dir="", inp_dir="")
 
     stp_obj.load_tab_filelist(rnxs_lis_inp)
     stp_obj.updt_site_w_rnx_fname()
     stp_obj.updt_epotab_rnx(use_rnx_filename_only=True, update_epoch_range=True)
 
     return stp_obj
+
+
+def guess_sites_list(inp_fil):
+    """
+    Guess the list of sites from the input list.
+
+    This function guesses the list of sites from the input list.
+    
+    It extracts the site identifier from the input list
+    and returns a list of unique site identifiers.
+
+    Parameters
+    ----------
+    inp_fil : list
+        The input list to extract the site identifiers from.
+        See `import_files` for details.
+        
+    Returns
+    -------
+    list
+        A list of unique site identifiers extracted from the input list.
+    """
+    inp_list = import_files(inp_fil)
+
+    sites_list = []
+
+    for f in inp_list:
+        if conv.rinex_regex_search_tester(f, short_name=False):
+            site = os.path.basename(f)[:9]
+            sites_list.append(site)
+
+    sites_list = list(sorted(list(set(sites_list))))
+
+    return sites_list

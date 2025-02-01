@@ -10,7 +10,8 @@ import ftplib
 import io
 
 import os
-#import socket
+
+# import socket
 import urllib
 import urllib.request
 import time
@@ -26,7 +27,7 @@ import tqdm
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -68,7 +69,9 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     """
     # urltambouille
     ### add the protocol if missing
-    if protocol_inp and not (hostname_inp.startswith("http") or hostname_inp.startswith("ftp")):
+    if protocol_inp and not (
+        hostname_inp.startswith("http") or hostname_inp.startswith("ftp")
+    ):
         prot_n_host = protocol_inp + "://" + hostname_inp
     else:
         prot_n_host = hostname_inp
@@ -83,6 +86,7 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     url_out = os.path.join(prot_n_host, dirr, fname_inp)
 
     return url_out
+
 
 #  ______ _______ _____
 # |  ____|__   __|  __ \
@@ -127,7 +131,7 @@ def ftp_create_obj(
     while True:
         try:
             ftp = ftplib.FTP(hostname_inp, timeout=timeout)
-            if username and password:
+            if (username is not None) and (password is not None):
                 ftp.login(username, password)
             return ftp
         except TimeoutError as e:
@@ -183,9 +187,9 @@ def list_remote_ftp(
     """
 
     # Clean hostname and remote directory
-    #legacy hostname_use defintion (urltambouille)
-    #hostname_use = hostname.replace("ftp://", "")
-    #hostname_use = hostname_use.replace("/", "")
+    # legacy hostname_use defintion (urltambouille)
+    # hostname_use = hostname.replace("ftp://", "")
+    # hostname_use = hostname_use.replace("/", "")
 
     url_parsed = urlparse(hostname)
     if url_parsed.scheme:
@@ -201,10 +205,14 @@ def list_remote_ftp(
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
-    elif username and password:
+    elif username is not None and password is not None:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
-            hostname_use, username, password, timeout=timeout, max_try=max_try
+            hostname_inp=hostname_use,
+            username=username,
+            password=password,
+            timeout=timeout,
+            max_try=max_try,
         )
     else:
         logger.error(
@@ -221,6 +229,7 @@ def list_remote_ftp(
         ftp_obj.cwd(remote_dir_use)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
+        logger.error("Wished destination: %s", remote_dir_use)
         return []
 
     # Retrieve list of files
@@ -231,8 +240,11 @@ def list_remote_ftp(
         file_list_bulk = []
 
     # current directory (.) and parent directory (..) are removed anyway
-    file_list_bulk = [f for f in file_list_bulk if f not in ('.', '..')]
-    file_list_join = [join_url('',hostname_use, remote_dir_use, f.split()[-1]) for f in file_list_bulk]
+    file_list_bulk = [f for f in file_list_bulk if f not in (".", "..")]
+    file_list_join = [
+        join_url("", hostname_use, remote_dir_use, f.split()[-1])
+        for f in file_list_bulk
+    ]
     # split()[-1] is necessary for Trimble files, to have just the filename and not the size, owner, etc.
 
     file_list = file_list_join
@@ -296,17 +308,16 @@ def download_ftp(
     def _ftp_callback(data):
         _ftp_callback.bytes_transferred += len(data)
 
-
     urlp = urlparse(url)
     url_host = urlp.netloc
-    url_dir = os.path.dirname(urlp.path) #[1:]
+    url_dir = os.path.dirname(urlp.path)  # [1:]
     url_fname = os.path.basename(urlp.path)
 
     # create the FTP object
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
-    elif username and password:
+    elif username is not None and password is not None:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
             url_host,
@@ -332,6 +343,7 @@ def download_ftp(
         ftp_obj.cwd(url_dir)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
+        logger.error("Wished destination: %s", url_dir)
         raise AutorinoDownloadError
 
     filename = url_fname
@@ -387,8 +399,8 @@ def list_remote_http(hostname, remote_dir):
     url = join_url("http", hostname, remote_dir, "")
 
     # legacy manual join (urltambouille
-    #url = os.path.join(hostname, remote_dir)
-    #url = "http://" + hostname + "/" + remote_dir
+    # url = os.path.join(hostname, remote_dir)
+    # url = "http://" + hostname + "/" + remote_dir
 
     logger.debug("HTTP file list: %s", url)
 

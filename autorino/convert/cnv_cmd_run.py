@@ -21,7 +21,7 @@ from geodezyx import utils, conv
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 ###################################################################

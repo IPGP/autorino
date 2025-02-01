@@ -36,7 +36,7 @@ def main():
         "--start",
         type=str,
         help="The start date for the epoch range. "
-             "Can be a date e.g. '2025-01-01', or a literal e.g. '2 days ago'. "
+             "Can be a date e.g. '2025-01-01', '2025-001' or a literal e.g. '2 days ago'. "
              "Can also be a list; if so, each epoch is considered separately. "
              "Can also be a file path; if so, the file contains a list of start epochs. "
              "Default is None.",
@@ -47,7 +47,7 @@ def main():
         "--end",
         type=str,
         help="The end date for the epoch range. "
-             "Can be a date e.g. '2025-01-01', or a literal e.g. '2 days ago'. "
+             "Can be a date e.g. '2025-01-01', '2025-001' or a literal e.g. '2 days ago'. "
              "Default is None.",
         default=None,
     )
@@ -61,13 +61,22 @@ def main():
         default="1D",
     )
     parser.add_argument(
-        "-ls",
+        "-l",
         "--list_sites",
         type=str,
-        help="A list of site identifiers to filter the configuration files. "
+        help="A comma-separated (,) list of site identifiers ('site_id') in the config file"
+             "to filter the configuration files. "
              "If provided, only configurations for sites in this list will be processed. "
              "Default is None.",
         default="",
+    )
+    parser.add_argument(
+        "-is",
+        "--ignore_sites",
+        action="store_true",
+        help="If True, the sites in --list_sites will be ignored."
+             "It is the opposed behavior of the regular one using list_sites."
+             "Default is False.",
     )
     parser.add_argument(
         "-ss",
@@ -104,6 +113,7 @@ def main():
     end = args.end
     period = args.period
     list_sites = args.list_sites.split(",") if args.list_sites else None
+    ignore_sites = args.ignore_sites
     steps_select_list = (
         args.steps_select_list.split(",") if args.steps_select_list else None
     )
@@ -113,7 +123,8 @@ def main():
     aroapi.cfgfile_run(
         cfg_in=config,
         main_cfg_in=main_config,
-        sites_list=list_sites,
+        list_sites=list_sites,
+        ignore_sites=ignore_sites,
         epo_srt=start,
         epo_end=end,
         period=period,

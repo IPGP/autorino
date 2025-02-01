@@ -19,7 +19,7 @@ from geodezyx import operational
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 BOLD_SRT = "\033[1m"
@@ -70,9 +70,8 @@ class ConvertGnss(arocmn.StepGnss):
         tmp_dir,
         log_dir,
         inp_dir=None,
+        inp_file_regex=None,
         epoch_range=None,
-        inp_dir_parent=None,
-        inp_structure=None,
         site=None,
         session=None,
         options=None,
@@ -111,6 +110,7 @@ class ConvertGnss(arocmn.StepGnss):
             tmp_dir=tmp_dir,
             log_dir=log_dir,
             inp_dir=inp_dir,
+            inp_file_regex=inp_file_regex,
             epoch_range=epoch_range,
             site=site,
             session=session,
@@ -120,7 +120,9 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert(self, verbose=False, force=False, rinexmod_options=None, converter='auto'):
+    def convert(
+        self, verbose=False, force=False, rinexmod_options=None, converter="auto"
+    ):
         """
         "total action" method
 
@@ -152,7 +154,7 @@ class ConvertGnss(arocmn.StepGnss):
         """
 
         self.set_logfile()
-        logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -219,10 +221,10 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            if not self.mono_ok_check(irow,"conversion"):
+            if not self.mono_ok_check(irow, "conversion"):
                 continue
 
-            logger.info(">>>>>> input raw file for conversion: %s", fraw.name)
+            logger.info(">>>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################
             # change the site_id here is a very bad idea, it f*cks the outdir 240605
@@ -235,14 +237,16 @@ class ConvertGnss(arocmn.StepGnss):
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate_dic (necessary for the output dir)
             self.mono_site_upd(irow, site4_list)
-            self.site_id = self.table.loc[irow, "site"]  # for translation of the output dir & rinexmod options
+            self.site_id = self.table.loc[
+                irow, "site"
+            ]  # for translation of the output dir & rinexmod options
 
             self.set_translate_dict()
             ###########################################################################
             # +++ CONVERTER SELECTION
 
-            if converter != 'auto':
-                converter_name_use = converter # converter is forced
+            if converter != "auto":
+                converter_name_use = converter  # converter is forced
             else:
                 # ++ do a first converter selection by identifying odd files
                 converter_name_use = arocnv.select_conv_odd_file(fraw)
@@ -282,6 +286,9 @@ class ConvertGnss(arocmn.StepGnss):
 
         # ++++ remove temporary files
         self.remov_tmp_files()
+
+        # close the log file
+        self.close_logfile()
 
         return None
 
@@ -325,7 +332,7 @@ class ConvertGnss(arocmn.StepGnss):
             The path of the converted file.
         """
 
-        if not self.mono_ok_check(irow,"conversion"):
+        if not self.mono_ok_check(irow, "conversion"):
             return None
 
         # definition of the output directory (after the action)
@@ -338,7 +345,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         try:
             frnxtmp, _ = arocnv.converter_run(
-                self.table.loc[irow, table_col], out_dir, converter=converter_inp
+                self.table.loc[irow, table_col], out_dir_use, converter=converter_inp
             )
         except Exception as e:
             logger.error("Error for: %s", self.table.loc[irow, table_col])
