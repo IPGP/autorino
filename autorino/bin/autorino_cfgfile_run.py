@@ -61,7 +61,7 @@ def main():
         default="1D",
     )
     parser.add_argument(
-        "-ls",
+        "-l",
         "--list_sites",
         type=str,
         help="A comma-separated (,) list of site identifiers ('site_id') in the config file"
