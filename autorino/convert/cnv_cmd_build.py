@@ -1084,7 +1084,7 @@ def cmd_build_teqc(
     bin_path=aro_env_soft_path["teqc"],
 ):
     """
-    Build a command to launch teqc, for generate_cfgfiles conversion and RINEX Handeling
+    Build a command to launch teqc, for legacy conversion and RINEX Handeling
 
     It has the same behavior as all the `cmd_build` functions
 
@@ -1151,7 +1151,7 @@ def cmd_build_converto(
     bin_path=aro_env_soft_path["converto"],
 ):
     """
-     Build a command to launch teqc, for generate_cfgfiles conversion and RINEX Handeling
+     Build a command to launch teqc, for legacy conversion and RINEX Handeling
 
      It has the same behavior as all the `cmd_build` functions
 

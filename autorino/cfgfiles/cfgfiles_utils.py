@@ -62,7 +62,7 @@ def feed_template(template_full_path, df_values, outdir, out_fname_prefix):
 def teqc_args_spliter(linp):
     """
     Split TEQC arguments into a dictionary.
-    For OVSG generate_cfgfiles configuration files only.
+    For OVSG legacy configuration files only.
 
     Parameters
     ----------

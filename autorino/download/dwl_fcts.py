@@ -187,7 +187,7 @@ def list_remote_ftp(
     """
 
     # Clean hostname and remote directory
-    # generate_cfgfiles hostname_use defintion (urltambouille)
+    # legacy hostname_use defintion (urltambouille)
     # hostname_use = hostname.replace("ftp://", "")
     # hostname_use = hostname_use.replace("/", "")
 
@@ -398,7 +398,7 @@ def list_remote_http(hostname, remote_dir):
 
     url = join_url("http", hostname, remote_dir, "")
 
-    # generate_cfgfiles manual join (urltambouille
+    # legacy manual join (urltambouille
     # url = os.path.join(hostname, remote_dir)
     # url = "http://" + hostname + "/" + remote_dir
 
