@@ -6,20 +6,22 @@ Created on Mon Jan  8 15:47:58 2024
 @author: psakic
 """
 import logging
+import re
 
 import dateparser
 import numpy as np
 import pandas as pd
 from pandas.tseries.frequencies import to_offset
+import datetime as dt
 
 import autorino.common as arocmn
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def epoch_range_interpret(epo_inp):
+def epoch_range_intrpt(epo_inp):
     """
     This function interprets an input to get an output EpochRange object. The input can either be a tuple,
     typically in the form of (epo1, epo2, period), or an instance of the EpochRange class. If the input is
@@ -49,7 +51,7 @@ def epoch_range_interpret(epo_inp):
     return epo_range_out
 
 
-def dateparser_interpret(date_inp, tz="UTC"):
+def datepars_intrpt(date_inp, tz="UTC"):
     """
     This function interprets a string or datetime-like object to a Pandas Timestamp.
     It also applies a timezone (UTC by default). Note that rounding does not take place here
@@ -75,18 +77,32 @@ def dateparser_interpret(date_inp, tz="UTC"):
     If the resulting date does not have a timezone, the specified timezone is applied.
     """
 
-    if isinstance(date_inp, str):
-        date_out = pd.Timestamp(dateparser.parse(date_inp))
-    else:
+    if not isinstance(date_inp, str):
         date_out = pd.Timestamp(date_inp)
+    ## date_inp is a str
+    else:
+        ### Must handle the case of day of year separately
+        doy_pattern_1 = r"^\d{4}-\d{1,3}$"
+        doy_pattern_2 = r"^\d{4}/\d{1.3}$"
+        # YYYY-DDD
+        if re.match(doy_pattern_1, date_inp):
+            date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y-%j"))
+        # YYYY/DDD
+        elif re.match(doy_pattern_2, date_inp):
+            date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y/%j"))
+        ###regular case
+        else:
+            date_out = pd.Timestamp(dateparser.parse(date_inp))
 
+    ### ADD THE TIMEZONE
     if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
         ### NaT case. can not support tz
         pass
-
     elif not date_out.tz:
-        logger.debug("date %s has no timezone. Applying tz %s",date_out,tz)
+        logger.debug("date %s has no timezone. Applying tz %s", date_out, tz)
         date_out = pd.Timestamp(date_out, tz=tz)
+    else:
+        pass
 
     return date_out
 
@@ -312,6 +328,7 @@ def create_dummy_epochrange():
     epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period="15min")
     return epo
 
+
 def iso_zulu_epoch(epo_in):
     """
     Convert an input epoch to ISO 8601 format with Zulu time (UTC).
@@ -326,5 +343,4 @@ def iso_zulu_epoch(epo_in):
     str
         The epoch in ISO 8601 format with Zulu time (UTC).
     """
-    return pd.Timestamp(epo_in).isoformat().replace('+00:00', 'Z')
-
+    return pd.Timestamp(epo_in).isoformat().replace("+00:00", "Z")

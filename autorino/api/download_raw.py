@@ -15,7 +15,7 @@ import autorino.common as arocmn
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -25,9 +25,10 @@ def download_raw(
     period,
     hostname,
     inp_dir_parent,
-    inp_structure,
+    inp_dir_structure,
+    inp_file_regex,
     out_dir_parent,
-    out_structure='<SITE_ID9>/%Y/',
+    out_structure="<SITE_ID9>/%Y/",
     site_id="XXXX00XXX",
     login="",
     password="",
@@ -60,8 +61,10 @@ def download_raw(
         The hostname of the server from which the data files will be downloaded.
     inp_dir_parent : str
         The parent directory on the server where the raw data files are located.
-    inp_structure : str
+    inp_dir_structure : str
         The raw file generic name structure on the server.
+    inp_file_regex : str
+        The regular expression used to match the raw data files on the server
     site_id : str, optional
         The site identifier for the data files. Default is "XXXX00XXX".
     login : str, optional
@@ -93,7 +96,7 @@ def download_raw(
 
     epoch_range = arocmn.EpochRange(epoch_srt, epoch_end, period)
 
-    inp_dir = os.path.join(inp_dir_parent, inp_structure)
+    inp_dir = os.path.join(inp_dir_parent, inp_dir_structure)
     out_dir = os.path.join(out_dir_parent, out_structure)
 
     dwl = arodwl.DownloadGnss(
@@ -101,6 +104,7 @@ def download_raw(
         tmp_dir=tmp_dir,
         log_dir=log_dir,
         inp_dir=inp_dir,
+        inp_file_regex=inp_file_regex,
         epoch_range=epoch_range,
         access=access_dic,
         site=site_dic,

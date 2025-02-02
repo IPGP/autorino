@@ -6,7 +6,7 @@ import logging.config
 import os
 from os import path
 
-__version__='1.0.0' #  changed automaticcaly with bump-my-version
+__version__='1.1.0' #  changed automaticcaly with bump-my-version
 
 #### IMPORT CONFIG FOR LOGGER
 log_file_path = os.path.join(
