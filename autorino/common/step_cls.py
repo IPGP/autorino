@@ -2029,7 +2029,9 @@ class StepGnss:
             rimopts_wrk["sitelog"] = self.metadata
 
         # +++ set #2: site name/marker
-        if irow is not None:
+        if 'marker' in rimopts_inp.keys():
+            rimopts_wrk["marker"] = rimopts_inp["marker"]
+        elif irow is not None:
             rimopts_wrk["marker"] = self.table.loc[irow, "site"]
         elif self.site_id9:
             rimopts_wrk["marker"] = self.site_id9
