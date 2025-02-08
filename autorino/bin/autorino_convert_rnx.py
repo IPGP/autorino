@@ -100,6 +100,13 @@ def main():
         default=None,
     )
 
+    parser.add_argument(
+        "-s",
+        "--site",
+        help="Force a site identifier (9-character) for the conversion if the input RAW files are not correctly named",
+        default=None,
+    )
+
     args = parser.parse_args()
 
     aroapi.convert_rnx(
@@ -112,6 +119,7 @@ def main():
         metadata=args.metadata,
         force=args.force,
         store_raw_structure=args.store_raw_structure,
+        site=args.site,
     )
 
 
