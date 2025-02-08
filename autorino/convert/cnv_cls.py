@@ -289,7 +289,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ RINEXMOD
-            rinexmod_options_use = self.updt_rnxmodopts(rinexmod_options, irow)
+            rinexmod_options_use = self.updt_rnxmodopts(rinexmod_options, irow, debug_print=True)
 
             self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
