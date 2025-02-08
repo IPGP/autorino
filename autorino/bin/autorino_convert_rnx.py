@@ -13,7 +13,7 @@ import autorino.api as aroapi
 def main():
     parser = argparse.ArgumentParser(description="Convert RAW files to RINEX.")
     parser.add_argument("-i",
-        "--inp_raws",
+        "--raws_inp",
         required=True,
         nargs="+",
         help="The input RAW files to be converted "
