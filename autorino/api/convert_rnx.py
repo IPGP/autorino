@@ -29,7 +29,7 @@ def convert_rnx(
     metadata=None,
     force=False,
     store_raw_structure=None,
-    site=None
+    site=None,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -94,19 +94,27 @@ def convert_rnx(
 
     if site:
         site_dic = {"site_id": site}
+        update_site_id_with_metadata = False
     else:
         site_dic = None
+        update_site_id_with_metadata = True
 
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata, site=site_dic)
+    cnv = arocnv.ConvertGnss(
+        out_dir_use, tmp_dir, log_dir, metadata=metadata, site=site_dic
+    )
     cnv.load_tab_filelist(raws_use)
-    cnv.convert(force=force, rinexmod_options=rinexmod_options)
+    cnv.convert(
+        force=force,
+        rinexmod_options=rinexmod_options,
+        update_site_id_with_metadata=update_site_id_with_metadata,
+    )
 
     if store_raw_structure:
         store_raw_stru_use = os.path.join(out_dir, store_raw_structure)
 
-        cpy_raw = arocmn.StepGnss(store_raw_stru_use,
-                                  tmp_dir, log_dir,
-                                  metadata=metadata)
+        cpy_raw = arocmn.StepGnss(
+            store_raw_stru_use, tmp_dir, log_dir, metadata=metadata
+        )
 
         cpy_raw.load_tab_filelist(raws_use)
         cpy_raw.copy_files()
