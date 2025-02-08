@@ -157,7 +157,7 @@ class ConvertGnss(arocmn.StepGnss):
             Since the site code from RAW file name can be poorly formatted
             we search it w.r.t. the sites from the metadata.
             If False, the site identifier is not updated, and it is the one of the
-            ConvertGnss object self.site_id that is used. 
+            ConvertGnss object self.site_id that is used.
             (for some advanced cases).
             Default is True.
 
@@ -251,8 +251,8 @@ class ConvertGnss(arocmn.StepGnss):
             # we update the table row and the translate_dic (necessary for the output dir)
             if update_site_id_with_metadata:
                 self.mono_site_upd(irow, site4_list)
-            # set self.site_id for the output dir translation & rinexmod options
-            self.site_id = self.table.loc[irow, "site"]
+                # set self.site_id for the output dir translation & rinexmod options
+                self.site_id = self.table.loc[irow, "site"]
 
             self.set_translate_dict()
             ###########################################################################
@@ -381,10 +381,14 @@ class ConvertGnss(arocmn.StepGnss):
         """
         Updates the 'site' entry for each row of the table.
 
-        This method is applied to each row of the table. It checks if the 'site' entry is defined.
-        If it is not defined or if the 'force' parameter is set to True, it updates the 'site' entry.
-        The update is performed by searching the site from a list of sites or metadata.
-        If the 'site' entry is already defined and 'force' is not set to True, it sets the 'site' entry to 'XXXX00XXX'.
+        This method is applied to each row of the table.
+        It checks if the 'site' entry is defined.
+        If it is not defined or if the 'force' parameter
+        is set to True, it updates the 'site' entry.
+        The update is performed by searching the site
+        from a list of sites or metadata.
+        If the 'site' entry is already defined and 'force' is not set to True,
+        it sets the 'site' entry to 'XXXX00XXX'.
 
         Parameters
         ----------
@@ -393,7 +397,9 @@ class ConvertGnss(arocmn.StepGnss):
         metadata_or_sites_list_inp : list
             A list of sites or metadata from which the site should be searched.
         force : bool, optional
-            If True, forces the update of the 'site' entry even if it is already defined. Default is False.
+            If True, forces the update of the 'site'
+            entry even if it is already defined.
+            Default is False.
 
         Returns
         -------
