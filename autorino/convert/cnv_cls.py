@@ -126,7 +126,6 @@ class ConvertGnss(arocmn.StepGnss):
         force=False,
         rinexmod_options=None,
         converter="auto",
-        update_site_id_with_metadata=True,
     ):
         """
         "total action" method
@@ -152,19 +151,21 @@ class ConvertGnss(arocmn.StepGnss):
             The converter to be used for the conversion.
             If not specified, the best converter is automatically selected.
             Default is 'auto'.
-        update_site_id_with_metadata : bool, optional
-            If True, updates the site identifier using the metadata (default case).
-            Since the site code from RAW file name can be poorly formatted
-            we search it w.r.t. the sites from the metadata.
-            If False, the site identifier is not updated, and it is the one of the
-            ConvertGnss object self.site_id that is used.
-            (for some advanced cases).
-            Default is True.
 
         Returns
         -------
         None
         """
+
+        # #### Legacy Option
+        # update_site_id_with_metadata : bool, optional
+        #     If True, updates the site identifier using the metadata (default case).
+        #     Since the site code from RAW file name can be poorly formatted
+        #     we search it w.r.t. the sites from the metadata.
+        #     If False, the site identifier is not updated, and it is the one of the
+        #     ConvertGnss object self.site_id that is used.
+        #     (for some advanced cases).
+        #     Default is True.
 
         self.set_logfile()
         logger.info(BOLD_SRT + ">>>>>> RAW > RINEX files conversion" + BOLD_END)
@@ -249,12 +250,9 @@ class ConvertGnss(arocmn.StepGnss):
             # +++ since the site code from fraw can be poorly formatted
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate_dic (necessary for the output dir)
-            if update_site_id_with_metadata:
-                self.mono_site_upd(irow, site4_list)
-                # set self.site_id for the output dir translation & rinexmod options
-                self.site_id = self.table.loc[irow, "site"]
-            else:
-                logger.critical(self.site_id)
+            self.mono_site_upd(irow, site4_list)
+            # set self.site_id for the output dir translation & rinexmod options
+            self.site_id = self.table.loc[irow, "site"]
 
             self.set_translate_dict()
             ###########################################################################
