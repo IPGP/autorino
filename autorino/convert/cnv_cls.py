@@ -253,6 +253,8 @@ class ConvertGnss(arocmn.StepGnss):
                 self.mono_site_upd(irow, site4_list)
                 # set self.site_id for the output dir translation & rinexmod options
                 self.site_id = self.table.loc[irow, "site"]
+            else:
+                logger.critical(self.site_id)
 
             self.set_translate_dict()
             ###########################################################################
