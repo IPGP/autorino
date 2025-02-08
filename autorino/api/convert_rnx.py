@@ -29,6 +29,7 @@ def convert_rnx(
     metadata=None,
     force=False,
     store_raw_structure=None,
+    site=None
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -70,6 +71,9 @@ def convert_rnx(
     force : bool, optional
         If set to True, the conversion will be forced even if the output files already exist.
         Defaults to False.
+    site : str, optional
+        The site identifier (9 characters) if the input RAW files are not correctly named
+        Defaults to None.
 
     Returns
     -------
@@ -88,7 +92,7 @@ def convert_rnx(
 
     raws_use = inp_raws
 
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata, site=site)
     cnv.load_tab_filelist(raws_use)
     cnv.convert(force=force, rinexmod_options=rinexmod_options)
 
