@@ -92,7 +92,12 @@ def convert_rnx(
 
     raws_use = inp_raws
 
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata, site=site)
+    if site:
+        site_dic = {"site_id": site}
+    else:
+        site_dic = None
+
+    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata, site=site_dic)
     cnv.load_tab_filelist(raws_use)
     cnv.convert(force=force, rinexmod_options=rinexmod_options)
 
