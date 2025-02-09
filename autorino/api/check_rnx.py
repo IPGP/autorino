@@ -29,6 +29,35 @@ def check_rnx(
     sites_list=[],
     output_dir=None,
 ):
+    """
+    This function checks the RINEX files in the input directory.
+
+    Parameters
+    ----------
+    inp_dir_parent : str
+        The parent input directory.
+    inp_dir_structure : str
+        The input directory structure.
+    epoch_start : str
+        The start epoch.
+    epoch_end : str
+        The end epoch.
+    sites_list : list, optional
+        A list of site identifiers to filter the check.
+    output_dir : str, optional
+        The output directory.
+
+    Returns
+    -------
+    tabu_chk_col : str
+        The tabulated string of the check table with colored values.
+    tabu_chk_bnw : str
+        The tabulated string of the check table with black and white values.
+    df_chk_sum  : pd.DataFrame
+        The values of the check table summarized in a dataframe.
+    df_chk_full_stats : pd.DataFrame
+        The full statistics of the check table.
+    """
 
     inp_dir = os.path.join(inp_dir_parent, inp_dir_structure)
     eporng = arocmn.EpochRange(epoch_start, epoch_end)
@@ -41,9 +70,10 @@ def check_rnx(
     chk_tab_stk = []
     chk_tab_stats_stk = []
     for site in sites_use:
-        logger.critical(site)
         chk = arochk.CheckGnss(
-            inp_dir=str(inp_dir), site={"site_id": site}, epoch_range=eporng
+            inp_dir=str(inp_dir),
+            site={"site_id": site},
+            epoch_range=eporng
         )
         chk.check()
         chk_tab_stk.append(chk.table)
@@ -76,6 +106,28 @@ def check_rnx(
 def checkrnx_output(
     output_dir, eporng, tabu_chk_col, tabu_chk_bnw, df_chk_sum, df_chk_full_stats
 ):
+    """
+    This function saves the check_rnx results in the output directory.
+
+    Parameters
+    ----------
+    output_dir : str
+        The output directory.
+    eporng : EpochRange
+        The epoch range.
+    tabu_chk_col : str
+        The tabulated string of the check table with colored values.
+    tabu_chk_bnw : str
+        The tabulated string of the check table with black and white values.
+    df_chk_sum  : pd.DataFrame
+        The values of the check table summarized in a dataframe.
+    df_chk_full_stats : pd.DataFrame
+        The full statistics of the check table.
+
+    Returns
+    -------
+    None
+    """
 
     prefix = "_".join(
         (
@@ -103,3 +155,5 @@ def checkrnx_output(
     tabu_bnw_txt = os.path.join(output_dir_use, prefix + "_check_rnx_tabu_bnw.txt")
     utils.write_in_file(tabu_chk_col, tabu_col_txt)
     utils.write_in_file(tabu_chk_bnw, tabu_bnw_txt)
+
+    return None

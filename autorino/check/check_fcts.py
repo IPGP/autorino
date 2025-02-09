@@ -9,6 +9,7 @@ Created on 27/01/2025 18:53:22
 import termcolor
 import pandas as pd
 import tabulate
+import os
 
 
 def color(val):
@@ -27,18 +28,54 @@ def color(val):
     if val > 96.0:
         return "cyan"
     elif val <= 1.0:
-        return "red"
-    elif 50. >= val > 1.0:
         return "magenta"
+    elif 50. >= val > 1.0:
+        return "red"
     else:
         return "yellow"
 
 
 def colorize_list(list_inp):
+    """
+    This function colorizes a list of values.
+
+    Parameters
+    ----------
+    list_inp : list
+        The list of values to be colorized.
+
+    Returns
+    -------
+    list: list of colorized values
+
+    """
+    if not 'TERM' in os.environ:
+        os.environ['TERM'] = 'xterm-256color'  # Set terminal type to xterm-256color if not set
+
     return [termcolor.colored(str(e), color(e)) for e in list_inp]
 
 
 def get_tabult_raw(chk_tab, short_label=False):
+    """
+    This function returns a tabulated string of the check table.
+
+    Parameters
+    ----------
+    chk_tab : pd.DataFrame
+        The check table.
+
+    short_label : bool, optional
+
+    Returns
+    -------
+    tabu_chk_col: str
+        The tabulated string of the check table with colored values.
+    tabu_chk_bnw: str
+        The tabulated string of the check table with black and white values.
+    df_chk_sum: pd.DataFrame
+        The values of the check table summarized in a dataframe.
+
+    """
     chk_tab = chk_tab.sort_values(["epoch_srt", "site"])
     sites = list(chk_tab["site"].unique())
 

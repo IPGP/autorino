@@ -17,3 +17,4 @@ colorlog
 tabulate
 matplotlib
 jinja2
+colorama
