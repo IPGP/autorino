@@ -137,10 +137,7 @@ class StepGnss:
         self.log_dir = log_dir
         self.inp_dir = inp_dir
 
-        if not inp_file_regex:
-            self.inp_file_regex = ".*"
-        else:
-            self.inp_file_regex = inp_file_regex
+        self.inp_file_regex = inp_file_regex if inp_file_regex else ".*"
 
         ### temp dirs init
         self.tmp_dir_tables = None  # initialized in the next line
@@ -854,7 +851,7 @@ class StepGnss:
         return None
 
     def translate_path(
-        self, path_inp: str, epoch_inp=None, make_dir: bool = False
+        self, path_inp: str, epoch_inp=None, make_dir: bool = False, absolute : bool =False
     ) -> str:
         """
         Translates a given path using the object's translation dictionary and optionally creates the directory.
@@ -871,6 +868,8 @@ class StepGnss:
             The epoch input to be used in the translation. Default is None.
         make_dir : bool, optional
             If True, the function will create the directory corresponding to the translated path. Default is False.
+        absolute : bool, optional
+            If True, the function will return the absolute path. Default is False.
 
         Returns
         -------
@@ -885,9 +884,14 @@ class StepGnss:
         (we decide to not create a dedicated method for this)
         """
         trslt_dir = arocmn.translator(path_inp, self.translate_dict, epoch_inp)
+
         if make_dir and not os.path.isdir(trslt_dir):
             utils.create_dir(trslt_dir)
             logger.debug("directory created: %s", trslt_dir)
+
+        if trslt_dir and absolute:
+            trslt_dir = os.path.abspath(trslt_dir)
+
         return trslt_dir
 
 

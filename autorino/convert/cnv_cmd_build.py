@@ -251,9 +251,9 @@ def cmd_build_trm2rinex(
         "run",
         "--rm",
         "-v",
-        str(inp_raw_fpath.parent) + ":/inp",
+        str(inp_raw_fpath.parent.resolve()) + ":/inp",
         "-v",
-        str(out_dir) + ":/out",
+        str(out_dir.resolve()) + ":/out",
     ]
     cmd_trm2rinex_list = [
         bin_path,
