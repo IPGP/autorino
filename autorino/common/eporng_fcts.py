@@ -270,7 +270,7 @@ def round_date(date_in, period, round_method="floor"):
 
     # ++++ Singleton case
     date_use = pd.Timedelta(date_in) if isinstance(date_in, pd.Timedelta) else pd.Timestamp(date_in)
-    date_out = getattr(date_use, round_method)(period)
+    date_out = getattr(date_use, round_method)(period) if round_method != "none" else date_use
 
     # ++++ back to the original type
     date_out = date_out.to_pydatetime() if isinstance(date_in, dt.datetime) else type(date_in)(date_out)
