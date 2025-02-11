@@ -179,9 +179,7 @@ def round_date(date_in, period, round_method="floor"):
 
     if pd.isna(date_in):  ### NaT case
         date_out = date_in
-
     elif isinstance(date_in, pd.Series):
-
         date_use = date_in
 
         if round_method == "ceil":
@@ -193,9 +191,8 @@ def round_date(date_in, period, round_method="floor"):
         elif round_method == "none":
             date_out = date_use
         else:
-            logger.error("round_method not understood")
+            logger.critical("round_method not understood")
             raise Exception
-
     else:
         date_typ = type(date_in)
         if date_typ in (pd.Timedelta,):
@@ -212,10 +209,14 @@ def round_date(date_in, period, round_method="floor"):
         elif round_method == "none":
             date_out = date_use
         else:
-            logger.error("round_method not understood")
+            logger.critical("round_method not understood")
             raise Exception
 
-        date_out = date_typ(date_out)
+        #++++ back to the original type
+        if date_typ in (dt.datetime,):
+            date_out = date_out.to_pydatetime()
+        else:
+            date_out = date_typ(date_out)
 
     return date_out
 
