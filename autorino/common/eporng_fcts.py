@@ -97,7 +97,7 @@ def datepars_intrpt(date_inp, tz=None, tz_if_naive="UTC"):
         ### regular case
         else:
             date_out = pd.Timestamp(dateparser.parse(date_inp).isoformat())
-            # .isoformat() is to correctly handle the TimeZone,
+            # .isoformat() is to correctly handle the time zone,
             # without weird pytz's objects used by dateparser
             # like <StaticTzInfo 'UTC\+00:00'>
 
@@ -107,7 +107,7 @@ def datepars_intrpt(date_inp, tz=None, tz_if_naive="UTC"):
         return date_out
     ### if the date is timezone-naive, apply the tz_if_naive
     if not date_out.tz:
-        logger.debug("date %s is timezone-naive. Applying tz %s", date_out, tz_if_naive)
+        logger.warning("date %s is timezone-naive. Applying tz %s", date_out, tz_if_naive)
         date_out = pd.Timestamp(date_out, tz=tz_if_naive)
     ### apply the tz
     if tz:
