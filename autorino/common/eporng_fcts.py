@@ -51,7 +51,7 @@ def epoch_range_intrpt(epo_inp):
     return epo_range_out
 
 
-def datepars_intrpt(date_inp, tz="UTC"):
+def datepars_intrpt(date_inp, tz=None, tz_if_naive="UTC"):
     """
     This function interprets a string or datetime-like object to a Pandas Timestamp.
     It also applies a timezone (UTC by default). Note that rounding does not take place here
@@ -62,7 +62,11 @@ def datepars_intrpt(date_inp, tz="UTC"):
     date_inp : str or datetime-like
         The input date to be interpreted.
     tz : str, optional
-        The timezone to be applied. The default is "UTC".
+        The timezone to be applied.
+        The default is None.
+    tz_if_naive : str, optional
+        The timezone to be applied if the input date is timezone-naive.
+        The default is "UTC".
 
     Returns
     -------
@@ -76,7 +80,7 @@ def datepars_intrpt(date_inp, tz="UTC"):
     If the resulting date is a NaT (Not a Time) type, it is returned as is.
     If the resulting date does not have a timezone, the specified timezone is applied.
     """
-
+    ### INTERPRET THE INPUT
     if not isinstance(date_inp, str):
         date_out = pd.Timestamp(date_inp)
     ## date_inp is a str
@@ -92,19 +96,27 @@ def datepars_intrpt(date_inp, tz="UTC"):
             date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y/%j"))
         ### regular case
         else:
-            date_out = pd.Timestamp(dateparser.parse(date_inp))
+            date_out = pd.Timestamp(dateparser.parse(date_inp).isoformat())
+            # .isoformat() is to correctly handle the TimeZone,
+            # without weird pytz's objects used by dateparser
+            # like <StaticTzInfo 'UTC\+00:00'>
 
-    ### ADD THE TIMEZONE
+    ### MANAGE THE TIMEZONE
+    ### NaT case. can not support tz
     if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
-        ### NaT case. can not support tz
-        pass
-    elif not date_out.tz:
-        logger.debug("date %s has no timezone. Applying tz %s", date_out, tz)
+        return date_out
+    ### if the date is timezone-naive, apply the tz_if_naive
+    if not date_out.tz:
+        logger.debug("date %s is timezone-naive. Applying tz %s", date_out, tz_if_naive)
+        date_out = pd.Timestamp(date_out, tz=tz_if_naive)
+    ### apply the tz
+    if tz:
         date_out = pd.Timestamp(date_out, tz=tz)
-    else:
-        pass
 
-    return date_out.to_pydatetime()
+    ### OUTPUT A NATIVE DATETIME
+    date_out = date_out.to_pydatetime()
+
+    return date_out
 
 
 def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
@@ -222,15 +234,45 @@ def round_date_legacy(date_in, period, round_method="floor"):
 
 
 def round_date(date_in, period, round_method="floor"):
+    """
+    low-level function to round a Pandas Serie or a datetime-like object
+    according to the "ceil", "floor", "round", "none" approach
+
+    Parameters
+    ----------
+    date_in : Pandas Serie or a datetime-like object
+        Input date .
+    period : str, optional
+        the rounding period.
+        Use the pandas' frequency aliases convention (see bellow for details).
+    round_method : str, optional
+        round method: 'ceil', 'floor', 'round', 'none'. The default is "floor".
+
+    Returns
+    -------
+    date_out : Pandas Serie or datetime-like object (same as input)
+        rounded date.
+
+    Note
+    ----
+    Pandas' frequency aliases memo
+    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+
+    """
+
+    # ++++ NaT case
     if pd.isna(date_in):
         return date_in
 
+    # ++++ Series case
     if isinstance(date_in, pd.Series):
         return getattr(date_in.dt, round_method)(period)
 
+    # ++++ Singleton case
     date_use = pd.Timedelta(date_in) if isinstance(date_in, pd.Timedelta) else pd.Timestamp(date_in)
     date_out = getattr(date_use, round_method)(period)
 
+    # ++++ back to the original type
     date_out = date_out.to_pydatetime() if isinstance(date_in, dt.datetime) else type(date_in)(date_out)
 
     return date_out
