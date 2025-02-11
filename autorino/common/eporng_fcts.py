@@ -147,7 +147,7 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
     return epo_out
 
 
-def round_date(date_in, period, round_method="floor"):
+def round_date_legacy(date_in, period, round_method="floor"):
     """
     low-level function to round a Pandas Serie or a datetime-like object
     according to the "ceil", "floor", "round", "none" approach
@@ -217,6 +217,21 @@ def round_date(date_in, period, round_method="floor"):
             date_out = date_out.to_pydatetime()
         else:
             date_out = date_typ(date_out)
+
+    return date_out
+
+
+def round_date(date_in, period, round_method="floor"):
+    if pd.isna(date_in):
+        return date_in
+
+    if isinstance(date_in, pd.Series):
+        return getattr(date_in.dt, round_method)(period)
+
+    date_use = pd.Timedelta(date_in) if isinstance(date_in, pd.Timedelta) else pd.Timestamp(date_in)
+    date_out = getattr(date_use, round_method)(period)
+
+    date_out = date_out.to_pydatetime() if isinstance(date_in, dt.datetime) else type(date_in)(date_out)
 
     return date_out
 
