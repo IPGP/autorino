@@ -66,13 +66,13 @@ def datepars_intrpt(date_inp, tz="UTC"):
 
     Returns
     -------
-    date_out : Timestamp
-        The interpreted date as a Pandas Timestamp.
+    date_out : datetime
+        The interpreted date as a python native datetime.
 
     Note
     ----
     If the input date is a string, it is parsed using the dateparser library.
-    If the input date is a datetime-like object, it is converted to a Pandas Timestamp.
+    If the input date is a datetime-like object, it is converted first to a Pandas Timestamp.
     If the resulting date is a NaT (Not a Time) type, it is returned as is.
     If the resulting date does not have a timezone, the specified timezone is applied.
     """
@@ -90,7 +90,7 @@ def datepars_intrpt(date_inp, tz="UTC"):
         # YYYY/DDD
         elif re.match(doy_pattern_2, date_inp):
             date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y/%j"))
-        ###regular case
+        ### regular case
         else:
             date_out = pd.Timestamp(dateparser.parse(date_inp))
 
@@ -104,7 +104,7 @@ def datepars_intrpt(date_inp, tz="UTC"):
     else:
         pass
 
-    return date_out
+    return date_out.to_pydatetime()
 
 
 def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
