@@ -601,21 +601,6 @@ class DownloadGnss(arocmn.StepGnss):
 
     def mono_fetch(self, irow, force=False, timeout=60, max_try=4, sleep_time=5):
 
-        # +++ oldcheck (to be removed)
-        # if self.table.loc[irow, "ok_out"] and not force:
-        #     logger.info(
-        #         "%s action on row skiped (output exists)",
-        #         self.table.loc[irow, "fpath_out"],
-        #     )
-        #     return None
-        #
-        # if not self.table.loc[irow, "ok_inp"]:
-        #     logger.warning(
-        #         "action on row skipped (input disabled): %s",
-        #         self.table.loc[irow, "fname"],
-        #     )
-        #     return None
-
         if not self.mono_ok_check(irow, "fetch"):
             return None
 
@@ -641,7 +626,7 @@ class DownloadGnss(arocmn.StepGnss):
         file_dl_tmp = None
         file_dl_out = None
         if not self.access["protocol"] in ("ftp", "http"):
-            logger.error("wrong protocol")
+            logger.critical("wrong protocol %s", self.access["protocol"])
             raise Exception
         elif self.access["protocol"] == "http":
             try:
@@ -652,7 +637,6 @@ class DownloadGnss(arocmn.StepGnss):
                     max_try=max_try,
                     sleep_time=sleep_time,
                 )
-                file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
                 dl_ok = True
             except Exception as e:
                 logger.error("HTTP download error: %s", str(e))
@@ -671,18 +655,21 @@ class DownloadGnss(arocmn.StepGnss):
                     ftp_obj_inp=self.ftp_obj,
                 )
                 dl_ok = True
-                file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
             except Exception as e:
                 logger.error("FTP download error: %s", str(e))
                 dl_ok = False
 
         else:  # ++ this case should never happen since there is a protocol test at the begining
             dl_ok = False
-
             pass
+
+        # +++++ check the downloaded file size
+        if dl_ok:
+            dl_ok, _ = arodwl.check_file_size(file_dl_tmp)
 
         # +++++ store the results in the table
         if dl_ok:
+            file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, "fpath_out"] = file_dl_out
             os.remove(file_dl_tmp)

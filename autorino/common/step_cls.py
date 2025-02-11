@@ -41,9 +41,12 @@ warnings.simplefilter("always", UserWarning)
 
 class StepGnss:
     """
-    The StepGnss class represents a step in a GNSS processing chain. It contains methods for initializing and managing
-    various aspects of a processing step, including epoch ranges, sites, sessions, options, and metadata. It also provides
-    methods for handling temporary directories, logging, and table management.
+    The StepGnss class represents a step in a GNSS processing chain.
+    It contains methods for initializing and managing
+    various aspects of a processing step, including epoch ranges,
+    sites, sessions, options, and metadata. It also provides
+    methods for handling temporary directories, logging,
+    and table management.
 
     Attributes
     ----------
@@ -315,7 +318,7 @@ class StepGnss:
         None
         """
         if not site:
-            #logger.warning("no site dict given, a dummy one will be created")
+            # logger.warning("no site dict given, a dummy one will be created")
             self.site = arocmn.dummy_site_dic()
         else:
             self.site = site
@@ -340,7 +343,7 @@ class StepGnss:
         None
         """
         if not session:
-            #logger.warning("no session dict given, a dummy one will be created")
+            # logger.warning("no session dict given, a dummy one will be created")
             self.session = arocmn.dummy_sess_dic()
         else:
             self.session = session
@@ -832,7 +835,7 @@ class StepGnss:
                 str(self).split("/")[0],
                 len(n_tdelta),
                 str(v_tdelta),
-                int(n_tdelta.iloc[0]), # HERE IS DEPRECATION WARNING PANDAS
+                int(n_tdelta.iloc[0]),  # HERE IS DEPRECATION WARNING PANDAS
             )
 
         self.epoch_range = arocmn.EpochRange(
@@ -851,7 +854,11 @@ class StepGnss:
         return None
 
     def translate_path(
-        self, path_inp: str, epoch_inp=None, make_dir: bool = False, absolute : bool =False
+        self,
+        path_inp: str,
+        epoch_inp=None,
+        make_dir: bool = False,
+        absolute: bool = False,
     ) -> str:
         """
         Translates a given path using the object's translation dictionary and optionally creates the directory.
@@ -893,7 +900,6 @@ class StepGnss:
             trslt_dir = os.path.abspath(trslt_dir)
 
         return trslt_dir
-
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
@@ -1265,7 +1271,9 @@ class StepGnss:
 
         for epoch in self.epoch_range.eporng_list():
             inp_dir_epo = self.translate_path(self.inp_dir, epoch_inp=epoch)
-            inp_file_regex_epo = self.translate_path(self.inp_file_regex,epoch_inp=epoch)
+            inp_file_regex_epo = self.translate_path(
+                self.inp_file_regex, epoch_inp=epoch
+            )
             flist_epo = arocmn.import_files(inp_dir_epo, inp_regex=inp_file_regex_epo)
             n_files_epo = len(list(flist_epo))
             flist_all.extend(flist_epo)
@@ -1368,7 +1376,7 @@ class StepGnss:
             local_fname_use = conv.statname_dt2rinexname_long(
                 self.site_id9,
                 epoch,
-                country="XXX", ### site_id9 has the country
+                country="XXX",  ### site_id9 has the country
                 data_source="R",  ### always will be with autorino
                 file_period=prd_str,
                 data_freq=self.session["data_frequency"],
@@ -2033,7 +2041,7 @@ class StepGnss:
             rimopts_wrk["sitelog"] = self.metadata
 
         # +++ set #2: site name/marker
-        if 'marker' in rimopts_inp.keys():
+        if "marker" in rimopts_inp.keys():
             rimopts_wrk["marker"] = rimopts_inp["marker"]
         elif irow is not None:
             rimopts_wrk["marker"] = self.table.loc[irow, "site"]

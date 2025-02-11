@@ -545,3 +545,35 @@ def ping(host, ping_timeout=20):
         return float(match.group(1)) * 10**-3
     else:
         return None
+
+
+def check_file_size(file_path, min_size=1000):
+    """
+    Check the size of a file and log a warning if it is too
+    small to be useful.
+
+    Parameters
+    ----------
+    file_path : str
+        The path to the file to check.
+    min_size : int, optional
+        The minimum file size in bytes. Default is 1000 bytes.
+
+    Returns
+    -------
+    ok_size : bool
+        True if the file size is acceptable, otherwise False.
+    file_size : int
+        The size of the file in bytes
+
+    """
+    file_size = os.path.getsize(file_path)
+    if file_size < min_size:
+        logger.error(
+            "Excluded small file (%iB < %iB): %s", file_size, min_size
+        )
+        ok_size = False
+    else:
+        ok_size = True
+
+    return ok_size, file_size
