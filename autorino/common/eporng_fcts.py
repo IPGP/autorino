@@ -111,7 +111,7 @@ def datepars_intrpt(date_inp, tz=None, tz_if_naive="UTC"):
         date_out = pd.Timestamp(date_out, tz=tz_if_naive)
     ### apply the tz
     if tz:
-        date_out = pd.Timestamp(date_out, tz=tz)
+        date_out = date_out.tz_convert(tz)
 
     ### OUTPUT A NATIVE DATETIME
     date_out = date_out.to_pydatetime()
