@@ -570,7 +570,7 @@ def check_file_size(file_path, min_size=1000):
     file_size = os.path.getsize(file_path)
     if file_size < min_size:
         logger.error(
-            "Excluded small file (%iB < %iB): %s", file_size, min_size
+            "Excluded small file (%iB < %iB): %s", file_size, min_size, file_path
         )
         ok_size = False
     else:
