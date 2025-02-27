@@ -87,7 +87,7 @@ def main():
 
     if args.list_file_input:
         with open(args.raws_inp[0], "r") as f:
-            raws_inp = f.splitlines()
+            raws_inp = f.read().splitlines()
     else:
         raws_inp = args.raws_inp
 
