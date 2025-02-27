@@ -12,7 +12,7 @@ import os
 
 import numpy as np
 import pandas as pd
-import rinexmod_api as rma
+import rinexmod
 import termcolor
 
 from geodezyx import conv
@@ -20,7 +20,7 @@ from geodezyx import conv
 # geodeZYX modules
 from geodezyx import operational as opera
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 
 
 def check_rinex(rinex_dir,start,end,silent=False,return_concat_df=False):
@@ -145,7 +145,7 @@ def _analyze_rinex(df_in):
     df_out = df_in.copy()
 
     ### get RINEX as an rinexMod's Object
-    df_out["robj"] = df_out["fpath"].apply(rma.RinexFile)
+    df_out["robj"] = df_out["fpath"].apply(rinexmod.rinexfile.RinexFile)
     ### get RINEX site code
     df_out["site"] = df_out["robj"].apply(lambda r:r.get_site(False,True))
     #sites_all = df_out["site"].unique
@@ -298,7 +298,7 @@ def _row_color_formater(df_simple_in,
         for site, cplt in site_row.items(): 
             flag = df_full_wrk.loc[(date,site)].flag
             color = color_map[flag]
-            cplt_color = termcolor.colored(str(cplt),color)
+            cplt_color = termcolor.colored(str(cplt), color)
             df_simple_out.loc[date,site] = cplt_color
             
     df_simple_out.columns = [termcolor.colored(x, 'light_grey' , None) for x in df_simple_out.columns]

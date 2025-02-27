@@ -5,13 +5,31 @@
 ## https://coderzcolumn.com/tutorials/python/logging-simple-guide-to-log-events-in-python
 ## https://coderzcolumn.com/tutorials/python/logging-config-simple-guide-to-configure-loggers-from-dictionary-and-config-files-in-python#2
 
+# import colorlog
+# import time
+#
+# class TruncateMillisFormatter(colorlog.ColoredFormatter):
+#     def formatTime(self, record, datefmt=None):
+#         # Get the time in the correct format from the log record
+#         ct = self.converter(record.created)
+#
+#         # If a datefmt is provided, use it to format the time
+#         if datefmt:
+#             t = time.strftime(datefmt, ct)
+#             s = "%s.%03d" % (t, record.msecs)  # Add milliseconds to the time
+#         else:
+#             # Format the time in the style of YYYYMMDDTHH:MM:SS.mmm
+#             t = time.strftime("%y%m%dT%H:%M:%S", ct)
+#             s = "%s.%03d" % (t, record.msecs)  # Add milliseconds to the time
+#         return s
+
 log_config_dict = {
     "version": 1,
     "disable_existing_loggers": False,
     "root": {
         "handlers": ["console_root"],
         "level": "ERROR",
-        # "propagate": False propagate is useless for the root logger
+        # "propagate": False # propagate is useless for the root logger
     },
     "loggers": {
         "autorino": {  # THIS KEY MUST DESCRIBES THE CURRENT MODULE!!!!
@@ -51,7 +69,7 @@ log_config_dict = {
             },
         },
         "fmtgzyx_nocolor": {
-            "fmt": "%(name)s %(asctime)s.%(msecs)03d|%(levelname).1s|%(funcName)-15s|%(message)s",
+            "fmt": "%(asctime)s.%(msecs)03d|%(levelname).1s|%(funcName)-15s|%(message)s",
             "datefmt": "%y%m%dT%H:%M:%S",
         },
     },

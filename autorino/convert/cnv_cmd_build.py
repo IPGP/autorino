@@ -251,15 +251,15 @@ def cmd_build_trm2rinex(
         "run",
         "--rm",
         "-v",
-        str(inp_raw_fpath.parent) + ":/inp",
+        str(inp_raw_fpath.parent.resolve()) + ":/inp",
         "-v",
-        str(out_dir) + ":/out",
+        str(out_dir.resolve()) + ":/out",
     ]
     cmd_trm2rinex_list = [
         bin_path,
         "inp/" + inp_raw_fpath.name,
         "-n",
-        #"-d",
+        # "-d", # doppler disabled, because can cause non standard values for RINEX format
         "-s",
         "-v",
         "3.04",
@@ -375,7 +375,7 @@ def cmd_build_t0xconvert(
 
     inp_raw_fpath_tmp = Path.joinpath(out_dir, inp_raw_fpath.name)
     # Copy the input file to the output directory (this is done silentely)
-    #shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
+    # shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)
     # this is actually done with a shell cp command prior to the conversion
     # see the cmd_list below
 

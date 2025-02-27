@@ -8,18 +8,19 @@ Created on 18/09/2024 18:24:43
 
 import os
 import autorino.convert as arocnv
+import autorino.common as arocmn
 
 
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
 def convert_rnx(
-    raws_inp,
+    inp_raws,
     out_dir,
     out_structure="<SITE_ID4>/%Y/",
     tmp_dir=None,
@@ -27,13 +28,14 @@ def convert_rnx(
     rinexmod_options=None,
     metadata=None,
     force=False,
+    store_raw_structure=None,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
 
     Parameters
     ----------
-    raws_inp : list
+    inp_raws : list
         The input RAW files to be converted.
         The input can be:
         * a python list
@@ -84,11 +86,32 @@ def convert_rnx(
     else:
         out_dir_use = out_dir
 
-    raws_use = raws_inp
+    raws_use = inp_raws
 
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    # if site:
+    #     site_dic = {"site_id": site}
+    #     update_site_id_with_metadata = False
+    # else:
+    #     site_dic = None
+    #     update_site_id_with_metadata = True
+
+    cnv = arocnv.ConvertGnss(
+        out_dir_use, tmp_dir, log_dir, metadata=metadata
+    )
     cnv.load_tab_filelist(raws_use)
+    cnv.convert(
+        force=force,
+        rinexmod_options=rinexmod_options,
+    )
 
-    cnv.convert(force=force, rinexmod_options=rinexmod_options)
+    if store_raw_structure:
+        store_raw_stru_use = os.path.join(out_dir, store_raw_structure)
+
+        cpy_raw = arocmn.StepGnss(
+            store_raw_stru_use, tmp_dir, log_dir, metadata=metadata
+        )
+
+        cpy_raw.load_tab_filelist(raws_use)
+        cpy_raw.copy_files()
 
     return cnv

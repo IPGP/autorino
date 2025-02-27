@@ -26,8 +26,11 @@ from rinexmod import rinexmod_api
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
+BOLD_SRT = "\033[1m"
+BOLD_END = "\033[0m"
 
 
 def load_cfg(configfile_path):
@@ -46,7 +49,9 @@ def load_cfg(configfile_path):
     dict
         The parsed content of the configuration file.
     """
-    logger.info("start to read configfile: %s", configfile_path)
+    logger.info(
+        BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", configfile_path
+    )
     y = yaml.safe_load(open(configfile_path))
     return y
 
@@ -92,7 +97,10 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         y_main = None
 
     y = update_w_main_dic(y, y_main)
-    logger.debug("Used configuration (updated with the main):\n %s", y)
+
+    print_cfg_for_debug = False
+    if print_cfg_for_debug:
+        logger.debug("Used configuration (updated with the main):\n %s", y)
 
     y_station = y["station"]
 
@@ -104,23 +112,48 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
 
 
 def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
+    """
+    Reads and interprets session configurations from a dictionary
+    and returns lists and dictionaries of StepGnss objects.
+
+    This function processes session configurations,
+    loads metadata if available, and constructs lists and dictionaries
+    of StepGnss objects based on the provided session configurations.
+
+    Parameters
+    ----------
+    y_sessions_dict : dict
+        A dictionary containing session configurations.
+    epoch_range_inp : EpochRange, optional
+        An EpochRange object which will override the epoch ranges given
+        in the session configurations. Default is None.
+    y_station : dict, optional
+        A dictionary containing station information. Default is None.
+
+    Returns
+    -------
+    steps_lis_lis : list
+        A list of lists of StepGnss objects to be launched sequentially.
+    steps_dic_dic : dict
+        A dictionary of dictionaries of StepGnss objects.
+    """
 
     # ++++ METADATA
     if y_station["site"]["sitelog_path"]:
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
-            # we load the metadata if the path is a directory or a file
+            # Load the metadata if the path is a directory or a file
             metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
         else:
-            # if not we consider it as a string
+            # If not, consider it as a string
             # (because the path might be translated later in the object)
             metadata = slpath
     else:
+        ###### MUST BE IMPLEMENTED WITH MANUAL VALUES
         metadata = None
 
     steps_lis_lis = []
     steps_dic_dic = {}
-
     for k_ses, y_ses in y_sessions_dict.items():
 
         y_gen = y_ses["general"]
@@ -150,11 +183,10 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             # y_step_main = y_workflow_main[k_stp]
             # y_step = update_w_main_dic(y_step, y_step_main)
 
-            # ++++ EPOCH RANGE AT THE STEP LEVEL
-
             if not _is_cfg_bloc_active(y_stp):
                 continue
 
+            # ++++ EPOCH RANGE AT THE STEP LEVEL
             step_cls = step_cls_select(k_stp)
             if not step_cls:
                 logger.warning("unknown step %s, skip", k_stp)
@@ -166,14 +198,28 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             else:
                 epo_obj_stp = _epoch_range_from_cfg_bloc(y_stp["epoch_range"])
 
+            ## concatenate the dir_parent and the structure
+            # (but not the file_regex, it is just about the directory)
             out_dir, _, _ = _get_dir_path(y_stp, "out")
             inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
+
+            if "inp_file_regex" in y_stp.keys():
+                inp_file_regex = y_stp["inp_file_regex"]
+            else:
+                logger.warning(
+                    "Compatibility Warning: inp_file_regex not defined in the cfg files, set to .*"
+                )
+                logger.warning(
+                    "Compatibility Warning: you should upgrade your config file to >v15"
+                )
+                inp_file_regex = ".*"
 
             kwargs_for_step = {
                 "out_dir": out_dir,
                 "tmp_dir": tmp_dir,
                 "log_dir": log_dir,
                 "inp_dir": inp_dir,
+                "inp_file_regex": inp_file_regex,
                 "epoch_range": epo_obj_stp,
                 "site": y_station["site"],
                 "session": y_ses["general"],
@@ -181,11 +227,12 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
                 "metadata": metadata,
             }
 
-            if k_stp in "download":
+            if k_stp == "download":
                 kwargs_for_step["access"] = y_station["access"]
 
+            ### +++ CREATION OF THE OBJECT ###########
             step_obj = step_cls(**kwargs_for_step)
-
+            ##########################################
             # appended in lis and dic at the end of the k_stp tests
             steps_lis.append(step_obj)
             steps_dic[k_stp] = step_obj
@@ -210,7 +257,7 @@ def step_cls_select(step_name):
         return None
 
 
-def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
+def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
     """
     Checks if a parent directory exists and translates it with the environment variable first.
 
@@ -256,13 +303,17 @@ def _check_parent_dir_existence(parent_dir, parent_dir_key=None):
             parent_dir_key,
         )
         raise FileNotFoundError(
-            None, parent_dir_key + " do not exists, create it first"
+            None,
+            parent_dir_key + " do not exists, create it manually first (mkdir -p ...)",
         )
 
     elif not os.path.isdir(parent_dir_out):  # standard case
-        logger.error("%s do not exists, create it first", parent_dir_out)
+        logger.error(
+            "%s do not exists, create it first manually (mkdir -p ...)", parent_dir_out
+        )
         raise FileNotFoundError(
-            None, parent_dir_out + " do not exists, create it first"
+            None,
+            parent_dir_out + " do not exists, create it manually first (mkdir -p ...)",
         )
     else:
         return None
@@ -305,7 +356,6 @@ def _epoch_range_from_cfg_bloc(epoch_range_dic):
     """
     get an EpochRange object from epoch_range dictionary bloc
     internal function for read_cfg
-
     """
     return arocmn.EpochRange(
         epoch_range_dic["epoch1"],
@@ -344,15 +394,43 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
         the parent directory, and the structure.
     """
     dir_parent = y_step[dir_type + "_dir_parent"]
-    structure = y_step[dir_type + "_structure"]
+    structure = y_step[dir_type + "_dir_structure"]
     if check_parent_dir_exist:
-        _check_parent_dir_existence(dir_parent, parent_dir_key=dir_type + "_dir_parent")
+        _check_parent_dir_exist(dir_parent, parent_dir_key=dir_type + "_dir_parent")
+
+    dir_parent, structure = format_dir_path(dir_parent, structure)
+
     dir_path = os.path.join(dir_parent, structure)
 
     return dir_path, dir_parent, structure
 
 
+def format_dir_path(dir_parent, structure):
+    """
+    Formats a directory path by adding or removing a leading slash.
+    """
+
+    if dir_parent[0] != "/":
+        logger.warning(
+            "dir_parent %s should start with slash (/), we add it automatically",
+            dir_parent,
+        )
+        dir_parent = "/" + dir_parent
+
+    if structure and structure[0] == "/":
+        logger.warning(
+            "structure %s should not start with slash (/), we remove it automatically",
+            structure,
+        )
+        structure = structure[1:]
+
+    return dir_parent, structure
+
+
 def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
+    """
+    Updates a dictionary with another dictionary.
+    """
     if u is None:
         return d
     for k, v in u.items():
@@ -368,7 +446,13 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     return d
 
 
-def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, verbose=True, force=False):
+def run_steps(
+    steps_lis,
+    steps_select_list=None,
+    exclude_steps_select=False,
+    verbose=True,
+    force=False,
+):
     """
     Executes the steps in the provided list.
 
@@ -420,15 +504,22 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, ver
         # Check if there are selected steps to be run
         if len(steps_select_list) > 0:
             # Forced case: steps_select_list contains the steps to be run only
-            if not exclude_steps_select and stp.get_step_type() not in steps_select_list:
+            if (
+                not exclude_steps_select
+                and stp.get_step_type() not in steps_select_list
+            ):
                 logger.warning(
-                    "step %s skipped, not selected in %s", stp.get_step_type(), steps_select_list
+                    "step %s skipped, not selected in %s",
+                    stp.get_step_type(),
+                    steps_select_list,
                 )
                 continue
             # Exclusion case: steps_select_list contains steps to be excluded
             elif exclude_steps_select and stp.get_step_type() in steps_select_list:
                 logger.warning(
-                    "step %s skipped, selected in %s", stp.get_step_type(), steps_select_list
+                    "step %s skipped, selected in %s",
+                    stp.get_step_type(),
+                    steps_select_list,
                 )
                 continue
             else:
@@ -441,37 +532,22 @@ def run_steps(steps_lis, steps_select_list=None, exclude_steps_select=False, ver
         if force:
             stp.options["force"] = True
 
-        # # Execute the step based on its type
-        # if stp.get_step_type() == "download":
-        #     stp.download(**stp.options)
-        # elif stp.get_step_type() == "convert":
-        #     stp.load_tab_prev_tab(wkf_prev.table)
-        #     stp.convert(**stp.options)
-        # elif stp.get_step_type() == "splice":
-        #     stp_rnx_inp = stp.copy()
-        #     stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
-        #     stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
-        # elif stp.get_step_type() == "split":
-        #     stp_rnx_inp = stp.copy()
-        #     stp_rnx_inp.load_tab_prev_tab(wkf_prev.table)
-        #     stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
-        #
-
+        load_table_msg_str = BOLD_SRT + ">>>>>>>> Load table for step %s" + BOLD_END
         # Execute the step based on its type
         if stp.get_step_type() == "download":
             stp.download(**stp.options)
         elif stp.get_step_type() == "convert":
-            logger.info("load table for step %s", stp.get_step_type())
+            logger.info(load_table_msg_str, stp.get_step_type())
             stp.load_tab_inpdir()
             stp.convert(**stp.options)
         elif stp.get_step_type() == "splice":
             stp_rnx_inp = stp.copy()
-            logger.info("load table for step %s", stp.get_step_type())
+            logger.info(load_table_msg_str, stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
         elif stp.get_step_type() == "split":
             stp_rnx_inp = stp.copy()
-            logger.info("load table for step %s", stp.get_step_type())
+            logger.info(load_table_msg_str, stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
 

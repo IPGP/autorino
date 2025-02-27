@@ -3,8 +3,8 @@
 # autorino
 autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
-**Version: 0.1.0**
-**Date: 2024-05-29**, README Revision: 2024-05-29
+**Version: 1.1.0**  
+**Date: 2025-01-30**
 
 **Authors & Contributors:**
 * [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
@@ -12,7 +12,6 @@ autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Ob
 * [Jean-Marie Saurel](https://github.com/jmsaurel) (IPGP-OVS, Paris, France)
 * [Cyprien Griot](https://github.com/cyprien-griot) (OVPF-IPGP, La Réunion, France)
 * [Diane Pacaud](https://github.com/DianouPac) (OVPF-IPGP, La Réunion, France)
-* [Aurélie Panetier](https://github.com/aureliep972) (IPGP, Paris, France)
 
 **Contact e-mail:** sakic@ipgp.fr
 
@@ -46,11 +45,17 @@ cd autorino
 pip install .
 ```
 
+For developpers, you can install _autorino_ in [developement mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html).
+```bash
+pip install -e .
+```
+
+
 ### Setting up the environment
 
 You need to set up the environment variable `$AUTORINO_ENV` to point to the _autorino_'s configuration file.
 
-In your .bashrc or .bash_profile file, add the following lines:
+In your `.bashrc` or `.bash_profile` file, add the following lines:
 ```bash
 export AUTORINO_ENV="/home/user/path_to/autorino/configfiles/env/autorino_env.yml"
 ```
@@ -96,14 +101,20 @@ converter here: [tps2rin](https://mytopcon.topconpositioning.com/support/product
 _autorino_ will emulate it with _wine_. Be sure to have `wine` installed on your computer. Detailled precedure will be added soon.
 #### BINEX
 converter here: [convbin](https://github.com/rtklibexplorer/RTKLIB)  
-_convbin_ is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.  
-Detailled procedure will be added soon.
+_convbin_ is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.
+##### detailed procedure
+```bash
+git clone https://github.com/rtklibexplorer/RTKLIB.git
+cd RTKLIB/app/consapp/convbin/gcc
+make
+```
+The compiled binary `convbin` will be in the `RTKLIB/app/consapp/convbin/gcc` folder.
+
 #### Trimble (official Linux converter)
 Ask Trimble support for the official Linux converter _t0xConverter_.
 #### Trimble (unofficial dockerized converter)
-converter here: [trm2rinex-docker](https://github.com/Matioupi/trm2rinex-docker)    
+converter here: [trm2rinex-docker-ovs](https://github.com/IPGP/trm2rinex-docker-ovs)    
 This docker image is a wrapper around Trimble's official converter _trm2rinex_ which is not available for Linux.  
-A dedicated README file `trm2rinex_readme.md` details the installation and usage of this docker image.  
 It relies on Trimble's official converter for Windows `ConvertToRinex` available 
 [here](https://geospatial.trimble.com/en/support) & [there](https://trl.trimble.com/docushare/dsweb/Get/Document-1051259/).
 
@@ -122,15 +133,44 @@ You might also need RINEX handeling software:
 NB: GFZRNX usage is **not allowed** in _routine mode_ without a proper commercial license. Be sure to comply with it.
 
 ### Setting up external utilities
-Once the converters are installed, you need to set the converter paths in the _autorino_'s `env` configuration file.
 
-You must have set the `$AUTORINO_ENV` environment variable to point to the `env` configuration file. 
+Be sur to have set `$AUTORINO_ENV` environment variable to point to the `env` configuration file. 
 (see dedicated section above)
 
-To configure the external utilities, in the you can:
-* set the full executable's paths to the in the `env` configuration file
-* set the paths in your `$PATH` environment variable, and then simply set the executable's names in the `env` 
+Once the converters are installed, you need to set the converter paths in the _autorino_'s `env` configuration file.
+
+To configure the external utilities, you can:
+1. set the full executable's paths to the in the `env` configuration file
+1. set the paths in your `$PATH` environment variable, and then simply set the executable's names in the `env` 
 configuration file.
+
+The authors recommend the second option, as it is more flexible and easier to maintain.
+
+#### A recommended receipe for setting up the external utilities
+
+* Create a directory for the GNSS converters in your prefered location, e.g. your `$HOME`.
+```bash
+mkdir /your/favorite/location/converters_gnss
+cd /your/favorite/location/converters_gnss
+```
+* Create a subdirectory with a version name, typically the date of the download.
+```bash
+mkdir vYYYYMMDD
+```
+* Copy the GNSS converters in the version directory. Do not forget to make each of them executable with `chmod +x`
+
+
+* Create a symbolic link called `operational`, pointing to the version directory.
+```bash
+ln -s vYYYYMMDD operational
+```
+* Edit your `.bashrc` or `.bash_profile` file to add the `operationnal` virtual folder to your `$PATH`, and then make its content available in the whole environnement.
+```bash
+export PATH=$PATH:/your/favorite/location/converters_gnss/operational
+```
+
+* If you want to update some conversion software, create a new version directory, set the new software inside, and update the `operational` symbolic link.
+
 
 ## Getting started: some simple examples
 
@@ -277,9 +317,7 @@ Each session is in a sub-block with its own parameters.
   The session block name is, by convention, `session_<sessionname>`, where `<sessionname>` is also the first
   session's `general` sub-block attribute's `name`.
     * `general` : name, data freqency, temporary and log directories of the session
-    * `epoch_range` : the epoch range of the step i.e. a start epoch (`epoch1`), an end epoch (`epoch2`), and `period` (step) 
-       of the session to download the data. `epoch1` and `epoch2` can be relative epochs in human readable sentences.
-      (interpretation done with the [dateparser](https://github.com/scrapinghub/dateparser/) package).
+    * `epoch_range` : See the dedicated section below.
     * `steps` : list of the steps constituting the workflow. 
        Each step is a sub-block with its own parameters.
 
@@ -340,4 +378,58 @@ The central attribute of a `StepGnss` object is its table (`step_gnss.table`).
 
 This is a pandas' DataFrame that lists, among other things, the input files, and, 
 where applicable, the output files if the operation has been successful.
+
+### About _epoch range_ and timing.
+
+When defining an _epoch range_ for a step, you give:
+* a _first epoch_ (`epoch1`*)
+* an _last epoch_ (`epoch2`*)
+* a _period_ (`period`)
+
+*: `epoch1` and `epoch2` are automatically sorted. You don't have to worry about the order, which one is the oldest 
+and which one is the newest with respect to the present epoch.
+ 
+To create an _epoch range_, autorino generates a set of (_start bound_, _end bound_) starting at the _first epoch_,
+increased incrementally by the _period_, and stoped at the _ending epoch_. The _ending epoch_ is __not included__ 
+as a final _start bound_.
+
+ `epoch1` and `epoch2` can be relative epochs to the presente epoch in human-readable sentences.
+(interpretation done with the [dateparser](https://github.com/scrapinghub/dateparser/) package). For instance:
+* `"10 days ago"`
+* `"today at 00:00"`
+* `"now"`
+* `"15 minutes ago"`
+
+`epoch1` and `epoch2` can also be absolute epochs in the `date` format. For instance: `"2024-05-01 00:00:00"`
+
+Internally, _autorino_ uses UTC timescale. (which is a good proxy for the GPS time as the minute level).
+Customizing the time zone is possible by modifying the `tz` format in the configuration files.
+It will change the way the input `epoch1` and `epoch2` are interpreted.
+You can customize it using the [_tz database_](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+ names: e.g. `Europe/Paris`, `America/Guadeloupe`, `America/Martinique`, `Indian/Reunion` etc...
+
+Using the `round_method` option, you can round `epoch1` and `epoch2` to the closest epoch according to `period`.
+Accepted values are:
+* `floor` (default): round to the closest epoch _before_ the `epoch1`/`epoch2`.
+* `ceil`: round to the closest epoch _after_ the `epoch1`/`epoch2`.
+* `round`: round to the closest epoch depending where you are in the period (not recommended).
+
+### A simple exemple
+
+If you ask on 2025-01-20 for an _epoch range_ with:
+* `epoch1`: `"10 days ago"`
+* `epoch2`: `"today"`
+* `period`: `"01D"`
+* `round_method`: `"floor"`
+
+You will get the following results:
+```commandline
+        epoch_srt         epoch_end
+25-01-16 00:00:00 25-01-16 23:59:59
+25-01-17 00:00:00 25-01-17 23:59:59
+25-01-18 00:00:00 25-01-18 23:59:59
+25-01-19 00:00:00 25-01-19 23:59:59
+25-01-20 00:00:00 25-01-20 23:59:59
+```
+
 

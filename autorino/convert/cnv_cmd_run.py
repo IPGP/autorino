@@ -21,7 +21,7 @@ from geodezyx import utils, conv
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 ###################################################################
@@ -230,7 +230,7 @@ def converter_run(
     bin_options=[],
     bin_kwoptions=dict(),
     bin_path: Union[Path, str] = "",
-    remove_converted_annex_files=False,
+    remove_converted_annex_files=True,
     cmd_build_fct=None,
     conv_regex_fct=None,
 ):
@@ -276,7 +276,7 @@ def converter_run(
     remove_converted_annex_files : bool, optional
         remove or not the 'annex' converted files.
         i.e. the not navigation files (e.g. the navigtation RINEXs).
-        The default is False.
+        The default is True.
     cmd_build_fct : function, optional
         A custom function which build the command calling
         the conversion program
@@ -430,7 +430,7 @@ def converter_run(
     if remove_converted_annex_files:
         for f in conv_files_annex:
             os.remove(f)
-            logger.info("converted annex file removed: %s", f)
+            logger.debug("converted annex file removed: %s", f)
 
     return str(out_fpath), process_converter
 

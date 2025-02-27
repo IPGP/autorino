@@ -15,19 +15,19 @@ import autorino.handle as arohdl
 import geodezyx.conv as conv
 
 
-
-spc = arohdl.SpliceGnss(dir,
-                        dir,
-                        dir,
-                        epoch_range=(conv.doy2dt(2024,226),
-                                     conv.doy2dt(2024,227),
-                                     "1d"),
-                                     inp_dir=prnx)
+spc = arohdl.SpliceGnss(
+    dir,
+    dir,
+    dir,
+    epoch_range=(conv.doy2dt(2024, 226), conv.doy2dt(2024, 227), "1d"),
+    inp_dir=prnx,
+)
 
 rnxsinp = spc.find_local_inp(return_as_step_obj=True)
 
-spc.splice("given",rnxsinp)
+spc.splice("given", rnxsinp)
 
 
 import versioningit
-versioningit.get_version('/home/psakicki/CODES/IPGP/autorino')
+
+versioningit.get_version("/home/psakicki/CODES/IPGP/autorino")

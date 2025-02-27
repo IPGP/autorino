@@ -20,7 +20,7 @@ import autorino.download as arodwl
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -72,7 +72,7 @@ def download_html_page(url_inp, output_file_inp):
 
 
 def extract_trimble_filelist(
-    html_files, pattern=".{4}______[0-9]{12}A\.T02", output_csv_dir=None
+    html_files, pattern=r".{4}______[0-9]{12}A\.T02", output_csv_dir=None
 ):
     """
     Extract the list of Trimble files from an HTML file.
@@ -124,7 +124,7 @@ def extract_trimble_filelist(
 
 def trimble_filelist_html(
     site,
-    host_name,
+    hostname,
     output_dir,
     start_date,
     end_date,
@@ -136,7 +136,7 @@ def trimble_filelist_html(
     eporng = arocmn.EpochRange(start_date, end_date, period, round_method="none")
     output_paths_ok = []
     for curr_date in eporng.eporng_list():
-        url = str(os.path.join('http://', host_name, curr_date.strftime(structure)))
+        url = str(os.path.join('http://', hostname, curr_date.strftime(structure)))
 
         #output_path_ini = os.path.join(output_dir, os.path.basename(url))
         output_fnam_ok = site + "_" + os.path.basename(url) + ".html"

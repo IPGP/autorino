@@ -14,3 +14,7 @@ tqdm
 bs4
 beautifulsoup4
 colorlog
+tabulate
+matplotlib
+jinja2
+colorama

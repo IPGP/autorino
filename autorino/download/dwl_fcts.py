@@ -10,7 +10,8 @@ import ftplib
 import io
 
 import os
-import socket
+
+# import socket
 import urllib
 import urllib.request
 import time
@@ -26,7 +27,7 @@ import tqdm
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -68,7 +69,9 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     """
     # urltambouille
     ### add the protocol if missing
-    if protocol_inp and not (hostname_inp.startswith("http") or hostname_inp.startswith("ftp")):
+    if protocol_inp and not (
+        hostname_inp.startswith("http") or hostname_inp.startswith("ftp")
+    ):
         prot_n_host = protocol_inp + "://" + hostname_inp
     else:
         prot_n_host = hostname_inp
@@ -83,6 +86,7 @@ def join_url(protocol_inp, hostname_inp, dir_inp, fname_inp):
     url_out = os.path.join(prot_n_host, dirr, fname_inp)
 
     return url_out
+
 
 #  ______ _______ _____
 # |  ____|__   __|  __ \
@@ -127,7 +131,7 @@ def ftp_create_obj(
     while True:
         try:
             ftp = ftplib.FTP(hostname_inp, timeout=timeout)
-            if username and password:
+            if (username is not None) and (password is not None):
                 ftp.login(username, password)
             return ftp
         except TimeoutError as e:
@@ -183,9 +187,9 @@ def list_remote_ftp(
     """
 
     # Clean hostname and remote directory
-    #legacy hostname_use defintion (urltambouille)
-    #hostname_use = hostname.replace("ftp://", "")
-    #hostname_use = hostname_use.replace("/", "")
+    # legacy hostname_use defintion (urltambouille)
+    # hostname_use = hostname.replace("ftp://", "")
+    # hostname_use = hostname_use.replace("/", "")
 
     url_parsed = urlparse(hostname)
     if url_parsed.scheme:
@@ -201,10 +205,14 @@ def list_remote_ftp(
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
-    elif username and password:
+    elif username is not None and password is not None:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
-            hostname_use, username, password, timeout=timeout, max_try=max_try
+            hostname_inp=hostname_use,
+            username=username,
+            password=password,
+            timeout=timeout,
+            max_try=max_try,
         )
     else:
         logger.error(
@@ -221,16 +229,23 @@ def list_remote_ftp(
         ftp_obj.cwd(remote_dir_use)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
+        logger.error("Wished destination: %s", remote_dir_use)
         return []
 
     # Retrieve list of files
-    file_list_bulk = ftp_obj.nlst()
+    try:
+        file_list_bulk = ftp_obj.nlst()
+    except Exception as e:
+        logger.error("FTP file list failed: %s", str(e))
+        file_list_bulk = []
+
     # current directory (.) and parent directory (..) are removed anyway
-    file_list_bulk = [f for f in file_list_bulk if f not in ('.', '..')]
-    file_list_join = [join_url('',hostname_use, remote_dir_use, f.split()[-1]) for f in file_list_bulk]
+    file_list_bulk = [f for f in file_list_bulk if f not in (".", "..")]
+    file_list_join = [
+        join_url("", hostname_use, remote_dir_use, f.split()[-1])
+        for f in file_list_bulk
+    ]
     # split()[-1] is necessary for Trimble files, to have just the filename and not the size, owner, etc.
-    # legacy manual join (urltambouille)
-    #file_list_leg = ["/".join((hostname_use, remote_dir_use, f)) for f in file_list_bulk if f not in ('.', '..')]
 
     file_list = file_list_join
 
@@ -281,6 +296,8 @@ def download_ftp(
     -------
     str
         The path to the downloaded file, or an empty string if the download failed.
+        If something goes wrong, the function will raise an AutorinoDownloadError
+        (no empty string or None).
 
     Raises
     ------
@@ -291,17 +308,16 @@ def download_ftp(
     def _ftp_callback(data):
         _ftp_callback.bytes_transferred += len(data)
 
-
     urlp = urlparse(url)
     url_host = urlp.netloc
-    url_dir = os.path.dirname(urlp.path) #[1:]
+    url_dir = os.path.dirname(urlp.path)  # [1:]
     url_fname = os.path.basename(urlp.path)
 
     # create the FTP object
     if ftp_obj_inp:
         disposable_ftp_obj = False
         ftp_obj = ftp_obj_inp
-    elif username and password:
+    elif username is not None and password is not None:
         disposable_ftp_obj = True
         ftp_obj = ftp_create_obj(
             url_host,
@@ -320,14 +336,15 @@ def download_ftp(
     # connect to the FTP server
     if not ftp_obj:
         logger.error("FTP connection failed for %s", url)
-        return ""
+        raise AutorinoDownloadError
 
     # change to the remote directory
     try:
         ftp_obj.cwd(url_dir)
     except ftplib.error_perm as e:
         logger.error("FTP directory change failed: %s", str(e))
-        return ""
+        logger.error("Wished destination: %s", url_dir)
+        raise AutorinoDownloadError
 
     filename = url_fname
     file_size = ftp_obj.size(filename)
@@ -348,17 +365,12 @@ def download_ftp(
                 )
                 break
         # here are all the possible exceptions that can be raised
-        except (
-            ftplib.error_temp,
-            ftplib.error_reply,
-            BrokenPipeError,
-            socket.timeout,
-            EOFError,
-        ) as e:
+        except Exception as e:
             try_count += 1
             if try_count > max_try:
                 logger.error("download failed, max try exceeded: %s", str(e))
-                return ""
+                raise AutorinoDownloadError
+                # this error will be handled by the upper function mono_fetch
             else:
                 logger.warning(
                     "download failed (%s), try %i/%i", str(e), try_count, max_try
@@ -387,8 +399,8 @@ def list_remote_http(hostname, remote_dir):
     url = join_url("http", hostname, remote_dir, "")
 
     # legacy manual join (urltambouille
-    #url = os.path.join(hostname, remote_dir)
-    #url = "http://" + hostname + "/" + remote_dir
+    # url = os.path.join(hostname, remote_dir)
+    # url = "http://" + hostname + "/" + remote_dir
 
     logger.debug("HTTP file list: %s", url)
 
@@ -533,3 +545,35 @@ def ping(host, ping_timeout=20):
         return float(match.group(1)) * 10**-3
     else:
         return None
+
+
+def check_file_size(file_path, min_size=1000):
+    """
+    Check the size of a file and log a warning if it is too
+    small to be useful.
+
+    Parameters
+    ----------
+    file_path : str
+        The path to the file to check.
+    min_size : int, optional
+        The minimum file size in bytes. Default is 1000 bytes.
+
+    Returns
+    -------
+    ok_size : bool
+        True if the file size is acceptable, otherwise False.
+    file_size : int
+        The size of the file in bytes
+
+    """
+    file_size = os.path.getsize(file_path)
+    if file_size < min_size:
+        logger.error(
+            "Excluded small file (%iB < %iB): %s", file_size, min_size, file_path
+        )
+        ok_size = False
+    else:
+        ok_size = True
+
+    return ok_size, file_size

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import logging
+#import logging
 import logging.config
 import os
 from os import path
+
+__version__='1.1.0' #  changed automaticcaly with bump-my-version
 
 #### IMPORT CONFIG FOR LOGGER
 log_file_path = os.path.join(
@@ -14,6 +16,9 @@ from . import cfglog
 
 if os.path.isfile(log_file_path):
     logging.config.dictConfig(cfglog.log_config_dict)
+
+    #import logging_tree
+    #logging_tree.printout()
 
 else:
     print("ERR:logger cfgfiles file", log_file_path, "is missing")

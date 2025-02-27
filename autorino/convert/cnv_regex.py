@@ -18,6 +18,7 @@ from pathlib import Path
 
 ###################################################################
 
+
 def conv_regex_void(f):
     """
     Generate the regular expressions of the main and annex converted files
@@ -315,7 +316,6 @@ def conv_regex_mdb2rnx(f):
     # souf226n 8.24l
     # souf226n 8.24n
     # souf226n 8.24o
-
 
     finp = str(f)
     f = Path(Path(f).name)  ### keep the filename only

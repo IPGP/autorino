@@ -9,6 +9,7 @@ Created on Fri Apr  7 12:07:18 2023
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -18,7 +19,7 @@ from geodezyx import operational
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 BOLD_SRT = "\033[1m"
@@ -69,9 +70,8 @@ class ConvertGnss(arocmn.StepGnss):
         tmp_dir,
         log_dir,
         inp_dir=None,
+        inp_file_regex=None,
         epoch_range=None,
-        inp_dir_parent=None,
-        inp_structure=None,
         site=None,
         session=None,
         options=None,
@@ -110,6 +110,7 @@ class ConvertGnss(arocmn.StepGnss):
             tmp_dir=tmp_dir,
             log_dir=log_dir,
             inp_dir=inp_dir,
+            inp_file_regex=inp_file_regex,
             epoch_range=epoch_range,
             site=site,
             session=session,
@@ -119,7 +120,13 @@ class ConvertGnss(arocmn.StepGnss):
 
     ###############################################
 
-    def convert(self, verbose=False, force=False, rinexmod_options=None):
+    def convert(
+        self,
+        verbose=False,
+        force=False,
+        rinexmod_options=None,
+        converter="auto",
+    ):
         """
         "total action" method
 
@@ -138,15 +145,30 @@ class ConvertGnss(arocmn.StepGnss):
         force : bool, optional
             If True, forces the conversion even if output files already exist. Default is False.
         rinexmod_options : dict, optional
-            A dictionary containing options for the rinexmod process. If not specified, default options are used.
+            A dictionary containing options for the rinexmod process.
+             If not specified, default options are used.
+        converter : str, optional
+            The converter to be used for the conversion.
+            If not specified, the best converter is automatically selected.
+            Default is 'auto'.
 
         Returns
         -------
         None
         """
 
+        # #### Legacy Option
+        # update_site_id_with_metadata : bool, optional
+        #     If True, updates the site identifier using the metadata (default case).
+        #     Since the site code from RAW file name can be poorly formatted
+        #     we search it w.r.t. the sites from the metadata.
+        #     If False, the site identifier is not updated, and it is the one of the
+        #     ConvertGnss object self.site_id that is used.
+        #     (for some advanced cases).
+        #     Default is True.
+
         self.set_logfile()
-        logger.info(BOLD_SRT + ">>>>>>>>> RAW > RINEX files conversion" + BOLD_END)
+        logger.info(BOLD_SRT + ">>>>>> RAW > RINEX files conversion" + BOLD_END)
 
         self.set_tmp_dirs()
         self.clean_tmp_dirs()
@@ -169,6 +191,10 @@ class ConvertGnss(arocmn.StepGnss):
         self.check_local_files("out")
         # tests if the input local files are already there
         self.check_local_files("inp")
+        # be sure ok_xxx columns are booleans
+        self.table_ok_cols_bool()
+        # switch ok_inp to False if the output files are already there
+        self.filter_ok_out()
 
         if force:
             self.force("convert")
@@ -209,27 +235,10 @@ class ConvertGnss(arocmn.StepGnss):
             fraw = Path(self.table.loc[irow, "fpath_inp"])
             ext = fraw.suffix.lower()
 
-            # +++ oldcheck (to be removed)
-            # if not self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-            #     logger.info("conversion skipped (output already exists): %s", fraw)
-            #     continue
-            # # +++ the test bellow conflicts the Force option
-            # # elif self.table.loc[irow, "ok_inp"] and self.table.loc[irow, "ok_out"]:
-            # #    logger.info(
-            # #        "conversion skipped (already converted in a previous run): %s", fraw
-            # #    )
-            # #    continue
-            # elif not self.table.loc[irow, "ok_inp"]:
-            #     logger.warning("conversion skipped (something went wrong): %s", fraw)
-            #     continue
-            # else:
-            #     pass
-            #
-            if not self.mono_ok_check(irow,"conversion"):
+            if not self.mono_ok_check(irow, "conversion"):
                 continue
 
-
-            logger.info(">>>>>> input raw file for conversion: %s", fraw.name)
+            logger.info(">>>> input raw file for conversion: %s", fraw.name)
 
             ###########################################################################
             # change the site_id here is a very bad idea, it f*cks the outdir 240605
@@ -242,13 +251,20 @@ class ConvertGnss(arocmn.StepGnss):
             # we search it w.r.t. the sites from the metadata
             # we update the table row and the translate_dic (necessary for the output dir)
             self.mono_site_upd(irow, site4_list)
-            self.site_id = self.table.loc[irow, "site"]  # for translation of the output dir & rinexmod options
+            # set self.site_id for the output dir translation & rinexmod options
+            self.site_id = self.table.loc[irow, "site"]
 
             self.set_translate_dict()
             ###########################################################################
+            # +++ CONVERTER SELECTION
 
-            # ++ do a first converter selection by identifying odd files
-            converter_name_use = arocnv.select_conv_odd_file(fraw)
+            if converter != "auto":
+                converter_name_use = converter  # converter is forced
+            else:
+                # ++ do a first converter selection by identifying odd files
+                converter_name_use = arocnv.select_conv_odd_file(fraw)
+                # NB: converter selection for regular files is done in
+                # autorino.conv_cmd_run._convert_select
 
             logger.info("extension/converter: %s/%s", ext, converter_name_use)
 
@@ -271,7 +287,9 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ RINEXMOD
-            rinexmod_options_use = self.updt_rnxmodopts(rinexmod_options, irow)
+            rinexmod_options_use = self.updt_rnxmodopts(
+                rinexmod_options, irow, debug_print=False
+            )
 
             self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
@@ -283,6 +301,9 @@ class ConvertGnss(arocmn.StepGnss):
 
         # ++++ remove temporary files
         self.remov_tmp_files()
+
+        # close the log file
+        self.close_logfile()
 
         return None
 
@@ -326,16 +347,7 @@ class ConvertGnss(arocmn.StepGnss):
             The path of the converted file.
         """
 
-        ## +++ oldcheck (to be removed)
-        # if not self.table.loc[irow, "ok_inp"]:
-        #     logger.warning(
-        #         "action on row skipped (input disabled): %s",
-        #         self.table.loc[irow, "fname"],
-        #     )
-        #     return None
-        #
-
-        if not self.mono_ok_check(irow,"conversion"):
+        if not self.mono_ok_check(irow, "conversion"):
             return None
 
         # definition of the output directory (after the action)
@@ -348,7 +360,7 @@ class ConvertGnss(arocmn.StepGnss):
 
         try:
             frnxtmp, _ = arocnv.converter_run(
-                self.table.loc[irow, table_col], out_dir, converter=converter_inp
+                self.table.loc[irow, table_col], out_dir_use, converter=converter_inp
             )
         except Exception as e:
             logger.error("Error for: %s", self.table.loc[irow, table_col])
@@ -360,8 +372,8 @@ class ConvertGnss(arocmn.StepGnss):
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, "fpath_out"] = frnxtmp
             epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
-            self.table.loc[irow, "epoch_srt"] = epo_srt_ok
-            self.table.loc[irow, "epoch_end"] = epo_end_ok
+            self.table.loc[irow, "epoch_srt"] = pd.to_datetime(epo_srt_ok, utc=True)
+            self.table.loc[irow, "epoch_end"] = pd.to_datetime(epo_end_ok, utc=True)
         else:
             ### update table if things go wrong
             self.table.loc[irow, "ok_out"] = False
@@ -371,10 +383,14 @@ class ConvertGnss(arocmn.StepGnss):
         """
         Updates the 'site' entry for each row of the table.
 
-        This method is applied to each row of the table. It checks if the 'site' entry is defined.
-        If it is not defined or if the 'force' parameter is set to True, it updates the 'site' entry.
-        The update is performed by searching the site from a list of sites or metadata.
-        If the 'site' entry is already defined and 'force' is not set to True, it sets the 'site' entry to 'XXXX00XXX'.
+        This method is applied to each row of the table.
+        It checks if the 'site' entry is defined.
+        If it is not defined or if the 'force' parameter
+        is set to True, it updates the 'site' entry.
+        The update is performed by searching the site
+        from a list of sites or metadata.
+        If the 'site' entry is already defined and 'force' is not set to True,
+        it sets the 'site' entry to 'XXXX00XXX'.
 
         Parameters
         ----------
@@ -383,7 +399,9 @@ class ConvertGnss(arocmn.StepGnss):
         metadata_or_sites_list_inp : list
             A list of sites or metadata from which the site should be searched.
         force : bool, optional
-            If True, forces the update of the 'site' entry even if it is already defined. Default is False.
+            If True, forces the update of the 'site'
+            entry even if it is already defined.
+            Default is False.
 
         Returns
         -------

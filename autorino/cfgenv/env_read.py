@@ -11,6 +11,11 @@ import os
 import collections.abc
 import yaml
 
+
+### we need to clear the root logger to avoid duplicate logs
+root_logger = logging.getLogger()
+root_logger.handlers.clear()  # Clear all handlers in the root logger
+
 logger = logging.getLogger('autorino')
 logger.setLevel("DEBUG")
 

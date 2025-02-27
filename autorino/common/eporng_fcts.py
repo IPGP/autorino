@@ -6,20 +6,22 @@ Created on Mon Jan  8 15:47:58 2024
 @author: psakic
 """
 import logging
+import re
 
 import dateparser
 import numpy as np
 import pandas as pd
 from pandas.tseries.frequencies import to_offset
+import datetime as dt
 
 import autorino.common as arocmn
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
-def epoch_range_interpret(epo_inp):
+def epoch_range_intrpt(epo_inp):
     """
     This function interprets an input to get an output EpochRange object. The input can either be a tuple,
     typically in the form of (epo1, epo2, period), or an instance of the EpochRange class. If the input is
@@ -49,7 +51,7 @@ def epoch_range_interpret(epo_inp):
     return epo_range_out
 
 
-def dateparser_interpret(date_inp, tz="UTC"):
+def datepars_intrpt(date_inp, tz=None, tz_if_naive="UTC"):
     """
     This function interprets a string or datetime-like object to a Pandas Timestamp.
     It also applies a timezone (UTC by default). Note that rounding does not take place here
@@ -60,32 +62,59 @@ def dateparser_interpret(date_inp, tz="UTC"):
     date_inp : str or datetime-like
         The input date to be interpreted.
     tz : str, optional
-        The timezone to be applied. The default is "UTC".
+        The timezone to be applied.
+        The default is None.
+    tz_if_naive : str, optional
+        The timezone to be applied if the input date is timezone-naive.
+        The default is "UTC".
 
     Returns
     -------
-    date_out : Timestamp
-        The interpreted date as a Pandas Timestamp.
+    date_out : datetime
+        The interpreted date as a python native datetime.
 
     Note
     ----
     If the input date is a string, it is parsed using the dateparser library.
-    If the input date is a datetime-like object, it is converted to a Pandas Timestamp.
+    If the input date is a datetime-like object, it is converted first to a Pandas Timestamp.
     If the resulting date is a NaT (Not a Time) type, it is returned as is.
     If the resulting date does not have a timezone, the specified timezone is applied.
     """
-
-    if isinstance(date_inp, str):
-        date_out = pd.Timestamp(dateparser.parse(date_inp))
-    else:
+    ### INTERPRET THE INPUT
+    if not isinstance(date_inp, str):
         date_out = pd.Timestamp(date_inp)
+    ## date_inp is a str
+    else:
+        ### Must handle the case of day of year separately
+        doy_pattern_1 = r"^\d{4}-\d{1,3}$"
+        doy_pattern_2 = r"^\d{4}/\d{1.3}$"
+        # YYYY-DDD
+        if re.match(doy_pattern_1, date_inp):
+            date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y-%j"))
+        # YYYY/DDD
+        elif re.match(doy_pattern_2, date_inp):
+            date_out = pd.Timestamp(dt.datetime.strptime(date_inp, "%Y/%j"))
+        ### regular case
+        else:
+            date_out = pd.Timestamp(dateparser.parse(date_inp).isoformat())
+            # .isoformat() is to correctly handle the time zone,
+            # without weird pytz's objects used by dateparser
+            # like <StaticTzInfo 'UTC\+00:00'>
 
+    ### MANAGE THE TIMEZONE
+    ### NaT case. can not support tz
     if isinstance(date_out, pd._libs.tslibs.nattype.NaTType):
-        ### NaT case. can not support tz
-        pass
+        return date_out
+    ### if the date is timezone-naive, apply the tz_if_naive
+    if not date_out.tz:
+        logger.warning("date %s is timezone-naive. Applying tz %s", date_out, tz_if_naive)
+        date_out = pd.Timestamp(date_out, tz=tz_if_naive)
+    ### apply the tz
+    if tz:
+        date_out = date_out.tz_convert(tz)
 
-    elif not date_out.tz:
-        date_out = pd.Timestamp(date_out, tz=tz)
+    ### OUTPUT A NATIVE DATETIME
+    date_out = date_out.to_pydatetime()
 
     return date_out
 
@@ -130,7 +159,7 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
     return epo_out
 
 
-def round_date(date_in, period, round_method="round"):
+def round_date_legacy(date_in, period, round_method="floor"):
     """
     low-level function to round a Pandas Serie or a datetime-like object
     according to the "ceil", "floor", "round", "none" approach
@@ -162,9 +191,7 @@ def round_date(date_in, period, round_method="round"):
 
     if pd.isna(date_in):  ### NaT case
         date_out = date_in
-
     elif isinstance(date_in, pd.Series):
-
         date_use = date_in
 
         if round_method == "ceil":
@@ -176,9 +203,8 @@ def round_date(date_in, period, round_method="round"):
         elif round_method == "none":
             date_out = date_use
         else:
-            logger.error("round_method not understood")
+            logger.critical("round_method not understood")
             raise Exception
-
     else:
         date_typ = type(date_in)
         if date_typ in (pd.Timedelta,):
@@ -195,10 +221,59 @@ def round_date(date_in, period, round_method="round"):
         elif round_method == "none":
             date_out = date_use
         else:
-            logger.error("round_method not understood")
+            logger.critical("round_method not understood")
             raise Exception
 
-        date_out = date_typ(date_out)
+        #++++ back to the original type
+        if date_typ in (dt.datetime,):
+            date_out = date_out.to_pydatetime()
+        else:
+            date_out = date_typ(date_out)
+
+    return date_out
+
+
+def round_date(date_in, period, round_method="floor"):
+    """
+    low-level function to round a Pandas Serie or a datetime-like object
+    according to the "ceil", "floor", "round", "none" approach
+
+    Parameters
+    ----------
+    date_in : Pandas Serie or a datetime-like object
+        Input date .
+    period : str, optional
+        the rounding period.
+        Use the pandas' frequency aliases convention (see bellow for details).
+    round_method : str, optional
+        round method: 'ceil', 'floor', 'round', 'none'. The default is "floor".
+
+    Returns
+    -------
+    date_out : Pandas Serie or datetime-like object (same as input)
+        rounded date.
+
+    Note
+    ----
+    Pandas' frequency aliases memo
+    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
+
+    """
+
+    # ++++ NaT case
+    if pd.isna(date_in):
+        return date_in
+
+    # ++++ Series case
+    if isinstance(date_in, pd.Series):
+        return getattr(date_in.dt, round_method)(period)
+
+    # ++++ Singleton case
+    date_use = pd.Timedelta(date_in) if isinstance(date_in, pd.Timedelta) else pd.Timestamp(date_in)
+    date_out = getattr(date_use, round_method)(period) if round_method != "none" else date_use
+
+    # ++++ back to the original type
+    date_out = date_out.to_pydatetime() if isinstance(date_in, dt.datetime) else type(date_in)(date_out)
 
     return date_out
 
@@ -311,6 +386,7 @@ def create_dummy_epochrange():
     epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period="15min")
     return epo
 
+
 def iso_zulu_epoch(epo_in):
     """
     Convert an input epoch to ISO 8601 format with Zulu time (UTC).
@@ -325,5 +401,4 @@ def iso_zulu_epoch(epo_in):
     str
         The epoch in ISO 8601 format with Zulu time (UTC).
     """
-    return pd.Timestamp(epo_in).isoformat().replace('+00:00', 'Z')
-
+    return pd.Timestamp(epo_in).isoformat().replace("+00:00", "Z")

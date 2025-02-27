@@ -22,7 +22,8 @@ logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 def cfgfile_run(
     cfg_in,
     main_cfg_in,
-    sites_list=None,
+    list_sites=None,
+    ignore_sites=False,
     epo_srt=None,
     epo_end=None,
     period="1D",
@@ -43,9 +44,14 @@ def cfgfile_run(
         If a directory is provided, all files ending with '.yml' will be used.
     main_cfg_in : str
         The main configuration file to be used.
-    sites_list : list, optional
+    list_sites : list, optional
         A list of site identifiers to filter the configuration files.
-         If provided, only configurations for sites in this list will be processed. Default is None.
+         If provided, only configurations for sites in this list will be processed.
+         Default is None.
+    ignore_sites : bool, optional
+        If True, the site in sites_list will be ignored.
+        It is the opposed behavior of the regular one using sites_list.
+        Default is False.
     epo_srt : str, list, optional
         The start date for the epoch range.
         Can be a list; if so, each epoch is considered separately.
@@ -80,12 +86,14 @@ def cfgfile_run(
 
     # Check if cfg_in is a directory or a file and get the list of configuration files
     if os.path.isdir(cfg_in):
-        cfg_use_lis = glob.glob(cfg_in + "/*yml")
+        cfg_use_lis = []
+        for ext in ("/*yml", "/*yaml"):
+            cfg_use_lis.extend(list(sorted(glob.glob(cfg_in + ext))))
     elif os.path.isfile(cfg_in):
         cfg_use_lis = [cfg_in]
     else:
         logger.error("%s does not exist, check input cfgfiles file/dir", cfg_in)
-        raise Exception
+        return None
 
     # Determine the epoch range based on the provided start and end dates
     if epo_srt and epo_end:
@@ -98,20 +106,29 @@ def cfgfile_run(
             start_use = epo_srt
         else:
             logger.critical("start must be a list or a file path")
-            raise Exception
+            return None
         epoch_range = arocmn.EpochRange(start_use, period=period)
     else:
         epoch_range = None
 
     # Process each configuration file
     for cfg_use in cfg_use_lis:
-        if sites_list:
+        if list_sites:
             # Quick load to check if the site is in the list or not
             y_quick = arocfg.load_cfg(configfile_path=cfg_use)
             site_quick = y_quick["station"]["site"]["site_id"]
-            if site_quick not in sites_list:
+            ### case 1: list_sites are the sites we want
+            if not ignore_sites and (site_quick not in list_sites):
                 logger.info("Skipping site %s (not in sites list)", site_quick)
                 continue
+            ### case 2: list_sites are the sites we ignore
+            elif ignore_sites and (site_quick in list_sites):
+                logger.info("Skipping site %s (in ignored sites list)", site_quick)
+                continue
+            ### case 3: regular case
+            else:
+                pass
+
 
         # Read the configuration and run the steps
         # step_lis_lis is a list of list because you can have several sessions in the same configuration file

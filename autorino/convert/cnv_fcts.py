@@ -20,7 +20,8 @@ from rinexmod import rinexmod_api
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-logger = logging.getLogger('autorino')
+
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
@@ -216,6 +217,7 @@ def stop_old_docker(max_running_time=120):
 
     return None
 
+
 def get_current_user_grp():
     """
     Retrieves the current user and group names.
@@ -233,6 +235,7 @@ def get_current_user_grp():
     # Get the current group
     current_group = grp.getgrgid(os.getgid()).gr_name
     return current_user, current_group
+
 
 def get_owner(file_inp):
     """
@@ -255,8 +258,14 @@ def get_owner(file_inp):
     gid = os.stat(file_inp).st_gid
 
     # Get the username and group name
-    user = pwd.getpwuid(uid).pw_name
-    group = grp.getgrgid(gid).gr_name
+    try:
+        user = pwd.getpwuid(uid).pw_name
+        group = grp.getgrgid(gid).gr_name
+    except Exception as e:
+        logger.warning(
+            f"Unable to get name for owner/grp ID ({uid}:{gid}) of {os.path.basename(file_inp)}: {e}"
+        )
+        user, group = uid, gid
 
     return user, group
 
@@ -291,9 +300,8 @@ def change_owner(file_inp, user, group):
         # Change the ownership
         try:
             os.chown(file_inp, uid, gid)
-        except OSError as e:
-            logger.warning(f"Unable to change owner {user_ini}:{group_ini} > {user}:{group}: {e}")
+        except Exception as e:
+            logger.warning(
+                f"Unable to change owner {user_ini}:{group_ini} > {user}:{group}: {e}"
+            )
     return None
-
-
-

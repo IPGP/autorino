@@ -19,8 +19,10 @@ import autorino.common as arocmn
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-logger = logging.getLogger('autorino')
+
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+
 
 class EpochRange:
     """
@@ -49,7 +51,9 @@ class EpochRange:
         Checks if the epoch range is valid.
     """
 
-    def __init__(self, epoch1, epoch2=None, period="1d", round_method="floor", tz="UTC"):
+    def __init__(
+        self, epoch1, epoch2=None, period="1d", round_method="floor", tz="UTC"
+    ):
         """
         Constructs all the necessary attributes for the epoch range object.
 
@@ -74,9 +78,11 @@ class EpochRange:
         self.round_method = round_method
         self.tz = tz
 
-        if self._epoch1_raw and self._epoch2_raw: # 1) historical case a start and an end are given
-            _epoch1tmp = arocmn.dateparser_interpret(self._epoch1_raw)
-            _epoch2tmp = arocmn.dateparser_interpret(self._epoch2_raw)
+        if (
+            self._epoch1_raw and self._epoch2_raw
+        ):  # 1) regular case: a start and an end are given
+            _epoch1tmp = arocmn.datepars_intrpt(self._epoch1_raw)
+            _epoch2tmp = arocmn.datepars_intrpt(self._epoch2_raw)
             _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
             _epoch_max_tmp = np.max((_epoch1tmp, _epoch2tmp))
 
@@ -86,8 +92,10 @@ class EpochRange:
             self.manual_range = False
             self._manu_range_list = []
 
-        elif utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw: # 2) case a start is given as a list, but no end
-            _epoch1tmp = [arocmn.dateparser_interpret(e) for e in self._epoch1_raw]
+        elif (
+            utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw
+        ):  # 2) case a start is given as a list, but no end
+            _epoch1tmp = [arocmn.datepars_intrpt(e) for e in self._epoch1_raw]
             _epoch_min_tmp = np.min(_epoch1tmp)
             _epoch_max_tmp = np.max(_epoch1tmp)
 
@@ -97,13 +105,13 @@ class EpochRange:
             self.manual_range = True
             self._manu_range_list = _epoch1tmp
 
-    ## NB: i think it is a bad idea to have an attribute (property) to get the list of epochs
+    ## NB: I think it is a bad idea to have an attribute (property) to get the list of epochs
 
     def __repr__(self):
         return "from {} to {}, period {}".format(
             arocmn.iso_zulu_epoch(self.epoch_start),
             arocmn.iso_zulu_epoch(self.epoch_end),
-            self.period
+            self.period,
         )
 
     ############ getters and setters
@@ -115,7 +123,7 @@ class EpochRange:
     @epoch_start.setter
     def epoch_start(self, value):
         """Sets the start of the epoch range."""
-        self._epoch_start = arocmn.dateparser_interpret(value, tz=self.tz)
+        self._epoch_start = arocmn.datepars_intrpt(value, tz=self.tz)
         self._epoch_start = arocmn.round_date(
             self._epoch_start, self.period, self.round_method
         )
@@ -128,7 +136,7 @@ class EpochRange:
     @epoch_end.setter
     def epoch_end(self, value):
         """Sets the end of the epoch range."""
-        self._epoch_end = arocmn.dateparser_interpret(value)  # ,tz=self.tz)
+        self._epoch_end = arocmn.datepars_intrpt(value, tz=self.tz)
         self._epoch_end = arocmn.round_date(
             self._epoch_end, self.period, self.round_method
         )
@@ -144,6 +152,14 @@ class EpochRange:
         val = int("".join(*numbers))
         unit = str("".join(*alphabets))
         return val, unit
+
+    @property
+    def period_as_timedelta(self):
+        """
+        For a period, e.g. 15min, 1H...
+        return in as a pandas Timedelta
+        """
+        return pd.Timedelta(self.period)
 
     ########### methods
     def eporng_list(self, end_bound=False):
@@ -163,7 +179,7 @@ class EpochRange:
         if self.manual_range:
             return self.eporng_list_manual(end_bound=end_bound)
         else:
-            return self.eporng_list_steady(end_bound=end_bound)
+            return self.eporng_list_regular(end_bound=end_bound)
 
     def eporng_list_manual(self, end_bound=False):
         """
@@ -188,9 +204,9 @@ class EpochRange:
         else:
             # subtract also one second for security reason
             plus_one = pd.Timedelta(self.period)
-            return list(np.array(self._manu_range_list) + plus_one - pd.Timedelta('1s'))
+            return list(np.array(self._manu_range_list) + plus_one - pd.Timedelta("1s"))
 
-    def eporng_list_steady(self, end_bound=False):
+    def eporng_list_regular(self, end_bound=False):
         """
         Compute the list of epochs corresponding to the EpochRange
         if end_bound = True, give the end bound of the range
@@ -214,7 +230,7 @@ class EpochRange:
             )
             eporng = eprrng_srt
         else:  ### end bound
-            plus_one = pd.Timedelta(self.period)
+            plus_one = self.period_as_timedelta
             eprrng_end = pd.date_range(
                 self.epoch_start, self.epoch_end + plus_one, freq=self.period
             )
@@ -237,3 +253,20 @@ class EpochRange:
             return False
         else:
             return True
+
+
+    def extra_margin_splice(self):
+        """
+        Returns the extra margin for splicing operations.
+
+        Leica raw files  can be a bit over their nominal end,
+        so we need to add a margin to the splicing operation.
+
+        Returns
+        -------
+
+        """
+        if self.period_as_timedelta >= pd.Timedelta("1 day"):
+            return pd.Timedelta("1 hour")
+        else:
+            return pd.Timedelta("1 minute")
