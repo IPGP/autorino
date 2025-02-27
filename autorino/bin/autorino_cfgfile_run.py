@@ -79,7 +79,7 @@ def main():
              "Default is False.",
     )
     parser.add_argument(
-        "-ss",
+        "-sc",
         "--steps_select_list",
         type=str,
         help="A list of selected steps to be executed. "
