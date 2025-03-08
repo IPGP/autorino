@@ -3,8 +3,8 @@
 # autorino
 autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
-**Version: 1.1.0**  
-**Date: 2025-01-30**
+**Version: 1.2.0**  
+**Date: 2025-03-08**
 
 **Authors & Contributors:**
 * [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
@@ -49,7 +49,6 @@ For developpers, you can install _autorino_ in [developement mode](https://setup
 ```bash
 pip install -e .
 ```
-
 
 ### Setting up the environment
 
