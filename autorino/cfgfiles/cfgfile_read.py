@@ -99,6 +99,11 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     else:
         y_main = None
 
+    if not y_main and check_from_main(y):
+        errmsg="FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
+        logger.error(errmsg)
+        raise FileNotFoundError(None, errmsg)
+
     y = update_w_main_dic(y, y_main)
 
     print_cfg_for_debug = False
@@ -112,7 +117,6 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
-
 
 def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
     """
@@ -143,7 +147,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
 
     # ++++ METADATA
     # Load as sitelog
-    if y_station["station"]["device"]["attributes_from_sitelog"]:
+
+    if y_station["device"]["attributes_from_sitelog"]:
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
             # Load the metadata if the path is a directory or a file
@@ -298,7 +303,7 @@ def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
             parent_dir_key = "a directory"
 
         logger.error(
-            "%s is not correctly defined in the main cfgfiles file"
+            "%s is not correctly defined in the main cfgfiles file "
             "(FROM_MAIN can not be replaced)",
             parent_dir_key,
         )
@@ -406,8 +411,11 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
 
 
 def _device2mda(y_station):
-    y_dev = y_station["station"]["device"]
-    y_sit = y_station["station"]['site']
+    """
+    Convert a device block from a configuration file to a MetaData object.
+    """
+    y_dev = y_station["device"]
+    y_sit = y_station['site']
 
     metadata = rimo_mda.MetaData()
     rec_dic = dict()
@@ -464,6 +472,30 @@ def format_dir_path(dir_parent, structure):
         structure = structure[1:]
 
     return dir_parent, structure
+
+def check_from_main(y):
+    """
+    Check if the FROM_MAIN keyword is used in the configuration file.
+
+    This function takes a dictionary representing the configuration file.
+    It checks if the 'FROM_MAIN' keyword is used in the configuration file.
+    If it is, it returns True. Otherwise, it returns False.
+
+    Parameters
+    ----------
+    y : dict
+        A dictionary representing the configuration file.
+
+    Returns
+    -------
+    bool
+        True if the 'FROM_MAIN' keyword is used in the configuration file.
+        False otherwise.
+    """
+    if "FROM_MAIN" in str(y):
+        return True
+    else:
+        return False
 
 
 def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
