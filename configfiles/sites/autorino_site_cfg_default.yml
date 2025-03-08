@@ -2,11 +2,14 @@
 cfgfile_version: 16.0 # describe the structure of the configuration file
 station:
     site:
-        name: Site Full Name 
+        name: "Site Full Name"
         site_id: SITE00FRA
-        domes: 
-        sitelog_path: FROM_MAIN #  can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
+        domes: 00000M000
+        operator: FROM_MAIN
+        agency: FROM_MAIN
+        country: France # ISO 3166 Country name https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
         position_xyz: (0,0,0)
+        sitelog_path: FROM_MAIN #  can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
     device:
         attributes_from_sitelog: True
         ant_type: 'ASH701975.01A   NONE'    # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab

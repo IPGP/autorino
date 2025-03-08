@@ -1,7 +1,9 @@
 cfgfile_version: 15.1 # describe the structure of the configuration file
 station:
     site:
-        sitelog_path: <$HOME>/sitelogs/  #  can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
+      operator: "AUTORINO_OPERATOR"
+      agency: "AUTORINO_AGENCY"
+      sitelog_path: <$HOME>/sitelogs/  #  can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
     sessions:
         session_24h30s: ####Keep session in dictionnary / Object not necessary
             general:
