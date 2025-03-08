@@ -8,13 +8,13 @@ station:
         operator: FROM_MAIN
         agency: FROM_MAIN
         country: France # ISO 3166 Country name https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
-        position_xyz: (0,0,0)
+        position_xyz: [0.,0.,0.]
         sitelog_path: FROM_MAIN #  can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
     device:
-        attributes_from_sitelog: True
-        ant_type: 'ASH701975.01A   NONE'    # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        attributes_from_sitelog: False
+        ant_type: 'ASH701975.01A   NONE' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
         ant_sn: 12345678
-        ecc_une: (0.,0.,0.) # Eccentricity Up North East    
+        ecc_une: [0.,0.,0.] # Eccentricity Up North East
         rec_type: TPS GB-1000 # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
         rec_sn: '' 
         rec_fw: ''
