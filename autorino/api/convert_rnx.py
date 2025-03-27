@@ -108,13 +108,14 @@ def convert_rnx(
     if raw_out_dir:
         if not raw_out_structure:
             raw_out_structure = out_structure
-        raw_out_dir_use = os.path.join(raw_out_dir, raw_out_structure)
+        raw_out_dir_use = str(os.path.join(raw_out_dir, raw_out_structure))
 
         cpy_raw = arocmn.StepGnss(
             raw_out_dir_use, tmp_dir, log_dir, metadata=metadata
         )
 
-        cpy_raw.load_tab_filelist(raws_use)
-        cpy_raw.copy_files()
+        cpy_raw.load_tab_prev_tab(cnv.table)
+        cpy_raw.guess_out_files()
+        cpy_raw.copy_files(force=force)
 
     return cnv

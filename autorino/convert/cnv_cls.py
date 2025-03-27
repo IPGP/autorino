@@ -334,12 +334,15 @@ class ConvertGnss(arocmn.StepGnss):
         irow : int
             The index of the row in the table to be converted.
         out_dir : str, optional
-            The directory where the output of the conversion should be stored. If not specified, the output is stored
+            The directory where the output of the conversion should be stored.
+             If not specified, the output is stored
             in the temporary directory.
         converter_inp : str, optional
-            The converter to be used for the conversion. If not specified, an automatic converter is used.
+            The converter to be used for the conversion.
+             If not specified, an automatic converter is used.
         table_col : str, optional
-            The column in the table that should be converted. Typically, this is a file. Default is 'fpath_inp'.
+            The column in the table that should be converted.
+            Typically, this is a file. Default is 'fpath_inp'.
 
         Returns
         -------

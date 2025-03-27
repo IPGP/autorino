@@ -679,11 +679,14 @@ class StepGnss:
 
     def updt_site_w_rnx_fname(self):
         """
-        Updates the site information in the table and in the 'site_id' object based on the RINEX filenames.
+        Updates the site information in the table and
+        in the 'site_id' object based on the RINEX filenames.
 
-        This method iterates over each row in the table and updates the 'site' column with the first 9 characters
-        of the 'fname' column if the filename matches the RINEX regex pattern. It then updates the 'site_id' attribute
-        of the StepGnss object based on the unique site values in the table.
+        This method iterates over each row in the table and
+        updates the 'site' column with the first 9 characters
+        of the 'fname' column if the filename matches the RINEX regex pattern.
+        It then updates the 'site_id' attribute of the StepGnss object
+        based on the unique site values in the table.
 
         Returns
         -------
@@ -709,13 +712,16 @@ class StepGnss:
         """
         Updates the epoch table with the specified timezone.
 
-        This method updates the 'epoch_srt' and 'epoch_end' columns of the epoch table with the specified timezone.
-        It uses the 'tz' parameter to set the timezone for the epoch table.
+        This method updates the 'epoch_srt' and 'epoch_end' columns
+        of the epoch table with the specified timezone.
+        It uses the 'tz' parameter to set the timezone
+        for the epoch table.
 
         Parameters
         ----------
         tz : str, optional
-            The timezone to be applied to the epoch table. Default is 'UTC'.
+            The timezone to be applied to the epoch table.
+            Default is 'UTC'.
 
         Returns
         -------
@@ -1088,7 +1094,8 @@ class StepGnss:
             str_inp : str
                 The input string to be shrunk.
             maxlen : int, optional
-                The maximum length of the output string. Default is the value of the 'max_colwidth' parameter of the
+                The maximum length of the output string.
+                Default is the value of the 'max_colwidth' parameter of the
                 'verbose' method.
 
             Returns
@@ -1331,7 +1338,8 @@ class StepGnss:
         and write it as 'fpath_out' value in the table
         """
 
-        #### to do: split it as a mono fct
+        #### to do: split it as a mono fct & go for irow iteration
+        #### IMPROVE_ME!!!!
 
         local_paths_list = []
 
@@ -1401,6 +1409,26 @@ class StepGnss:
         logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))
 
         return local_paths_list
+
+    def guess_out_files(self):
+
+        out_paths_list = []
+
+        for irow, row in self.table.iterrows():
+            ## dirty update of the site_id
+            ## a new translate_path should accept table row
+            ### IMPORVE_ME !!!
+            self.site_id = self.table.loc[irow, "site"]
+            outdir_use = self.translate_path(self.out_dir,
+                                             epoch_inp=self.table.loc[irow, "epoch_srt"])
+            bnam_inp = os.path.basename(row["fpath_inp"])
+            fpath_out = os.path.join(outdir_use, bnam_inp)
+            self.table.loc[irow, "fpath_out"] = fpath_out
+            self.check_local_files(self, io="out")
+            out_paths_list.append(fpath_out)
+
+        return fpath_out
+
 
     def check_local_files(self, io="out"):
         """
@@ -1585,11 +1613,15 @@ class StepGnss:
 
         return files_decmp_list
 
-    def copy_files(self):
+    def copy_files(self, force=False):
+        if force:
+            self.force("copy")
         for irow, row in self.table.iterrows():
             self.mono_mv_final(irow, copy_only=True)
 
-    def move_files(self):
+    def move_files(self, force=False):
+        if force:
+            self.force("move")
         for irow, row in self.table.iterrows():
             self.mono_mv_final(irow)
 
@@ -2271,6 +2303,9 @@ class StepGnss:
             The directory to which the file is moved. If not provided, the 'out_dir' attribute of the object is used.
         table_col : str, optional
             The column in the table which contains the file path to be moved. Defaults to 'fpath_out'.
+        copy_only : bool, optional
+            If True, the file is copied to the final destination instead of being moved.
+             Default is False.
 
         Returns
         -------
@@ -2287,10 +2322,7 @@ class StepGnss:
         #     return None
         # #NB: for mv it's ok_out column the one to check
 
-        if copy_only:
-            mvorcp = "copy"
-        else:
-            mvorcp = "move"
+        mvorcp = "copy" if copy_only else "move"
 
         # NB: for mv it's ok_out column the one to check
         if not self.mono_ok_check(
