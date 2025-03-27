@@ -1424,7 +1424,7 @@ class StepGnss:
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
             self.table.loc[irow, "fpath_out"] = fpath_out
-            self.check_local_files(self, io="out")
+            self.check_local_files(io="out")
             out_paths_list.append(fpath_out)
 
         return fpath_out

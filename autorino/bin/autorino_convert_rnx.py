@@ -116,12 +116,6 @@ def main():
 
     args = parser.parse_args()
 
-    # if args.list_file_input:
-    #     with open(args.raws_inp[0], "r") as f:
-    #         raws_inp = f.read().splitlines()
-    # else:
-    #     raws_inp = args.raws_inp
-
     aroapi.convert_rnx(
         inp_raws=_prep_raws_inp(args),
         out_dir=args.out_dir,
@@ -137,13 +131,16 @@ def main():
 
 
 def _prep_raws_inp(args):
+    ### input is a filelist of RINEXs
     if args.list_file_input:
         with open(args.inp_raws[0], "r") as f:
             inp_raws_out = f.read().splitlines()
     else:
         if len(args.inp_raws) == 1:
+            ### input is a single RINEXs OR a directory
             inp_raws_out = args.inp_raws[0]
         else:
+            ### input is several RINEXs
             inp_raws_out = args.inp_raws
     return inp_raws_out
 
