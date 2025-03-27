@@ -94,8 +94,15 @@ def main():
     )
 
     parser.add_argument(
-        "-tr",
-        "--store_raw_structure",
+        "-ro",
+        "--raw_out_dir",
+        help="NOT IMPLEMENTED YET",
+        default=None,
+    )
+
+    parser.add_argument(
+        "-rt",
+        "--raw_out_structure",
         help="NOT IMPLEMENTED YET",
         default=None,
     )
@@ -124,7 +131,8 @@ def main():
         rinexmod_options=args.rinexmod_options,
         metadata=args.metadata,
         force=args.force,
-        store_raw_structure=args.store_raw_structure,
+        raw_out_dir=args.raw_out_dir,
+        raw_out_structure=args.raw_out_structure
     )
 
 
