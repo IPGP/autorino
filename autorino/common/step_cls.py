@@ -1617,13 +1617,13 @@ class StepGnss:
         if force:
             self.force("copy")
         for irow, row in self.table.iterrows():
-            self.mono_move(irow, table_col=table_col, copy_only=True)
+            self.mono_move(irow, table_col=table_col, copy_only=True, move_final=False)
 
     def move_files(self, force=False, table_col="fpath_inp"):
         if force:
             self.force("move")
         for irow, row in self.table.iterrows():
-            self.mono_move(irow,table_col=table_col)
+            self.mono_move(irow,table_col=table_col, move_final=False)
 
     def remov_tmp_files(self):
         """
