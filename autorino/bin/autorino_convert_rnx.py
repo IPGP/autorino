@@ -116,11 +116,11 @@ def main():
 
     args = parser.parse_args()
 
-    if args.list_file_input:
-        with open(args.raws_inp[0], "r") as f:
-            raws_inp = f.read().splitlines()
-    else:
-        raws_inp = args.raws_inp
+    # if args.list_file_input:
+    #     with open(args.raws_inp[0], "r") as f:
+    #         raws_inp = f.read().splitlines()
+    # else:
+    #     raws_inp = args.raws_inp
 
     aroapi.convert_rnx(
         inp_raws=_prep_raws_inp(args),
