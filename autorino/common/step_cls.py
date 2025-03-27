@@ -2332,7 +2332,7 @@ class StepGnss:
 
         # NB: for a final move it's ok_out column the one to check
         if not self.mono_ok_check(
-            irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=True
+            irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=move_final
         ):
             return None
 
