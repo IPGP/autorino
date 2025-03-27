@@ -115,7 +115,9 @@ def convert_rnx(
         )
 
         cpy_raw.load_tab_prev_tab(cnv.table)
+        cpy_raw.print_table()
         cpy_raw.guess_out_files()
+        cpy_raw.print_table()
         cpy_raw.copy_files(force=force)
 
     return cnv
