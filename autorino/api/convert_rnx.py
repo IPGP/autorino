@@ -28,7 +28,8 @@ def convert_rnx(
     rinexmod_options=None,
     metadata=None,
     force=False,
-    store_raw_structure=None,
+    raw_out_dir=None,
+    raw_out_structure=None,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -104,11 +105,13 @@ def convert_rnx(
         rinexmod_options=rinexmod_options,
     )
 
-    if store_raw_structure:
-        store_raw_stru_use = os.path.join(out_dir, store_raw_structure)
+    if raw_out_dir:
+        if not raw_out_structure:
+            raw_out_structure = out_structure
+        raw_out_dir_use = os.path.join(raw_out_dir, raw_out_structure)
 
         cpy_raw = arocmn.StepGnss(
-            store_raw_stru_use, tmp_dir, log_dir, metadata=metadata
+            raw_out_dir_use, tmp_dir, log_dir, metadata=metadata
         )
 
         cpy_raw.load_tab_filelist(raws_use)
