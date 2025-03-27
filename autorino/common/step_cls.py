@@ -1617,13 +1617,13 @@ class StepGnss:
         if force:
             self.force("copy")
         for irow, row in self.table.iterrows():
-            self.mono_move(irow, table_col=table_col, copy_only=True, move_final=False)
+            self.mono_mv_final(irow, table_col=table_col, copy_only=True, move_final=False)
 
     def move_files(self, force=False, table_col="fpath_inp"):
         if force:
             self.force("move")
         for irow, row in self.table.iterrows():
-            self.mono_move(irow,table_col=table_col, move_final=False)
+            self.mono_mv_final(irow, table_col=table_col, move_final=False)
 
     def remov_tmp_files(self):
         """
@@ -2282,11 +2282,11 @@ class StepGnss:
 
         return frnxmod
 
-    def mono_move(self, irow, out_dir=None, table_col="fpath_out", move_final=True, copy_only=False):
+    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out",  copy_only=False):
         """
         "on row" method
 
-        Moves the 'table_col' entry to a destination for each row of the table.
+        Moves the 'table_col' entry to a final destination for each row of the table.
 
         This method is applied on each row of the table. It checks if the 'ok_out' column is True for the row.
         If it is, it moves the file specified in the 'table_col' column to a final destination directory.
@@ -2309,9 +2309,6 @@ class StepGnss:
             If True, the file is copied to the final destination
             instead of being moved.
             Default is False.
-        move_final : bool, optional
-            It is a final move, we check ok_out only in the table.
-            Default is True.
 
         Returns
         -------
@@ -2332,7 +2329,7 @@ class StepGnss:
 
         # NB: for a final move it's ok_out column the one to check
         if not self.mono_ok_check(
-            irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=move_final
+            irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=True
         ):
             return None
 
