@@ -58,4 +58,4 @@ for irow, row in hdl_split.table.iterrows():
 
     hdl_split.mono_rinexmod(irow, rnxmod_dir, rinexmod_kwargs)
 
-    hdl_split.mono_mv_final(irow)
+    hdl_split.mono_move(irow)

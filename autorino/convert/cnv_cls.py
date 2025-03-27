@@ -297,7 +297,7 @@ class ConvertGnss(arocmn.StepGnss):
 
             #############################################################
             # +++++ FINAL MOVE
-            self.mono_mv_final(irow)
+            self.mono_move(irow)
 
         # ++++ remove temporary files
         self.remov_tmp_files()

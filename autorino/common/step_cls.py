@@ -1613,17 +1613,17 @@ class StepGnss:
 
         return files_decmp_list
 
-    def copy_files(self, force=False):
+    def copy_files(self, force=False, table_col="fpath_inp"):
         if force:
             self.force("copy")
         for irow, row in self.table.iterrows():
-            self.mono_mv_final(irow, copy_only=True)
+            self.mono_move(irow, table_col=table_col, copy_only=True)
 
-    def move_files(self, force=False):
+    def move_files(self, force=False, table_col="fpath_inp"):
         if force:
             self.force("move")
         for irow, row in self.table.iterrows():
-            self.mono_mv_final(irow)
+            self.mono_move(irow,table_col=table_col)
 
     def remov_tmp_files(self):
         """
@@ -2282,11 +2282,11 @@ class StepGnss:
 
         return frnxmod
 
-    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out", copy_only=False):
+    def mono_move(self, irow, out_dir=None, table_col="fpath_out", move_final=True, copy_only=False):
         """
         "on row" method
 
-        Moves the 'table_col' entry to a final destination for each row of the table.
+        Moves the 'table_col' entry to a destination for each row of the table.
 
         This method is applied on each row of the table. It checks if the 'ok_out' column is True for the row.
         If it is, it moves the file specified in the 'table_col' column to a final destination directory.
@@ -2300,12 +2300,18 @@ class StepGnss:
         irow : int
             The index of the row in the table on which the method is applied.
         out_dir : str, optional
-            The directory to which the file is moved. If not provided, the 'out_dir' attribute of the object is used.
+            The directory to which the file is moved.
+             If not provided, the 'out_dir' attribute of the object is used.
         table_col : str, optional
-            The column in the table which contains the file path to be moved. Defaults to 'fpath_out'.
+            The column in the table which contains the file path to be moved.
+            Defaults to 'fpath_out'.
         copy_only : bool, optional
-            If True, the file is copied to the final destination instead of being moved.
-             Default is False.
+            If True, the file is copied to the final destination
+            instead of being moved.
+            Default is False.
+        move_final : bool, optional
+            It is a final move, we check ok_out only in the table.
+            Default is True.
 
         Returns
         -------
@@ -2324,7 +2330,7 @@ class StepGnss:
 
         mvorcp = "copy" if copy_only else "move"
 
-        # NB: for mv it's ok_out column the one to check
+        # NB: for a final move it's ok_out column the one to check
         if not self.mono_ok_check(
             irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=True
         ):
@@ -2338,14 +2344,12 @@ class StepGnss:
 
         ### def output folders
         outdir_use = self.translate_path(
-            out_dir_use, epoch_inp=self.table.loc[irow, "epoch_srt"]
+            out_dir_use, make_dir=True, epoch_inp=self.table.loc[irow, "epoch_srt"]
         )
 
         file_to_mv = self.table.loc[irow, table_col]
 
         try:
-            ### do the move
-            utils.create_dir(outdir_use)
             # we prefer a copy rather than a move, mv can lead to some error
             file_moved = shutil.copy2(file_to_mv, outdir_use)
             # file_moved = shutil.move(file_to_mv, outdir_use)

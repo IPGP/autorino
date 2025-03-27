@@ -650,7 +650,7 @@ class SpliceGnss(HandleGnss):
 
 
             if self.tmp_dir_rinexmoded != self.out_dir:
-                self.mono_mv_final(irow, self.out_dir)
+                self.mono_move(irow, self.out_dir)
 
         self.remov_tmp_files()
         return None
@@ -919,7 +919,7 @@ class SplitGnss(HandleGnss):
             )
 
             if self.tmp_dir_rinexmoded != self.out_dir:
-                self.mono_mv_final(irow)
+                self.mono_move(irow)
 
         self.remov_tmp_files()
 

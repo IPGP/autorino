@@ -118,6 +118,6 @@ def convert_rnx(
         cpy_raw.print_table()
         cpy_raw.guess_out_files()
         cpy_raw.print_table()
-        cpy_raw.copy_files(force=force)
+        cpy_raw.copy_files(force=force,table_col="fpath_inp")
 
     return cnv
