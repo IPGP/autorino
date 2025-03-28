@@ -1422,9 +1422,8 @@ class StepGnss:
             self.set_translate_dict()
 
             outdir_use = self.translate_path(
-                self.out_dir, epoch_inp=self.table.loc[irow, "epoch_srt"]
+                self.out_dir, epoch_inp=self.table.loc[irow, "epoch_srt"], make_dir=True
             )
-            print("AAAAAAAAA", self.site_id, outdir_use)
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
             self.table.loc[irow, "fpath_out"] = fpath_out
@@ -1648,7 +1647,9 @@ class StepGnss:
             if mode == "inpout":
                 file_mv = self.mono_mv_inpout(irow, copy_only=copy_only)
             elif mode == "final":
-                file_mv = self.mono_mv_final(irow, table_col="fpath_out", copy_only=copy_only)
+                file_mv = self.mono_mv_final(
+                    irow, table_col="fpath_out", copy_only=copy_only
+                )
             else:
                 logger.error("mode must be 'inpout' or 'final'")
                 raise Exception
