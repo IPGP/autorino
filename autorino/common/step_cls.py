@@ -1419,6 +1419,8 @@ class StepGnss:
             ## a new translate_path should accept table row
             ### IMPORVE_ME !!!
             self.site_id = self.table.loc[irow, "site"]
+            self.set_translate_dict()
+
             outdir_use = self.translate_path(
                 self.out_dir, epoch_inp=self.table.loc[irow, "epoch_srt"]
             )
