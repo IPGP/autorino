@@ -2322,6 +2322,8 @@ class StepGnss:
             instead of being moved.
             Default is False.
 
+        See also mono_mv_inpout
+
         Returns
         -------
         str or None
@@ -2355,7 +2357,7 @@ class StepGnss:
 
         file_to_mv = self.table.loc[irow, table_col]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(file_to_mv, out_dir_use, copy_only=copy_only)
+        file_moved = arocmn.move_core(file_to_mv, outdir_use, copy_only=copy_only)
         ### ^^^^^ HERE IS THE MOVE
         self.mono_mv_validat(irow, file_moved=file_moved, table_col=table_col)
 
@@ -2365,8 +2367,11 @@ class StepGnss:
         """
         Moves or copies the input file to the output file.
 
-        This method checks if the input file is valid and then moves or copies it to the output file path.
+        This method checks if the input file (`fpath_inp`) is valid and then moves or
+        copies it to the output file path (`fpath_out`).
         It validates the move or copy operation and updates the table accordingly.
+
+        See also mono_mv_final
 
         Parameters
         ----------
