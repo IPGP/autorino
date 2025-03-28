@@ -2351,13 +2351,13 @@ class StepGnss:
             out_dir_use = self.out_dir
 
         ### def output folders
-        outdir_use = self.translate_path(
+        outdir_trsl = self.translate_path(
             out_dir_use, make_dir=True, epoch_inp=self.table.loc[irow, "epoch_srt"]
         )
 
         file_to_mv = self.table.loc[irow, table_col]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(file_to_mv, outdir_use, copy_only=copy_only)
+        file_moved = arocmn.move_core(file_to_mv, outdir_trsl, copy_only=copy_only)
         ### ^^^^^ HERE IS THE MOVE
         self.mono_mv_validat(irow, file_moved=file_moved, table_col=table_col)
 
