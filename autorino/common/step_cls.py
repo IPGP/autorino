@@ -1422,13 +1422,14 @@ class StepGnss:
             outdir_use = self.translate_path(
                 self.out_dir, epoch_inp=self.table.loc[irow, "epoch_srt"]
             )
+            print("AAAAAAAAA", self.site_id, outdir_use)
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
             self.table.loc[irow, "fpath_out"] = fpath_out
             self.check_local_files(io="out")
             out_paths_list.append(fpath_out)
 
-        return fpath_out
+        return out_paths_list
 
     def check_local_files(self, io="out"):
         """
@@ -1614,6 +1615,28 @@ class StepGnss:
         return files_decmp_list
 
     def move_files(self, mode="inpout", copy_only=False, force=False):
+        """
+        Moves or copies files based on the specified mode.
+
+        This method iterates over the rows in the table and moves or copies files
+        from the input path to the output path or to the final destination based on the mode.
+        It validates the move or copy operation and updates the table accordingly.
+
+        Parameters
+        ----------
+        mode : str, optional
+            The mode of operation. Can be 'inpout' to move/copy files from input to output path,
+            or 'final' to move/copy files to the final destination. Default is 'inpout'.
+        copy_only : bool, optional
+            If True, the files are copied instead of moved. Default is False.
+        force : bool, optional
+            If True, forces the operation even if the input files are not valid. Default is False.
+
+        Returns
+        -------
+        list
+            A list of paths of the moved or copied files.
+        """
         mvcp = "copy" if copy_only else "move"
         if force:
             self.force(mvcp)
