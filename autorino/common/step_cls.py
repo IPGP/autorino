@@ -1419,8 +1419,9 @@ class StepGnss:
             ## a new translate_path should accept table row
             ### IMPORVE_ME !!!
             self.site_id = self.table.loc[irow, "site"]
-            outdir_use = self.translate_path(self.out_dir,
-                                             epoch_inp=self.table.loc[irow, "epoch_srt"])
+            outdir_use = self.translate_path(
+                self.out_dir, epoch_inp=self.table.loc[irow, "epoch_srt"]
+            )
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
             self.table.loc[irow, "fpath_out"] = fpath_out
@@ -1428,7 +1429,6 @@ class StepGnss:
             out_paths_list.append(fpath_out)
 
         return fpath_out
-
 
     def check_local_files(self, io="out"):
         """
@@ -1613,17 +1613,28 @@ class StepGnss:
 
         return files_decmp_list
 
-    def copy_files(self, force=False, table_col="fpath_inp"):
-        if force:
-            self.force("copy")
-        for irow, row in self.table.iterrows():
-            self.mono_mv_final(irow, table_col=table_col, copy_only=True, move_final=False)
 
-    def move_files(self, force=False, table_col="fpath_inp"):
+    def move_files(self, mode="inpout", copy_only=False, force=False):
+        mvcp = "copy" if copy_only else "move"
+
         if force:
-            self.force("move")
+            self.force(mvcp)
+
         for irow, row in self.table.iterrows():
-            self.mono_mv_final(irow, table_col=table_col, move_final=False)
+            if mode=="inpout":
+                self.mono_mv_inpout(irow, copy_only=copy_only,
+                                    move_final=False)
+            elif mode=="final":
+                self.mono_mv_final(irow, table_col="fpath_out",
+                                   copy_only=copy_only, move_final=True)
+            else:
+                logger.error("mode must be 'inpout' or 'final'")
+                raise Exception
+
+        return None
+
+
+
 
     def remov_tmp_files(self):
         """
@@ -2118,7 +2129,7 @@ class StepGnss:
         fname_custom="",
         force=False,
         switch_ok_out_false=False,
-        check_ok_out_only_for_mv_final=False,
+        mv_final_mode=False,
     ):
         """
         Checks the status of the input and output files for a specific row in the table.
@@ -2142,7 +2153,7 @@ class StepGnss:
         switch_ok_out_false : bool, optional
             If True, the 'ok_out' column of the table is set to False if the step should be skipped.
             Default is False.
-        check_ok_out_only_for_mv_final : bool, optional
+        mv_final_mode : bool, optional
             If True, the step is skipped if the output file does not exists.
             Designed for final move (mv_final) steps.
             Default is False.
@@ -2173,9 +2184,9 @@ class StepGnss:
         if force:
             logger.info("%s forced: %s", step_name, finp_use)
             bool_ok = True
-        elif check_ok_out_only_for_mv_final and self.table.loc[irow, "ok_out"]:
+        elif mv_final_mode and self.table.loc[irow, "ok_out"]:
             bool_ok = True
-        elif check_ok_out_only_for_mv_final and not self.table.loc[irow, "ok_out"]:
+        elif mv_final_mode and not self.table.loc[irow, "ok_out"]:
             logger.warning("%s skipped (output not found): %s", step_name, fout_use)
             bool_ok = False
         # NB: we disable this option since it is not used (2025-01-14)
@@ -2282,18 +2293,19 @@ class StepGnss:
 
         return frnxmod
 
-    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out",  copy_only=False):
+    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out", copy_only=False):
         """
         "on row" method
 
-        Moves the 'table_col' entry to a final destination for each row of the table.
+        Moves the 'table_col' entry to a final destination based **on out_dir** for each row of the table.
 
         This method is applied on each row of the table. It checks if the 'ok_out' column is True for the row.
-        If it is, it moves the file specified in the 'table_col' column to a final destination directory.
-        The final destination directory is either provided as an argument or it defaults to the 'out_dir' attribute of
-        the object.
-        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the
-        success of the operation.
+        If it is, it moves the file specified in the 'table_col' column to a final destination directory
+        **based on out_dir**.
+        The final destination directory is either provided as an argument or
+         it defaults to the 'out_dir' attribute of the object.
+        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table
+        for the row based on the success of the operation.
 
         Parameters
         ----------
@@ -2325,12 +2337,9 @@ class StepGnss:
         #     return None
         # #NB: for mv it's ok_out column the one to check
 
-        mvorcp = "copy" if copy_only else "move"
-
-        # NB: for a final move it's ok_out column the one to check
-        if not self.mono_ok_check(
-            irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=True
-        ):
+        mvcp = "copy" if copy_only else "move"
+        # NB: for a final move it's ok_out column the one to check => mv_final_mode=True
+        if not self.mono_ok_check(irow, step_name="final " + mvcp, mv_final_mode=True):
             return None
 
         # definition of the output directory (after the action)
@@ -2345,31 +2354,78 @@ class StepGnss:
         )
 
         file_to_mv = self.table.loc[irow, table_col]
+        ### vvvvv HERE IS THE MOVE
+        file_moved = arocmn.move_core(file_to_mv, out_dir_use, copy_only=copy_only)
+        ### ^^^^^ HERE IS THE MOVE
+        self.mono_mv_validat(irow, file_moved=file_moved, table_col=table_col)
 
-        try:
-            # we prefer a copy rather than a move, mv can lead to some error
-            file_moved = shutil.copy2(file_to_mv, outdir_use)
-            # file_moved = shutil.move(file_to_mv, outdir_use)
-            logger.debug("file " + mvorcp + "ed to final destination: %s", file_moved)
-        except Exception as e:
-            logger.error("Error for: %s", file_to_mv)
-            logger.error("Exception raised: %s", e)
-            file_moved = None
+        return file_moved
 
+    def mono_mv_inpout(self, irow, copy_only=False):
+        """
+        Moves or copies the input file to the output file.
+
+        This method checks if the input file is valid and then moves or copies it to the output file path.
+        It validates the move or copy operation and updates the table accordingly.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to process.
+        copy_only : bool, optional
+            If True, the file is copied instead of moved. Default is False.
+
+        Returns
+        -------
+        str or None
+            The path of the moved or copied file if the operation is successful, None otherwise.
+        """
+        mvcp = "copy" if copy_only else "move"
+        if not self.mono_ok_check(irow, step_name=mvcp):
+            return None
+
+        file_src = self.table.loc[irow, "fpath_inp"]
+        file_des = self.table.loc[irow, "fpath_out"]
+        ### vvvvv HERE IS THE MOVE
+        file_moved = arocmn.move_core(file_src, file_des, copy_only=copy_only)
+        ### ^^^^^ HERE IS THE MOVE
+        self.mono_mv_validat(irow, file_moved=file_moved, table_col="fpath_out")
+        return file_moved
+
+    def mono_mv_validat(self, irow, file_moved, table_col="fpath_out"):
+        """
+        Validates the move operation for a file in the table.
+
+        This method updates the table based on the success of a file move operation.
+        If the file was successfully moved, it updates the 'ok_out', 'table_col', and 'size_out' columns.
+        If the file move failed, it sets 'ok_out' to False and logs the row in the table log.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to validate.
+        file_moved : str
+            The path of the moved file. If the move failed, this should be None.
+        table_col : str, optional
+            The column in the table which contains the file path to be moved.
+            Defaults to 'fpath_out'.
+
+        Returns
+        -------
+        str
+            The final path of the moved file if the operation is successful, None otherwise.
+        """
         if file_moved:
-            ### remove the original file if it is still around (normal with a copy rather than a move)
-            if (not copy_only) and os.path.isfile(file_to_mv):
-                os.remove(file_to_mv)
-            ### update table if things go well
+            # Remove the original file if it is still around (normal with a copy rather than a move)
+            # Update table if things go well
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, table_col] = file_moved
             self.table.loc[irow, "size_out"] = os.path.getsize(file_moved)
         else:
-            ### update table if things go wrong
+            # Update table if things go wrong
             self.table.loc[irow, "ok_out"] = False
             self.write_in_table_log(self.table.loc[irow])
             # raise e
-
         return file_moved
 
     def mono_decompress(

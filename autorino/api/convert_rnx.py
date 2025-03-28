@@ -76,16 +76,10 @@ def convert_rnx(
     -------
     None
     """
-    if not tmp_dir:
-        tmp_dir = os.path.join(out_dir, "tmp_convert_rnx")
 
-    if not log_dir:
-        log_dir = tmp_dir
-
-    if out_structure:
-        out_dir_use = os.path.join(out_dir, out_structure)
-    else:
-        out_dir_use = out_dir
+    tmp_dir = tmp_dir or os.path.join(out_dir, "tmp_convert_rnx")
+    log_dir = log_dir or tmp_dir
+    out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
 
     raws_use = inp_raws
 
@@ -118,6 +112,6 @@ def convert_rnx(
         cpy_raw.print_table()
         cpy_raw.guess_out_files()
         cpy_raw.print_table()
-        cpy_raw.copy_files(force=force,table_col="fpath_inp")
+        cpy_raw.move_files(mode="inpout", force=force, copy_only=True)
 
     return cnv

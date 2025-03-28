@@ -298,3 +298,20 @@ def guess_sites_list(inp_fil):
     sites_list = list(sorted(list(set(sites_list))))
 
     return sites_list
+
+
+def move_core(src, dest, copy_only=False):
+    mvcp = "copied" if copy_only else "moved"
+    try:
+        # we prefer a copy rather than a move, mv can lead to some error
+        file_moved = shutil.copy2(src, dest)
+        # file_moved = shutil.move(src, dest)
+        logger.debug("file " + mvcp + " to final destination: %s", file_moved)
+    except Exception as e:
+        logger.error("Error for: %s", src)
+        logger.error("Exception raised: %s", e)
+        file_moved = None
+
+    if file_moved and (not copy_only) and os.path.isfile(src):
+        os.remove(src)
+    return file_moved
