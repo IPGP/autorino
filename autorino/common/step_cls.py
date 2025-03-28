@@ -1613,28 +1613,24 @@ class StepGnss:
 
         return files_decmp_list
 
-
     def move_files(self, mode="inpout", copy_only=False, force=False):
         mvcp = "copy" if copy_only else "move"
-
         if force:
             self.force(mvcp)
 
+        file_mv_lis = []
         for irow, row in self.table.iterrows():
-            if mode=="inpout":
-                self.mono_mv_inpout(irow, copy_only=copy_only,
-                                    move_final=False)
-            elif mode=="final":
-                self.mono_mv_final(irow, table_col="fpath_out",
-                                   copy_only=copy_only, move_final=True)
+            if mode == "inpout":
+                file_mv = self.mono_mv_inpout(irow, copy_only=copy_only)
+            elif mode == "final":
+                file_mv = self.mono_mv_final(irow, table_col="fpath_out", copy_only=copy_only)
             else:
                 logger.error("mode must be 'inpout' or 'final'")
                 raise Exception
 
-        return None
+            file_mv_lis.append(file_mv)
 
-
-
+        return file_mv_lis
 
     def remov_tmp_files(self):
         """

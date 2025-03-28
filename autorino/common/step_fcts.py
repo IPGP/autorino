@@ -302,6 +302,27 @@ def guess_sites_list(inp_fil):
 
 
 def move_core(src, dest, copy_only=False):
+    """
+    Moves or copies a file from the source to the destination.
+
+    This function attempts to copy or move a file from the source path to the destination path.
+    If the operation is successful, it logs the action and returns the path of the moved/copied file.
+    If the operation fails, it logs the error and returns None.
+
+    Parameters
+    ----------
+    src : str
+        The source file path.
+    dest : str
+        The destination file path.
+    copy_only : bool, optional
+        If True, the file is copied instead of moved. Default is False.
+
+    Returns
+    -------
+    str or None
+        The path of the moved/copied file if the operation is successful, None otherwise.
+    """
     mvcp = "copied" if copy_only else "moved"
     try:
         # we prefer a copy rather than a move, mv can lead to some error
