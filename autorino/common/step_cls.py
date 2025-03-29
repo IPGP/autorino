@@ -227,12 +227,7 @@ class StepGnss:
 
     @property
     def site_id9(self):
-        if len(self._site_id) == 9:
-            return self._site_id
-        elif len(self._site_id) == 4:
-            return self._site_id + "00XXX"
-        else:
-            return self._site_id[:4] + "00XXX"
+        return _get_site_id9(self.site_id)
 
     # epoch_range_inp
     @property
@@ -252,6 +247,14 @@ class StepGnss:
     def table(self, value):
         self._table = value
         # designed for future safety tests
+
+    def _get_site_id9(site_id_inp):
+        if len(site_id_inp) == 9:
+            return self._site_id
+        elif len(site_id_inp) == 4:
+            return site_id_inp + "00XXX"
+        else:
+            return site_id_inp[:4] + "00XXX"
 
     def _init_table(self, table_cols: list = None, init_epoch: bool = True):
         """
@@ -863,6 +866,7 @@ class StepGnss:
         self,
         path_inp: str,
         epoch_inp=None,
+        irow=None,
         make_dir: bool = False,
         absolute: bool = False,
     ) -> str:
@@ -879,8 +883,13 @@ class StepGnss:
             The input path to be translated.
         epoch_inp : datetime, optional
             The epoch input to be used in the translation. Default is None.
+        irow : int, optional
+            The index of the row in the table to use for translation.
+            Will overrides the StepGnss translate_dict
+            Default is None.
         make_dir : bool, optional
-            If True, the function will create the directory corresponding to the translated path. Default is False.
+            If True, the function will create the directory corresponding to the translated path.
+            Default is False.
         absolute : bool, optional
             If True, the function will return the absolute path. Default is False.
 
@@ -896,16 +905,64 @@ class StepGnss:
         for translation of attribute self.inp_file_rinex, use also this method
         (we decide to not create a dedicated method for this)
         """
-        trslt_dir = arocmn.translator(path_inp, self.translate_dict, epoch_inp)
 
-        if make_dir and not os.path.isdir(trslt_dir):
-            utils.create_dir(trslt_dir)
-            logger.debug("directory created: %s", trslt_dir)
+        trslt_dic_use = self.translate_dict
 
-        if trslt_dir and absolute:
-            trslt_dir = os.path.abspath(trslt_dir)
+        if not irow is None:
+            trslt_dic_use = self.translate_dict.copy()
+            epoch_use = self.table["epo_srt"].iloc[irow]
+            _set_trslt_site_ids(trslt_dic_use, self.table["site"].iloc[irow])
 
-        return trslt_dir
+        if epoch_inp:
+            epoch_use = epoch_inp
+
+        trslt_path_out = arocmn.translator(path_inp, trslt_dic_use, epoch_use)
+
+        if make_dir and not os.path.isdir(trslt_path_out):
+            utils.create_dir(trslt_path_out)
+            logger.debug("directory created: %s", trslt_path_out)
+
+        if trslt_path_out and absolute:
+            trslt_path_out = os.path.abspath(trslt_path_out)
+
+        return trslt_path_out
+
+    def _set_trslt_site_ids(trsltdict_inp, site_inp):
+        """
+        Sets the site ID in the provided translation dictionary.
+
+        This function updates the translation dictionary with the site ID in different formats.
+        It adds the site ID in 4-character and 9-character formats, both in upper and lower case.
+        If the site ID ends with 'XXX', it uses the 4-character format for the 'site_id' key.
+
+        Parameters
+        ----------
+        trsltdict_inp : dict
+            The translation dictionary to be updated.
+        site_inp : str
+            The site ID to be used for updating the translation dictionary.
+
+        Returns
+        -------
+        dict
+            The updated translation dictionary.
+        """
+        site9_use = str(self._get_site_id9(site_inp))
+        site4_use = str(site9_use[:4])
+        s = "site_id4"
+        trsltdict_inp[s.upper()] = site4_use.upper()
+        trsltdict_inp[s.lower()] = site4_use.lower()
+        s = "site_id9"
+        trsltdict_inp[s.upper()] = site9_use.upper()
+        trsltdict_inp[s.lower()] = site9_use.lower()
+        s = "site_id"
+        if site9_use.endswith("XXX"):
+            trsltdict_inp[s.upper()] = site4_use.upper()
+            trsltdict_inp[s.lower()] = site4_use.lower()
+        else:
+            trsltdict_inp[s.upper()] = site9_use.upper()
+            trsltdict_inp[s.lower()] = site9_use.lower()
+        return trsltdict_inp
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
@@ -1395,7 +1452,7 @@ class StepGnss:
 
             local_path_use0 = os.path.join(local_dir_use, local_fname_use)
 
-            local_path_use = self.translate_path(local_path_use0, epoch)
+            local_path_use = self.translate_path(local_path_use0, epoch_inp=epoch)
 
             local_fname_use = os.path.basename(local_path_use)
 
@@ -1418,12 +1475,11 @@ class StepGnss:
             ## dirty update of the site_id
             ## a new translate_path should accept table row
             ### IMPORVE_ME !!!
-            self.site_id = self.table.loc[irow, "site"]
-            self.set_translate_dict()
+            # self.site_id = self.table.loc[irow, "site"]
+            # self.set_translate_dict()
 
-            outdir_use = self.translate_path(
-                self.out_dir, epoch_inp=self.table.loc[irow, "epoch_srt"], make_dir=True
-            )
+            outdir_use = self.translate_path(self.out_dir, irow=irow, make_dir=True)
+
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
             self.table.loc[irow, "fpath_out"] = fpath_out

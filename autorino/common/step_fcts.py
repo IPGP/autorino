@@ -337,3 +337,5 @@ def move_core(src, dest, copy_only=False):
     if file_moved and (not copy_only) and os.path.isfile(src):
         os.remove(src)
     return file_moved
+
+
