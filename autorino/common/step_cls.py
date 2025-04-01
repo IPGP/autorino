@@ -227,7 +227,7 @@ class StepGnss:
 
     @property
     def site_id9(self):
-        return self._get_site_id9(self.site_id)
+        return arocmn.make_site_id9(self.site_id)
 
     # epoch_range_inp
     @property
@@ -247,14 +247,6 @@ class StepGnss:
     def table(self, value):
         self._table = value
         # designed for future safety tests
-
-    def _get_site_id9(self, site_id_inp):
-        if len(site_id_inp) == 9:
-            return site_id_inp
-        elif len(site_id_inp) == 4:
-            return site_id_inp + "00XXX"
-        else:
-            return site_id_inp[:4] + "00XXX"
 
     def _init_table(self, table_cols: list = None, init_epoch: bool = True):
         """
@@ -906,17 +898,15 @@ class StepGnss:
         (we decide to not create a dedicated method for this)
         """
 
-        trslt_dic_use = self.translate_dict
-
-        epoch_use = None
-
         if not irow is None:
-            trslt_dic_use = self.translate_dict.copy()
-            epoch_use = self.table["epo_srt"].iloc[irow]
-            _set_trslt_site_ids(trslt_dic_use, self.table["site"].iloc[irow])
-
-        if epoch_inp:
+            if epoch_inp:
+                epoch_use = epoch_inp
+            else:
+                epoch_use = self.table["epo_srt"].iloc[irow]
+            trslt_dic_use = self._set_trslt_site_ids(self.table["site"].iloc[irow])
+        else:
             epoch_use = epoch_inp
+            trslt_dic_use = self.translate_dict
 
         trslt_path_out = arocmn.translator(path_inp, trslt_dic_use, epoch_use)
 
@@ -929,7 +919,7 @@ class StepGnss:
 
         return trslt_path_out
 
-    def _set_trslt_site_ids(trsltdict_inp, site_inp):
+    def _set_trslt_site_ids(self, site_inp):
         """
         Sets the site ID in the provided translation dictionary.
 
@@ -949,8 +939,11 @@ class StepGnss:
         dict
             The updated translation dictionary.
         """
-        site9_use = str(self._get_site_id9(site_inp))
-        site4_use = str(site9_use[:4])
+
+        trslt_dic_inp = self.translate_dict.copy()
+
+        site9_use = arocmn.make_site_id9(site_inp)
+        site4_use = site9_use[:4]
         s = "site_id4"
         trsltdict_inp[s.upper()] = site4_use.upper()
         trsltdict_inp[s.lower()] = site4_use.lower()
@@ -964,6 +957,7 @@ class StepGnss:
         else:
             trsltdict_inp[s.upper()] = site9_use.upper()
             trsltdict_inp[s.lower()] = site9_use.lower()
+
         return trsltdict_inp
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):

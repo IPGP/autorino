@@ -25,6 +25,32 @@ logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
 
+def make_site_id9(site_id_inp):
+    """
+    Converts a site ID to a 9-character format.
+
+    This function takes a site ID and converts it to a 9-character format.
+    If the input site ID is already 9 characters long, it returns the uppercase version of the input.
+    If the input site ID is 4 characters long, it appends '00XXX' to the uppercase version of the input.
+    Otherwise, it takes the first 4 characters of the input, converts them to uppercase, and appends '00XXX'.
+
+    Parameters
+    ----------
+    site_id_inp : str
+        The input site ID to be converted.
+
+    Returns
+    -------
+    str
+        The site ID in 9-character format.
+    """
+    if len(site_id_inp) == 9:
+        return site_id_inp.upper()
+    elif len(site_id_inp) == 4:
+        return site_id_inp.upper() + "00XXX"
+    else:
+        return site_id_inp[:4].upper() + "00XXX"
+
 def dummy_site_dic():
     """
     Creates a dummy site dictionary.
