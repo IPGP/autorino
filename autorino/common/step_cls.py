@@ -903,7 +903,7 @@ class StepGnss:
                 epoch_use = epoch_inp
             else:
                 epoch_use = self.table["epo_srt"].iloc[irow]
-            trslt_dic_use = self._set_trslt_site_ids(self.table["site"].iloc[irow])
+            trslt_dic_use = self.trslt_dic_siteid(self.table["site"].iloc[irow])
         else:
             epoch_use = epoch_inp
             trslt_dic_use = self.translate_dict
@@ -919,19 +919,19 @@ class StepGnss:
 
         return trslt_path_out
 
-    def _set_trslt_site_ids(self, site_inp):
+    def trslt_dic_siteid(self, site_id_inp):
         """
-        Sets the site ID in the provided translation dictionary.
+        Returns an ad hoc translation dictionary with given site IDs.
 
-        This function updates the translation dictionary with the site ID in different formats.
+        This function returns an ad hoc translation dictionary with the site ID in different formats.
         It adds the site ID in 4-character and 9-character formats, both in upper and lower case.
         If the site ID ends with 'XXX', it uses the 4-character format for the 'site_id' key.
 
         Parameters
         ----------
-        trsltdict_inp : dict
+        trsltdict_out : dict
             The translation dictionary to be updated.
-        site_inp : str
+        site_id_inp : str
             The site ID to be used for updating the translation dictionary.
 
         Returns
@@ -942,23 +942,23 @@ class StepGnss:
 
         trslt_dic_inp = self.translate_dict.copy()
 
-        site9_use = arocmn.make_site_id9(site_inp)
+        site9_use = arocmn.make_site_id9(site_id_inp)
         site4_use = site9_use[:4]
         s = "site_id4"
-        trsltdict_inp[s.upper()] = site4_use.upper()
-        trsltdict_inp[s.lower()] = site4_use.lower()
+        trsltdict_out[s.upper()] = site4_use.upper()
+        trsltdict_out[s.lower()] = site4_use.lower()
         s = "site_id9"
-        trsltdict_inp[s.upper()] = site9_use.upper()
-        trsltdict_inp[s.lower()] = site9_use.lower()
+        trsltdict_out[s.upper()] = site9_use.upper()
+        trsltdict_out[s.lower()] = site9_use.lower()
         s = "site_id"
         if site9_use.endswith("XXX"):
-            trsltdict_inp[s.upper()] = site4_use.upper()
-            trsltdict_inp[s.lower()] = site4_use.lower()
+            trsltdict_out[s.upper()] = site4_use.upper()
+            trsltdict_out[s.lower()] = site4_use.lower()
         else:
-            trsltdict_inp[s.upper()] = site9_use.upper()
-            trsltdict_inp[s.lower()] = site9_use.lower()
+            trsltdict_out[s.upper()] = site9_use.upper()
+            trsltdict_out[s.lower()] = site9_use.lower()
 
-        return trsltdict_inp
+        return trsltdict_out
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
