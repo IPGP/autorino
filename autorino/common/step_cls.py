@@ -227,7 +227,7 @@ class StepGnss:
 
     @property
     def site_id9(self):
-        return _get_site_id9(self.site_id)
+        return self._get_site_id9(self.site_id)
 
     # epoch_range_inp
     @property
@@ -248,9 +248,9 @@ class StepGnss:
         self._table = value
         # designed for future safety tests
 
-    def _get_site_id9(site_id_inp):
+    def _get_site_id9(self, site_id_inp):
         if len(site_id_inp) == 9:
-            return self._site_id
+            return site_id_inp
         elif len(site_id_inp) == 4:
             return site_id_inp + "00XXX"
         else:
@@ -907,6 +907,8 @@ class StepGnss:
         """
 
         trslt_dic_use = self.translate_dict
+
+        epoch_use = None
 
         if not irow is None:
             trslt_dic_use = self.translate_dict.copy()
