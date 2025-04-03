@@ -899,18 +899,35 @@ class StepGnss:
 
     def translate_path_row(self,
                            path_inp: str,
-                           irow : int,
+                           irow: int,
                            make_dir: bool = False,
                            absolute: bool = False) -> str:
         """
-        irow : int, optional
+        Translates a given path using the object's translation dictionary for a specific row in the table.
+
+        This function translates the input path using the translation dictionary specific to the site ID
+        of the row indicated by `irow`. It optionally creates the directory and returns the absolute path.
+
+        Parameters
+        ----------
+        path_inp : str
+            The input path to be translated.
+        irow : int
             The index of the row in the table to use for translation.
-            Will overrides the StepGnss translate_dict
-            Default is None.
+            Will override the StepGnss translate_dict.
+        make_dir : bool, optional
+            If True, the function will create the directory corresponding to the translated path. Default is False.
+        absolute : bool, optional
+            If True, the function will return the absolute path. Default is False.
+
+        Returns
+        -------
+        str
+            The translated directory path.
         """
 
-        epoch_use = self.table.iloc[irow,"epo_srt"]
-        trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow,"site"])
+        epoch_use = self.table.iloc[irow, "epo_srt"]
+        trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow, "site"])
 
         trslt_path_out = self.translate_core(path_inp, trslt_dic_use, epoch_use, make_dir, absolute)
         return trslt_path_out
