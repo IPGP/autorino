@@ -858,7 +858,6 @@ class StepGnss:
         self,
         path_inp: str,
         epoch_inp=None,
-        irow=None,
         make_dir: bool = False,
         absolute: bool = False,
     ) -> str:
@@ -875,10 +874,6 @@ class StepGnss:
             The input path to be translated.
         epoch_inp : datetime, optional
             The epoch input to be used in the translation. Default is None.
-        irow : int, optional
-            The index of the row in the table to use for translation.
-            Will overrides the StepGnss translate_dict
-            Default is None.
         make_dir : bool, optional
             If True, the function will create the directory corresponding to the translated path.
             Default is False.
@@ -898,26 +893,28 @@ class StepGnss:
         (we decide to not create a dedicated method for this)
         """
 
-        if not irow is None:
-            if epoch_inp:
-                epoch_use = epoch_inp
-            else:
-                epoch_use = self.table["epo_srt"].iloc[irow]
-            trslt_dic_use = self.trslt_dic_siteid(self.table["site"].iloc[irow])
-        else:
-            epoch_use = epoch_inp
-            trslt_dic_use = self.translate_dict
-
-        trslt_path_out = arocmn.translator(path_inp, trslt_dic_use, epoch_use)
-
-        if make_dir and not os.path.isdir(trslt_path_out):
-            utils.create_dir(trslt_path_out)
-            logger.debug("directory created: %s", trslt_path_out)
-
-        if trslt_path_out and absolute:
-            trslt_path_out = os.path.abspath(trslt_path_out)
+        trslt_path_out = self.translate_core(path_inp, self.translate_dict, epoch_inp, make_dir, absolute)
 
         return trslt_path_out
+
+    def translate_path_row(self,
+                           path_inp: str,
+                           irow : int,
+                           make_dir: bool = False,
+                           absolute: bool = False) -> str:
+        """
+        irow : int, optional
+            The index of the row in the table to use for translation.
+            Will overrides the StepGnss translate_dict
+            Default is None.
+        """
+
+        epoch_use = self.table.iloc[irow,"epo_srt"]
+        trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow,"site"])
+
+        trslt_path_out = self.translate_core(path_inp, trslt_dic_use, epoch_use, make_dir, absolute)
+        return trslt_path_out
+
 
     def trslt_dic_siteid(self, site_id_inp):
         """
@@ -929,18 +926,16 @@ class StepGnss:
 
         Parameters
         ----------
-        trsltdict_out : dict
-            The translation dictionary to be updated.
         site_id_inp : str
             The site ID to be used for updating the translation dictionary.
 
         Returns
         -------
-        dict
+        trsltdict_out : dict
             The updated translation dictionary.
         """
 
-        trslt_dic_inp = self.translate_dict.copy()
+        trsltdict_out = self.translate_dict.copy()
 
         site9_use = arocmn.make_site_id9(site_id_inp)
         site4_use = site9_use[:4]
@@ -959,6 +954,19 @@ class StepGnss:
             trsltdict_out[s.lower()] = site9_use.lower()
 
         return trsltdict_out
+
+    @staticmethod
+    def translate_core(self, path_inp, trslt_dic_use, epoch_use, make_dir=False, absolute=False):
+        trslt_path_out = arocmn.translator(path_inp, trslt_dic_use, epoch_use)
+
+        if make_dir and not os.path.isdir(trslt_path_out):
+            utils.create_dir(trslt_path_out)
+            logger.debug("directory created: %s", trslt_path_out)
+
+        if trslt_path_out and absolute:
+            trslt_path_out = os.path.abspath(trslt_path_out)
+
+        return trslt_path_out
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
@@ -1474,7 +1482,7 @@ class StepGnss:
             # self.site_id = self.table.loc[irow, "site"]
             # self.set_translate_dict()
 
-            outdir_use = self.translate_path(self.out_dir, irow=irow, make_dir=True)
+            outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
 
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
