@@ -10,10 +10,8 @@ import matplotlib.pyplot as plt
 import autorino.cfgenv as aroenv
 import autorino.check as arochk
 import autorino.common as arocmn
-import timeit
 import pandas as pd
 import os
-import tabulate
 import logging
 from geodezyx import utils
 

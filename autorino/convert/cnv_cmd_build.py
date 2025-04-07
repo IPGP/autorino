@@ -919,7 +919,9 @@ def cmd_build_tps2rin(
         a dictionary for custom keywords arguments. The default is dict().
     bin_path : str, optional
         the path the executed binary.
-        The default is "tps2rin".
+        Since tps2rin is a Windows executable and executed with wine,
+        it must be an **absoulte** path.
+
 
     Returns
     -------
@@ -933,6 +935,10 @@ def cmd_build_tps2rin(
 
     Note
     ----
+
+    tps2rin requires wine to run on Linux.
+
+
     Usage of `tps2rin`
     ```
     TPS2RIN 1.0.28.3459 Win64 build Jun 01, 2022 (c) Topcon Positioning Systems

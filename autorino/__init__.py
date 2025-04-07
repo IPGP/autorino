@@ -6,23 +6,20 @@ import logging.config
 import os
 from os import path
 
-__version__='1.2.0' #  changed automaticcaly with bump-my-version
+__version__='1.2.0' # changed automaticcaly with bump-my-version
 
 #### IMPORT CONFIG FOR LOGGER
 log_file_path = os.path.join(
     path.dirname(path.abspath(__file__)), "cfglog", "cfglog.py"
 )
-from . import cfglog
 
 if os.path.isfile(log_file_path):
-    logging.config.dictConfig(cfglog.log_config_dict)
-
-    #import logging_tree
-    #logging_tree.printout()
-
+    #from .cfglog import cfglog
+    from .cfglog import log_config_dict
+    logging.config.dictConfig(log_config_dict)
 else:
     print("ERR:logger cfgfiles file", log_file_path, "is missing")
 
 #### IMPORT AUTORINO INTERNAL SUBMODULES
-from . import api
-from . import bin
+# from autorino import api
+# from . import bin

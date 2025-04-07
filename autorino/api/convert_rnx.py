@@ -10,7 +10,6 @@ import os
 import autorino.convert as arocnv
 import autorino.common as arocmn
 
-
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
