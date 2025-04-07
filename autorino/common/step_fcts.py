@@ -385,7 +385,6 @@ def log_tester():
     logger.warning("level warning")
     logger.error("level error")
     logger.critical("level critical")
-    logger.exception("level exception")
 
     return None
 
