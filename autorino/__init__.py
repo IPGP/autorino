@@ -24,3 +24,8 @@ if os.path.isfile(log_json_path):
     logging.config.dictConfig(json_config)
 else:
     print("ERR:logger cfgfiles file", log_json_path, "is missing")
+
+#### IMPORT AUTORINO INTERNAL SUBMODULES
+# necessary for frontend CLI programs
+from . import api
+from . import bin
