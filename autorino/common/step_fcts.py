@@ -377,6 +377,8 @@ def log_tester():
     Exception
         If the logger is not working.
     """
+    from logging_tree import printout
+    printout()
 
     logger.debug("level debug")
     logger.info("level info")

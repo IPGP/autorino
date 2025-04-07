@@ -14,15 +14,8 @@ import autorino.common as arocmn
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger("autorino2")
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
-
-
-from logging_tree import printout
-printout()
-
-print("BBBBBBBBBB")
-logger.info("AAAAAAAA")
 
 def convert_rnx(
     inp_raws,
