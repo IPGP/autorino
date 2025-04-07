@@ -14,9 +14,15 @@ import autorino.common as arocmn
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger("autorino")
+logger = logging.getLogger("autorino2")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+
+from logging_tree import printout
+printout()
+
+print("BBBBBBBBBB")
+logger.info("AAAAAAAA")
 
 def convert_rnx(
     inp_raws,
@@ -80,15 +86,8 @@ def convert_rnx(
     log_dir = log_dir or tmp_dir
     out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
 
+    ###### Convert RAW > RINEX files
     raws_use = inp_raws
-
-    # if site:
-    #     site_dic = {"site_id": site}
-    #     update_site_id_with_metadata = False
-    # else:
-    #     site_dic = None
-    #     update_site_id_with_metadata = True
-
     cnv = arocnv.ConvertGnss(
         out_dir_use, tmp_dir, log_dir, metadata=metadata
     )
@@ -98,7 +97,7 @@ def convert_rnx(
         rinexmod_options=rinexmod_options,
     )
 
-    ### Archive the RAW file
+    ###### Archive the RAW files
     if raw_out_dir:
         if not raw_out_structure:
             raw_out_structure = out_structure
@@ -109,9 +108,9 @@ def convert_rnx(
         )
 
         cpy_raw.load_tab_prev_tab(cnv.table)
-        cpy_raw.print_table()
+        #cpy_raw.print_table()
         cpy_raw.guess_out_files()
-        cpy_raw.print_table()
+        #cpy_raw.print_table()
         cpy_raw.move_files(mode="inpout", force=force, copy_only=True)
 
     return cnv

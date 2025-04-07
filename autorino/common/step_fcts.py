@@ -365,3 +365,26 @@ def move_core(src, dest, copy_only=False):
     return file_moved
 
 
+def log_tester():
+    """
+    Tests if the logger is working.
+
+    This function checks if the logger is working by logging a test message.
+    If the logger is not working, it raises an exception.
+
+    Raises
+    ------
+    Exception
+        If the logger is not working.
+    """
+
+    logger.debug("level debug")
+    logger.info("level info")
+    logger.warning("level warning")
+    logger.error("level error")
+    logger.critical("level critical")
+    logger.exception("level exception")
+
+    return None
+
+
