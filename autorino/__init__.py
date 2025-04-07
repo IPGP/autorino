@@ -5,11 +5,7 @@ Created on 07/04/2025 15:01:05
 
 @author: psakic
 """
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-
-#import logging
 import logging.config
 import os
 from os import path
