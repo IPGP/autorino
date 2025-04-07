@@ -29,3 +29,26 @@ else:
 # necessary for frontend CLI programs
 from . import api
 from . import bin
+from . import cfgenv
+from . import cfgfiles
+from . import cfglog
+from . import check
+from . import common
+from . import convert
+from . import download
+from . import handle
+
+__all__ = ['api',
+           'bin',
+           'cfgenv',
+           'cfgfiles',
+           'cfglog',
+           'check',
+           'common',
+           'convert',
+           'download',
+           'handle']
+
+if __name__ == '__main__':
+    print("autorino version",__version__)
+    print("autorino.__all__",__all__)
