@@ -98,6 +98,7 @@ def convert_rnx(
         rinexmod_options=rinexmod_options,
     )
 
+    ### Archive the RAW file
     if raw_out_dir:
         if not raw_out_structure:
             raw_out_structure = out_structure

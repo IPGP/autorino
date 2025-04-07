@@ -893,7 +893,11 @@ class StepGnss:
         (we decide to not create a dedicated method for this)
         """
 
-        trslt_path_out = self.translate_core(path_inp, self.translate_dict, epoch_inp, make_dir, absolute)
+        trslt_path_out = self.translate_core(path_inp=path_inp,
+                                             trslt_dic_use=self.translate_dict,
+                                             epoch_use=epoch_inp,
+                                             make_dir=make_dir,
+                                             absolute=absolute)
 
         return trslt_path_out
 
@@ -929,7 +933,11 @@ class StepGnss:
         epoch_use = self.table.iloc[irow, "epo_srt"]
         trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow, "site"])
 
-        trslt_path_out = self.translate_core(path_inp, trslt_dic_use, epoch_use, make_dir, absolute)
+        trslt_path_out = self.translate_core(path_inp=path_inp,
+                                             trslt_dic_use=trslt_dic_use,
+                                             epoch_use=epoch_use,
+                                             make_dir=make_dir,
+                                             absolute=absolute)
         return trslt_path_out
 
 
@@ -972,7 +980,6 @@ class StepGnss:
 
         return trsltdict_out
 
-    @staticmethod
     def translate_core(self, path_inp, trslt_dic_use, epoch_use, make_dir=False, absolute=False):
         trslt_path_out = arocmn.translator(path_inp, trslt_dic_use, epoch_use)
 

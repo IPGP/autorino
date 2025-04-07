@@ -13,10 +13,12 @@ log_file_path = os.path.join(
     path.dirname(path.abspath(__file__)), "cfglog", "cfglog.py"
 )
 
+from . import cfglog
+
 if os.path.isfile(log_file_path):
-    #from .cfglog import cfglog
-    from .cfglog import log_config_dict
-    logging.config.dictConfig(log_config_dict)
+    logging.config.dictConfig(cfglog.log_config_dict)
+    #from .cfglog import log_config_dict
+    #logging.config.dictConfig(log_config_dict)
 else:
     print("ERR:logger cfgfiles file", log_file_path, "is missing")
 
