@@ -188,7 +188,7 @@ autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 # package-data = {"sample" = ["*.dat"]}
-packages = ["find:"]
+packages = ['autorino']
 include-package-data = true
 
 #[tool.versioningit.vcs]
