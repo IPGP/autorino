@@ -10,14 +10,12 @@ import os
 import autorino.convert as arocnv
 import autorino.common as arocmn
 
-
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
-
 
 def convert_rnx(
     inp_raws,
@@ -28,7 +26,8 @@ def convert_rnx(
     rinexmod_options=None,
     metadata=None,
     force=False,
-    store_raw_structure=None,
+    raw_out_dir=None,
+    raw_out_structure=None,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -70,31 +69,26 @@ def convert_rnx(
     force : bool, optional
         If set to True, the conversion will be forced even if the output files already exist.
         Defaults to False.
+    raw_out_dir : str, optional
+        Directory where RAW files will be archived.
+        No delete will occur, your RAW files are sacred.
+        Defaults to None.
+    raw_out_structure : str, optional
+        Structure for archiving RAW files.
+        Defaults to `out_structure` if not provided.
+
 
     Returns
     -------
     None
     """
-    if not tmp_dir:
-        tmp_dir = os.path.join(out_dir, "tmp_convert_rnx")
 
-    if not log_dir:
-        log_dir = tmp_dir
+    tmp_dir = tmp_dir or os.path.join(out_dir, "tmp_convert_rnx")
+    log_dir = log_dir or tmp_dir
+    out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
 
-    if out_structure:
-        out_dir_use = os.path.join(out_dir, out_structure)
-    else:
-        out_dir_use = out_dir
-
+    ###### Convert RAW > RINEX files
     raws_use = inp_raws
-
-    # if site:
-    #     site_dic = {"site_id": site}
-    #     update_site_id_with_metadata = False
-    # else:
-    #     site_dic = None
-    #     update_site_id_with_metadata = True
-
     cnv = arocnv.ConvertGnss(
         out_dir_use, tmp_dir, log_dir, metadata=metadata
     )
@@ -104,14 +98,20 @@ def convert_rnx(
         rinexmod_options=rinexmod_options,
     )
 
-    if store_raw_structure:
-        store_raw_stru_use = os.path.join(out_dir, store_raw_structure)
+    ###### Archive the RAW files
+    if raw_out_dir:
+        if not raw_out_structure:
+            raw_out_structure = out_structure
+        raw_out_dir_use = str(os.path.join(raw_out_dir, raw_out_structure))
 
         cpy_raw = arocmn.StepGnss(
-            store_raw_stru_use, tmp_dir, log_dir, metadata=metadata
+            raw_out_dir_use, tmp_dir, log_dir, metadata=metadata
         )
 
-        cpy_raw.load_tab_filelist(raws_use)
-        cpy_raw.copy_files()
+        cpy_raw.load_tab_prev_tab(cnv.table)
+        #cpy_raw.print_table()
+        cpy_raw.guess_out_files()
+        #cpy_raw.print_table()
+        cpy_raw.move_files(mode="inpout", force=force, copy_only=True)
 
     return cnv

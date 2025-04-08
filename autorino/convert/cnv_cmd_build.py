@@ -919,7 +919,9 @@ def cmd_build_tps2rin(
         a dictionary for custom keywords arguments. The default is dict().
     bin_path : str, optional
         the path the executed binary.
-        The default is "tps2rin".
+        Since tps2rin is a Windows executable and executed with wine,
+        it must be an **absoulte** path.
+
 
     Returns
     -------
@@ -933,6 +935,10 @@ def cmd_build_tps2rin(
 
     Note
     ----
+
+    tps2rin requires wine to run on Linux.
+
+
     Usage of `tps2rin`
     ```
     TPS2RIN 1.0.28.3459 Win64 build Jun 01, 2022 (c) Topcon Positioning Systems
@@ -1025,7 +1031,7 @@ def cmd_build_tps2rin(
     en in profile.
       -c                 Use Hatanaka Compression.
       -N <ABCD>          Short Marker Name alias for Marker Name.
-      --lfn <R,CAN,00>   Use long file name format. R is data source, CAN - country c
+      --lfn <R,CAN,00>   Use long file name format. R is data src, CAN - country c
     ode,
                         00 - station code (monument 0-9 and receiver 0-9 numbers).
       --file-period <n>  Rotation File period in seconds for file name generation.
@@ -1433,7 +1439,7 @@ def cmd_build_gfzrnx(
       [-nomren23 <[s,][mr,][iso]>] - fast nominal output file name for RINEX-2 to RINEX-3 file renaming.
                                      RINEX-3 output file name is written to STDOUT.
 
-                                        s   - data source (S|R)        (default R)
+                                        s   - data src (S|R)        (default R)
                                         mr  - marker receiver number   (default 00)
                                         iso - 3 char. iso country code (default XXX)
 

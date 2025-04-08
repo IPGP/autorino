@@ -8,6 +8,7 @@ Created on Mon Jan  8 16:53:51 2024
 
 import os
 import re
+import shutil
 
 import numpy as np
 import pandas as pd
@@ -23,6 +24,32 @@ import autorino.common as arocmn
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
 
+
+def make_site_id9(site_id_inp):
+    """
+    Converts a site ID to a 9-character format.
+
+    This function takes a site ID and converts it to a 9-character format.
+    If the input site ID is already 9 characters long, it returns the uppercase version of the input.
+    If the input site ID is 4 characters long, it appends '00XXX' to the uppercase version of the input.
+    Otherwise, it takes the first 4 characters of the input, converts them to uppercase, and appends '00XXX'.
+
+    Parameters
+    ----------
+    site_id_inp : str
+        The input site ID to be converted.
+
+    Returns
+    -------
+    str
+        The site ID in 9-character format.
+    """
+    if len(site_id_inp) == 9:
+        return site_id_inp.upper()
+    elif len(site_id_inp) == 4:
+        return site_id_inp.upper() + "00XXX"
+    else:
+        return site_id_inp[:4].upper() + "00XXX"
 
 def dummy_site_dic():
     """
@@ -115,17 +142,21 @@ def import_files(inp_fil, inp_regex=".*"):
 
     if not inp_fil:
         flist = []
+    # the input is a tuple, i.e. a list of text files, the output is the concatenanted content of the text files
     elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
         flist = list(np.hstack([open(f, "r+").readlines() for f in inp_fil]))
         flist = [f.strip() for f in flist]
+    # the input is a python list, the output is the same python list
     elif isinstance(inp_fil, list):
         flist = inp_fil
+    # the input is a single text file path, the output is the content of the text file
     elif os.path.isfile(inp_fil):
         flist = open(inp_fil, "r+").readlines()
         flist = [f.strip() for f in flist]
+    # The input is a directory path, the output is the list of files inside the directory
     elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil, ".*", regex=True)
         # Here we find everything ".*", the regex will be filtered bellow
+        flist = utils.find_recursive(inp_fil, ".*", regex=True)
     else:
         flist = []
         logger.warning("the filelist is empty")
@@ -298,3 +329,67 @@ def guess_sites_list(inp_fil):
     sites_list = list(sorted(list(set(sites_list))))
 
     return sites_list
+
+
+def move_core(src, dest, copy_only=False):
+    """
+    Moves or copies a file from the source to the destination.
+
+    This function attempts to copy or move a file from the source path to the destination path.
+    If the operation is successful, it logs the action and returns the path of the moved/copied file.
+    If the operation fails, it logs the error and returns None.
+
+    Parameters
+    ----------
+    src : str
+        The source file path.
+    dest : str
+        The destination file path.
+    copy_only : bool, optional
+        If True, the file is copied instead of moved. Default is False.
+
+    Returns
+    -------
+    str or None
+        The path of the moved/copied file if the operation is successful, None otherwise.
+    """
+    mvcp = "copied" if copy_only else "moved"
+    try:
+        # we prefer a copy rather than a move, mv can lead to some error
+        file_moved = shutil.copy2(src, dest)
+        # file_moved = shutil.move(src, dest)
+        logger.debug("file " + mvcp + " to final destination: %s", file_moved)
+    except Exception as e:
+        logger.error("Error for: %s", src)
+        logger.error("Exception raised: %s", e)
+        file_moved = None
+
+    if file_moved and (not copy_only) and os.path.isfile(src):
+        os.remove(src)
+    return file_moved
+
+
+def log_tester():
+    """
+    Tests if the logger is working.
+
+    This function checks if the logger is working by logging a test message.
+    If the logger is not working, it raises an exception.
+
+    Raises
+    ------
+    Exception
+        If the logger is not working.
+    """
+    from logging_tree import printout
+    printout()
+
+    logger.debug("level debug")
+    logger.info("level info")
+    logger.warning("level warning")
+    logger.error("level error")
+    logger.critical("level critical")
+
+    return None
+
+

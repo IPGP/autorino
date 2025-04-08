@@ -8,17 +8,9 @@
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/#choosing-a-build-backend
 [build-system]
 # A list of packages that are needed to build your package:
-requires = ["setuptools"]  # REQUIRED if [build-system] table is used
+requires = ["setuptools>=61.0.0", "wheel"] # REQUIRED if [build-system] table is used (maybe wheel too)
 # The name of the Python object that frontends will use to perform the build:
 build-backend = "setuptools.build_meta"  # If not defined, then legacy behavior can happen.
-
-# This is configuration specific to the `setuptools` build backend.
-# If you are using a different build backend, you will need to change this.
-[tool.setuptools]
-# If there are data files included in your packages that need to be
-# installed, specify them here.
-# package-data = {"sample" = ["*.dat"]}
-packages = ["autorino"]
 
 [project]
 # This is the name of your project. The first time you publish this
@@ -39,7 +31,7 @@ name = "autorino"  # REQUIRED, is the only field that cannot be marked as dynami
 #
 # For a discussion on single-sourcing the version, see
 # https://packaging.python.org/guides/single-sourcing-package-version/
-version = "1.2.0"  # REQUIRED, although can be dynamic
+version = "1.3.0"  # REQUIRED, although can be dynamic
 
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
@@ -73,7 +65,7 @@ license = {file = "LICENSE"}
 # Note that this is a list of additional keywords, separated
 # by commas, to be used to assist searching for the distribution in a
 # larger catalog.
-keywords = ["sample", "setuptools", "development"]
+keywords = ["geodesy", "reference frames", "RINEX", "data management"]
 
 # This should be your name or the name of the organization who originally
 # authored the project, and a valid email address corresponding to the name
@@ -137,13 +129,6 @@ classifiers = [
 # OR
 #find = {namespaces = false}  # Disable implicit namespaces
 
-
-#[tool.setuptools.packages.find]
-#where = ["."]  # list of folders that contain the packages (["."] by default)
-#include = ["autorino"]  # package names should match these glob patterns (["*"] by default)
-#exclude = []  # exclude packages matching these glob patterns (empty by default)
-#namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
-
 ### depndencies from requirements.txt
 # https://stackoverflow.com/questions/73600082/how-to-reference-a-requirements-txt-in-the-pyproject-toml-of-a-setuptools-projec
 # NB: github links must have the form: mypackage @ git+https://github.com/myorg/myrepo@v1.0.0#egg=mypackage
@@ -158,12 +143,12 @@ dependencies = {file = ["requirements.txt"]}
 #
 #   $ pip install sampleproject[dev]
 #
-# Optional dependencies the project provides. These are commonly 
+# Optional dependencies the project provides. These are commonly
 # referred to as "extras". For a more extensive definition see:
 # https://packaging.python.org/en/latest/specifications/dependency-specifiers/#extras
 [project.optional-dependencies]
-dev = ["check-manifest"]
-test = ["coverage"]
+#dev = ["check-manifest"]
+#test = ["coverage"]
 
 # List URLs that are relevant to your project
 #
@@ -172,7 +157,7 @@ test = ["coverage"]
 # https://packaging.python.org/specifications/core-metadata/#home-page-optional
 #
 # Examples listed include a pattern for specifying where the package tracks
-# issues, where the source is hosted, where to say thanks to the package
+# issues, where the src is hosted, where to say thanks to the package
 # maintainers, and where to support the project financially. The key is
 # what's used to render the link text on PyPI.
 [project.urls]
@@ -189,6 +174,23 @@ autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
+
+# This is configuration specific to the `setuptools` build backend.
+# If you are using a different build backend, you will need to change this.
+[tool.setuptools]
+# If there are data files included in your packages that need to be
+# installed, specify them here.
+# package-data = {"sample" = ["*.dat"]}
+#packages = ['autorino']
+
+[tool.setuptools.packages.find]
+where = ["."]  # list of folders that contain the packages (["."] by default)
+include = ["autorino*"] # package names should match these glob patterns (["*"] by default)
+#exclude = []  # exclude packages matching these glob patterns (empty by default)
+#namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+
+
+
 
 #[tool.versioningit.vcs]
 ## The method key:
@@ -217,7 +219,7 @@ autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
 #default-tag = "1.0.0"
 
 [tool.bumpversion]
-current_version = "1.2.0"  # REQUIRED, although can be dynamic
+current_version = "1.3.0"  # REQUIRED, although can be dynamic
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
