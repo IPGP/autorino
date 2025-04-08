@@ -7,6 +7,8 @@ Created on 30/05/2024 16:22:55
 """
 
 import argparse
+import os.path
+
 import yaml
 import autorino.api as aroapi
 
@@ -131,19 +133,20 @@ def main():
 
 
 def _prep_raws_inp(args):
-    ### input is a filelist of RINEXs
+    """
+    see also step_fcts.import_files
+    """
     if args.list_file_input:
+        ### input is a filelist of RINEXs => output is a list
         with open(args.inp_raws[0], "r") as f:
-            inp_raws_out = f.read().splitlines()
+            return f.read().splitlines()
+    elif len(args.inp_raws) == 1 and os.path.isdir(args.inp_raws[0]):
+        ### input is a directory => output is the directory str
+        return args.inp_raws[0]
     else:
-        if len(args.inp_raws) == 1:
-            ### input is a single RINEXs OR a directory
-            inp_raws_out = args.inp_raws[0]
-        else:
-            ### input is several RINEXs
-            inp_raws_out = args.inp_raws
-    return inp_raws_out
-
+        ### input is a single or several RINEXs => output is a list
+        # (if one single RINEX file, then it is a singleton list)
+        return args.inp_raws
 
 if __name__ == "__main__":
     main()

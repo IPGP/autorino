@@ -69,6 +69,8 @@ def convert_rnx(
     force : bool, optional
         If set to True, the conversion will be forced even if the output files already exist.
         Defaults to False.
+    raw_out_dir : str, optional
+
 
     Returns
     -------

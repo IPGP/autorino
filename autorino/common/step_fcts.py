@@ -142,17 +142,21 @@ def import_files(inp_fil, inp_regex=".*"):
 
     if not inp_fil:
         flist = []
+    # the input is a tuple, i.e. a list of text files, the output is the concatenanted content of the text files
     elif isinstance(inp_fil, tuple) and os.path.isfile(inp_fil[0]):
         flist = list(np.hstack([open(f, "r+").readlines() for f in inp_fil]))
         flist = [f.strip() for f in flist]
+    # the input is a python list, the output is the same python list
     elif isinstance(inp_fil, list):
         flist = inp_fil
+    # the input is a single text file path, the output is the content of the text file
     elif os.path.isfile(inp_fil):
         flist = open(inp_fil, "r+").readlines()
         flist = [f.strip() for f in flist]
+    # The input is a directory path, the output is the list of files inside the directory
     elif os.path.isdir(inp_fil):
-        flist = utils.find_recursive(inp_fil, ".*", regex=True)
         # Here we find everything ".*", the regex will be filtered bellow
+        flist = utils.find_recursive(inp_fil, ".*", regex=True)
     else:
         flist = []
         logger.warning("the filelist is empty")
