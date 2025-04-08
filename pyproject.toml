@@ -177,10 +177,10 @@ dependencies = {file = ["requirements.txt"]}
 # The following would provide a command line executable called `sample`
 # which executes the function `main` from this package when invoked.
 [project.scripts]
-autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
-autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
-autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
-autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
+autorino_cfgfile_run = "autorino.cli.autorino_cfgfile_run:main"
+autorino_convert_rnx = "autorino.cli.autorino_convert_rnx:main"
+autorino_trimble_filelist = "autorino.cli.autorino_trimble_filelist:main"
+autorino_check_rnx = "autorino.cli.autorino_check_rnx:main"
 
 # This is configuration specific to the `setuptools` build backend.
 # If you are using a different build backend, you will need to change this.
