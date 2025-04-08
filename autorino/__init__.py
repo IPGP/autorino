@@ -8,7 +8,7 @@ Created on 07/04/2025 15:01:05
 
 #### IMPORT AUTORINO INTERNAL SUBMODULES
 from . import api
-from . import cli
+from . import bin
 from . import cfgenv
 from . import cfgfiles
 from . import cfglog
@@ -19,7 +19,7 @@ from . import download
 from . import handle
 
 __all__ = ['api',
-           'cli',
+           'bin',
            'cfgenv',
            'cfgfiles',
            'cfglog',
