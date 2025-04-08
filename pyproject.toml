@@ -31,7 +31,7 @@ name = "autorino"  # REQUIRED, is the only field that cannot be marked as dynami
 #
 # For a discussion on single-sourcing the version, see
 # https://packaging.python.org/guides/single-sourcing-package-version/
-version = "1.2.0"  # REQUIRED, although can be dynamic
+version = "1.3.0"  # REQUIRED, although can be dynamic
 
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
@@ -219,7 +219,7 @@ include = ["autorino*"] # package names should match these glob patterns (["*"] 
 #default-tag = "1.0.0"
 
 [tool.bumpversion]
-current_version = "1.2.0"  # REQUIRED, although can be dynamic
+current_version = "1.3.0"  # REQUIRED, although can be dynamic
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
