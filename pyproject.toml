@@ -18,7 +18,7 @@ build-backend = "setuptools.build_meta"  # If not defined, then legacy behavior 
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 # package-data = {"sample" = ["*.dat"]}
-packages = ["autorino"]
+# packages = ["autorino"]
 
 [project]
 # This is the name of your project. The first time you publish this
