@@ -129,13 +129,6 @@ classifiers = [
 # OR
 #find = {namespaces = false}  # Disable implicit namespaces
 
-
-# [tool.setuptools.packages.find]
-# where = ["."]  # list of folders that contain the packages (["."] by default)
-# include = ["*"]  # package names should match these glob patterns (["*"] by default)
-#exclude = []  # exclude packages matching these glob patterns (empty by default)
-#namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
-
 ### depndencies from requirements.txt
 # https://stackoverflow.com/questions/73600082/how-to-reference-a-requirements-txt-in-the-pyproject-toml-of-a-setuptools-projec
 # NB: github links must have the form: mypackage @ git+https://github.com/myorg/myrepo@v1.0.0#egg=mypackage
@@ -189,6 +182,17 @@ autorino_check_rnx = "autorino.cli.autorino_check_rnx:main"
 # installed, specify them here.
 # package-data = {"sample" = ["*.dat"]}
 packages = ['autorino']
+
+
+
+[tool.setuptools.packages.find]
+# where = ["."]  # list of folders that contain the packages (["."] by default)
+# include = ["*"]  # package names should match these glob patterns (["*"] by default)
+#exclude = []  # exclude packages matching these glob patterns (empty by default)
+#namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+where = ["."]
+include = ["autorino*"]
+
 
 #[tool.versioningit.vcs]
 ## The method key:
