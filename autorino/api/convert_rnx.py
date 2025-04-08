@@ -70,6 +70,12 @@ def convert_rnx(
         If set to True, the conversion will be forced even if the output files already exist.
         Defaults to False.
     raw_out_dir : str, optional
+        Directory where RAW files will be archived.
+        No delete will occur, your RAW files are sacred.
+        Defaults to None.
+    raw_out_structure : str, optional
+        Structure for archiving RAW files.
+        Defaults to `out_structure` if not provided.
 
 
     Returns

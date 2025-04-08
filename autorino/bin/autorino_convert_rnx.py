@@ -98,14 +98,16 @@ def main():
     parser.add_argument(
         "-ro",
         "--raw_out_dir",
-        help="NOT IMPLEMENTED YET",
+        help="Directory where RAW files will be archived. "
+             "No deletion will occur, your RAW files are sacred.",
         default=None,
     )
 
     parser.add_argument(
         "-rt",
         "--raw_out_structure",
-        help="NOT IMPLEMENTED YET",
+        help="Structure for archiving RAW files. "
+             "Defaults to the same structure as the output directory if not provided.",
         default=None,
     )
 
