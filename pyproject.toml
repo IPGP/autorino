@@ -12,15 +12,6 @@ requires = ["setuptools"]  # REQUIRED if [build-system] table is used
 # The name of the Python object that frontends will use to perform the build:
 build-backend = "setuptools.build_meta"  # If not defined, then legacy behavior can happen.
 
-# This is configuration specific to the `setuptools` build backend.
-# If you are using a different build backend, you will need to change this.
-[tool.setuptools]
-# If there are data files included in your packages that need to be
-# installed, specify them here.
-# package-data = {"sample" = ["*.dat"]}
-packages = ["find:"]
-include-package-data = true
-
 [project]
 # This is the name of your project. The first time you publish this
 # package, this name will be registered for you. It will determine how
@@ -190,6 +181,15 @@ autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
+
+# This is configuration specific to the `setuptools` build backend.
+# If you are using a different build backend, you will need to change this.
+[tool.setuptools]
+# If there are data files included in your packages that need to be
+# installed, specify them here.
+# package-data = {"sample" = ["*.dat"]}
+packages = ["find:"]
+include-package-data = true
 
 #[tool.versioningit.vcs]
 ## The method key:
