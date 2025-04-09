@@ -13,13 +13,13 @@ import yaml
 from pathlib import Path
 
 
-
 ### we need to clear the root logger to avoid duplicate logs
 root_logger = logging.getLogger()
 root_logger.handlers.clear()  # Clear all handlers in the root logger
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel("DEBUG")
+
 
 def update_recursive(d, u):
     for k, v in u.items():
@@ -31,20 +31,24 @@ def update_recursive(d, u):
 
 
 def load_bashrc_vars():
-    bashrc = Path.home() / '.bashrc'
+    bashrc = Path.home() / ".bashrc"
 
     environ_out = os.environ.copy()
 
     if bashrc.exists():
         # Simple parsing - may need more robust solution
-        exports = [line for line in bashrc.read_text().splitlines()
-                  if line.startswith('export ')]
+        exports = [
+            line
+            for line in bashrc.read_text().splitlines()
+            if line.startswith("export ")
+        ]
         for export in exports:
-            var, value = export[7:].split('=', 1)
+            var, value = export[7:].split("=", 1)
             if not var in environ_out.keys():
-                environ_out[var] = value.strip('"\'')
+                environ_out[var] = value.strip("\"'")
 
         return environ_out
+
 
 def read_env(envfile_path=None):
     """
@@ -63,7 +67,7 @@ def read_env(envfile_path=None):
     # Initialize the variable to hold the path to the environment file to be used
     envfile_path_use = None
 
-    environ_use = dict(os.environ) # load_bashrc_vars()
+    environ_use = dict(os.environ)  # load_bashrc_vars()
     print(environ_use)
 
     # Determine the environment file path based on the function argument,
@@ -78,16 +82,21 @@ def read_env(envfile_path=None):
     print(envfile_path_use)
 
     # Check if the specified environment file exists, otherwise fallback to the default file
-    if not os.path.isfile(envfile_path_use) or envfile_path_use == "":
-        if envfile_path_use == "":
-            logger.warning(
-                "custom environment configfile not defined in the environment variable $AUTORINO_ENV"
-            )
-        else:
-            logger.warning(
-                "$AUTORINO_ENV custom environment configfile not found in %s", envfile_path_use
-            )
+    if envfile_path_use == "":
+        use_def = True
+        logger.warning(
+            "custom environment configfile not defined in the env. variable $AUTORINO_ENV"
+        )
+    elif not os.path.exists(envfile_path_use):
+        use_def = True
+        logger.warning(
+            "$AUTORINO_ENV custom environment configfile not found in %s",
+            envfile_path_use,
+        )
+    else:
+        use_def = False
 
+    if use_def:
         logger.warning("fallback to default values in %s", envfile_path_def)
         envfile_path_use = envfile_path_def
 
@@ -100,14 +109,12 @@ def read_env(envfile_path=None):
 
     env_dic_fin = env_dic_def.copy()
     env_dic_fin = update_recursive(env_dic_fin, env_dic_use)
-    #logger.debug("default environment values (%s): %s", envfile_path_def, env_dic_def)
-    #logger.debug("used environment values (%s): %s", envfile_path_use, env_dic_use)
-    #logger.debug("final environment values: %s", env_dic_fin)
+    # logger.debug("default environment values (%s): %s", envfile_path_def, env_dic_def)
+    # logger.debug("used environment values (%s): %s", envfile_path_use, env_dic_use)
+    # logger.debug("final environment values: %s", env_dic_fin)
 
     # Return the merged dictionary
     return env_dic_fin
 
 
 aro_env_dict = read_env()
-
-
