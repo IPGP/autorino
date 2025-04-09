@@ -75,6 +75,8 @@ def read_env(envfile_path=None):
     else:
         envfile_path_use = ""
 
+    print(envfile_path_use)
+
     # Check if the specified environment file exists, otherwise fallback to the default file
     if not os.path.isfile(envfile_path_use) or envfile_path_use == "":
         if envfile_path_use == "":
