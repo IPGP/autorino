@@ -10,6 +10,8 @@ import logging
 import os
 import collections.abc
 import yaml
+from pathlib import Path
+
 
 
 ### we need to clear the root logger to avoid duplicate logs
@@ -27,6 +29,16 @@ def update_recursive(d, u):
             d[k] = v
     return d
 
+
+def load_bashrc_vars():
+    bashrc = Path.home() / '.bashrc'
+    if bashrc.exists():
+        # Simple parsing - may need more robust solution
+        exports = [line for line in bashrc.read_text().splitlines()
+                  if line.startswith('export ')]
+        for export in exports:
+            var, value = export[7:].split('=', 1)
+            os.environ[var] = value.strip('"\'')
 
 def read_env(envfile_path=None):
     """
