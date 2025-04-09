@@ -49,8 +49,8 @@ def read_env(envfile_path=None):
     # environment variable, or default to an empty string
     if envfile_path:
         envfile_path_use = envfile_path
-    elif "AUTORINO_ENV" in os.environ:
-        envfile_path_use = os.environ["AUTORINO_ENV"]
+    elif os.getenv("AUTORINO_ENV"):
+        envfile_path_use = os.getenv("AUTORINO_ENV")
     else:
         envfile_path_use = ""
 
