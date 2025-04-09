@@ -63,7 +63,7 @@ def read_env(envfile_path=None):
     # Initialize the variable to hold the path to the environment file to be used
     envfile_path_use = None
 
-    environ_use = load_bashrc_vars()
+    environ_use = os.environ # load_bashrc_vars()
     print(environ_use)
 
     # Determine the environment file path based on the function argument,
