@@ -32,13 +32,19 @@ def update_recursive(d, u):
 
 def load_bashrc_vars():
     bashrc = Path.home() / '.bashrc'
+
+    environ_out = os.environ.copy()
+
     if bashrc.exists():
         # Simple parsing - may need more robust solution
         exports = [line for line in bashrc.read_text().splitlines()
                   if line.startswith('export ')]
         for export in exports:
             var, value = export[7:].split('=', 1)
-            os.environ[var] = value.strip('"\'')
+            if not var in environ_out.keys():
+                environ_out[var] = value.strip('"\'')
+
+        return environ_out
 
 def read_env(envfile_path=None):
     """
@@ -57,12 +63,14 @@ def read_env(envfile_path=None):
     # Initialize the variable to hold the path to the environment file to be used
     envfile_path_use = None
 
+    environ_use = load_bashrc_vars()
+
     # Determine the environment file path based on the function argument,
     # environment variable, or default to an empty string
     if envfile_path:
         envfile_path_use = envfile_path
-    elif os.getenv("AUTORINO_ENV"):
-        envfile_path_use = os.getenv("AUTORINO_ENV")
+    elif "AUTORINO_ENV" in environ_use.keys():
+        envfile_path_use = environ_use["AUTORINO_ENV"]
     else:
         envfile_path_use = ""
 
