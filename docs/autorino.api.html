@@ -1,0 +1,522 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.api package &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="autorino.bin package" href="autorino.bin.html" />
+    <link rel="prev" title="autorino package complete reference" href="autorino.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package complete reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.check_rnx">autorino.api.check_rnx module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.configfile_run">autorino.api.configfile_run module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.convert_rnx">autorino.api.convert_rnx module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.download_raw">autorino.api.download_raw module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.splice_rnx_abs">autorino.api.splice_rnx_abs module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.splice_rnx_rel">autorino.api.splice_rnx_rel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.split_rnx">autorino.api.split_rnx module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.bin.html">autorino.bin package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgenv.html">autorino.cfgenv package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html">autorino.cfgfiles package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfglog.html">autorino.cfglog package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.check.html">autorino.check package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.common.html">autorino.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.convert.html">autorino.convert package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.download.html">autorino.download package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.handle.html">autorino.handle package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="autorino.html">autorino package complete reference</a></li>
+      <li class="breadcrumb-item active">autorino.api package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/autorino.api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-autorino.api">
+<span id="autorino-api-package"></span><h1>autorino.api package<a class="headerlink" href="#module-autorino.api" title="Link to this heading"></a></h1>
+<p>Created on 18/09/2024 18:13:25</p>
+<p>&#64;author: psakic</p>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-autorino.api.check_rnx">
+<span id="autorino-api-check-rnx-module"></span><h2>autorino.api.check_rnx module<a class="headerlink" href="#module-autorino.api.check_rnx" title="Link to this heading"></a></h2>
+<p>Created on 27/01/2025 09:50:23</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.check_rnx.check_rnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.check_rnx.</span></span><span class="sig-name descname"><span class="pre">check_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_dir_parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir_structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sites_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/check_rnx.html#check_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.check_rnx.check_rnx" title="Link to this definition"></a></dt>
+<dd><p>This function checks the RINEX files in the input directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp_dir_parent</strong> (<em>str</em>) – The parent input directory.</p></li>
+<li><p><strong>inp_dir_structure</strong> (<em>str</em>) – The input directory structure.</p></li>
+<li><p><strong>epoch_start</strong> (<em>str</em>) – The start epoch.</p></li>
+<li><p><strong>epoch_end</strong> (<em>str</em>) – The end epoch.</p></li>
+<li><p><strong>sites_list</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of site identifiers to filter the check.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The output directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>tabu_chk_col</strong> (<em>str</em>) – The tabulated string of the check table with colored values.</p></li>
+<li><p><strong>tabu_chk_bnw</strong> (<em>str</em>) – The tabulated string of the check table with black and white values.</p></li>
+<li><p><strong>df_chk_sum</strong> (<em>pd.DataFrame</em>) – The values of the check table summarized in a dataframe.</p></li>
+<li><p><strong>df_chk_full_stats</strong> (<em>pd.DataFrame</em>) – The full statistics of the check table.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.check_rnx.checkrnx_output">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.check_rnx.</span></span><span class="sig-name descname"><span class="pre">checkrnx_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eporng</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabu_chk_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabu_chk_bnw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_chk_sum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_chk_full_stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/check_rnx.html#checkrnx_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.check_rnx.checkrnx_output" title="Link to this definition"></a></dt>
+<dd><p>This function saves the check_rnx results in the output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>str</em>) – The output directory.</p></li>
+<li><p><strong>eporng</strong> (<a class="reference internal" href="autorino.common.html#autorino.common.eporng_cls.EpochRange" title="autorino.common.eporng_cls.EpochRange"><em>EpochRange</em></a>) – The epoch range.</p></li>
+<li><p><strong>tabu_chk_col</strong> (<em>str</em>) – The tabulated string of the check table with colored values.</p></li>
+<li><p><strong>tabu_chk_bnw</strong> (<em>str</em>) – The tabulated string of the check table with black and white values.</p></li>
+<li><p><strong>df_chk_sum</strong> (<em>pd.DataFrame</em>) – The values of the check table summarized in a dataframe.</p></li>
+<li><p><strong>df_chk_full_stats</strong> (<em>pd.DataFrame</em>) – The full statistics of the check table.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-autorino.api.configfile_run">
+<span id="autorino-api-configfile-run-module"></span><h2>autorino.api.configfile_run module<a class="headerlink" href="#module-autorino.api.configfile_run" title="Link to this heading"></a></h2>
+<p>Created on 18/09/2024 18:23:30</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.configfile_run.cfgfile_run">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.configfile_run.</span></span><span class="sig-name descname"><span class="pre">cfgfile_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_srt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_select_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_steps_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/configfile_run.html#cfgfile_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.configfile_run.cfgfile_run" title="Link to this definition"></a></dt>
+<dd><p>Run the Autorino configuration files.</p>
+<p>This function takes in a configuration file or a directory of configuration files,
+reads the configuration, and runs the steps specified in the configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg_in</strong> (<em>str</em>) – The input configuration file or directory of configuration files.
+If a directory is provided, all files ending with ‘.yml’ will be used.</p></li>
+<li><p><strong>main_cfg_in</strong> (<em>str</em>) – The main configuration file to be used.</p></li>
+<li><p><strong>list_sites</strong> (<em>list</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>A list of site identifiers to filter the configuration files.</dt><dd><p>If provided, only configurations for sites in this list will be processed.
+Default is None.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>ignore_sites</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the site in sites_list will be ignored.
+It is the opposed behavior of the regular one using sites_list.
+Default is False.</p></li>
+<li><p><strong>epo_srt</strong> (<em>str</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – The start date for the epoch range.
+Can be a list; if so, each epoch is considered separately.
+Can be a file path; if so, the file contains a list of start epochs
+Default is None.</p></li>
+<li><p><strong>epo_end</strong> (<em>str</em><em>, </em><em>optional</em>) – The end date for the epoch range. Default is None.</p></li>
+<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – The period for the epoch range. Default is “1D”.</p></li>
+<li><p><strong>steps_select_list</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of selected steps to be executed.
+If not provided, all steps in ‘steps_lis’ will be executed.
+Default is None.</p></li>
+<li><p><strong>exclude_steps_select</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True the selected steps indicated in step_select_list are excluded.
+It is the opposite behavior of the regular one using steps_select_list
+Default is False.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the steps will be executed even if the output files already exist.
+overrides the ‘force’ parameters in the configuration file.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the provided cfg_in does not exist as a file or directory, an exception is raised.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-autorino.api.convert_rnx">
+<span id="autorino-api-convert-rnx-module"></span><h2>autorino.api.convert_rnx module<a class="headerlink" href="#module-autorino.api.convert_rnx" title="Link to this heading"></a></h2>
+<p>Created on 18/09/2024 18:24:43</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.convert_rnx.convert_rnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.convert_rnx.</span></span><span class="sig-name descname"><span class="pre">convert_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&lt;SITE_ID4&gt;/%Y/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/convert_rnx.html#convert_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.convert_rnx.convert_rnx" title="Link to this definition"></a></dt>
+<dd><p>Frontend function that performs RAW &gt; RINEX conversion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp_raws</strong> (<em>list</em>) – The input RAW files to be converted.
+The input can be:
+* a python list
+* a text file path containing a list of files
+* a tuple containing several text files path
+* a directory path.</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em>) – The output directory where the converted files will be stored.</p></li>
+<li><p><strong>out_structure</strong> (<em>str</em><em>, </em><em>optional</em>) – The structure of the output directory.
+If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
+See README.md for more information.
+Typical values are ‘&lt;SITE_ID4&gt;/%Y/’ or ‘%Y/%j/’.
+Default value is ‘&lt;SITE_ID4&gt;/%Y/’.</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The temporary directory used during the conversion process.
+If not provided, it defaults to &lt;out_dir&gt;/tmp_convert_rnx.
+Defaults to None.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>The directory where logs will be stored. If not provided, it defaults to tmp_dir.</dt><dd><p>Defaults to None.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – The options for modifying the RINEX files during the conversion. Defaults to None.</p></li>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <dl>
+<dt>The metadata to be included in the converted RINEX files. Possible inputs are:</dt><dd><ul>
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object.</p></li>
+</ul>
+<p>Defaults to None.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the conversion will be forced even if the output files already exist.
+Defaults to False.</p></li>
+<li><p><strong>raw_out_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory where RAW files will be archived.
+No delete will occur, your RAW files are sacred.
+Defaults to None.</p></li>
+<li><p><strong>raw_out_structure</strong> (<em>str</em><em>, </em><em>optional</em>) – Structure for archiving RAW files.
+Defaults to <cite>out_structure</cite> if not provided.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-autorino.api.download_raw">
+<span id="autorino-api-download-raw-module"></span><h2>autorino.api.download_raw module<a class="headerlink" href="#module-autorino.api.download_raw" title="Link to this heading"></a></h2>
+<p>Created on 18/09/2024 18:24:17</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.download_raw.download_raw">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.download_raw.</span></span><span class="sig-name descname"><span class="pre">download_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch_srt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir_parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir_structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir_parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&lt;SITE_ID9&gt;/%Y/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XXXX00XXX'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">login</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/download_raw.html#download_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.download_raw.download_raw" title="Link to this definition"></a></dt>
+<dd><p>Downloads raw GNSS data files.</p>
+<p>This function downloads raw GNSS data files for a specified epoch range and stores them
+in the specified output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>epoch_srt</strong> (<em>datetime-like</em>) – The start epoch for the splicing operation.</p></li>
+<li><p><strong>epoch_end</strong> (<em>datetime-like</em>) – The end epoch for the splicing operation.</p></li>
+<li><p><strong>period</strong> (<em>str</em>) – The period for the splicing operation.</p></li>
+<li><p><strong>out_dir_parent</strong> (<em>str</em>) – The parent output directory where the downloaded files will be stored.</p></li>
+<li><p><strong>out_structure</strong> (<em>str</em>) – The structure of the output sub-directory where the downloaded files will be stored.
+Typical values are ‘&lt;SITE_ID4&gt;/%Y/’ or ‘%Y/%j/’.
+Default value is ‘&lt;SITE_ID4&gt;/%Y/’.</p></li>
+<li><p><strong>hostname</strong> (<em>str</em>) – The hostname of the server from which the data files will be downloaded.</p></li>
+<li><p><strong>inp_dir_parent</strong> (<em>str</em>) – The parent directory on the server where the raw data files are located.</p></li>
+<li><p><strong>inp_dir_structure</strong> (<em>str</em>) – The raw file generic name structure on the server.</p></li>
+<li><p><strong>inp_file_regex</strong> (<em>str</em>) – The regular expression used to match the raw data files on the server</p></li>
+<li><p><strong>site_id</strong> (<em>str</em><em>, </em><em>optional</em>) – The site identifier for the data files. Default is “XXXX00XXX”.</p></li>
+<li><p><strong>login</strong> (<em>str</em><em>, </em><em>optional</em>) – The login username for the server. Default is an empty string.</p></li>
+<li><p><strong>password</strong> (<em>str</em><em>, </em><em>optional</em>) – The login password for the server. Default is an empty string.</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The temporary directory used during the download process. Default is None.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory where logs will be stored. If not provided, it defaults to tmp_dir. Default is None.</p></li>
+<li><p><strong>options</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional options for the download process. Default is an empty dictionary.</p></li>
+<li><p><strong>session</strong> (<em>dict</em><em>, </em><em>optional</em>) – Session information for the download process. Default is an empty dictionary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The DownloadGnss object after the download operation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-autorino.api.splice_rnx_abs">
+<span id="autorino-api-splice-rnx-abs-module"></span><h2>autorino.api.splice_rnx_abs module<a class="headerlink" href="#module-autorino.api.splice_rnx_abs" title="Link to this heading"></a></h2>
+<p>Created on 18/09/2024 18:26:05</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.splice_rnx_abs.splice_rnx_abs">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.splice_rnx_abs.</span></span><span class="sig-name descname"><span class="pre">splice_rnx_abs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rnxs_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_srt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'30S'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle_software</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'converto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/splice_rnx_abs.html#splice_rnx_abs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.splice_rnx_abs.splice_rnx_abs" title="Link to this definition"></a></dt>
+<dd><p>Splice RINEX files together in an absolute way, based on the provided epoch range.</p>
+<p>This function takes in a list of RINEX files and splices them together based on the specified
+epoch range and other criteria. The spliced files are stored in the specified output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rnxs_inp</strong> (<em>list</em>) – The input RINEX files to be spliced.</p></li>
+<li><p><strong>epoch_srt</strong> (<em>str</em>) – The start epoch for the splicing operation.</p></li>
+<li><p><strong>epoch_end</strong> (<em>str</em>) – The end epoch for the splicing operation.</p></li>
+<li><p><strong>period</strong> (<em>str</em>) – The period for the splicing operation.</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em>) – The output directory where the spliced files will be stored.</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em>) – The temporary directory used during the splicing process.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory where logs will be stored. If not provided, it defaults to tmp_dir.</p></li>
+<li><p><strong>site</strong> (<em>str</em><em>, </em><em>optional</em>) – The site name to be used for the spliced RINEX files. Defaults to None.
+Facultative but highly recommended to detect exisiting files to be skipped.</p></li>
+<li><p><strong>data_frequency</strong> (<em>str</em><em>, </em><em>optional</em>) – The data frequency for the spliced RINEX files.
+Facultative but highly recommended to detect exisiting files to be skipped.</p></li>
+<li><p><strong>handle_software</strong> (<em>str</em><em>, </em><em>optional</em>) – The software to be used for handling the RINEX files during the splice operation. Defaults to “converto”.</p></li>
+<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – The options for modifying the RINEX files during the splice operation. Defaults to None.</p></li>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>The metadata to be included in the spliced RINEX files. Possible inputs are:</dt><dd><ul>
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path),</p></li>
+<li><p>single string (directory containing the sitelogs),</p></li>
+<li><p>list of MetaData objects,</p></li>
+<li><p>single MetaData object. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The SpliceGnss object after the splice operation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-autorino.api.splice_rnx_rel">
+<span id="autorino-api-splice-rnx-rel-module"></span><h2>autorino.api.splice_rnx_rel module<a class="headerlink" href="#module-autorino.api.splice_rnx_rel" title="Link to this heading"></a></h2>
+<p>Created on 18/09/2024 18:26:37</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.splice_rnx_rel.splice_rnx_rel">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.splice_rnx_rel.</span></span><span class="sig-name descname"><span class="pre">splice_rnx_rel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rnxs_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle_software</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'converto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rolling_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rolling_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'floor'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_epoch_rnd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/splice_rnx_rel.html#splice_rnx_rel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.splice_rnx_rel.splice_rnx_rel" title="Link to this definition"></a></dt>
+<dd><p>Splices RINEX files together in a relative way, based on certain criteria.</p>
+<p>This function takes in a list of RINEX files and splices them together based on the provided criteria.
+The spliced files are stored in the specified output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rnxs_inp</strong> (<em>list</em>) – The input RINEX files to be spliced.
+The input can be:
+* a python list
+* a text file path containing a list of files
+* a tuple containing several text files path
+* a directory path.</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em>) – The output directory where the spliced files will be stored.</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em>) – The temporary directory used during the splicing process.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory where logs will be stored. If not provided, it defaults to tmp_dir.</p></li>
+<li><p><strong>handle_software</strong> (<em>str</em><em>, </em><em>optional</em>) – The software to be used for handling the RINEX files during the splice operation.
+Defaults to “converto”.</p></li>
+<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – The period for splicing the RINEX files. Defaults to “1d”.</p></li>
+<li><p><strong>rolling_period</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use a rolling period for splicing the RINEX files.
+If False, the spliced files will be based only on the “full” period provided,
+i.e. Day1 00h-24h, Day2 00h-24h, etc.
+If True, the spliced files will be based on the rolling period.
+i.e. Day1 00h-Day2 00h, Day1 01h-Day2 01h, Day1 02h-Day2 02h etc.
+Defaults to False.
+see also eporng_fcts.round_epochs function</p></li>
+<li><p><strong>rolling_ref</strong> (<em>datetime-like</em><em> or </em><em>int</em><em>, </em><em>optional</em>) – The reference for the rolling period.
+If datetime-like object, use this epoch as reference.
+If integer, use the epoch of the corresponding index
+Use -1 for the last epoch for instance.
+The default is -1.
+see also eporng_fcts.round_epochs function</p></li>
+<li><p><strong>round_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method for rounding the epochs during the splice operation. Defaults to “floor”.</p></li>
+<li><p><strong>drop_epoch_rnd</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to drop the rounded epochs during the splice operation. Defaults to False.</p></li>
+<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – The options for modifying the RINEX files during the splice operation. Defaults to None.</p></li>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>The metadata to be included in the spliced RINEX files. Possible inputs are:</dt><dd><ul>
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>spc_main_obj</strong> – The main SpliceGnss object after the splice operation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-autorino.api.split_rnx">
+<span id="autorino-api-split-rnx-module"></span><h2>autorino.api.split_rnx module<a class="headerlink" href="#module-autorino.api.split_rnx" title="Link to this heading"></a></h2>
+<p>Created on 18/09/2024 18:25:28</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.split_rnx.split_rnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.split_rnx.</span></span><span class="sig-name descname"><span class="pre">split_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rnxs_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_srt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'30S'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle_software</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'converto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/split_rnx.html#split_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.split_rnx.split_rnx" title="Link to this definition"></a></dt>
+<dd><p>Frontend function to split RINEX files based on certain criteria</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rnxs_inp</strong> (<em>list</em>) – The input RINEX files to be split
+The input can be:
+* a python list
+* a text file path containing a list of files
+* a tuple containing several text files path
+* a directory path.</p></li>
+<li><p><strong>epoch_srt</strong> (<em>datetime-like</em>) – The start epoch for the splicing operation.</p></li>
+<li><p><strong>epoch_end</strong> (<em>datetime-like</em>) – The end epoch for the splicing operation.</p></li>
+<li><p><strong>period</strong> (<em>str</em>) – The period for the splicing operation.</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em>) – The output directory where the split files will be stored</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em>) – The temporary directory used during the splitting process</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory where logs will be stored. If not provided, it defaults to tmp_dir</p></li>
+<li><p><strong>site</strong> (<em>str</em><em>, </em><em>optional</em>) – The site name to be used for the split RINEX files
+Facultative but highly recommended to detect exisiting files to be skipped.
+data_frequency : str, optional
+The data frequency for the spliced RINEX files.
+Facultative but highly recommended to detect exisiting files to be skipped.</p></li>
+<li><p><strong>handle_software</strong> (<em>str</em><em>, </em><em>optional</em>) – The software to be used for handling the RINEX files during the split operation</p></li>
+<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – The options for modifying the RINEX files during the split operation</p></li>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>The metadata to be included in the split RINEX files
+Possible inputs are:</p>
+<blockquote>
+<div><ul>
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="autorino.html" class="btn btn-neutral float-left" title="autorino package complete reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="autorino.bin.html" class="btn btn-neutral float-right" title="autorino.bin package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

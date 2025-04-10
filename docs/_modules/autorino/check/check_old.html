@@ -1,0 +1,421 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.check.check_old &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            autorino
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.check.check_old</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.check.check_old</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Fri Jun  2 10:56:52 2023</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Create a logger object.</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">rinexmod</span>
+<span class="kn">import</span> <span class="nn">termcolor</span>
+
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">conv</span>
+<span class="c1">#### Import star style</span>
+<span class="c1"># geodeZYX modules</span>
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">operational</span> <span class="k">as</span> <span class="n">opera</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;autorino&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="check_rinex">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_old.check_rinex">[docs]</a>
+<span class="k">def</span> <span class="nf">check_rinex</span><span class="p">(</span><span class="n">rinex_dir</span><span class="p">,</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">,</span><span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">return_concat_df</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Frontend to check the validity of RINEXs (downloaded/converted)</span>
+<span class="sd">    </span>
+<span class="sd">    DataFrame tables are returned to gives an overview of the RINEXs</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rinex_dir : str</span>
+<span class="sd">        parent directory of a RINEX archive.</span>
+<span class="sd">        the complete directory and sub-dirs. will be crawled</span>
+<span class="sd">    start : datetime</span>
+<span class="sd">        start date of the wished period.</span>
+<span class="sd">    end : datetime</span>
+<span class="sd">        end date of the wished period.</span>
+<span class="sd">    silent : bool, optional</span>
+<span class="sd">        do not print the tables in the console</span>
+<span class="sd">        The default is False (tables will be printed).</span>
+<span class="sd">    return_concat_df : bool, optional</span>
+<span class="sd">        Instead of a daily print of the tables,</span>
+<span class="sd">        all the analyzed days are stacked in single tables.</span>
+<span class="sd">        Result is slower but more pretty.</span>
+<span class="sd">        The default is False.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    df_analyze_out : DataFrame</span>
+<span class="sd">        A Table with all the details of the analyzed RINEXs.</span>
+<span class="sd">    df_simple_color_out : DataFrame</span>
+<span class="sd">        A synoptic Table with simply the completeness of analyzed RINEXs.</span>
+<span class="sd">    df_issue_out : DataFrame</span>
+<span class="sd">        A detailed Table for the problematic analyzed RINEXs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+        
+    <span class="n">list_rnx_all</span> <span class="o">=</span> <span class="n">opera</span><span class="o">.</span><span class="n">rinex_finder</span><span class="p">(</span><span class="n">rinex_dir</span><span class="p">)</span>
+    
+    <span class="n">char4_all_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">e</span><span class="p">)[:</span><span class="mi">4</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">list_rnx_all</span><span class="p">]))</span>
+    <span class="n">sites_all</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">char4_all_list</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">df_all0</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">list_rnx_all</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;fpath&quot;</span><span class="p">])</span>
+    <span class="n">df_all</span> <span class="o">=</span> <span class="n">df_all0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="n">df_all</span><span class="p">[</span><span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_all</span><span class="p">[</span><span class="s2">&quot;fpath&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">)</span>
+    <span class="n">df_all</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_all</span><span class="p">[</span><span class="s2">&quot;fpath&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">conv</span><span class="o">.</span><span class="n">rinexname2dt</span><span class="p">)</span>
+    
+    <span class="c1">#### do the date filtering based on start and end</span>
+    <span class="n">df_all</span> <span class="o">=</span> <span class="n">df_all</span><span class="p">[(</span><span class="n">df_all</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_all</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">)]</span>
+    
+    <span class="n">df_analyze_stk</span><span class="p">,</span> <span class="n">df_simple_color_stk</span><span class="p">,</span> <span class="n">df_issue_dat_stk</span> <span class="o">=</span> <span class="p">[],[],[]</span>
+    <span class="c1">#### Iterate on each date group dataframe</span>
+    <span class="k">for</span> <span class="n">date</span><span class="p">,</span> <span class="n">df_dat0</span> <span class="ow">in</span> <span class="n">df_all</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">):</span>
+        <span class="n">df_dat</span> <span class="o">=</span> <span class="n">df_dat0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1">### do the analyze of each RINEX content</span>
+        <span class="n">df_dat</span> <span class="o">=</span> <span class="n">_analyze_rinex</span><span class="p">(</span><span class="n">df_dat</span><span class="p">)</span>
+        <span class="c1">### identify missing sites</span>
+        <span class="n">df_dat</span> <span class="o">=</span> <span class="n">_site_missing_in_date</span><span class="p">(</span><span class="n">df_dat</span><span class="p">,</span><span class="n">sites_all</span><span class="p">)</span>
+        <span class="c1">### create simple one-line version and details of issues </span>
+        <span class="n">df_simple_dat</span><span class="p">,</span> <span class="n">df_issue_dat</span> <span class="o">=</span> <span class="n">_simple_row</span><span class="p">(</span><span class="n">df_dat</span><span class="p">)</span>
+        <span class="n">df_simple_dat_color</span> <span class="o">=</span> <span class="n">_row_color_formater</span><span class="p">(</span><span class="n">df_simple_dat</span><span class="p">,</span><span class="n">df_dat</span><span class="p">)</span>
+        
+        <span class="c1">### stack everything </span>
+        <span class="n">df_analyze_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_dat</span><span class="p">)</span>        
+        <span class="n">df_simple_color_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_simple_dat_color</span><span class="p">)</span>
+        <span class="n">df_issue_dat_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_issue_dat</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">return_concat_df</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot; for </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;RINEXs summary&quot;</span> <span class="o">+</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">df_simple_dat_color</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;RINEXs issues&quot;</span> <span class="o">+</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">df_issue_dat</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+
+    <span class="n">df_analyze</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_analyze_stk</span><span class="p">)</span>    
+    <span class="n">df_simple_color</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_simple_color_stk</span><span class="p">)</span>
+    <span class="n">df_issue</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_issue_dat_stk</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">return_concat_df</span><span class="p">:</span>
+        <span class="n">df_analyze_out</span> <span class="o">=</span> <span class="n">df_analyze</span>
+        <span class="n">df_simple_color_out</span> <span class="o">=</span> <span class="n">df_simple_color</span>
+        <span class="n">df_issue_out</span> <span class="o">=</span> <span class="n">df_issue</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df_analyze_out</span> <span class="o">=</span> <span class="n">df_analyze_stk</span>
+        <span class="n">df_simple_color_out</span> <span class="o">=</span> <span class="n">df_simple_color_stk</span>
+        <span class="n">df_issue_out</span> <span class="o">=</span> <span class="n">df_issue_dat_stk</span>        
+        
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span> <span class="ow">and</span> <span class="n">return_concat_df</span><span class="p">:</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot; for period </span><span class="si">{}</span><span class="s2"> - </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start</span><span class="p">,</span><span class="n">end</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;RINEXs summary&quot;</span> <span class="o">+</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">df_simple_color</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;RINEXs issues&quot;</span> <span class="o">+</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">df_issue</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+    
+    
+    <span class="k">return</span> <span class="n">df_analyze_out</span><span class="p">,</span> <span class="n">df_simple_color_out</span><span class="p">,</span> <span class="n">df_issue_out</span></div>
+
+
+
+<span class="c1">##############################################################################</span>
+<span class="c1">#### Inner functions</span>
+
+
+<div class="viewcode-block" id="_analyze_rinex">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_old._analyze_rinex">[docs]</a>
+<span class="k">def</span> <span class="nf">_analyze_rinex</span><span class="p">(</span><span class="n">df_in</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    this function do the basic analysis of a DataFrame containing </span>
+<span class="sd">    RINEX paths in a &quot;fpath&quot; column</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df_in : DataFrame</span>
+<span class="sd">        DataFrame RINEX paths in a &quot;fpath&quot; column.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    df_out : DataFrame</span>
+<span class="sd">        Enhanced version of df_in (copied first) with the RINEX infos.</span>
+<span class="sd">        </span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Flags meaning</span>
+<span class="sd">    </span>
+<span class="sd">    * 0 = OK</span>
+<span class="sd">    * 1 = missing RINEX or critical content</span>
+<span class="sd">    * 2 = incomplete RINEX</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_out</span> <span class="o">=</span> <span class="n">df_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1">### get RINEX as an rinexMod&#39;s Object</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;robj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;fpath&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">rinexmod</span><span class="o">.</span><span class="n">rinexfile</span><span class="o">.</span><span class="n">RinexFile</span><span class="p">)</span>
+    <span class="c1">### get RINEX site code</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;robj&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="n">get_site</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span><span class="kc">True</span><span class="p">))</span>
+    <span class="c1">#sites_all = df_out[&quot;site&quot;].unique</span>
+    <span class="c1">### get RINEX start/end in the data</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;robj&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="n">start_date</span><span class="p">)</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">)</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;robj&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="n">end_date</span><span class="p">)</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">)</span>
+    <span class="c1">### get RINEX nominal interval</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;itrvl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;robj&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="n">sample_rate_numeric</span><span class="p">)</span>
+    <span class="c1">### get RINEX number of epochs</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;nepochs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;robj&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get_dates_all</span><span class="p">()))</span>
+    <span class="c1">### get completness</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;td_str&quot;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;robj&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="n">get_file_period_from_filename</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;td_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">mask_hour</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;td_str&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;01H&quot;</span>
+    <span class="n">df_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask_hour</span><span class="p">,</span><span class="s2">&quot;td_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3600</span>
+    <span class="n">mask_day</span> <span class="o">=</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;td_str&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;01D&quot;</span>
+    <span class="n">df_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask_day</span><span class="p">,</span><span class="s2">&quot;td_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">86400</span>
+
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;itrvl&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;nepochs&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;td_int&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">],</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="c1">### set flag</span>
+    <span class="c1"># 0 = OK</span>
+    <span class="c1"># 1 = missing or critical</span>
+    <span class="c1"># 2 = incomplete</span>
+    <span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">df_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mf">99.</span><span class="p">,</span> <span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">df_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">1.</span> <span class="p">,</span> <span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">df_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_out</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">99.</span><span class="p">),</span> <span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    
+    <span class="k">return</span> <span class="n">df_out</span></div>
+
+
+
+<div class="viewcode-block" id="_site_missing_in_date">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_old._site_missing_in_date">[docs]</a>
+<span class="k">def</span> <span class="nf">_site_missing_in_date</span><span class="p">(</span><span class="n">df_dat_in</span><span class="p">,</span><span class="n">sites_all</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identify the missing RINEX for a date </span>
+<span class="sd">    and add they with dummy values in</span>
+<span class="sd">    a date-grouped DataFrame</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df_dat_in : DataFrame</span>
+<span class="sd">        A date-grouped RINEX DataFrame</span>
+<span class="sd">        (generated with _analyze_rinex and grouped with .groupby()).</span>
+<span class="sd">    sites_all : list</span>
+<span class="sd">        a list of all site possible.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    df_dat_out : DataFrame</span>
+<span class="sd">        Enhanced version of df_dat_in (copied first) with the missing RINEX</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">df_dat_out</span> <span class="o">=</span> <span class="n">df_dat_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">date</span> <span class="o">=</span> <span class="n">df_dat_out</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">unique</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="n">sites_all</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sites_all</span><span class="p">)</span>
+    <span class="c1">### find the site missings ...</span>
+    <span class="n">sites_missing</span> <span class="o">=</span> <span class="n">sites_all</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">sites_all</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">df_dat_out</span><span class="o">.</span><span class="n">site</span><span class="p">))]</span>
+    
+    <span class="c1">### ... add them in thedata frame   </span>
+    <span class="k">for</span> <span class="n">sitmis</span> <span class="ow">in</span> <span class="n">sites_missing</span><span class="p">:</span>
+        <span class="n">linemis_col</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df_dat_out</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        
+        <span class="n">linemis</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">linemis_col</span><span class="p">)</span> <span class="p">,</span>
+                            <span class="n">index</span><span class="o">=</span><span class="n">linemis_col</span><span class="p">)</span>
+        
+        <span class="n">linemis</span><span class="p">[</span><span class="s1">&#39;site&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sitmis</span>
+        <span class="n">linemis</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date</span>
+        <span class="n">linemis</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">NaT</span>
+        <span class="n">linemis</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">NaT</span>
+        <span class="n">linemis</span><span class="p">[</span><span class="s1">&#39;nepochs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">linemis</span><span class="p">[</span><span class="s1">&#39;itrvl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">linemis</span><span class="p">[</span><span class="s1">&#39;%&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">linemis</span><span class="p">[</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">linemis</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">linemis</span><span class="p">])</span>
+        
+        <span class="n">df_dat_out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_dat_out</span><span class="p">,</span>
+                                <span class="n">linemis</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                           <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+        <span class="n">df_dat_out</span> <span class="o">=</span> <span class="n">df_dat_out</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;site&quot;</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">df_dat_out</span></div>
+
+
+<div class="viewcode-block" id="_simple_row">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_old._simple_row">[docs]</a>
+<span class="k">def</span> <span class="nf">_simple_row</span><span class="p">(</span><span class="n">df_dat_in</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simplfy the date-grouped RINEX DataFrame in a one-line summary with </span>
+<span class="sd">    just the completeness (&quot;%&quot;)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df_dat_in : DataFrame</span>
+<span class="sd">        A date-grouped RINEX DataFrame.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    df_simple_out : DataFrame (mono-row)</span>
+<span class="sd">        One line simplfied version of df_dat_in.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_dat_wrk</span> <span class="o">=</span> <span class="n">df_dat_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">ser_dat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">df_dat_wrk</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                        <span class="n">index</span><span class="o">=</span><span class="n">df_dat_wrk</span><span class="o">.</span><span class="n">site</span><span class="p">)</span>
+    <span class="n">df_simple_out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">ser_dat</span><span class="p">],</span>
+                                 <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">df_dat_in</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">unique</span><span class="p">()[</span><span class="mi">0</span><span class="p">]])</span>  
+    
+    
+    <span class="n">df_dat_wrk_midx</span> <span class="o">=</span> <span class="n">df_dat_wrk</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span><span class="s2">&quot;site&quot;</span><span class="p">])</span>
+    
+    <span class="n">linelissue_stk</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="n">cols_lineissue</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">,</span><span class="s2">&quot;end&quot;</span><span class="p">,</span><span class="s2">&quot;nepochs&quot;</span><span class="p">,</span> <span class="s2">&quot;itrvl&quot;</span><span class="p">,</span><span class="s2">&quot;%&quot;</span><span class="p">]</span>
+    
+    <span class="k">for</span> <span class="n">date</span><span class="p">,</span><span class="n">site_row</span> <span class="ow">in</span> <span class="n">df_simple_out</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">site</span><span class="p">,</span> <span class="n">cplt</span> <span class="ow">in</span> <span class="n">site_row</span><span class="o">.</span><span class="n">items</span><span class="p">():</span> 
+            <span class="n">flag</span> <span class="o">=</span> <span class="n">df_dat_wrk_midx</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">date</span><span class="p">,</span><span class="n">site</span><span class="p">)]</span><span class="o">.</span><span class="n">flag</span>
+            <span class="k">if</span> <span class="n">flag</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lineissue</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">df_dat_wrk_midx</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">date</span><span class="p">,</span><span class="n">site</span><span class="p">)]])</span>
+                <span class="n">lineissue</span> <span class="o">=</span> <span class="n">lineissue</span><span class="p">[</span><span class="n">cols_lineissue</span><span class="p">]</span>
+                <span class="n">linelissue_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lineissue</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">linelissue_stk</span><span class="p">:</span>
+        <span class="n">df_issue</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">linelissue_stk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df_issue</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">cols_lineissue</span><span class="p">)</span> <span class="c1"># no issue :)</span>
+    
+    <span class="k">return</span> <span class="n">df_simple_out</span><span class="p">,</span><span class="n">df_issue</span></div>
+
+
+
+<div class="viewcode-block" id="_row_color_formater">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_old._row_color_formater">[docs]</a>
+<span class="k">def</span> <span class="nf">_row_color_formater</span><span class="p">(</span><span class="n">df_simple_in</span><span class="p">,</span>
+                        <span class="n">df_full_in</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Format a df_simple DataFrame with colors</span>
+<span class="sd">    Need df_full_ in to gat the flags values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        
+    <span class="n">color_map</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span>
+                 <span class="mi">1</span><span class="p">:</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+                 <span class="mi">2</span><span class="p">:</span><span class="s2">&quot;yellow&quot;</span><span class="p">}</span>
+    
+    <span class="n">df_simple_out</span>  <span class="o">=</span> <span class="n">df_simple_in</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="n">df_full_wrk</span> <span class="o">=</span> <span class="n">df_full_in</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">,</span><span class="s2">&quot;site&quot;</span><span class="p">])</span>
+         
+    <span class="k">for</span> <span class="n">date</span><span class="p">,</span><span class="n">site_row</span> <span class="ow">in</span> <span class="n">df_simple_in</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">site</span><span class="p">,</span> <span class="n">cplt</span> <span class="ow">in</span> <span class="n">site_row</span><span class="o">.</span><span class="n">items</span><span class="p">():</span> 
+            <span class="n">flag</span> <span class="o">=</span> <span class="n">df_full_wrk</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">date</span><span class="p">,</span><span class="n">site</span><span class="p">)]</span><span class="o">.</span><span class="n">flag</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">color_map</span><span class="p">[</span><span class="n">flag</span><span class="p">]</span>
+            <span class="n">cplt_color</span> <span class="o">=</span> <span class="n">termcolor</span><span class="o">.</span><span class="n">colored</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cplt</span><span class="p">),</span> <span class="n">color</span><span class="p">)</span>
+            <span class="n">df_simple_out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">date</span><span class="p">,</span><span class="n">site</span><span class="p">]</span> <span class="o">=</span> <span class="n">cplt_color</span>
+            
+    <span class="n">df_simple_out</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">termcolor</span><span class="o">.</span><span class="n">colored</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;light_grey&#39;</span> <span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_simple_out</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">df_simple_out</span></div>
+
+            
+<span class="c1">####################################</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

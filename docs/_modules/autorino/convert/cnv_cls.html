@@ -1,0 +1,535 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.convert.cnv_cls &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            autorino
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.convert.cnv_cls</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.convert.cnv_cls</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Fri Apr  7 12:07:18 2023</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">autorino.convert</span> <span class="k">as</span> <span class="nn">arocnv</span>
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">operational</span>
+
+<span class="c1">#### Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">aro_env_dict</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+<span class="n">BOLD_SRT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
+<span class="n">BOLD_END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+
+
+<div class="viewcode-block" id="ConvertGnss">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss">[docs]</a>
+<span class="k">class</span> <span class="nc">ConvertGnss</span><span class="p">(</span><span class="n">arocmn</span><span class="o">.</span><span class="n">StepGnss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class used to represent the GNSS conversion process.</span>
+
+<span class="sd">    This class inherits from the StepGnss class</span>
+<span class="sd">    and is used to handle the conversion of GNSS data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    out_dir : str</span>
+<span class="sd">        The directory where the output of the conversion should be stored.</span>
+<span class="sd">    tmp_dir : str</span>
+<span class="sd">        The directory where temporary files during the conversion process should be stored.</span>
+<span class="sd">    log_dir : str</span>
+<span class="sd">        The directory where log files should be stored.</span>
+<span class="sd">    epoch_range : tuple, optional</span>
+<span class="sd">        A tuple containing the start and end epochs for the conversion process.</span>
+<span class="sd">    site : str, optional</span>
+<span class="sd">        The site for which the conversion process should be performed.</span>
+<span class="sd">    session : str, optional</span>
+<span class="sd">        The session for which the conversion process should be performed.</span>
+<span class="sd">    options : dict, optional</span>
+<span class="sd">        A dictionary containing any additional options for the conversion process.</span>
+<span class="sd">    metadata : str or list, optional</span>
+<span class="sd">        The metadata to be included in the converted RINEX files</span>
+<span class="sd">        Possible inputs are:</span>
+<span class="sd">        * list of string (sitelog file paths),</span>
+<span class="sd">        * single string (single sitelog file path)</span>
+<span class="sd">        * single string (directory containing the sitelogs)</span>
+<span class="sd">        * list of MetaData objects</span>
+<span class="sd">        * single MetaData object</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    __init__(self, out_dir, tmp_dir, log_dir, epoch_range_inp=None, site=None, session=None, options=None, metadata=None)</span>
+<span class="sd">        Initializes the ConvertGnss class with the specified parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ConvertGnss.__init__">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">out_dir</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="p">,</span>
+        <span class="n">inp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inp_file_regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the ConvertGnss class with the specified parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out_dir : str</span>
+<span class="sd">            The directory where the output of the conversion should be stored.</span>
+<span class="sd">        tmp_dir : str</span>
+<span class="sd">            The directory where temporary files during the conversion process should be stored.</span>
+<span class="sd">        log_dir : str</span>
+<span class="sd">            The directory where log files should be stored.</span>
+<span class="sd">        epoch_range : tuple, optional</span>
+<span class="sd">            A tuple containing the start and end epochs for the conversion process.</span>
+<span class="sd">        site : str, optional</span>
+<span class="sd">            The site for which the conversion process should be performed.</span>
+<span class="sd">        session : str, optional</span>
+<span class="sd">            The session for which the conversion process should be performed.</span>
+<span class="sd">        options : dict, optional</span>
+<span class="sd">            A dictionary containing any additional options for the conversion process.</span>
+<span class="sd">        metadata : str or list, optional</span>
+<span class="sd">            The metadata to be included in the converted RINEX files</span>
+<span class="sd">            Possible inputs are:</span>
+<span class="sd">            * list of string (sitelog file paths),</span>
+<span class="sd">            * single string (single sitelog file path)</span>
+<span class="sd">            * single string (directory containing the sitelogs)</span>
+<span class="sd">            * list of MetaData objects</span>
+<span class="sd">            * single MetaData object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir</span><span class="p">,</span>
+            <span class="n">inp_file_regex</span><span class="o">=</span><span class="n">inp_file_regex</span><span class="p">,</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="c1">###############################################</span>
+
+<div class="viewcode-block" id="ConvertGnss.convert">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss.convert">[docs]</a>
+    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">converter</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;total action&quot; method</span>
+
+<span class="sd">        Executes the total conversion process for GNSS data.</span>
+
+<span class="sd">        This method handles the entire conversion process for GNSS data.</span>
+<span class="sd">        It sets up temporary directories, guesses and deactivates existing local RINEX files, decompresses files,</span>
+<span class="sd">        filters and converts input files, applies rinexmod options, and finally moves the converted files to</span>
+<span class="sd">        the final directory.</span>
+<span class="sd">        It also handles logging and error checking throughout the process.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, prints the conversion table. Default is False.</span>
+<span class="sd">        force : bool, optional</span>
+<span class="sd">            If True, forces the conversion even if output files already exist. Default is False.</span>
+<span class="sd">        rinexmod_options : dict, optional</span>
+<span class="sd">            A dictionary containing options for the rinexmod process.</span>
+<span class="sd">             If not specified, default options are used.</span>
+<span class="sd">        converter : str, optional</span>
+<span class="sd">            The converter to be used for the conversion.</span>
+<span class="sd">            If not specified, the best converter is automatically selected.</span>
+<span class="sd">            Default is &#39;auto&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># #### Legacy Option</span>
+        <span class="c1"># update_site_id_with_metadata : bool, optional</span>
+        <span class="c1">#     If True, updates the site identifier using the metadata (default case).</span>
+        <span class="c1">#     Since the site code from RAW file name can be poorly formatted</span>
+        <span class="c1">#     we search it w.r.t. the sites from the metadata.</span>
+        <span class="c1">#     If False, the site identifier is not updated, and it is the one of the</span>
+        <span class="c1">#     ConvertGnss object self.site_id that is used.</span>
+        <span class="c1">#     (for some advanced cases).</span>
+        <span class="c1">#     Default is True.</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_logfile</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">BOLD_SRT</span> <span class="o">+</span> <span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt; RAW &gt; RINEX files conversion&quot;</span> <span class="o">+</span> <span class="n">BOLD_END</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tmp_dirs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_tmp_dirs</span><span class="p">()</span>
+        <span class="c1"># other tmps subdirs come also later in the loop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_translate_dict</span><span class="p">()</span>
+        <span class="c1"># others translate dict updates will come in the loop</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="n">site4_list</span><span class="p">,</span> <span class="n">site9_list</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">site_list_from_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">site4_list</span><span class="p">,</span> <span class="n">site9_list</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+        <span class="c1">### initialize the table as log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_table_log</span><span class="p">(</span><span class="n">out_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_tables</span><span class="p">)</span>
+
+        <span class="c1">### guess and deactivate existing local RINEX files</span>
+        <span class="c1"># generate the potential local files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_rnx</span><span class="p">()</span>
+        <span class="c1"># tests if the output local files are already there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
+        <span class="c1"># tests if the input local files are already there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="s2">&quot;inp&quot;</span><span class="p">)</span>
+        <span class="c1"># be sure ok_xxx columns are booleans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_ok_cols_bool</span><span class="p">()</span>
+        <span class="c1"># switch ok_inp to False if the output files are already there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_ok_out</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="s2">&quot;convert&quot;</span><span class="p">)</span>
+
+        <span class="n">filter_prev_tables</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">filter_prev_tables</span><span class="p">:</span>
+            <span class="n">prv_tbl_df</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">load_previous_tables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_tables</span><span class="p">)</span>
+            <span class="c1"># Filter previous tables stored in log_dir</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prv_tbl_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filter_prev_tab</span><span class="p">(</span><span class="n">prv_tbl_df</span><span class="p">)</span>
+            <span class="c1"># switch ok_inp to False if the output files are already there</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filter_ok_out</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_decmp_files</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decompress</span><span class="p">()</span>
+
+        <span class="c1"># get a table with only the good files (ok_inp == True)</span>
+        <span class="c1"># table_init_ok must be used only for the following statistics!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_ok_cols_bool</span><span class="p">()</span>
+        <span class="n">table_init_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_purge</span><span class="p">()</span>
+
+        <span class="n">n_tot_inp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">])</span>
+        <span class="n">n_ok_inp</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">n_not_ok_inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%5i</span><span class="s2">/</span><span class="si">%5i</span><span class="s2"> files will be converted, </span><span class="si">%5i</span><span class="s2">/</span><span class="si">%5i</span><span class="s2"> files are excluded&quot;</span><span class="p">,</span>
+            <span class="n">n_ok_inp</span><span class="p">,</span>
+            <span class="n">n_tot_inp</span><span class="p">,</span>
+            <span class="n">n_not_ok_inp</span><span class="p">,</span>
+            <span class="n">n_tot_inp</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span>
+
+        <span class="c1">######################### START THE LOOP ##############################</span>
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">fraw</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">])</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">fraw</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;conversion&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt;&gt; input raw file for conversion: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fraw</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1">###########################################################################</span>
+            <span class="c1"># change the site_id here is a very bad idea, it f*cks the outdir 240605</span>
+            <span class="c1"># (the outdir has not the country code anymore)</span>
+            <span class="c1">#</span>
+            <span class="c1"># but, because of the new IGS update (9 char in sitlog)</span>
+            <span class="c1"># it should not be a pb anymore</span>
+
+            <span class="c1"># +++ since the site code from fraw can be poorly formatted</span>
+            <span class="c1"># we search it w.r.t. the sites from the metadata</span>
+            <span class="c1"># we update the table row and the translate_dic (necessary for the output dir)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mono_site_upd</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">site4_list</span><span class="p">)</span>
+            <span class="c1"># set self.site_id for the output dir translation &amp; rinexmod options</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">site_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;site&quot;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_translate_dict</span><span class="p">()</span>
+            <span class="c1">###########################################################################</span>
+            <span class="c1"># +++ CONVERTER SELECTION</span>
+
+            <span class="k">if</span> <span class="n">converter</span> <span class="o">!=</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+                <span class="n">converter_name_use</span> <span class="o">=</span> <span class="n">converter</span>  <span class="c1"># converter is forced</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># ++ do a first converter selection by identifying odd files</span>
+                <span class="n">converter_name_use</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">select_conv_odd_file</span><span class="p">(</span><span class="n">fraw</span><span class="p">)</span>
+                <span class="c1"># NB: converter selection for regular files is done in</span>
+                <span class="c1"># autorino.conv_cmd_run._convert_select</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;extension/converter: </span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">converter_name_use</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">converter_name_use</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;file skipped, no converter found: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fraw</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;no converter found&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_in_table_log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">])</span>
+
+            <span class="c1"># ++ a function to stop the docker containers running for too long</span>
+            <span class="c1"># (for trimble conversion)</span>
+            <span class="n">arocnv</span><span class="o">.</span><span class="n">stop_old_docker</span><span class="p">()</span>
+
+            <span class="c1">#############################################################</span>
+            <span class="c1"># +++++ CONVERSION</span>
+            <span class="n">frnxtmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_convert</span><span class="p">(</span>
+                <span class="n">irow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_converted</span><span class="p">,</span> <span class="n">converter_inp</span><span class="o">=</span><span class="n">converter_name_use</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_rnx_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frnxtmp</span><span class="p">)</span>  <span class="c1"># list for final remove</span>
+
+            <span class="c1">#############################################################</span>
+            <span class="c1"># +++++ RINEXMOD</span>
+            <span class="n">rinexmod_options_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">updt_rnxmodopts</span><span class="p">(</span>
+                <span class="n">rinexmod_options</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">debug_print</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">mono_rinexmod</span><span class="p">(</span>
+                <span class="n">irow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_rinexmoded</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="n">rinexmod_options_use</span>
+            <span class="p">)</span>
+
+            <span class="c1">#############################################################</span>
+            <span class="c1"># +++++ FINAL MOVE</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mono_mv_final</span><span class="p">(</span><span class="n">irow</span><span class="p">)</span>
+
+        <span class="c1"># ++++ remove temporary files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remov_tmp_files</span><span class="p">()</span>
+
+        <span class="c1"># close the log file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_logfile</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="c1">#               _   _</span>
+    <span class="c1">#     /\       | | (_)</span>
+    <span class="c1">#    /  \   ___| |_ _  ___  _ __  ___    ___  _ __    _ __ _____      _____</span>
+    <span class="c1">#   / /\ \ / __| __| |/ _ \| &#39;_ \/ __|  / _ \| &#39;_ \  | &#39;__/ _ \ \ /\ / / __|</span>
+    <span class="c1">#  / ____ \ (__| |_| | (_) | | | \__ \ | (_) | | | | | | | (_) \ V  V /\__ \</span>
+    <span class="c1"># /_/    \_\___|\__|_|\___/|_| |_|___/  \___/|_| |_| |_|  \___/ \_/\_/ |___/</span>
+    <span class="c1">#</span>
+
+<div class="viewcode-block" id="ConvertGnss.mono_convert">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss.mono_convert">[docs]</a>
+    <span class="k">def</span> <span class="nf">mono_convert</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">converter_inp</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;on row&quot; method</span>
+
+<span class="sd">        Converts the &#39;table_col&#39; entry for each row of the table.</span>
+
+<span class="sd">        This method is applied to each row of the table. It converts the &#39;table_col&#39; entry, typically a file.</span>
+<span class="sd">        The conversion is performed using the specified converter.</span>
+<span class="sd">        If no converter is specified, an automatic converter is used.</span>
+<span class="sd">        The output of the conversion is stored in the specified output directory.</span>
+<span class="sd">        If no output directory is specified, the output is stored in the temporary directory.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        irow : int</span>
+<span class="sd">            The index of the row in the table to be converted.</span>
+<span class="sd">        out_dir : str, optional</span>
+<span class="sd">            The directory where the output of the conversion should be stored.</span>
+<span class="sd">             If not specified, the output is stored</span>
+<span class="sd">            in the temporary directory.</span>
+<span class="sd">        converter_inp : str, optional</span>
+<span class="sd">            The converter to be used for the conversion.</span>
+<span class="sd">             If not specified, an automatic converter is used.</span>
+<span class="sd">        table_col : str, optional</span>
+<span class="sd">            The column in the table that should be converted.</span>
+<span class="sd">            Typically, this is a file. Default is &#39;fpath_inp&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The path of the converted file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;conversion&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># definition of the output directory (after the action)</span>
+        <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
+            <span class="n">out_dir_use</span> <span class="o">=</span> <span class="n">out_dir</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;tmp_dir_converted&quot;</span><span class="p">):</span>
+            <span class="n">out_dir_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_converted</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out_dir_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">frnxtmp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">converter_run</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">table_col</span><span class="p">],</span> <span class="n">out_dir_use</span><span class="p">,</span> <span class="n">converter</span><span class="o">=</span><span class="n">converter_inp</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error for: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">table_col</span><span class="p">])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Exception raised: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">frnxtmp</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">frnxtmp</span><span class="p">:</span>
+            <span class="c1">### update table if things go well</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frnxtmp</span>
+            <span class="n">epo_srt_ok</span><span class="p">,</span> <span class="n">epo_end_ok</span> <span class="o">=</span> <span class="n">operational</span><span class="o">.</span><span class="n">rinex_start_end</span><span class="p">(</span><span class="n">frnxtmp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">epo_srt_ok</span><span class="p">,</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">epo_end_ok</span><span class="p">,</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">### update table if things go wrong</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">frnxtmp</span></div>
+
+
+<div class="viewcode-block" id="ConvertGnss.mono_site_upd">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss.mono_site_upd">[docs]</a>
+    <span class="k">def</span> <span class="nf">mono_site_upd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">metadata_or_sites_list_inp</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the &#39;site&#39; entry for each row of the table.</span>
+
+<span class="sd">        This method is applied to each row of the table.</span>
+<span class="sd">        It checks if the &#39;site&#39; entry is defined.</span>
+<span class="sd">        If it is not defined or if the &#39;force&#39; parameter</span>
+<span class="sd">        is set to True, it updates the &#39;site&#39; entry.</span>
+<span class="sd">        The update is performed by searching the site</span>
+<span class="sd">        from a list of sites or metadata.</span>
+<span class="sd">        If the &#39;site&#39; entry is already defined and &#39;force&#39; is not set to True,</span>
+<span class="sd">        it sets the &#39;site&#39; entry to &#39;XXXX00XXX&#39;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        irow : int</span>
+<span class="sd">            The index of the row in the table to be updated.</span>
+<span class="sd">        metadata_or_sites_list_inp : list</span>
+<span class="sd">            A list of sites or metadata from which the site should be searched.</span>
+<span class="sd">        force : bool, optional</span>
+<span class="sd">            If True, forces the update of the &#39;site&#39;</span>
+<span class="sd">            entry even if it is already defined.</span>
+<span class="sd">            Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The updated &#39;site&#39; entry.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">val_def</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">is_ok</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;site&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">val_def</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
+            <span class="n">fraw</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">])</span>
+            <span class="n">site_found</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">site_search_from_list</span><span class="p">(</span><span class="n">fraw</span><span class="p">,</span> <span class="n">metadata_or_sites_list_inp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;site&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">site_found</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">site_found</span> <span class="o">=</span> <span class="s2">&quot;XXXX00XXX&quot;</span>
+
+        <span class="k">return</span> <span class="n">site_found</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
