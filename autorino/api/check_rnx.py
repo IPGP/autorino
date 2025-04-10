@@ -16,7 +16,7 @@ import logging
 from geodezyx import utils
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
 def check_rnx(

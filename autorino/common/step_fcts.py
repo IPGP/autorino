@@ -22,7 +22,7 @@ import autorino.cfgenv.env_read as aroenv
 import autorino.common as arocmn
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
 def make_site_id9(site_id_inp):

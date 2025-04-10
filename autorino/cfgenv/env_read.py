@@ -30,26 +30,6 @@ def update_recursive(d, u):
     return d
 
 
-def load_bashrc_vars():
-    bashrc = Path.home() / ".bashrc"
-
-    environ_out = os.environ.copy()
-
-    if bashrc.exists():
-        # Simple parsing - may need more robust solution
-        exports = [
-            line
-            for line in bashrc.read_text().splitlines()
-            if line.startswith("export ")
-        ]
-        for export in exports:
-            var, value = export[7:].split("=", 1)
-            if not var in environ_out.keys():
-                environ_out[var] = value.strip("\"'")
-
-        return environ_out
-
-
 def read_env(envfile_path=None):
     """
     read a environement cfgfiles file path (YAML format) and return
@@ -68,7 +48,6 @@ def read_env(envfile_path=None):
     envfile_path_use = None
 
     environ_use = dict(os.environ)  # load_bashrc_vars()
-    print(environ_use)
 
     # Determine the environment file path based on the function argument,
     # environment variable, or default to an empty string
@@ -79,20 +58,14 @@ def read_env(envfile_path=None):
     else:
         envfile_path_use = ""
 
-    print(envfile_path_use)
-
     # Check if the specified environment file exists, otherwise fallback to the default file
+    cuenfi = "custom environment configfile"
     if envfile_path_use == "":
         use_def = True
-        logger.warning(
-            "custom environment configfile not defined in the env. variable $AUTORINO_ENV"
-        )
+        logger.warning(f"{cuenfi} not defined in the env. variable $AUTORINO_ENV")
     elif not os.path.exists(envfile_path_use):
         use_def = True
-        logger.warning(
-            "$AUTORINO_ENV custom environment configfile not found in %s",
-            envfile_path_use,
-        )
+        logger.warning(f"$AUTORINO_ENV {cuenfi} not found in {envfile_path_use}")
     else:
         use_def = False
 
@@ -117,4 +90,5 @@ def read_env(envfile_path=None):
     return env_dic_fin
 
 
-aro_env_dict = read_env()
+### This dict is the one used in the WHOLE autorino package
+ARO_ENV_DIC = read_env()

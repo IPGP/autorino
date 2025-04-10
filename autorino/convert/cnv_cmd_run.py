@@ -22,7 +22,7 @@ import logging
 import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 ###################################################################
 # +++++ conversion function
@@ -94,7 +94,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
     # +++++ TRIMBLE
     # preliminary tests: Trimble default converter must be extracted from the environment values
     if ext in (".T00", ".T01", ".T02", ".T04") and converter_inp == "auto":
-        converter_inp = aroenv.aro_env_dict["general"]["trimble_default_software"]
+        converter_inp = aroenv.ARO_ENV_DIC["general"]["trimble_default_software"]
         logger.debug(
             "Trimble default converter defined in environnement: %s", converter_inp
         )

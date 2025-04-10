@@ -18,7 +18,7 @@ import logging
 import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 # pd.options.mode.chained_assignment = "warn"
 warnings.simplefilter("ignore", category=RuntimeWarning)

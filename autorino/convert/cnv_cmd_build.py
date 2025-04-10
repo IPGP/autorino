@@ -35,7 +35,7 @@ from geodezyx import utils
 ##software paths
 import autorino.cfgenv.env_read as aroenv
 
-aro_env_soft_path = aroenv.aro_env_dict["conv_software_paths"]
+aro_env_soft_path = aroenv.ARO_ENV_DIC["conv_software_paths"]
 
 
 def _kw_options_dict2str(kw_options):
