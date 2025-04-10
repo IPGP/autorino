@@ -1,14 +1,12 @@
-cfgfile_version: 20.0 # describe the structure of the configuration file
+cfgfile_version: 15.1 # describe the structure of the configuration file
 station:
     site:
       operator: "AUTORINO_OPERATOR"
       agency: "AUTORINO_AGENCY"
-      country: France # ISO 3166 Country name https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
       sitelog_path: <$HOME>/sitelogs/  #  can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
     sessions:
-        session_24h30s:
+        session_24h30s: ####Keep session in dictionnary / Object not necessary
             general:
-                active : True
                 name: 24h30s 
                 tmp_dir_parent: '/<$HOME>/autorino_workflow_tests/tmp'
                 tmp_dir_structure: '' 
@@ -30,9 +28,7 @@ station:
                         FROM_SESSION
                     options:
                         force: False
-                        remote_find_method: ask # ask or guess
-                        # ask: get the actual remote file's list, for FTP
-                        # guess: pre-generate remote file's paths for HTTP (but also works with FTP)
+                        remote_find_method: ask
                         invalidate_small_local_files: False
                         timeout: 30
                         max_try: 4

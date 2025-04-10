@@ -11,7 +11,7 @@ import collections.abc
 # Create a logger object.
 import os
 import yaml
-from mergedeep import merge
+import mergedeep
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -93,19 +93,23 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     y_inp = load_cfg(configfile_path)
     y_main = yaml.safe_load(open(main_cfg_path)) if main_cfg_path else None
 
-    legacy_main_mode = 1
+    # before config files v20 (2025-04-10), the keyword FROM_MAIN was used in the sites cfgfiles
+    # after v20, the main cfgfile is the basis, and is automatically overloaded with site cfgfile values
+    legacy_main_updt = True if float(y_inp["cfgfile_version"]) < 20.0 else False
 
-    if legacy_main_mode:
+    if legacy_main_updt:  # cfgfile_version < 20.
+        logger.warning(
+            "Legacy cfgfile w/ FROM_MAIN keyword used (cfgfile_version < 20.)"
+        )
         if not y_main and check_from_main(y_inp):
-            errmsg="FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
+            errmsg = "FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
             logger.error(errmsg)
             raise FileNotFoundError(None, errmsg)
-
         y = update_w_main_dic(y_inp, y_main)
-    else:
-        y = merge(y_main, y_inp) if y_main else y_inp.copy()
+    else:  # cfgfile_version >= 20.
+        y = mergedeep.merge(y_main, y_inp) if y_main else y_inp.copy()
 
-    print_cfg_for_debug = False
+    print_cfg_for_debug = True
     if print_cfg_for_debug:
         logger.debug("Used configuration (updated with the main):\n %s", y)
 
@@ -116,6 +120,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
+
 
 def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
     """
@@ -156,7 +161,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             # If not, consider it as a string
             # (because the path might be translated later in the object)
             metadata = slpath
-    # Load as devie block
+    # Load as device block
     else:
         metadata = _device2mda(y_station)
 
@@ -164,7 +169,14 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
     steps_dic_dic = {}
     for k_ses, y_ses in y_sessions_dict.items():
 
+        steps_lis = []
+        steps_dic = {}
+
         y_gen = y_ses["general"]
+
+        if not _is_cfg_bloc_active(y_gen):
+            continue
+
         # y_gen_main = y_ses_main['general']
         # y_gen = update_w_main_dic(y_gen, y_gen_main)
 
@@ -179,9 +191,6 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             epo_obj_ses = epoch_range_inp
         else:
             epo_obj_ses = _epoch_range_from_cfg_bloc(y_ses["epoch_range"])
-
-        steps_lis = []
-        steps_dic = {}
 
         # ++++ manage steps
         y_steps = y_ses["steps"]
@@ -414,12 +423,14 @@ def _device2mda(y_station):
     Convert a device block from a configuration file to a MetaData object.
     """
     y_dev = y_station["device"]
-    y_sit = y_station['site']
+    y_sit = y_station["site"]
 
     for attkw in ["rec_type", "rec_sn", "rec_fw", "ant_type", "ant_sn"]:
         if not attkw in y_dev.keys():
-            logger.warning("device attribute %s not found in cfg file, set to 'unknown'", attkw)
-            y_dev[attkw] = 'unknown'
+            logger.warning(
+                "device attribute %s not found in cfg file, set to 'unknown'", attkw
+            )
+            y_dev[attkw] = "unknown"
 
     metadata = rimo_mda.MetaData()
     rec_dic = dict()
@@ -439,15 +450,17 @@ def _device2mda(y_station):
 
     metadata.add_instru(rec_dic, ant_dic)
 
-    metadata.set_meta(site_id=y_sit['site_id'],
-                      domes=y_sit['domes'],
-                      operator=y_sit['operator'],
-                      x=y_sit["position_xyz"][0],
-                      y=y_sit["position_xyz"][1],
-                      z=y_sit["position_xyz"][2],
-                      country=y_sit["country"],
-                      date_prepared=dt.datetime.now(),
-                      agency=y_sit["agency"])
+    metadata.set_meta(
+        site_id=y_sit["site_id"],
+        domes=y_sit["domes"],
+        operator=y_sit["operator"],
+        x=y_sit["position_xyz"][0],
+        y=y_sit["position_xyz"][1],
+        z=y_sit["position_xyz"][2],
+        country=y_sit["country"],
+        date_prepared=dt.datetime.now(),
+        agency=y_sit["agency"],
+    )
 
     return metadata
 
@@ -472,6 +485,7 @@ def format_dir_path(dir_parent, structure):
         structure = structure[1:]
 
     return dir_parent, structure
+
 
 def check_from_main(y):
     """

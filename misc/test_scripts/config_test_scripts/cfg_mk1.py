@@ -13,6 +13,10 @@ import autorino.cfgfiles as arocfg
 pmain = '/home/psakicki/CODES/IPGP/autorino/configfiles/main/autorino_main_cfg_exemple.yml'
 psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/sites/autorino_site_cfg_exemple.yml'
 
+pmain = '/home/psakicki/CODES/IPGP/autorino/configfiles/main/autorino_v20_main_cfg_exemple.yml'
+psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/sites/autorino_v20_site_cfg_exemple.yml'
+
+
 # CFNG
 
 #out = arocfg.read_configfile_sessions_list(psite)

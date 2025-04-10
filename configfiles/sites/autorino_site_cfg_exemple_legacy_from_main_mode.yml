@@ -1,15 +1,15 @@
 ### other structure for the session(s) 
-cfgfile_version: 20.0 # describe the structure of the configuration file
+cfgfile_version: 16.0 # describe the structure of the configuration file
 station:
     site:
         name: "Site Full Name"
         site_id: SITE00FRA
         domes: 00000M000
+        operator: FROM_MAIN
+        agency: FROM_MAIN
+        country: France # ISO 3166 Country name https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
         position_xyz: [0.,0.,0.]
-        # operator: FROM_MAIN
-        # agency: FROM_MAIN
-        # country: FROM_MAIN
-        # sitelog_path: FROM_MAIN # can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
+        sitelog_path: FROM_MAIN #  can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
     device:
         attributes_from_sitelog: False
         ant_type: 'ASH701975.01A   NONE' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
@@ -28,25 +28,37 @@ station:
     sessions:
         session_24h30s:
             general:
-                active : True
+                name: 24h30s 
+                data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+                tmp_dir_parent: FROM_MAIN
+                tmp_dir_structure: FROM_MAIN 
+                log_dir_parent: FROM_MAIN
+                log_dir_structure: FROM_MAIN 
+            epoch_range:
+                FROM_MAIN
             steps:
                 download:
                     active: True
                     inp_dir_parent: "/SD Card/Data/30s/<SITE_ID4>/%Y/%m/%d" #  use alias <name> for a specific session name
                     inp_dir_structure:  ""
                     inp_file_regex:  "<SITE_ID4>%j.\\.m[0-9]{2}"
-                    # out_dir_parent: FROM_MAIN
-                    # out_dir_structure: FROM_MAIN
-                    # epoch_range:
-                    #     FROM_MAIN
+                    out_dir_parent: FROM_MAIN
+                    out_dir_structure: FROM_MAIN
+                    epoch_range:
+                        FROM_MAIN
                     options:
                         force: False
                         remote_find_method: ask # ask or guess
                         # ask: get the actual remote file's list, for FTP
                         # guess: pre-generate remote file's paths for HTTP (but also works with FTP)
-                        # FROM_MAIN for other options
+                        invalidate_small_local_files: False
+                        timeout: 60
+                        max_try: 4
+                        sleep_time: 5
+                        ping_max_try: 4
+                        ping_timeout: 20
                 convert:
-                    active: True
+                    FROM_MAIN
                 splice:
-                    active: True
+                    FROM_MAIN
                     
