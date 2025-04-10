@@ -10,8 +10,8 @@ import collections.abc
 
 # Create a logger object.
 import os
-
 import yaml
+from mergedeep import merge
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -23,8 +23,6 @@ from rinexmod import metadata as rimo_mda
 
 import datetime as dt
 
-# import autorino.session as aroses
-# import autorino.epochrange as aroepo
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
@@ -92,19 +90,20 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     """
     # global y_main
 
-    y = load_cfg(configfile_path)
+    y_inp = load_cfg(configfile_path)
+    y_main = yaml.safe_load(open(main_cfg_path)) if main_cfg_path else None
 
-    if main_cfg_path:
-        y_main = yaml.safe_load(open(main_cfg_path))
+    legacy_main_mode = 1
+
+    if legacy_main_mode:
+        if not y_main and check_from_main(y_inp):
+            errmsg="FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
+            logger.error(errmsg)
+            raise FileNotFoundError(None, errmsg)
+
+        y = update_w_main_dic(y_inp, y_main)
     else:
-        y_main = None
-
-    if not y_main and check_from_main(y):
-        errmsg="FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
-        logger.error(errmsg)
-        raise FileNotFoundError(None, errmsg)
-
-    y = update_w_main_dic(y, y_main)
+        y = merge(y_main, y_inp) if y_main else y_inp.copy()
 
     print_cfg_for_debug = False
     if print_cfg_for_debug:
@@ -417,25 +416,26 @@ def _device2mda(y_station):
     y_dev = y_station["device"]
     y_sit = y_station['site']
 
+    for attkw in ["rec_type", "rec_sn", "rec_fw", "ant_type", "ant_sn"]:
+        if not attkw in y_dev.keys():
+            logger.warning("device attribute %s not found in cfg file, set to 'unknown'", attkw)
+            y_dev[attkw] = 'unknown'
+
     metadata = rimo_mda.MetaData()
     rec_dic = dict()
-    if y_dev["rec_type"]:
-        rec_dic["Receiver Type"] = y_dev["rec_type"]
-    if y_dev["rec_sn"]:
-        rec_dic["Serial Number"] = y_dev["rec_sn"]
-    if y_dev["rec_fw"]:
-        rec_dic["Firmware Version"] = y_dev["rec_fw"]
+    rec_dic["Receiver Type"] = y_dev["rec_type"]
+    rec_dic["Serial Number"] = y_dev["rec_sn"]
+    rec_dic["Firmware Version"] = y_dev["rec_fw"]
 
     ant_dic = dict()
-    if y_dev["ant_type"]:
-        ant_dic["Antenna Type"] = y_dev["ant_type"]
-    if y_dev["ant_sn"]:
-        ant_dic["Serial Number"] = y_dev["ant_sn"]
+    ant_dic["Antenna Type"] = y_dev["ant_type"]
+    ant_dic["Antenna Radome Type"] = y_dev["ant_type"][-4:]
 
-    if y_dev["ecc_une"]:
-        ant_dic["Marker->ARP Up Ecc. (m)"] = y_dev["ecc_une"][0]
-        ant_dic["Marker->ARP North Ecc(m)"] = y_dev["ecc_une"][1]
-        ant_dic["Marker->ARP East Ecc(m)"] = y_dev["ecc_une"][2]
+    ant_dic["Serial Number"] = y_dev["ant_sn"]
+
+    ant_dic["Marker->ARP Up Ecc. (m)"] = y_dev["ecc_une"][0]
+    ant_dic["Marker->ARP North Ecc(m)"] = y_dev["ecc_une"][1]
+    ant_dic["Marker->ARP East Ecc(m)"] = y_dev["ecc_une"][2]
 
     metadata.add_instru(rec_dic, ant_dic)
 
