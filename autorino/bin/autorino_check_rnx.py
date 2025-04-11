@@ -43,11 +43,17 @@ def main():
     parser.add_argument(
         "-o", "--output", help="Path to the output files. (csv, plot, etc.)"
     )
-    parser.add_argument("-l", "--sites_list", help="Comma-separated list of sites.")
+    parser.add_argument(
+        "-l",
+        "--sites_list",
+        nargs="+",
+        help="Comma-separated list of sites.",
+        default=[],
+    )
 
     args = parser.parse_args()
 
-    sites_list = args.sites_list.split(",") if args.sites_list else []
+    sites_list = args.sites_list if args.sites_list else []
 
     # Call the check_rnx function
     _ = check_rnx(
