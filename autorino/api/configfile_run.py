@@ -42,7 +42,7 @@ def cfgfile_run(
     cfg_in : str
         The input configuration file or directory of configuration files.
         If a directory is provided, all files ending with '.yml' will be used.
-    main_cfg_in : str
+    main_cfg_in : str or list of str
         The main configuration file to be used.
     list_sites : list, optional
         A list of site identifiers to filter the configuration files.

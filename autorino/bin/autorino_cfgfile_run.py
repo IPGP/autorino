@@ -30,8 +30,9 @@ def main():
         "-m",
         "--main_config",
         type=str,
+        nargs="+",
         help="The main configuration file to be used.",
-        default="",
+        default=None,
     )
     parser.add_argument(
         "-s",

@@ -89,8 +89,10 @@ def read_cfg(site_cfg_path, epoch_range=None, main_cfg_path=None):
     epoch_range : EpochRange, optional
         An EpochRange object which will override the epoch ranges
         given in the configuration file. Default is None.
-    main_cfg_path : str, optional
-        The path to the main configuration file. Default is None.
+    main_cfg_path : str or list of str, optional
+        The path to the main configuration file.
+        If a list is provided, the main config files are merged.
+        Default is None.
 
     Returns
     -------
