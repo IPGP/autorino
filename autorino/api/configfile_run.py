@@ -115,7 +115,7 @@ def cfgfile_run(
     for cfg_use in cfg_use_lis:
         if list_sites:
             # Quick load to check if the site is in the list or not
-            y_quick = arocfg.load_cfg(configfile_path=cfg_use)
+            y_quick = arocfg.load_cfg(cfg_path=cfg_use)
             site_quick = y_quick["station"]["site"]["site_id"]
             ### case 1: list_sites are the sites we want
             if not ignore_sites and (site_quick not in list_sites):
@@ -132,8 +132,8 @@ def cfgfile_run(
 
         # Read the configuration and run the steps
         # step_lis_lis is a list of list because you can have several sessions in the same configuration file
-        steps_lis_lis, steps_dic_dic, y_station = arocfg.read_cfg(
-            configfile_path=cfg_use, main_cfg_path=main_cfg_in, epoch_range=epoch_range
+        steps_lis_lis, steps_dic_dic, y_use = arocfg.read_cfg(
+            site_cfg_path=cfg_use, main_cfg_path=main_cfg_in, epoch_range=epoch_range
         )
 
         for steps_lis in steps_lis_lis:

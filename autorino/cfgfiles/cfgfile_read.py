@@ -34,7 +34,7 @@ BOLD_SRT = "\033[1m"
 BOLD_END = "\033[0m"
 
 
-def load_cfg(configfile_path):
+def load_cfg(cfg_path, verbose=True):
     """
     Loads quickly a configuration file (YAML format) without interpretation.
 
@@ -42,22 +42,35 @@ def load_cfg(configfile_path):
 
     Parameters
     ----------
-    configfile_path : str
-        The path to the configuration file.
+    cfg_path : str or list of str
+        The path(s) to the configuration file.
+        If a list is provided, the config files are merged
+    verbose : bool
 
     Returns
     -------
     dict
-        The parsed content of the configuration file.
+        The parsed/merged content of the configuration files.
     """
-    logger.info(
-        BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", configfile_path
-    )
-    y = yaml.safe_load(open(configfile_path))
-    return y
+
+    recursive = True if isinstance(cfg_path, list) else False
+
+    if verbose and not recursive:
+        logger.info(BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", cfg_path)
+
+    if recursive:
+        ys_raw = [load_cfg(c, verbose=verbose) for c in cfg_path]
+        ys_raw = [y for y in ys_raw if y]
+        return mergedeep.merge({}, *ys_raw)
+    elif not os.path.isfile(cfg_path):
+        logger.warning(f"config file doesn't exists!: {cfg_path}")
+        return None
+    else:
+        y_out = yaml.safe_load(open(cfg_path))
+        return y_out
 
 
-def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
+def read_cfg(site_cfg_path, epoch_range=None, main_cfg_path=None):
     """
     Read and interpret a configuration file (YAML format) and
     return a list of StepGnss objects to be launched sequentially.
@@ -71,7 +84,7 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
 
     Parameters
     ----------
-    configfile_path : str
+    site_cfg_path : str
         The path to the configuration file.
     epoch_range : EpochRange, optional
         An EpochRange object which will override the epoch ranges
@@ -85,44 +98,31 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
         A list of lists of StepGnss objects to be launched sequentially.
     steps_dic_dic : dict
         A dictionary of dictionaries of StepGnss.
-    y_station : dict
-        A dictionary of station information.
+    y_use : dict
+        The parsed/merged content of the configuration file as dictionary.
     """
-    # global y_main
 
-    y_inp = load_cfg(configfile_path)
-    y_main = yaml.safe_load(open(main_cfg_path)) if main_cfg_path else None
+    y_inp = load_cfg(site_cfg_path)
+    y_main = load_cfg(main_cfg_path, verbose=False)
 
     # before config files v20 (2025-04-10), the keyword FROM_MAIN was used in the sites cfgfiles
     # after v20, the main cfgfile is the basis, and is automatically overloaded with site cfgfile values
     legacy_main_updt = True if float(y_inp["cfgfile_version"]) < 20.0 else False
-
     if legacy_main_updt:  # cfgfile_version < 20.
-        logger.warning(
-            "Legacy cfgfile w/ FROM_MAIN keyword used (cfgfile_version < 20.)"
-        )
-        if not y_main and check_from_main(y_inp):
-            errmsg = "FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
-            logger.error(errmsg)
-            raise FileNotFoundError(None, errmsg)
-        y = update_w_main_dic(y_inp, y_main)
+        y_use = read_cfg_legacy(y_inp, y_main)
     else:  # cfgfile_version >= 20.
-        y = mergedeep.merge(y_main, y_inp) if y_main else y_inp.copy()
+        y_use = mergedeep.merge({}, y_main, y_inp) if y_main else y_inp.copy()
 
     print_cfg_for_debug = True
     if print_cfg_for_debug:
-        logger.debug("Used configuration (updated with the main):\n %s", y)
+        logger.debug("Used configuration (updated with the main):\n %s", y_use)
 
-    y_station = y["station"]
+    steps_lis_lis, steps_dic_dic = read_cfg_core(y_use, epoch_range_inp=epoch_range)
 
-    steps_lis_lis, steps_dic_dic = read_cfg_sessions(
-        y_station["sessions"], y_station=y_station, epoch_range_inp=epoch_range
-    )
-
-    return steps_lis_lis, steps_dic_dic, y_station
+    return steps_lis_lis, steps_dic_dic, y_use
 
 
-def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
+def read_cfg_core(y_inp, epoch_range_inp=None):
     """
     Reads and interprets session configurations from a dictionary
     and returns lists and dictionaries of StepGnss objects.
@@ -133,13 +133,11 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
 
     Parameters
     ----------
-    y_sessions_dict : dict
-        A dictionary containing session configurations.
+    y_inp : dict
+        A dictionary a site configuration.
     epoch_range_inp : EpochRange, optional
         An EpochRange object which will override the epoch ranges given
         in the session configurations. Default is None.
-    y_station : dict, optional
-        A dictionary containing station information. Default is None.
 
     Returns
     -------
@@ -151,6 +149,9 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
 
     # ++++ METADATA
     # Load as sitelog
+
+    y_station = y_inp["station"]
+    y_sessions = y_station["sessions"]
 
     if y_station["device"]["attributes_from_sitelog"]:
         slpath = y_station["site"]["sitelog_path"]
@@ -167,7 +168,7 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
 
     steps_lis_lis = []
     steps_dic_dic = {}
-    for k_ses, y_ses in y_sessions_dict.items():
+    for k_ses, y_ses in y_sessions.items():
 
         steps_lis = []
         steps_dic = {}
@@ -268,6 +269,120 @@ def step_cls_select(step_name):
     else:
         logger.warning("unknown step %s in cfgfiles file, skip", step_name)
         return None
+
+def run_steps(
+    steps_lis,
+    steps_select_list=None,
+    exclude_steps_select=False,
+    verbose=True,
+    force=False,
+):
+    """
+    Executes the steps in the provided list.
+
+    This function takes a list of StepGnss objects,
+    an optional list of selected steps,
+    and an optional boolean flag for printing tables.
+    It iterates over the list of StepGnss objects and executes
+    the 'download' or 'convert' method depending on the type of the step.
+    If a list of selected steps is provided,
+    only the steps in the list will be executed.
+    If the 'verbose' flag is set to True,
+    the tables will be printed during the execution of the steps.
+
+    Parameters
+    ----------
+    steps_lis : Iterable
+        A list of StepGnss objects to be executed.
+    steps_select_list : list, optional
+        A list of selected steps to be executed.
+        If not provided, all steps in 'steps_lis' will be executed.
+        Default is None.
+    exclude_steps_select : bool, optional
+        If True the selected steps indicated in step_select_list are excluded.
+        It is the opposite behavior of the regular one using steps_select_list
+        Default is False.
+    verbose : bool, optional
+        A flag indicating whether to print the tables during the execution of the steps.
+         Default is True.
+    force : bool, optional
+        A flag indicating whether to force the execution of the steps.
+        overrides the 'force' parameters in the configuration file.
+        Default is False.
+
+    Returns
+    -------
+    None
+    """
+
+    # If no steps are selected, initialize an empty list
+    if not steps_select_list:
+        steps_select_list = []
+
+    wkf_prev = None
+
+    # Log the number of steps to be run
+    logger.info("%i steps will be run %s", len(steps_lis), steps_lis)
+
+    # Iterate over the list of steps
+    for istp, stp in enumerate(steps_lis):
+        if istp > 0:
+            wkf_prev = steps_lis[istp - 1]
+
+        # Check if there are selected steps to be run
+        if len(steps_select_list) > 0:
+            # Forced case: steps_select_list contains the steps to be run only
+            if (
+                not exclude_steps_select
+                and stp.get_step_type() not in steps_select_list
+            ):
+                logger.warning(
+                    "step %s skipped, not selected in %s",
+                    stp.get_step_type(),
+                    steps_select_list,
+                )
+                continue
+            # Exclusion case: steps_select_list contains steps to be excluded
+            elif exclude_steps_select and stp.get_step_type() in steps_select_list:
+                logger.warning(
+                    "step %s skipped, selected in %s",
+                    stp.get_step_type(),
+                    steps_select_list,
+                )
+                continue
+            else:
+                pass
+
+        # Set the verbose option if verbose is True
+        if verbose:
+            stp.options["verbose"] = True
+
+        if force:
+            stp.options["force"] = True
+
+        load_table_msg_str = BOLD_SRT + ">>>>>>>> Load table for step %s" + BOLD_END
+        # Execute the step based on its type
+        if stp.get_step_type() == "download":
+            stp.download(**stp.options)
+        elif stp.get_step_type() == "convert":
+            logger.info(load_table_msg_str, stp.get_step_type())
+            stp.load_tab_inpdir()
+            stp.convert(**stp.options)
+        elif stp.get_step_type() == "splice":
+            stp_rnx_inp = stp.copy()
+            logger.info(load_table_msg_str, stp.get_step_type())
+            stp_rnx_inp.load_tab_inpdir(update_epochs=True)
+            stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+        elif stp.get_step_type() == "split":
+            stp_rnx_inp = stp.copy()
+            logger.info(load_table_msg_str, stp.get_step_type())
+            stp_rnx_inp.load_tab_inpdir(update_epochs=True)
+            stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+
+        ##### close the step
+
+    return None
+
 
 
 def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
@@ -505,6 +620,10 @@ def check_from_main(y):
     bool
         True if the 'FROM_MAIN' keyword is used in the configuration file.
         False otherwise.
+
+    Warning
+    -------
+    Obsolete since 2025-04 and cfgfile v >= 20.0
     """
     if "FROM_MAIN" in str(y):
         return True
@@ -515,6 +634,10 @@ def check_from_main(y):
 def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
     """
     Updates a dictionary with another dictionary.
+
+    Warning
+    -------
+    Obsolete since 2025-04 and cfgfile v >= 20.0
     """
     if u is None:
         return d
@@ -530,113 +653,50 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
                 d[k] = v
     return d
 
-
-def run_steps(
-    steps_lis,
-    steps_select_list=None,
-    exclude_steps_select=False,
-    verbose=True,
-    force=False,
-):
+def read_cfg_legacy(y_inp, y_main):
     """
-    Executes the steps in the provided list.
+    Handles legacy configuration files with the 'FROM_MAIN' keyword.
 
-    This function takes a list of StepGnss objects, an optional list of selected steps,
-    and an optional boolean flag for printing tables.
-    It iterates over the list of StepGnss objects and executes
-    the 'download' or 'convert' method depending on the type of the step.
-    If a list of selected steps is provided, only the steps in the list will be executed.
-    If the 'verbose' flag is set to True, the tables will be printed during the execution of the steps.
+    This function processes configuration files with a version less than 20.0,
+    where the 'FROM_MAIN' keyword is used to indicate that values should be
+    inherited from a main configuration file. If the main configuration file
+    is not provided or cannot be found, an error is raised.
 
     Parameters
     ----------
-    steps_lis : Iterable
-        A list of StepGnss objects to be executed.
-    steps_select_list : list, optional
-        A list of selected steps to be executed.
-        If not provided, all steps in 'steps_lis' will be executed.
-        Default is None.
-    exclude_steps_select : bool, optional
-        If True the selected steps indicated in step_select_list are excluded.
-        It is the opposite behavior of the regular one using steps_select_list
-        Default is False.
-    verbose : bool, optional
-        A flag indicating whether to print the tables during the execution of the steps.
-         Default is True.
-    force : bool, optional
-        A flag indicating whether to force the execution of the steps.
-        overrides the 'force' parameters in the configuration file.
-        Default is False.
+    y_inp : dict
+        The input configuration dictionary (site-specific configuration).
+    y_main : dict or None
+        The main configuration dictionary. If None, the function will check
+        for the presence of the 'FROM_MAIN' keyword in the input configuration.
 
     Returns
     -------
-    None
+    dict
+        The updated configuration dictionary, where values from the main
+        configuration file have been merged into the input configuration.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the 'FROM_MAIN' keyword is used in the input configuration but
+        no main configuration file is provided.
+
+    Warning
+    -------
+    Obsolete since 2025-04 and cfgfile v >= 20.0
     """
+    # Log a warning indicating that a legacy configuration file is being used
+    logger.warning("Use legacy cfgfile w/ FROM_MAIN keyword (cfgfile_version < 20.)")
 
-    # If no steps are selected, initialize an empty list
-    if not steps_select_list:
-        steps_select_list = []
+    # Check if the main configuration file is missing and the 'FROM_MAIN' keyword is used
+    if not y_main and check_from_main(y_inp):
+        errmsg = "FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
+        logger.error(errmsg)  # Log an error message
+        raise FileNotFoundError(None, errmsg)  # Raise an exception with the error message
 
-    wkf_prev = None
+    # Merge the input configuration with the main configuration
+    y = update_w_main_dic(y_inp, y_main)
 
-    # Log the number of steps to be run
-    logger.info("%i steps will be run %s", len(steps_lis), steps_lis)
-
-    # Iterate over the list of steps
-    for istp, stp in enumerate(steps_lis):
-        if istp > 0:
-            wkf_prev = steps_lis[istp - 1]
-
-        # Check if there are selected steps to be run
-        if len(steps_select_list) > 0:
-            # Forced case: steps_select_list contains the steps to be run only
-            if (
-                not exclude_steps_select
-                and stp.get_step_type() not in steps_select_list
-            ):
-                logger.warning(
-                    "step %s skipped, not selected in %s",
-                    stp.get_step_type(),
-                    steps_select_list,
-                )
-                continue
-            # Exclusion case: steps_select_list contains steps to be excluded
-            elif exclude_steps_select and stp.get_step_type() in steps_select_list:
-                logger.warning(
-                    "step %s skipped, selected in %s",
-                    stp.get_step_type(),
-                    steps_select_list,
-                )
-                continue
-            else:
-                pass
-
-        # Set the verbose option if verbose is True
-        if verbose:
-            stp.options["verbose"] = True
-
-        if force:
-            stp.options["force"] = True
-
-        load_table_msg_str = BOLD_SRT + ">>>>>>>> Load table for step %s" + BOLD_END
-        # Execute the step based on its type
-        if stp.get_step_type() == "download":
-            stp.download(**stp.options)
-        elif stp.get_step_type() == "convert":
-            logger.info(load_table_msg_str, stp.get_step_type())
-            stp.load_tab_inpdir()
-            stp.convert(**stp.options)
-        elif stp.get_step_type() == "splice":
-            stp_rnx_inp = stp.copy()
-            logger.info(load_table_msg_str, stp.get_step_type())
-            stp_rnx_inp.load_tab_inpdir(update_epochs=True)
-            stp.splice(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
-        elif stp.get_step_type() == "split":
-            stp_rnx_inp = stp.copy()
-            logger.info(load_table_msg_str, stp.get_step_type())
-            stp_rnx_inp.load_tab_inpdir(update_epochs=True)
-            stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
-
-        ##### close the step
-
-    return None
+    # Return the updated configuration dictionary
+    return y
