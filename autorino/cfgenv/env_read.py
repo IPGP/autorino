@@ -77,8 +77,8 @@ def read_env(envfile_path=None):
     logger.info("load environment configfile: %s", envfile_path_use)
 
     # Load the default and specified environment files and merge their contents
-    env_dic_def = yaml.safe_load(open(envfile_path_def))
-    env_dic_use = yaml.safe_load(open(envfile_path_use))
+    env_dic_def = yaml.safe_load(open(envfile_path_def))['environment']
+    env_dic_use = yaml.safe_load(open(envfile_path_use))['environment']
 
     env_dic_fin = env_dic_def.copy()
     env_dic_fin = update_recursive(env_dic_fin, env_dic_use)
