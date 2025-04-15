@@ -931,7 +931,7 @@ class StepGnss:
         """
 
         epoch_use = self.table.iloc[irow, "epo_srt"]
-        trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow]["site"])
+        trslt_dic_use = self.trslt_dic_siteid(self.table["site"].iloc[irow])
 
         trslt_path_out = self.translate_core(path_inp=path_inp,
                                              trslt_dic_use=trslt_dic_use,
@@ -1505,6 +1505,8 @@ class StepGnss:
             ### IMPORVE_ME !!!
             # self.site_id = self.table.loc[irow, "site"]
             # self.set_translate_dict()
+            
+            print("AAAAAAAAA",irow)
 
             outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
 
