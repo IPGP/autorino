@@ -108,7 +108,7 @@ def convert_rnx(
             raw_out_dir_use, tmp_dir, log_dir, metadata=metadata
         )
 
-        cpy_raw.load_tab_prev_tab(cnv.table)
+        cpy_raw.load_tab_filelist(raws_use)
         #cpy_raw.print_table()
         cpy_raw.guess_out_files()
         #cpy_raw.print_table()

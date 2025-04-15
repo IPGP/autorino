@@ -1505,8 +1505,6 @@ class StepGnss:
             ### IMPORVE_ME !!!
             # self.site_id = self.table.loc[irow, "site"]
             # self.set_translate_dict()
-            
-            print("AAAAAAAAA",irow)
 
             outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
 
