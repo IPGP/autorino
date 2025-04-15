@@ -19,6 +19,9 @@ import autorino.download as arodwl
 import autorino.handle as arohdl
 
 from rinexmod import rinexmod_api
+from rinexmod import metadata as rimo_mda
+
+import datetime as dt
 
 # import autorino.session as aroses
 # import autorino.epochrange as aroepo
@@ -96,6 +99,11 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     else:
         y_main = None
 
+    if not y_main and check_from_main(y):
+        errmsg="FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
+        logger.error(errmsg)
+        raise FileNotFoundError(None, errmsg)
+
     y = update_w_main_dic(y, y_main)
 
     print_cfg_for_debug = False
@@ -109,7 +117,6 @@ def read_cfg(configfile_path, epoch_range=None, main_cfg_path=None):
     )
 
     return steps_lis_lis, steps_dic_dic, y_station
-
 
 def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
     """
@@ -139,7 +146,9 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
     """
 
     # ++++ METADATA
-    if y_station["site"]["sitelog_path"]:
+    # Load as sitelog
+
+    if y_station["device"]["attributes_from_sitelog"]:
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
             # Load the metadata if the path is a directory or a file
@@ -148,9 +157,9 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             # If not, consider it as a string
             # (because the path might be translated later in the object)
             metadata = slpath
+    # Load as devie block
     else:
-        ###### MUST BE IMPLEMENTED WITH MANUAL VALUES
-        metadata = None
+        metadata = _device2mda(y_station)
 
     steps_lis_lis = []
     steps_dic_dic = {}
@@ -206,12 +215,8 @@ def read_cfg_sessions(y_sessions_dict, epoch_range_inp=None, y_station=None):
             if "inp_file_regex" in y_stp.keys():
                 inp_file_regex = y_stp["inp_file_regex"]
             else:
-                logger.warning(
-                    "Compatibility Warning: inp_file_regex not defined in the cfg files, set to .*"
-                )
-                logger.warning(
-                    "Compatibility Warning: you should upgrade your config file to >v15"
-                )
+                logger.warning("Compatibility! inp_file_regex not defined in cfg files")
+                logger.warning("upgrade your config file to >v15, set to .* for now")
                 inp_file_regex = ".*"
 
             kwargs_for_step = {
@@ -298,7 +303,7 @@ def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
             parent_dir_key = "a directory"
 
         logger.error(
-            "%s is not correctly defined in the main cfgfiles file"
+            "%s is not correctly defined in the main cfgfiles file "
             "(FROM_MAIN can not be replaced)",
             parent_dir_key,
         )
@@ -405,6 +410,48 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
     return dir_path, dir_parent, structure
 
 
+def _device2mda(y_station):
+    """
+    Convert a device block from a configuration file to a MetaData object.
+    """
+    y_dev = y_station["device"]
+    y_sit = y_station['site']
+
+    metadata = rimo_mda.MetaData()
+    rec_dic = dict()
+    if y_dev["rec_type"]:
+        rec_dic["Receiver Type"] = y_dev["rec_type"]
+    if y_dev["rec_sn"]:
+        rec_dic["Serial Number"] = y_dev["rec_sn"]
+    if y_dev["rec_fw"]:
+        rec_dic["Firmware Version"] = y_dev["rec_fw"]
+
+    ant_dic = dict()
+    if y_dev["ant_type"]:
+        ant_dic["Antenna Type"] = y_dev["ant_type"]
+    if y_dev["ant_sn"]:
+        ant_dic["Serial Number"] = y_dev["ant_sn"]
+
+    if y_dev["ecc_une"]:
+        ant_dic["Marker->ARP Up Ecc. (m)"] = y_dev["ecc_une"][0]
+        ant_dic["Marker->ARP North Ecc(m)"] = y_dev["ecc_une"][1]
+        ant_dic["Marker->ARP East Ecc(m)"] = y_dev["ecc_une"][2]
+
+    metadata.add_instru(rec_dic, ant_dic)
+
+    metadata.set_meta(site_id=y_sit['site_id'],
+                      domes=y_sit['domes'],
+                      operator=y_sit['operator'],
+                      x=y_sit["position_xyz"][0],
+                      y=y_sit["position_xyz"][1],
+                      z=y_sit["position_xyz"][2],
+                      country=y_sit["country"],
+                      date_prepared=dt.datetime.now(),
+                      agency=y_sit["agency"])
+
+    return metadata
+
+
 def format_dir_path(dir_parent, structure):
     """
     Formats a directory path by adding or removing a leading slash.
@@ -425,6 +472,30 @@ def format_dir_path(dir_parent, structure):
         structure = structure[1:]
 
     return dir_parent, structure
+
+def check_from_main(y):
+    """
+    Check if the FROM_MAIN keyword is used in the configuration file.
+
+    This function takes a dictionary representing the configuration file.
+    It checks if the 'FROM_MAIN' keyword is used in the configuration file.
+    If it is, it returns True. Otherwise, it returns False.
+
+    Parameters
+    ----------
+    y : dict
+        A dictionary representing the configuration file.
+
+    Returns
+    -------
+    bool
+        True if the 'FROM_MAIN' keyword is used in the configuration file.
+        False otherwise.
+    """
+    if "FROM_MAIN" in str(y):
+        return True
+    else:
+        return False
 
 
 def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
@@ -476,7 +547,8 @@ def run_steps(
         It is the opposite behavior of the regular one using steps_select_list
         Default is False.
     verbose : bool, optional
-        A flag indicating whether to print the tables during the execution of the steps. Default is True.
+        A flag indicating whether to print the tables during the execution of the steps.
+         Default is True.
     force : bool, optional
         A flag indicating whether to force the execution of the steps.
         overrides the 'force' parameters in the configuration file.

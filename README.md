@@ -3,8 +3,8 @@
 # autorino
 autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
-**Version: 1.1.0**  
-**Date: 2025-01-30**
+**Version: 1.3.0**  
+**Date: 2025-04-08**
 
 **Authors & Contributors:**
 * [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
@@ -50,7 +50,6 @@ For developpers, you can install _autorino_ in [developement mode](https://setup
 pip install -e .
 ```
 
-
 ### Setting up the environment
 
 You need to set up the environment variable `$AUTORINO_ENV` to point to the _autorino_'s configuration file.
@@ -63,26 +62,6 @@ This configuration file is a YAML file that contains the paths to the different 
 
 If `$AUTORINO_ENV` is not set, _autorino_ will use the default configuration file located in the package's `configfiles/env/` folder.  
 Per defaults values assume that the converter executables are known by your system and (e.g. set in your `$PATH`).
-
-
-### Advenced user installation (legacy style)
-
-You can install _autorino_ package by adding its path of to your `$PYTHONPATH` in your _.bashrc_.
-```bash
-PYTHONPATH=$PYTHONPATH:/home/user/path_to/autorino
-```
-If you want to use _autorino_ in CLI mode, you must also add the path to the _autorino_ script to your `$PATH` in your _.bashrc_.
-```bash
-$PATH=$PATH:/home/user/path_to/autorino/autorino
-``` 
-Note that it is `autorino/autorino` two times, since the CLI programs are inside the _autorino_'s module.
-
-_autorino_ relies on several external dependencies. Be sure to have them installed on your system using 
-```
-pip install -r /home/user/path_to/autorino/requirements.txt
-```
-
-And then set up the environment variable `$AUTORINO_ENV` as described above.
 
 ## External utilities (GNSS converters)
 

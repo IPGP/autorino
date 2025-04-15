@@ -7,6 +7,8 @@ Created on 30/05/2024 16:22:55
 """
 
 import argparse
+import os.path
+
 import yaml
 import autorino.api as aroapi
 
@@ -94,9 +96,18 @@ def main():
     )
 
     parser.add_argument(
-        "-tr",
-        "--store_raw_structure",
-        help="NOT IMPLEMENTED YET",
+        "-ro",
+        "--raw_out_dir",
+        help="Directory where RAW files will be archived. "
+             "No deletion will occur, your RAW files are sacred.",
+        default=None,
+    )
+
+    parser.add_argument(
+        "-rt",
+        "--raw_out_structure",
+        help="Structure for archiving RAW files. "
+             "Defaults to the same structure as the output directory if not provided.",
         default=None,
     )
 
@@ -118,21 +129,26 @@ def main():
         rinexmod_options=args.rinexmod_options,
         metadata=args.metadata,
         force=args.force,
-        store_raw_structure=args.store_raw_structure,
+        raw_out_dir=args.raw_out_dir,
+        raw_out_structure=args.raw_out_structure
     )
 
 
 def _prep_raws_inp(args):
+    """
+    see also step_fcts.import_files
+    """
     if args.list_file_input:
+        ### input is a filelist of RINEXs => output is a list
         with open(args.inp_raws[0], "r") as f:
-            inp_raws_out = f.read().splitlines()
+            return f.read().splitlines()
+    elif len(args.inp_raws) == 1 and os.path.isdir(args.inp_raws[0]):
+        ### input is a directory => output is the directory str
+        return args.inp_raws[0]
     else:
-        if len(args.inp_raws) == 1:
-            inp_raws_out = args.inp_raws[0]
-        else:
-            inp_raws_out = args.inp_raws
-    return inp_raws_out
-
+        ### input is a single or several RINEXs => output is a list
+        # (if one single RINEX file, then it is a singleton list)
+        return args.inp_raws
 
 if __name__ == "__main__":
     main()

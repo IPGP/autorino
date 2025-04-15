@@ -227,12 +227,7 @@ class StepGnss:
 
     @property
     def site_id9(self):
-        if len(self._site_id) == 9:
-            return self._site_id
-        elif len(self._site_id) == 4:
-            return self._site_id + "00XXX"
-        else:
-            return self._site_id[:4] + "00XXX"
+        return arocmn.make_site_id9(self.site_id)
 
     # epoch_range_inp
     @property
@@ -679,11 +674,14 @@ class StepGnss:
 
     def updt_site_w_rnx_fname(self):
         """
-        Updates the site information in the table and in the 'site_id' object based on the RINEX filenames.
+        Updates the site information in the table and
+        in the 'site_id' object based on the RINEX filenames.
 
-        This method iterates over each row in the table and updates the 'site' column with the first 9 characters
-        of the 'fname' column if the filename matches the RINEX regex pattern. It then updates the 'site_id' attribute
-        of the StepGnss object based on the unique site values in the table.
+        This method iterates over each row in the table and
+        updates the 'site' column with the first 9 characters
+        of the 'fname' column if the filename matches the RINEX regex pattern.
+        It then updates the 'site_id' attribute of the StepGnss object
+        based on the unique site values in the table.
 
         Returns
         -------
@@ -709,13 +707,16 @@ class StepGnss:
         """
         Updates the epoch table with the specified timezone.
 
-        This method updates the 'epoch_srt' and 'epoch_end' columns of the epoch table with the specified timezone.
-        It uses the 'tz' parameter to set the timezone for the epoch table.
+        This method updates the 'epoch_srt' and 'epoch_end' columns
+        of the epoch table with the specified timezone.
+        It uses the 'tz' parameter to set the timezone
+        for the epoch table.
 
         Parameters
         ----------
         tz : str, optional
-            The timezone to be applied to the epoch table. Default is 'UTC'.
+            The timezone to be applied to the epoch table.
+            Default is 'UTC'.
 
         Returns
         -------
@@ -874,7 +875,8 @@ class StepGnss:
         epoch_inp : datetime, optional
             The epoch input to be used in the translation. Default is None.
         make_dir : bool, optional
-            If True, the function will create the directory corresponding to the translated path. Default is False.
+            If True, the function will create the directory corresponding to the translated path.
+            Default is False.
         absolute : bool, optional
             If True, the function will return the absolute path. Default is False.
 
@@ -890,16 +892,105 @@ class StepGnss:
         for translation of attribute self.inp_file_rinex, use also this method
         (we decide to not create a dedicated method for this)
         """
-        trslt_dir = arocmn.translator(path_inp, self.translate_dict, epoch_inp)
 
-        if make_dir and not os.path.isdir(trslt_dir):
-            utils.create_dir(trslt_dir)
-            logger.debug("directory created: %s", trslt_dir)
+        trslt_path_out = self.translate_core(path_inp=path_inp,
+                                             trslt_dic_use=self.translate_dict,
+                                             epoch_use=epoch_inp,
+                                             make_dir=make_dir,
+                                             absolute=absolute)
 
-        if trslt_dir and absolute:
-            trslt_dir = os.path.abspath(trslt_dir)
+        return trslt_path_out
 
-        return trslt_dir
+    def translate_path_row(self,
+                           path_inp: str,
+                           irow: int,
+                           make_dir: bool = False,
+                           absolute: bool = False) -> str:
+        """
+        Translates a given path using the object's translation dictionary for a specific row in the table.
+
+        This function translates the input path using the translation dictionary specific to the site ID
+        of the row indicated by `irow`. It optionally creates the directory and returns the absolute path.
+
+        Parameters
+        ----------
+        path_inp : str
+            The input path to be translated.
+        irow : int
+            The index of the row in the table to use for translation.
+            Will override the StepGnss translate_dict.
+        make_dir : bool, optional
+            If True, the function will create the directory corresponding to the translated path. Default is False.
+        absolute : bool, optional
+            If True, the function will return the absolute path. Default is False.
+
+        Returns
+        -------
+        str
+            The translated directory path.
+        """
+
+        epoch_use = self.table.iloc[irow, "epo_srt"]
+        trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow, "site"])
+
+        trslt_path_out = self.translate_core(path_inp=path_inp,
+                                             trslt_dic_use=trslt_dic_use,
+                                             epoch_use=epoch_use,
+                                             make_dir=make_dir,
+                                             absolute=absolute)
+        return trslt_path_out
+
+
+    def trslt_dic_siteid(self, site_id_inp):
+        """
+        Returns an ad hoc translation dictionary with given site IDs.
+
+        This function returns an ad hoc translation dictionary with the site ID in different formats.
+        It adds the site ID in 4-character and 9-character formats, both in upper and lower case.
+        If the site ID ends with 'XXX', it uses the 4-character format for the 'site_id' key.
+
+        Parameters
+        ----------
+        site_id_inp : str
+            The site ID to be used for updating the translation dictionary.
+
+        Returns
+        -------
+        trsltdict_out : dict
+            The updated translation dictionary.
+        """
+
+        trsltdict_out = self.translate_dict.copy()
+
+        site9_use = arocmn.make_site_id9(site_id_inp)
+        site4_use = site9_use[:4]
+        s = "site_id4"
+        trsltdict_out[s.upper()] = site4_use.upper()
+        trsltdict_out[s.lower()] = site4_use.lower()
+        s = "site_id9"
+        trsltdict_out[s.upper()] = site9_use.upper()
+        trsltdict_out[s.lower()] = site9_use.lower()
+        s = "site_id"
+        if site9_use.endswith("XXX"):
+            trsltdict_out[s.upper()] = site4_use.upper()
+            trsltdict_out[s.lower()] = site4_use.lower()
+        else:
+            trsltdict_out[s.upper()] = site9_use.upper()
+            trsltdict_out[s.lower()] = site9_use.lower()
+
+        return trsltdict_out
+
+    def translate_core(self, path_inp, trslt_dic_use, epoch_use, make_dir=False, absolute=False):
+        trslt_path_out = arocmn.translator(path_inp, trslt_dic_use, epoch_use)
+
+        if make_dir and not os.path.isdir(trslt_path_out):
+            utils.create_dir(trslt_path_out)
+            logger.debug("directory created: %s", trslt_path_out)
+
+        if trslt_path_out and absolute:
+            trslt_path_out = os.path.abspath(trslt_path_out)
+
+        return trslt_path_out
 
     def create_lockfile(self, timeout=1800, prefix_lockfile=None):
         """
@@ -1088,7 +1179,8 @@ class StepGnss:
             str_inp : str
                 The input string to be shrunk.
             maxlen : int, optional
-                The maximum length of the output string. Default is the value of the 'max_colwidth' parameter of the
+                The maximum length of the output string.
+                Default is the value of the 'max_colwidth' parameter of the
                 'verbose' method.
 
             Returns
@@ -1331,7 +1423,8 @@ class StepGnss:
         and write it as 'fpath_out' value in the table
         """
 
-        #### to do: split it as a mono fct
+        #### to do: split it as a mono fct & go for irow iteration
+        #### IMPROVE_ME!!!!
 
         local_paths_list = []
 
@@ -1387,7 +1480,7 @@ class StepGnss:
 
             local_path_use0 = os.path.join(local_dir_use, local_fname_use)
 
-            local_path_use = self.translate_path(local_path_use0, epoch)
+            local_path_use = self.translate_path(local_path_use0, epoch_inp=epoch)
 
             local_fname_use = os.path.basename(local_path_use)
 
@@ -1401,6 +1494,27 @@ class StepGnss:
         logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))
 
         return local_paths_list
+
+    def guess_out_files(self):
+
+        out_paths_list = []
+
+        for irow, row in self.table.iterrows():
+            ## dirty update of the site_id
+            ## a new translate_path should accept table row
+            ### IMPORVE_ME !!!
+            # self.site_id = self.table.loc[irow, "site"]
+            # self.set_translate_dict()
+
+            outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
+
+            bnam_inp = os.path.basename(row["fpath_inp"])
+            fpath_out = os.path.join(outdir_use, bnam_inp)
+            self.table.loc[irow, "fpath_out"] = fpath_out
+            self.check_local_files(io="out")
+            out_paths_list.append(fpath_out)
+
+        return out_paths_list
 
     def check_local_files(self, io="out"):
         """
@@ -1585,13 +1699,48 @@ class StepGnss:
 
         return files_decmp_list
 
-    def copy_files(self):
-        for irow, row in self.table.iterrows():
-            self.mono_mv_final(irow, copy_only=True)
+    def move_files(self, mode="inpout", copy_only=False, force=False):
+        """
+        Moves or copies files based on the specified mode.
 
-    def move_files(self):
+        This method iterates over the rows in the table and moves or copies files
+        from the input path to the output path or to the final destination based on the mode.
+        It validates the move or copy operation and updates the table accordingly.
+
+        Parameters
+        ----------
+        mode : str, optional
+            The mode of operation. Can be 'inpout' to move/copy files from input to output path,
+            or 'final' to move/copy files to the final destination. Default is 'inpout'.
+        copy_only : bool, optional
+            If True, the files are copied instead of moved. Default is False.
+        force : bool, optional
+            If True, forces the operation even if the input files are not valid. Default is False.
+
+        Returns
+        -------
+        list
+            A list of paths of the moved or copied files.
+        """
+        mvcp = "copy" if copy_only else "move"
+        if force:
+            self.force(mvcp)
+
+        file_mv_lis = []
         for irow, row in self.table.iterrows():
-            self.mono_mv_final(irow)
+            if mode == "inpout":
+                file_mv = self.mono_mv_inpout(irow, copy_only=copy_only)
+            elif mode == "final":
+                file_mv = self.mono_mv_final(
+                    irow, table_col="fpath_out", copy_only=copy_only
+                )
+            else:
+                logger.error("mode must be 'inpout' or 'final'")
+                raise Exception
+
+            file_mv_lis.append(file_mv)
+
+        return file_mv_lis
 
     def remov_tmp_files(self):
         """
@@ -2086,7 +2235,7 @@ class StepGnss:
         fname_custom="",
         force=False,
         switch_ok_out_false=False,
-        check_ok_out_only_for_mv_final=False,
+        mv_final_mode=False,
     ):
         """
         Checks the status of the input and output files for a specific row in the table.
@@ -2110,7 +2259,7 @@ class StepGnss:
         switch_ok_out_false : bool, optional
             If True, the 'ok_out' column of the table is set to False if the step should be skipped.
             Default is False.
-        check_ok_out_only_for_mv_final : bool, optional
+        mv_final_mode : bool, optional
             If True, the step is skipped if the output file does not exists.
             Designed for final move (mv_final) steps.
             Default is False.
@@ -2141,9 +2290,9 @@ class StepGnss:
         if force:
             logger.info("%s forced: %s", step_name, finp_use)
             bool_ok = True
-        elif check_ok_out_only_for_mv_final and self.table.loc[irow, "ok_out"]:
+        elif mv_final_mode and self.table.loc[irow, "ok_out"]:
             bool_ok = True
-        elif check_ok_out_only_for_mv_final and not self.table.loc[irow, "ok_out"]:
+        elif mv_final_mode and not self.table.loc[irow, "ok_out"]:
             logger.warning("%s skipped (output not found): %s", step_name, fout_use)
             bool_ok = False
         # NB: we disable this option since it is not used (2025-01-14)
@@ -2254,23 +2403,32 @@ class StepGnss:
         """
         "on row" method
 
-        Moves the 'table_col' entry to a final destination for each row of the table.
+        Moves the 'table_col' entry to a final destination based **on out_dir** for each row of the table.
 
         This method is applied on each row of the table. It checks if the 'ok_out' column is True for the row.
-        If it is, it moves the file specified in the 'table_col' column to a final destination directory.
-        The final destination directory is either provided as an argument or it defaults to the 'out_dir' attribute of
-        the object.
-        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table for the row based on the
-        success of the operation.
+        If it is, it moves the file specified in the 'table_col' column to a final destination directory
+        **based on out_dir**.
+        The final destination directory is either provided as an argument or
+         it defaults to the 'out_dir' attribute of the object.
+        The method also updates the 'ok_out', 'table_col', and 'size_out' columns of the table
+        for the row based on the success of the operation.
 
         Parameters
         ----------
         irow : int
             The index of the row in the table on which the method is applied.
         out_dir : str, optional
-            The directory to which the file is moved. If not provided, the 'out_dir' attribute of the object is used.
+            The directory to which the file is moved.
+             If not provided, the 'out_dir' attribute of the object is used.
         table_col : str, optional
-            The column in the table which contains the file path to be moved. Defaults to 'fpath_out'.
+            The column in the table which contains the file path to be moved.
+            Defaults to 'fpath_out'.
+        copy_only : bool, optional
+            If True, the file is copied to the final destination
+            instead of being moved.
+            Default is False.
+
+        See also mono_mv_inpout
 
         Returns
         -------
@@ -2287,15 +2445,9 @@ class StepGnss:
         #     return None
         # #NB: for mv it's ok_out column the one to check
 
-        if copy_only:
-            mvorcp = "copy"
-        else:
-            mvorcp = "move"
-
-        # NB: for mv it's ok_out column the one to check
-        if not self.mono_ok_check(
-            irow, step_name="final " + mvorcp, check_ok_out_only_for_mv_final=True
-        ):
+        mvcp = "copy" if copy_only else "move"
+        # NB: for a final move it's ok_out column the one to check => mv_final_mode=True
+        if not self.mono_ok_check(irow, step_name="final " + mvcp, mv_final_mode=True):
             return None
 
         # definition of the output directory (after the action)
@@ -2305,38 +2457,86 @@ class StepGnss:
             out_dir_use = self.out_dir
 
         ### def output folders
-        outdir_use = self.translate_path(
-            out_dir_use, epoch_inp=self.table.loc[irow, "epoch_srt"]
+        outdir_trsl = self.translate_path(
+            out_dir_use, make_dir=True, epoch_inp=self.table.loc[irow, "epoch_srt"]
         )
 
         file_to_mv = self.table.loc[irow, table_col]
+        ### vvvvv HERE IS THE MOVE
+        file_moved = arocmn.move_core(file_to_mv, outdir_trsl, copy_only=copy_only)
+        ### ^^^^^ HERE IS THE MOVE
+        self.mono_mv_validat(irow, file_moved=file_moved, table_col=table_col)
 
-        try:
-            ### do the move
-            utils.create_dir(outdir_use)
-            # we prefer a copy rather than a move, mv can lead to some error
-            file_moved = shutil.copy2(file_to_mv, outdir_use)
-            # file_moved = shutil.move(file_to_mv, outdir_use)
-            logger.debug("file " + mvorcp + "ed to final destination: %s", file_moved)
-        except Exception as e:
-            logger.error("Error for: %s", file_to_mv)
-            logger.error("Exception raised: %s", e)
-            file_moved = None
+        return file_moved
 
+    def mono_mv_inpout(self, irow, copy_only=False):
+        """
+        Moves or copies the input file to the output file.
+
+        This method checks if the input file (`fpath_inp`) is valid and then moves or
+        copies it to the output file path (`fpath_out`).
+        It validates the move or copy operation and updates the table accordingly.
+
+        See also mono_mv_final
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to process.
+        copy_only : bool, optional
+            If True, the file is copied instead of moved. Default is False.
+
+        Returns
+        -------
+        str or None
+            The path of the moved or copied file if the operation is successful, None otherwise.
+        """
+        mvcp = "copy" if copy_only else "move"
+        if not self.mono_ok_check(irow, step_name=mvcp):
+            return None
+
+        file_src = self.table.loc[irow, "fpath_inp"]
+        file_des = self.table.loc[irow, "fpath_out"]
+        ### vvvvv HERE IS THE MOVE
+        file_moved = arocmn.move_core(file_src, file_des, copy_only=copy_only)
+        ### ^^^^^ HERE IS THE MOVE
+        self.mono_mv_validat(irow, file_moved=file_moved, table_col="fpath_out")
+        return file_moved
+
+    def mono_mv_validat(self, irow, file_moved, table_col="fpath_out"):
+        """
+        Validates the move operation for a file in the table.
+
+        This method updates the table based on the success of a file move operation.
+        If the file was successfully moved, it updates the 'ok_out', 'table_col', and 'size_out' columns.
+        If the file move failed, it sets 'ok_out' to False and logs the row in the table log.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to validate.
+        file_moved : str
+            The path of the moved file. If the move failed, this should be None.
+        table_col : str, optional
+            The column in the table which contains the file path to be moved.
+            Defaults to 'fpath_out'.
+
+        Returns
+        -------
+        str
+            The final path of the moved file if the operation is successful, None otherwise.
+        """
         if file_moved:
-            ### remove the original file if it is still around (normal with a copy rather than a move)
-            if (not copy_only) and os.path.isfile(file_to_mv):
-                os.remove(file_to_mv)
-            ### update table if things go well
+            # Remove the original file if it is still around (normal with a copy rather than a move)
+            # Update table if things go well
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, table_col] = file_moved
             self.table.loc[irow, "size_out"] = os.path.getsize(file_moved)
         else:
-            ### update table if things go wrong
+            # Update table if things go wrong
             self.table.loc[irow, "ok_out"] = False
             self.write_in_table_log(self.table.loc[irow])
             # raise e
-
         return file_moved
 
     def mono_decompress(
