@@ -931,7 +931,7 @@ class StepGnss:
         """
 
         epoch_use = self.table.iloc[irow, "epo_srt"]
-        trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow, "site"])
+        trslt_dic_use = self.trslt_dic_siteid(self.table.iloc[irow]["site"])
 
         trslt_path_out = self.translate_core(path_inp=path_inp,
                                              trslt_dic_use=trslt_dic_use,
