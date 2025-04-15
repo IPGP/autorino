@@ -357,6 +357,7 @@ def move_core(src, dest, copy_only=False):
     try:
         # we prefer a copy rather than a move, mv can lead to some error
         file_moved = shutil.copy2(src, dest)
+        file_moved = os.path.abspath(file_moved)
         # file_moved = shutil.move(src, dest)
         logger.debug("file " + mvcp + " to final destination: %s", file_moved)
     except Exception as e:
