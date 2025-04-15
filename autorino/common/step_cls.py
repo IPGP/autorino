@@ -893,19 +893,19 @@ class StepGnss:
         (we decide to not create a dedicated method for this)
         """
 
-        trslt_path_out = self.translate_core(path_inp=path_inp,
-                                             trslt_dic_use=self.translate_dict,
-                                             epoch_use=epoch_inp,
-                                             make_dir=make_dir,
-                                             absolute=absolute)
+        trslt_path_out = self.translate_core(
+            path_inp=path_inp,
+            trslt_dic_use=self.translate_dict,
+            epoch_use=epoch_inp,
+            make_dir=make_dir,
+            absolute=absolute,
+        )
 
         return trslt_path_out
 
-    def translate_path_row(self,
-                           path_inp: str,
-                           irow: int,
-                           make_dir: bool = False,
-                           absolute: bool = False) -> str:
+    def translate_path_row(
+        self, path_inp: str, irow: int, make_dir: bool = False, absolute: bool = False
+    ) -> str:
         """
         Translates a given path using the object's translation dictionary for a specific row in the table.
 
@@ -933,13 +933,14 @@ class StepGnss:
         epoch_use = self.table["epoch_srt"].iloc[irow]
         trslt_dic_use = self.trslt_dic_siteid(self.table["site"].iloc[irow])
 
-        trslt_path_out = self.translate_core(path_inp=path_inp,
-                                             trslt_dic_use=trslt_dic_use,
-                                             epoch_use=epoch_use,
-                                             make_dir=make_dir,
-                                             absolute=absolute)
+        trslt_path_out = self.translate_core(
+            path_inp=path_inp,
+            trslt_dic_use=trslt_dic_use,
+            epoch_use=epoch_use,
+            make_dir=make_dir,
+            absolute=absolute,
+        )
         return trslt_path_out
-
 
     def trslt_dic_siteid(self, site_id_inp):
         """
@@ -980,7 +981,9 @@ class StepGnss:
 
         return trsltdict_out
 
-    def translate_core(self, path_inp, trslt_dic_use, epoch_use, make_dir=False, absolute=False):
+    def translate_core(
+        self, path_inp, trslt_dic_use, epoch_use, make_dir=False, absolute=False
+    ):
         trslt_path_out = arocmn.translator(path_inp, trslt_dic_use, epoch_use)
 
         if make_dir and not os.path.isdir(trslt_path_out):
@@ -1550,16 +1553,16 @@ class StepGnss:
             return local_files_list
 
         for irow, row in self.table.iterrows():
-            local_file = row["fpath_" + io]
-            if (
-                type(local_file) is float
-            ):  ### if not initialized, value is NaN (and then a float)
+            loc_file = row["fpath_" + io]
+            if type(loc_file) is float:
+                ### if not initialized, value is NaN (and then a float)
                 self.table.loc[irow, "ok_" + io] = False
             else:
-                if os.path.exists(local_file) and os.path.getsize(local_file) > 0:
+                loc_file_abs = os.path.abspath(loc_file)
+                if os.path.exists(loc_file_abs) and os.path.getsize(loc_file_abs) > 0:
                     self.table.loc[irow, "ok_" + io] = True
-                    self.table.loc[irow, "size_" + io] = os.path.getsize(local_file)
-                    local_files_list.append(local_file)
+                    self.table.loc[irow, "size_" + io] = os.path.getsize(loc_file_abs)
+                    local_files_list.append(loc_file_abs)
                 else:
                     self.table.loc[irow, "ok_" + io] = False
                     self.table.loc[irow, "size_" + io] = np.nan
