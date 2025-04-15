@@ -294,8 +294,8 @@ class ConvertGnss(arocmn.StepGnss):
             self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
             )
-
             #############################################################
+
             # +++++ FINAL MOVE
             self.mono_mv_final(irow)
 
