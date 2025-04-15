@@ -930,7 +930,7 @@ class StepGnss:
             The translated directory path.
         """
 
-        epoch_use = self.table["epo_srt"].iloc[irow]
+        epoch_use = self.table["epoch_srt"].iloc[irow]
         trslt_dic_use = self.trslt_dic_siteid(self.table["site"].iloc[irow])
 
         trslt_path_out = self.translate_core(path_inp=path_inp,
