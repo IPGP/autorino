@@ -108,16 +108,18 @@ def convert_rnx(
         cpy_raw = arocmn.StepGnss(
             raw_out_dir_use, tmp_dir, log_dir, metadata=metadata
         )
+        
+        debug_print = False
 
         cpy_raw.load_tab_prev_tab(cnv.table)
         cpy_raw.table["fpath_inp"] = cnv.table["fpath_inp"]
         cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
-        #cpy_raw.print_table()
+        cpy_raw.print_table() if debug_print
         cpy_raw.guess_out_files()
-        #cpy_raw.print_table()
+        cpy_raw.print_table() if debug_print
         cpy_raw.filter_ok_out()
-        #cpy_raw.print_table()
+        cpy_raw.print_table() if debug_print
         cpy_raw.move_files(mode="inpout", force=force, copy_only=True)
-        #cpy_raw.print_table()
+        cpy_raw.print_table() if debug_print
 
     return cnv
