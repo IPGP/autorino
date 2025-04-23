@@ -1426,89 +1426,33 @@ class StepGnss:
         and write it as 'fpath_out' value in the table
         """
 
-        #### to do: split it as a mono fct & go for irow iteration
-        #### IMPROVE_ME!!!!
+        loc_paths_list = []
 
-        local_paths_list = []
-
+        warnmsg = "unable to get the epochs to generate local RINEX paths"
         ### no epoch at all, you are surely in convert mode
         if pd.isna(self.table["epoch_srt"]).all():
-            logger.debug(
-                "unable to get the epochs to generate local RINEX paths (normal in epoch-blind convert mode)"
-            )
+            logger.warning(f"{warnmsg} (normal in epoch-blind convert mode)")
             return []
 
         ### some epochs are here, this is weirder and should not happen, we raise a warning
         if pd.isna(self.table["epoch_srt"]).any():
-            logger.debug(
-                "unable to get the epochs to generate local RINEX paths (something went wrong)"
-            )
+            logger.error(f"{warnmsg} (something went wrong)")
             return []
 
-        for iepoch, epoch in self.table["epoch_srt"].items():
-            # guess the potential local files
-            if io == "out":
-                local_dir_use = str(self.out_dir)
-            elif io == "inp":
-                local_dir_use = str(self.inp_dir)
-            else:
-                logging.error("io must be 'inp' or 'out'")
-                raise Exception
+        loc_paths_list = []
+        for irow, row in self.table.iterrows():
+            loc_path = self.mono_guess_rnx(irow, io=io)
+            loc_paths_list.append(loc_path)
 
-            # local_fname_use = str(self.inp_basename)
+        logger.info("nbr local RINEX files guessed: %s", len(loc_paths_list))
 
-            epo_dt_srt = epoch.to_pydatetime()
-            epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
-
-            # force the timezone to avoid nasty effects: rinexmod is not TZ aware... but autorino is!
-            # prefer to force the timezone elsewere in autorino
-            epo_dt_srt = epo_dt_srt.replace(tzinfo=None)
-            epo_dt_end = epo_dt_end.replace(tzinfo=None)
-
-            prd_str = rinexmod.rinexfile.file_period_from_timedelta(
-                epo_dt_srt, epo_dt_end
-            )[0]
-
-            local_fname_use = conv.statname_dt2rinexname_long(
-                self.site_id9,
-                epoch,
-                country="XXX",  ### site_id9 has the country
-                data_source="R",  ### always will be with autorino
-                file_period=prd_str,
-                data_freq=self.session["data_frequency"],
-                data_type="MO",
-                format_compression="crx.gz",
-                preset_type=None,
-            )
-
-            local_path_use0 = os.path.join(local_dir_use, local_fname_use)
-
-            local_path_use = self.translate_path(local_path_use0, epoch_inp=epoch)
-
-            local_fname_use = os.path.basename(local_path_use)
-
-            local_paths_list.append(local_path_use)
-
-            # iepoch = self.table[self.table['epoch_srt'] == epoch].index
-            # self.table.loc[iepoch, 'fname'] = local_fname_use
-            self.table.loc[iepoch, "fpath_" + io] = local_path_use
-            logger.debug("local RINEX file guessed: %s", local_path_use)
-
-        logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))
-
-        return local_paths_list
+        return loc_paths_list
 
     def guess_out_files(self):
 
         out_paths_list = []
 
         for irow, row in self.table.iterrows():
-            ## dirty update of the site_id
-            ## a new translate_path should accept table row
-            ### IMPORVE_ME !!!
-            # self.site_id = self.table.loc[irow, "site"]
-            # self.set_translate_dict()
-
             outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
 
             bnam_inp = os.path.basename(row["fpath_inp"])
@@ -2622,3 +2566,46 @@ class StepGnss:
             bool_decomp_out = False
 
         return file_decomp_out, bool_decomp_out
+
+
+    def mono_guess_rnx(self, irow, io="out"):
+        if io == "out":
+            loc_dir = str(self.out_dir)
+        elif io == "inp":
+            loc_dir = str(self.inp_dir)
+        else:
+            logging.error("io must be 'inp' or 'out'")
+            raise Exception
+
+        epo_srt = row["epoch_srt"].to_pydatetime()
+        epo_end = row["epoch_end"].to_pydatetime()
+
+        # force the timezone to avoid nasty effects: rinexmod is not TZ aware... but autorino is!
+        # prefer to force the timezone elsewere in autorino
+        epo_srt = epo_srt.replace(tzinfo=None)
+        epo_end = epo_end.replace(tzinfo=None)
+
+        prd_str = rinexmod.rinexfile.file_period_from_timedelta(epo_srt, epo_end)[0]
+
+        loc_fname = conv.statname_dt2rinexname_long(
+            self.site_id9,
+            epo_srt,
+            country="XXX",  ### site_id9 has the country
+            data_source="R",  ### always will be with autorino
+            file_period=prd_str,
+            data_freq=self.session["data_frequency"],
+            data_type="MO",
+            format_compression="crx.gz",
+            preset_type=None,
+        )
+
+        loc_path0 = os.path.join(loc_dir, loc_fname)
+        loc_path = self.translate_path(loc_path0, epoch_inp=epo_srt)
+        loc_fname = os.path.basename(loc_path)
+
+        # iepoch = self.table[self.table['epoch_srt'] == epoch].index
+        # self.table.loc[iepoch, 'fname'] = loc_fname
+        self.table.loc[irow, "fpath_" + io] = loc_path
+        logger.debug("local RINEX file guessed: %s", loc_path)
+
+        return loc_path
