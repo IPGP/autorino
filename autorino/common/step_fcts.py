@@ -331,7 +331,7 @@ def guess_sites_list(inp_fil):
     return sites_list
 
 
-def move_core(src, dest, copy_only=False):
+def move_core(src, dest, copy_only=False, force=False):
     """
     Moves or copies a file from the source to the destination.
 
@@ -347,6 +347,9 @@ def move_core(src, dest, copy_only=False):
         The destination file path.
     copy_only : bool, optional
         If True, the file is copied instead of moved. Default is False.
+    force : bool, optional
+        Force the move/copy if the file already exists
+        Default is False
 
     Returns
     -------
@@ -354,6 +357,11 @@ def move_core(src, dest, copy_only=False):
         The path of the moved/copied file if the operation is successful, None otherwise.
     """
     mvcp = "copied" if copy_only else "moved"
+
+    if os.path.isfile(dest) and not force:
+        logger.info(f"{dest} exists and kept (force={force})")
+        return dest
+
     try:
         # we prefer a copy rather than a move, mv can lead to some error
         file_moved = shutil.copy2(src, dest)
@@ -367,6 +375,7 @@ def move_core(src, dest, copy_only=False):
 
     if file_moved and (not copy_only) and os.path.isfile(src):
         os.remove(src)
+
     return file_moved
 
 

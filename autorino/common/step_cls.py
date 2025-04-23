@@ -1449,16 +1449,40 @@ class StepGnss:
         return loc_paths_list
 
     def guess_out_files(self):
+        """
+        Generates output file paths for each row in the table and updates the table.
 
+        This method iterates over the rows of the table, constructs the output file path
+        for each input file, and updates the `fpath_out` column in the table. It also
+        ensures that the output directory exists and checks the validity of the output files.
+
+        Returns
+        -------
+        list
+            A list of output file paths generated for the table rows.
+
+        Notes
+        -----
+        - The output directory is created if it does not exist.
+        - The `check_local_files` method is called to validate the output files.
+        """
         out_paths_list = []
 
         for irow, row in self.table.iterrows():
+            # Translate the output directory path for the current row and create it if necessary
             outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
 
+            # Construct the output file path using the input file's base name
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
+
+            # Update the table with the generated output file path
             self.table.loc[irow, "fpath_out"] = fpath_out
+
+            # Check the validity of the output files
             self.check_local_files(io="out")
+
+            # Append the output file path to the list
             out_paths_list.append(fpath_out)
 
         return out_paths_list
@@ -1493,23 +1517,13 @@ class StepGnss:
         local_files_list = []
 
         if io not in ["inp", "out"]:
-            logger.error("io must be 'inp' or 'out'")
-            return local_files_list
+            logging.error("io must be 'inp' or 'out'")
+            raise Exception
 
         for irow, row in self.table.iterrows():
-            loc_file = row["fpath_" + io]
-            if type(loc_file) is float:
-                ### if not initialized, value is NaN (and then a float)
-                self.table.loc[irow, "ok_" + io] = False
-            else:
-                loc_file_abs = os.path.abspath(loc_file)
-                if os.path.exists(loc_file_abs) and os.path.getsize(loc_file_abs) > 0:
-                    self.table.loc[irow, "ok_" + io] = True
-                    self.table.loc[irow, "size_" + io] = os.path.getsize(loc_file_abs)
-                    local_files_list.append(loc_file_abs)
-                else:
-                    self.table.loc[irow, "ok_" + io] = False
-                    self.table.loc[irow, "size_" + io] = np.nan
+            loc_file_out = self.mono_chk_local(irow, io=io)
+            if loc_file_out:
+                local_files_list.append(loc_file_out)
 
         return local_files_list
 
@@ -1590,9 +1604,8 @@ class StepGnss:
 
             files_uncmp_list.append(file_decmp)  ### all files are stored in this list
             if bool_decmp:
-                files_decmp_list.append(
-                    file_decmp
-                )  ### only the DEcompressed files are stored in this list (to be rm later)
+                files_decmp_list.append(file_decmp)
+                ### only the DEcompressed files are stored in this list (to be rm later)
 
         return files_decmp_list, files_uncmp_list
 
@@ -1657,8 +1670,10 @@ class StepGnss:
         Parameters
         ----------
         mode : str, optional
-            The mode of operation. Can be 'inpout' to move/copy files from input to output path,
-            or 'final' to move/copy files to the final destination. Default is 'inpout'.
+            The mode of operation. Can be:
+            'inpout' to move/copy files from input to output path,
+            'final' to move/copy files to the final destination.
+            Default is 'inpout'.
         copy_only : bool, optional
             If True, the files are copied instead of moved. Default is False.
         force : bool, optional
@@ -1676,10 +1691,10 @@ class StepGnss:
         file_mv_lis = []
         for irow, row in self.table.iterrows():
             if mode == "inpout":
-                file_mv = self.mono_mv_inpout(irow, copy_only=copy_only)
+                file_mv = self.mono_mv_inpout(irow, copy_only=copy_only, force=force)
             elif mode == "final":
                 file_mv = self.mono_mv_final(
-                    irow, table_col="fpath_out", copy_only=copy_only
+                    irow, table_col="fpath_out", copy_only=copy_only, force=force
                 )
             else:
                 logger.error("mode must be 'inpout' or 'final'")
@@ -1780,7 +1795,7 @@ class StepGnss:
             f = row["fname"]
             boolbad = utils.patterns_in_string_checker(f, *keywords_path_excl)
             if boolbad:
-                self.table.iloc[irow, "ok_inp"] = False
+                self.table.loc[irow, "ok_inp"] = False
                 logger.debug("file filtered, contains an excluded keyword: %s", f)
                 nfil += 1
             else:
@@ -2346,7 +2361,9 @@ class StepGnss:
 
         return frnxmod
 
-    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out", copy_only=False):
+    def mono_mv_final(
+        self, irow, out_dir=None, table_col="fpath_out", copy_only=False, force=False
+    ):
         """
         "on row" method
 
@@ -2374,6 +2391,9 @@ class StepGnss:
             If True, the file is copied to the final destination
             instead of being moved.
             Default is False.
+        force : bool, optional
+            Force the move/copy if the file already exists
+            Default is False
 
         See also mono_mv_inpout
 
@@ -2410,13 +2430,15 @@ class StepGnss:
 
         file_to_mv = self.table.loc[irow, table_col]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(file_to_mv, outdir_trsl, copy_only=copy_only)
+        file_moved = arocmn.move_core(
+            file_to_mv, outdir_trsl, copy_only=copy_only, force=force
+        )
         ### ^^^^^ HERE IS THE MOVE
         self.mono_mv_validat(irow, file_moved=file_moved, table_col=table_col)
 
         return file_moved
 
-    def mono_mv_inpout(self, irow, copy_only=False):
+    def mono_mv_inpout(self, irow, copy_only=False, force=False):
         """
         Moves or copies the input file to the output file.
 
@@ -2432,6 +2454,9 @@ class StepGnss:
             The index of the row in the table to process.
         copy_only : bool, optional
             If True, the file is copied instead of moved. Default is False.
+        force : bool, optional
+            Force the move/copy if the file already exists
+            Default is False
 
         Returns
         -------
@@ -2445,7 +2470,9 @@ class StepGnss:
         file_src = self.table.loc[irow, "fpath_inp"]
         file_des = self.table.loc[irow, "fpath_out"]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(file_src, file_des, copy_only=copy_only)
+        file_moved = arocmn.move_core(
+            file_src, file_des, copy_only=copy_only, force=force
+        )
         ### ^^^^^ HERE IS THE MOVE
         self.mono_mv_validat(irow, file_moved=file_moved, table_col="fpath_out")
         return file_moved
@@ -2567,31 +2594,63 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
-
     def mono_guess_rnx(self, irow, io="out"):
-        if io == "out":
-            loc_dir = str(self.out_dir)
-        elif io == "inp":
-            loc_dir = str(self.inp_dir)
-        else:
+        """
+        Guesses the local RINEX file path for a given row in the table.
+
+        This method determines the local RINEX file path based on the epoch range
+        and site information for a specific row in the table. It supports both
+        input (`inp`) and output (`out`) modes.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table for which the RINEX file path is to be guessed.
+        io : str, optional
+            Specifies whether to guess the input (`inp`) or output (`out`) file path.
+            Default is `out`.
+
+        Returns
+        -------
+        str
+            The guessed local RINEX file path.
+
+        Raises
+        ------
+        Exception
+            If the `io` parameter is not `inp` or `out`.
+
+        Notes
+        -----
+        - The method ensures that the timezone information is removed from the
+          epoch start and end times to avoid compatibility issues with `rinexmod`.
+        - The guessed file path is stored in the `fpath_<io>` column of the table.
+        """
+
+        # Determine the directory based on the `io` parameter
+        if io not in ["inp", "out"]:
             logging.error("io must be 'inp' or 'out'")
             raise Exception
 
-        epo_srt = row["epoch_srt"].to_pydatetime()
-        epo_end = row["epoch_end"].to_pydatetime()
+        loc_dir = str(self.out_dir if io == "out" else self.inp_dir)
 
-        # force the timezone to avoid nasty effects: rinexmod is not TZ aware... but autorino is!
-        # prefer to force the timezone elsewere in autorino
+        # Retrieve the start and end epochs for the specified row
+        epo_srt = self.table.loc[irow, "epoch_srt"].to_pydatetime()
+        epo_end = self.table.loc[irow, "epoch_end"].to_pydatetime()
+
+        # Remove timezone information to ensure compatibility with `rinexmod`
         epo_srt = epo_srt.replace(tzinfo=None)
         epo_end = epo_end.replace(tzinfo=None)
 
+        # Determine the file period string based on the epoch range
         prd_str = rinexmod.rinexfile.file_period_from_timedelta(epo_srt, epo_end)[0]
 
+        # Generate the RINEX file name using site and session information
         loc_fname = conv.statname_dt2rinexname_long(
             self.site_id9,
             epo_srt,
-            country="XXX",  ### site_id9 has the country
-            data_source="R",  ### always will be with autorino
+            country="XXX",  # `site_id9` includes the country
+            data_source="R",  # Always "R" for autorino
             file_period=prd_str,
             data_freq=self.session["data_frequency"],
             data_type="MO",
@@ -2599,13 +2658,58 @@ class StepGnss:
             preset_type=None,
         )
 
+        # Construct the full file path and translate it
         loc_path0 = os.path.join(loc_dir, loc_fname)
         loc_path = self.translate_path(loc_path0, epoch_inp=epo_srt)
         loc_fname = os.path.basename(loc_path)
 
-        # iepoch = self.table[self.table['epoch_srt'] == epoch].index
-        # self.table.loc[iepoch, 'fname'] = loc_fname
+        # Update the table with the guessed file path
         self.table.loc[irow, "fpath_" + io] = loc_path
         logger.debug("local RINEX file guessed: %s", loc_path)
 
         return loc_path
+
+    def mono_chk_local(self, irow, io="out"):
+        """
+        Checks the existence and validity of a local file for a specific row in the table.
+
+        This method verifies if the file specified in the `fpath_<io>` column of the table exists
+        and is non-empty. It updates the corresponding `ok_<io>` and `size_<io>` columns in the table
+        based on the file's existence and size.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to check.
+        io : str, optional
+            Specifies whether to check the input (`inp`) or output (`out`) file path.
+            Default is `out`.
+
+        Returns
+        -------
+        str or None
+            The absolute path of the file if it exists and is valid, otherwise None.
+
+        Notes
+        -----
+        - If the file path is not initialized (NaN), the method sets `ok_<io>` to False.
+        - If the file exists and is non-empty, the method sets `ok_<io>` to True and updates `size_<io>`
+          with the file size.
+        - If the file does not exist or is empty, the method sets `ok_<io>` to False and `size_<io>` to NaN.
+        """
+        loc_file = self.table.loc[irow, "fpath_" + io]
+        if isinstance(loc_file, float) and np.isnan(loc_file):
+            ### if not initialized, value is NaN (and then a float)
+            self.table.loc[irow, "ok_" + io] = False
+            loc_file_out = None
+        else:
+            loc_file_abs = os.path.abspath(loc_file)
+            if os.path.exists(loc_file_abs) and os.path.getsize(loc_file_abs) > 0:
+                self.table.loc[irow, "ok_" + io] = True
+                self.table.loc[irow, "size_" + io] = os.path.getsize(loc_file_abs)
+                loc_file_out = loc_file_abs
+            else:
+                self.table.loc[irow, "ok_" + io] = False
+                self.table.loc[irow, "size_" + io] = np.nan
+                loc_file_out = None
+        return loc_file_out
