@@ -25,7 +25,8 @@ def convert_rnx(
     log_dir=None,
     rinexmod_options=None,
     metadata=None,
-    force=False,
+    force_rnx=False,
+    force_raw=False,
     raw_out_dir=None,
     raw_out_structure=None,
 ):
@@ -66,8 +67,11 @@ def convert_rnx(
          * list of MetaData objects
          * single MetaData object.
          Defaults to None.
-    force : bool, optional
+    force_rnx : bool, optional
         If set to True, the conversion will be forced even if the output files already exist.
+        Defaults to False.
+    force_raw : bool, optional
+        If set to True, the RAW file archiving will be forced even if the output files already exist.
         Defaults to False.
     raw_out_dir : str, optional
         Directory where RAW files will be archived.
@@ -94,7 +98,7 @@ def convert_rnx(
     )
     cnv.load_tab_filelist(raws_use)
     cnv.convert(
-        force=force,
+        force=force_rnx,
         rinexmod_options=rinexmod_options,
     )
 
@@ -114,12 +118,12 @@ def convert_rnx(
         cpy_raw.load_tab_prev_tab(cnv.table)
         cpy_raw.table["fpath_inp"] = cnv.table["fpath_inp"]
         cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
-        cpy_raw.print_table() if debug_print
+        cpy_raw.print_table() if debug_print else None
         cpy_raw.guess_out_files()
-        cpy_raw.print_table() if debug_print
+        cpy_raw.print_table() if debug_print else None
         cpy_raw.filter_ok_out()
-        cpy_raw.print_table() if debug_print
-        cpy_raw.move_files(mode="inpout", force=force, copy_only=True)
-        cpy_raw.print_table() if debug_print
+        cpy_raw.print_table() if debug_print else None
+        cpy_raw.move_files(mode="inpout", force=force_raw, copy_only=True)
+        cpy_raw.print_table() if debug_print else None
 
     return cnv

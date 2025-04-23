@@ -55,13 +55,20 @@ def main():
         """,
     )
     parser.add_argument(
-        "-f",
-        "--force",
+        "-frnx",
+        "--force_rnx",
         action="store_true",
         help="Force the conversion even if the output files already exist",
         default=False,
     )
 
+    parser.add_argument(
+        "-fraw",
+        "--force_raw",
+        action="store_true",
+        help="Force the RAW file archiving even if the output files already exist",
+        default=False,
+    )
 
     parser.add_argument(
         "-l",
@@ -111,13 +118,6 @@ def main():
         default=None,
     )
 
-    # parser.add_argument(
-    #     "-s",
-    #     "--site",
-    #     help="Force a site identifier (9-character) for the conversion if the input RAW files are not correctly named",
-    #     default=None,
-    # )
-
     args = parser.parse_args()
 
     aroapi.convert_rnx(
@@ -128,9 +128,10 @@ def main():
         log_dir=args.log_dir,
         rinexmod_options=args.rinexmod_options,
         metadata=args.metadata,
-        force=args.force,
+        force_rnx=args.force_rnx,
+        force_raw=args.force_raw,
         raw_out_dir=args.raw_out_dir,
-        raw_out_structure=args.raw_out_structure
+        raw_out_structure=args.raw_out_structure,
     )
 
 
