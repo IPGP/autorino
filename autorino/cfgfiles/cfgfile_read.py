@@ -36,7 +36,7 @@ BOLD_END = "\033[0m"
 
 def load_cfg(cfg_path, verbose=True):
     """
-    Loads quickly a configuration file (YAML format) without interpretation.
+    Loads quickly one or several configuration files (YAML format) **without interpretation**.
 
     This function reads a YAML configuration file from the specified path and returns the parsed content.
 
@@ -57,7 +57,6 @@ def load_cfg(cfg_path, verbose=True):
 
     if verbose and not recursive:
         logger.info(BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", cfg_path)
-
     if recursive:
         ys_raw = [load_cfg(c, verbose=verbose) for c in cfg_path]
         ys_raw = [y for y in ys_raw if y]
@@ -70,7 +69,7 @@ def load_cfg(cfg_path, verbose=True):
         return y_out
 
 
-def read_cfg(site_cfg_path, epoch_range=None, main_cfg_path=None):
+def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None):
     """
     Read and interpret a configuration file (YAML format) and
     return a list of StepGnss objects to be launched sequentially.
@@ -86,12 +85,15 @@ def read_cfg(site_cfg_path, epoch_range=None, main_cfg_path=None):
     ----------
     site_cfg_path : str
         The path to the configuration file.
+        Should be a single file here (no list).
     epoch_range : EpochRange, optional
         An EpochRange object which will override the epoch ranges
         given in the configuration file. Default is None.
-    main_cfg_path : str or list of str, optional
-        The path to the main configuration file.
-        If a list is provided, the main config files are merged.
+    include_cfg_paths_xtra : str or list of str, optional
+        The path to the include configuration file.
+        If a list is provided, the include config files are merged.
+        It overrides the files given with the 'include' keyword
+        in the site configuration file.
         Default is None.
 
     Returns
@@ -104,20 +106,25 @@ def read_cfg(site_cfg_path, epoch_range=None, main_cfg_path=None):
         The parsed/merged content of the configuration file as dictionary.
     """
 
-    y_inp = load_cfg(site_cfg_path)
-    y_main = load_cfg(main_cfg_path, verbose=False)
+    y_site = load_cfg(site_cfg_path)
+
+    if "include" in y_site.keys():
+        include_cfg_paths = get_include_cfg_paths(y_site, site_cfg_path)
+        y_incl = load_cfg(include_cfg_paths, verbose=False)
+    else:
+        y_incl = load_cfg(include_cfg_paths_xtra, verbose=False)
 
     # before config files v20 (2025-04-10), the keyword FROM_MAIN was used in the sites cfgfiles
     # after v20, the main cfgfile is the basis, and is automatically overloaded with site cfgfile values
-    legacy_main_updt = True if float(y_inp["cfgfile_version"]) < 20.0 else False
+    legacy_main_updt = True if float(y_site["cfgfile_version"]) < 20.0 else False
     if legacy_main_updt:  # cfgfile_version < 20.
-        y_use = read_cfg_legacy(y_inp, y_main)
+        y_use = read_cfg_legacy(y_site, y_incl)
     else:  # cfgfile_version >= 20.
-        y_use = mergedeep.merge({}, y_main, y_inp) if y_main else y_inp.copy()
+        y_use = mergedeep.merge({}, y_incl, y_site) if y_incl else y_site.copy()
 
     print_cfg_for_debug = True
     if print_cfg_for_debug:
-        logger.debug("Used configuration (updated with the main):\n %s", y_use)
+        logger.debug("Used configuration (updated with include):\n %s", y_use)
 
     steps_lis_lis, steps_dic_dic = read_cfg_core(y_use, epoch_range_inp=epoch_range)
 
@@ -272,6 +279,7 @@ def step_cls_select(step_name):
         logger.warning("unknown step %s in cfgfiles file, skip", step_name)
         return None
 
+
 def run_steps(
     steps_lis,
     steps_select_list=None,
@@ -384,7 +392,6 @@ def run_steps(
         ##### close the step
 
     return None
-
 
 
 def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
@@ -604,6 +611,26 @@ def format_dir_path(dir_parent, structure):
     return dir_parent, structure
 
 
+def get_include_cfg_paths(y_inp, site_cfg_path):
+    incl_cfg_paths_out = []
+    for p in y_inp["include"]:
+        pmod = arocmn.translator(p)
+        pmod = os.path.join(os.path.dirname(site_cfg_path), pmod)
+        pmod = arocmn.abs_path_wrt(pmod, site_cfg_path)
+        incl_cfg_paths_out.append(pmod)
+    return incl_cfg_paths_out
+
+
+#  _                                    __                  _   _
+# | |                                  / _|                | | (_)
+# | |     ___  __ _  __ _  ___ _   _  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___
+# | |    / _ \/ _` |/ _` |/ __| | | | |  _| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+# | |___|  __/ (_| | (_| | (__| |_| | | | | |_| | | | | (__| |_| | (_) | | | \__ \
+# |______\___|\__, |\__,_|\___|\__, | |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+#              __/ |            __/ |
+#             |___/            |___/
+
+
 def check_from_main(y):
     """
     Check if the FROM_MAIN keyword is used in the configuration file.
@@ -655,6 +682,7 @@ def update_w_main_dic(d, u=None, specific_value="FROM_MAIN"):
                 d[k] = v
     return d
 
+
 def read_cfg_legacy(y_inp, y_main):
     """
     Handles legacy configuration files with the 'FROM_MAIN' keyword.
@@ -695,7 +723,9 @@ def read_cfg_legacy(y_inp, y_main):
     if not y_main and check_from_main(y_inp):
         errmsg = "FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)"
         logger.error(errmsg)  # Log an error message
-        raise FileNotFoundError(None, errmsg)  # Raise an exception with the error message
+        raise FileNotFoundError(
+            None, errmsg
+        )  # Raise an exception with the error message
 
     # Merge the input configuration with the main configuration
     y = update_w_main_dic(y_inp, y_main)

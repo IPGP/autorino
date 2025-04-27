@@ -133,7 +133,7 @@ def cfgfile_run(
         # Read the configuration and run the steps
         # step_lis_lis is a list of list because you can have several sessions in the same configuration file
         steps_lis_lis, steps_dic_dic, y_use = arocfg.read_cfg(
-            site_cfg_path=cfg_use, main_cfg_path=main_cfg_in, epoch_range=epoch_range
+            site_cfg_path=cfg_use, include_cfg_paths_xtra=main_cfg_in, epoch_range=epoch_range
         )
 
         for steps_lis in steps_lis_lis:

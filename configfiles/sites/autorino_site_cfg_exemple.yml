@@ -1,5 +1,7 @@
 ### other structure for the session(s) 
-cfgfile_version: 20.0 # describe the structure of the configuration file
+cfgfile_version: 20.1 # describe the structure of the configuration file
+include:
+    - ../main/autorino_main_cfg_exemple.yml
 station:
     site:
         name: "Site Full Name"

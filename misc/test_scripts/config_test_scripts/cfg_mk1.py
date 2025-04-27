@@ -20,7 +20,7 @@ psite = '/home/psakicki/CODES/IPGP/autorino/configfiles/sites/autorino_site_cfg_
 # CFNG
 
 #out = arocfg.read_configfile_sessions_list(psite)
-out = arocfg.read_cfg(psite, main_cfg_path=pmain)
+out = arocfg.read_cfg(psite, include_cfg_paths_xtra=pmain)
 
 a = arocmn.EpochRange(pd.NaT,pd.NaT)
 a.eporng_list()

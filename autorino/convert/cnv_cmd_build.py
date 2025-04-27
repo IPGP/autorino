@@ -78,7 +78,7 @@ def _kw_options_dict2str(kw_options):
 
     cmd_str = " ".join(cmd_list)
 
-    return cmd_list, cmd_str
+    return list(cmd_list), str(cmd_str)
 
 
 def _options_list2str(options):
@@ -116,7 +116,7 @@ def _options_list2str(options):
 
     cmd_str = " ".join(cmd_list)
 
-    return cmd_list, cmd_str
+    return list(cmd_list), str(cmd_str)
 
 
 ###################################################################

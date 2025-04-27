@@ -162,3 +162,28 @@ def _translator_env_variables(path_inp):
             path_translated = path_translated.replace("<$" + k + ">", str(v))
 
     return path_translated
+
+
+def abs_path_wrt(relative_path, base_abs_path):
+    """
+    Converts a relative path to an absolute path with respect to another absolute file path.
+
+    Parameters
+    ----------
+    relative_path : str
+        The relative path to be converted.
+    base_abs_path : str
+        The absolute path of the base file or directory.
+
+
+    Returns
+    -------
+    str
+        The absolute path.
+    """
+    if not os.path.isabs(relative_path):
+        base_dir = os.path.dirname(base_abs_path)
+        absolute_path = os.path.join(base_dir, relative_path)
+        return os.path.abspath(absolute_path)
+    else:
+        return os.path.abspath(relative_path)

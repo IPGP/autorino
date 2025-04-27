@@ -1,4 +1,4 @@
-environement:
+environment:
   conv_software_paths:
     # key : "value"
     convbin : "convbin" #RTKLIB converter
