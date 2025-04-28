@@ -109,7 +109,7 @@ def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None):
     y_site = load_cfg(site_cfg_path)
 
     if "include" in y_site.keys():
-        include_cfg_paths = get_include_cfg_paths(y_site, site_cfg_path)
+        include_cfg_paths = get_incl_cfg_paths(y_site, site_cfg_path)
         y_incl = load_cfg(include_cfg_paths, verbose=False)
     else:
         y_incl = load_cfg(include_cfg_paths_xtra, verbose=False)
@@ -611,14 +611,70 @@ def format_dir_path(dir_parent, structure):
     return dir_parent, structure
 
 
-def get_include_cfg_paths(y_inp, site_cfg_path):
+def get_incl_cfg_paths(y_inp, site_cfg_path):
+    """
+    Generates a list of absolute paths for included configuration files.
+
+    This function processes the 'include' section of a configuration dictionary,
+    translates the paths using a translator function, and converts them to
+    absolute paths relative to the provided site configuration file path.
+
+    Parameters
+    ----------
+    y_inp : dict
+        A dictionary containing the configuration data, including an 'include' key
+        with paths to additional configuration files.
+    site_cfg_path : str
+        The absolute path to the site configuration file.
+
+    Returns
+    -------
+    list
+        A list of absolute paths for the included configuration files.
+    """
     incl_cfg_paths_out = []
     for p in y_inp["include"]:
+        # Translate the path using a custom translator function
         pmod = arocmn.translator(p)
+        # Convert the path to be relative to the site configuration file's directory
         pmod = os.path.join(os.path.dirname(site_cfg_path), pmod)
+        # Ensure the path is absolute with respect to the site configuration file
         pmod = arocmn.abs_path_wrt(pmod, site_cfg_path)
         incl_cfg_paths_out.append(pmod)
     return incl_cfg_paths_out
+
+
+def get_incl_strategy(strat_str):
+    """
+    Retrieves the merging strategy for configuration files.
+
+    This function maps a string representing a merging strategy to the corresponding
+    `mergedeep.Strategy` enum value. Supported strategies are 'append' and 'replace'.
+
+    Parameters
+    ----------
+    strat_str : str
+        The merging strategy as a string. Valid values are 'append' or 'replace'.
+
+    Returns
+    -------
+    mergedeep.Strategy
+        The corresponding merging strategy.
+
+    Raises
+    ------
+    ValueError
+        If the provided strategy string is invalid.
+    """
+    if strat_str == "append":
+        return mergedeep.Strategy.APPEND
+    elif strat_str == "replace":
+        return mergedeep.Strategy.REPLACE
+    else:
+        raise ValueError(
+            f"Invalid strategy '{strat_str}'. "
+            "Valid strategies are 'append' or 'replace'."
+        )
 
 
 #  _                                    __                  _   _

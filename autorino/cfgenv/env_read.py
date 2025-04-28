@@ -10,8 +10,7 @@ import logging
 import os
 import collections.abc
 import yaml
-from pathlib import Path
-
+import mergedeep
 
 ### we need to clear the root logger to avoid duplicate logs
 root_logger = logging.getLogger()
@@ -21,74 +20,38 @@ logger = logging.getLogger("autorino")
 logger.setLevel("DEBUG")
 
 
-def update_recursive(d, u):
-    for k, v in u.items():
-        if isinstance(v, collections.abc.Mapping):
-            d[k] = update_recursive(d.get(k, {}), v)
-        else:
-            d[k] = v
-    return d
-
-
 def read_env(envfile_path=None):
     """
-    read a environement cfgfiles file path (YAML format) and return
-    the corresponding dictionnary
+    Reads an environment configuration file (YAML format) and returns the corresponding dictionary.
 
-    priority for envfile path :
-    fct argument > bashrc env variable > default in the current file
+    Priority for determining the environment file path:
+    1. Function argument
+    2. Environment variable `AUTORINO_ENV`
+    3. Default file in the current directory
     """
-
-    # Set the default path for the environment file
-    envfile_path_def = os.path.join(
+    # Default environment file path
+    default_env_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "autorino_env_default.yml"
     )
 
-    # Initialize the variable to hold the path to the environment file to be used
-    envfile_path_use = None
+    # Determine the environment file path
+    envfile_path_use = (
+        envfile_path or os.environ.get("AUTORINO_ENV", "")
+    )
 
-    environ_use = dict(os.environ)  # load_bashrc_vars()
+    if not envfile_path_use or not os.path.exists(envfile_path_use):
+        logger.warning(
+            f"{'Custom environment configfile not defined' if not envfile_path_use else f'File not found: {envfile_path_use}'}"
+        )
+        logger.warning("Falling back to default values in %s", default_env_path)
+        envfile_path_use = default_env_path
 
-    # Determine the environment file path based on the function argument,
-    # environment variable, or default to an empty string
-    if envfile_path:
-        envfile_path_use = envfile_path
-    elif "AUTORINO_ENV" in environ_use:
-        envfile_path_use = environ_use["AUTORINO_ENV"]
-    else:
-        envfile_path_use = ""
+    logger.info("Loading environment configfile: %s", envfile_path_use)
 
-    # Check if the specified environment file exists, otherwise fallback to the default file
-    cuenfi = "custom environment configfile"
-    if envfile_path_use == "":
-        use_def = True
-        logger.warning(f"{cuenfi} not defined in the env. variable $AUTORINO_ENV")
-    elif not os.path.exists(envfile_path_use):
-        use_def = True
-        logger.warning(f"$AUTORINO_ENV {cuenfi} not found in {envfile_path_use}")
-    else:
-        use_def = False
+    # Load and merge environment configurations
+    env_default = yaml.safe_load(open(default_env_path))["environment"]
+    env_custom = yaml.safe_load(open(envfile_path_use))["environment"]
+    return mergedeep.merge({}, env_default, env_custom)
 
-    if use_def:
-        logger.warning("fallback to default values in %s", envfile_path_def)
-        envfile_path_use = envfile_path_def
-
-    # Log the path of the environment file being loaded
-    logger.info("load environment configfile: %s", envfile_path_use)
-
-    # Load the default and specified environment files and merge their contents
-    env_dic_def = yaml.safe_load(open(envfile_path_def))['environment']
-    env_dic_use = yaml.safe_load(open(envfile_path_use))['environment']
-
-    env_dic_fin = env_dic_def.copy()
-    env_dic_fin = update_recursive(env_dic_fin, env_dic_use)
-    # logger.debug("default environment values (%s): %s", envfile_path_def, env_dic_def)
-    # logger.debug("used environment values (%s): %s", envfile_path_use, env_dic_use)
-    # logger.debug("final environment values: %s", env_dic_fin)
-
-    # Return the merged dictionary
-    return env_dic_fin
-
-
-### This dict is the one used in the WHOLE autorino package
+# Global environment dictionary used throughout the package
 ARO_ENV_DIC = read_env()
