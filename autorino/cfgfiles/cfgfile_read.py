@@ -12,6 +12,7 @@ import collections.abc
 import os
 import yaml
 import mergedeep
+from pprint import pprint
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -69,7 +70,7 @@ def load_cfg(cfg_path, verbose=True):
         return y_out
 
 
-def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None):
+def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None, verbose_debug = False):
     """
     Read and interpret a configuration file (YAML format) and
     return a list of StepGnss objects to be launched sequentially.
@@ -122,9 +123,10 @@ def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None):
     else:  # cfgfile_version >= 20.
         y_use = mergedeep.merge({}, y_incl, y_site) if y_incl else y_site.copy()
 
-    print_cfg_for_debug = True
     if print_cfg_for_debug:
-        logger.debug("Used configuration (updated with include):\n %s", y_use)
+        logger.debug(
+            "Used configuration (updated with include):\n %s", yaml.dump(y_use)
+        )
 
     steps_lis_lis, steps_dic_dic = read_cfg_core(y_use, epoch_range_inp=epoch_range)
 
@@ -219,7 +221,7 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
                 logger.warning("unknown step %s, skip", k_stp)
                 continue
 
-            if y_stp["epoch_range"] == "FROM_SESSION":
+            if y_stp["epoch_range"] == "FROM_SESSION" or not "epoch_range" in y_stp.keys():
                 epo_obj_stp = epo_obj_ses
                 y_stp["epoch_range"] = y_ses["epoch_range"]
             else:
@@ -267,6 +269,33 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
 
 
 def step_cls_select(step_name):
+    """
+    Selects the appropriate class for a given step name.
+
+    This function maps a step name to its corresponding class, which is used
+    to handle specific GNSS processing steps such as 'download', 'convert',
+    'split', or 'splice'. If the step name is unknown, a warning is logged,
+    and None is returned.
+
+    Parameters
+    ----------
+    step_name : str
+        The name of the step for which the corresponding class is to be selected.
+
+    Returns
+    -------
+    class or None
+        The class corresponding to the given step name, or None if the step name is unknown.
+
+    Notes
+    -----
+    - Supported step names and their corresponding classes:
+        - 'download': arodwl.DownloadGnss
+        - 'convert': arocnv.ConvertGnss
+        - 'split': arohdl.SplitGnss
+        - 'splice': arohdl.SpliceGnss
+    - Logs a warning if the step name is not recognized.
+    """
     if step_name == "download":
         return arodwl.DownloadGnss
     elif step_name == "convert":
@@ -530,8 +559,21 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
         A tuple containing the constructed directory path,
         the parent directory, and the structure.
     """
-    dir_parent = y_step[dir_type + "_dir_parent"]
-    structure = y_step[dir_type + "_dir_structure"]
+
+    def _key_check(key_inp, y_step_inp):
+        if not key_inp in y_step_inp.keys():
+            logger.error(f"no {key_parent} in {y_step}")
+        return None
+
+    key_parent = dir_type + "_dir_parent"
+    key_structure = dir_type + "_dir_structure"
+
+    _key_check(key_parent, y_step)
+    dir_parent = y_step[key_parent]
+
+    _key_check(key_structure, y_step)
+    structure = y_step[key_structure]
+
     if check_parent_dir_exist:
         _check_parent_dir_exist(dir_parent, parent_dir_key=dir_type + "_dir_parent")
 

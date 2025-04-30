@@ -1,0 +1,31 @@
+### other structure for the session(s) 
+cfgfile_version: 20.1 # describe the structure of the configuration file
+include:
+    - ../main/autorino_main_cfg.yml
+    - ../profile/autorino_profile_session24h30s_trimble_cfg.yml
+station:
+    site:
+        name: 'Your Site Full Name'
+        site_id: SITE00FRA
+        domes: 00000M000
+        position_xyz: [0.,0.,0.]
+        # operator: DEFINED IN MAIN
+        # agency: DEFINED IN MAIN
+        # country: DEFINED IN MAIN
+        # sitelog_path: DEFINED IN MAIN # can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
+    device:
+        attributes_from_sitelog: False # Choose if the device attribute will come from a sitelog given with `sitelog_path` or the values below
+        ant_type: 'ASH701975.01A   NONE' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        ant_sn: '12345678' # Antenna Serial Number
+        ecc_une: [0.,0.,0.] # Eccentricity Up North East
+        rec_type: 'TPS GB-1000' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        rec_sn: '' # Receiver Serial Number
+        rec_fw: '' # Receiver firmware version
+        rec_manufacturer: 'TOPCON' # a free field for advanced usages    
+    access:
+        protocol: 'ftp'
+        hostname: '192.168.0.1' ## IP address or URL
+        login: 'anonymous'
+        password: '*******'
+        datalink: 'terrestrial' # prevent download of several stations with the same datalink at the same time
+                    

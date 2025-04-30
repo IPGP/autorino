@@ -171,6 +171,7 @@ dependencies = {file = ["requirements.txt"]}
 # which executes the function `main` from this package when invoked.
 [project.scripts]
 autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
+autorino_cfgfile_check = "autorino.bin.autorino_cfgfile_check:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"

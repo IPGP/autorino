@@ -1,0 +1,9 @@
+station:
+    sessions:
+        session_24h30s:
+            steps:
+                download:
+                    active: True
+                    inp_dir_parent: "/download/Internal/%Y%m" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+                    inp_dir_structure:  ""
+                    inp_file_regex:  "<SITE_ID4>______%Y%m%d0000A.T02"

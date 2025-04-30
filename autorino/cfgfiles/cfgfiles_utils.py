@@ -11,9 +11,6 @@ import jinja2
 import geodezyx
 import os
 
-
-
-
 def feed_template(template_full_path, df_values, outdir, out_fname_prefix):
     """
     Feed a Jinja2 template with values from a DataFrame and write the results to files.
@@ -51,12 +48,11 @@ def feed_template(template_full_path, df_values, outdir, out_fname_prefix):
 
         geodezyx.utils.create_dir(outdirsub)
 
-        outfile = os.path.join(outdirsub, out_fname_prefix + row['site'] + ".yml")
+        outfile = os.path.join(outdirsub, out_fname_prefix + row["site"] + ".yml")
         print(outfile)
         fout = open(outfile, "w+")
         fout.write(result)
         fout.close()
-
 
 
 def teqc_args_spliter(linp):
@@ -90,5 +86,3 @@ def teqc_args_spliter(linp):
     del d["void"]
 
     return d
-
-

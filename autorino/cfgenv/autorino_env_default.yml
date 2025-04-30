@@ -16,5 +16,5 @@ environment:
   general:
     log_level: "DEBUG"
     trimble_default_software: "trm2rinex" # name of the Trimble converter *key* (lower case) in the conv_software_paths above (trm2rinex or t0xconvert)
-    include_cfgfiles_strategy: "replace" # "replace" or "append"
+    cfg_merge_strategy: "replace" # "replace" or "append", not implemented yet
 
