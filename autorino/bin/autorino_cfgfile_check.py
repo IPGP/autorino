@@ -8,6 +8,7 @@ Created on 29/04/2025 12:18:06
 
 import autorino.cfgfiles as arocfg
 import argparse
+import yaml
 
 def main():
     parser = argparse.ArgumentParser(
@@ -32,11 +33,23 @@ def main():
         default=None,
     )
 
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        help="The output path where to write the checked configuration.",
+        default=None,
+    )
+
     args = parser.parse_args()
 
-    arocfg.read_cfg(site_cfg_path=args.config,
+    _ , _ , yout= arocfg.read_cfg(site_cfg_path=args.config,
                     include_cfg_paths_xtra=args.include_config,
-                    verbose_debug=True)
+                    verbose=True)
+
+    if args.output is not None:
+        yaml.dump(yout, open(args.output, "w+"))
+
 
 if __name__ == "__main__":
     main()

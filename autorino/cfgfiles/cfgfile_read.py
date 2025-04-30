@@ -59,18 +59,20 @@ def load_cfg(cfg_path, verbose=True):
     if verbose and not recursive:
         logger.info(BOLD_SRT + ">>>>>>>> Read configfile: " + BOLD_END + "%s", cfg_path)
     if recursive:
-        ys_raw = [load_cfg(c, verbose=verbose) for c in cfg_path]
-        ys_raw = [y for y in ys_raw if y]
+        ys_raw = [y for y in [load_cfg(c, verbose=verbose) for c in cfg_path] if y]
         return mergedeep.merge({}, *ys_raw)
     elif not os.path.isfile(cfg_path):
-        logger.warning(f"config file doesn't exists!: {cfg_path}")
-        return None
+        msg = f"config file doesn't exists!: {cfg_path}"
+        logger.error(msg)
+        raise FileNotFoundError(None, msg)
     else:
         y_out = yaml.safe_load(open(cfg_path))
         return y_out
 
 
-def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None, verbose_debug = False):
+def read_cfg(
+    site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None, verbose=False
+):
     """
     Read and interpret a configuration file (YAML format) and
     return a list of StepGnss objects to be launched sequentially.
@@ -96,6 +98,8 @@ def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None, verbo
         It overrides the files given with the 'include' keyword
         in the site configuration file.
         Default is None.
+    verbose : bool, optional
+        A flag indicating whether to print the configuration
 
     Returns
     -------
@@ -123,10 +127,8 @@ def read_cfg(site_cfg_path, epoch_range=None, include_cfg_paths_xtra=None, verbo
     else:  # cfgfile_version >= 20.
         y_use = mergedeep.merge({}, y_incl, y_site) if y_incl else y_site.copy()
 
-    if print_cfg_for_debug:
-        logger.debug(
-            "Used configuration (updated with include):\n %s", yaml.dump(y_use)
-        )
+    if verbose:
+        logger.debug(f"Used configuration (updated with include):\n{yaml.dump(y_use)}")
 
     steps_lis_lis, steps_dic_dic = read_cfg_core(y_use, epoch_range_inp=epoch_range)
 
@@ -221,7 +223,10 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
                 logger.warning("unknown step %s, skip", k_stp)
                 continue
 
-            if y_stp["epoch_range"] == "FROM_SESSION" or not "epoch_range" in y_stp.keys():
+            if (
+                y_stp["epoch_range"] == "FROM_SESSION"
+                or not "epoch_range" in y_stp.keys()
+            ):
                 epo_obj_stp = epo_obj_ses
                 y_stp["epoch_range"] = y_ses["epoch_range"]
             else:

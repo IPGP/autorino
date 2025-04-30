@@ -1,3 +1,4 @@
+cfgfile_version: 20.1 # Version of the configuration file format.
 station:
     sessions:
         session_24h30s:
@@ -9,17 +10,17 @@ station:
                     inp_file_regex:  "<SITE_ID4>%j.\\.m[0-9]{2}"
                 convert:
                     active: True
-                    out_dir_parent: /srv/ipgp/gnss/travail/autorino_work/unspliced_tmp
+                    out_dir_parent: '/srv/ipgp/gnss/travail/autorino_work/unspliced_tmp'
                     options:
                         rinexmod_options:
                             filename_style: exact
                 splice: ###### SPLICE STEP DEFINITION (Needed for Leica)
                     active : True
                     inp_dir_parent: '/<$HOME>/autorino_workflow_tests/raw'
-                    inp_dir_structure: <SITE_ID9>/%Y/%j
+                    inp_dir_structure: '<SITE_ID9>/%Y/%j'
                     inp_file_regex: "<SITE_ID9>.*\\.(rnx|crx|crx\\.gz)$"
                     out_dir_parent: '/<$HOME>/autorino_workflow_tests/rnx'
-                    out_dir_structure: <SITE_ID9>/%Y/%j
+                    out_dir_structure: '<SITE_ID9>/%Y/%j'
                     epoch_range:
                         FROM_SESSION
                     options:

@@ -1,3 +1,4 @@
+cfgfile_version: 20.1 # Version of the configuration file format.
 station:
     sessions:
         session_24h30s:
