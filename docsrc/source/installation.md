@@ -23,13 +23,18 @@ pip install -e .
 
 ### Setting up the environment
 
-You need to set up the environment variable `$AUTORINO_ENV` to point to the _autorino_'s configuration file.
+You need to set up the environment variables `$AUTORINO_DIR` & `$AUTORINO_ENV` 
+to describe _autorino_'s configuration file.
 
 In your `.bashrc` or `.bash_profile` file, add the following lines:
 ```bash
-export AUTORINO_ENV="/home/user/path_to/autorino/configfiles/env/autorino_env.yml"
+export AUTORINO_DIR="/home/user/path_to/autorino/configfiles/env/autorino_env.yml"
+export AUTORINO_ENV="${AUTORINO_ENV}/configfiles/main/autorino_main_cfg.yml"
 ```
-This configuration file is a YAML file that contains the paths to the different GNSS raw data converters, described in the next section below.
 
-If `$AUTORINO_ENV` is not set, _autorino_ will use the default configuration file located in the package's `configfiles/env/` folder.  
-Per defaults values assume that the converter executables are known by your system and (e.g. set in your `$PATH`).
+This _main_ configuration file is a YAML file that contains an `environement` section.
+It defines the paths to the different GNSS raw data converters, described in the next section.
+
+If `$AUTORINO_ENV` is not set, _autorino_ will use the default values.  
+Per defaults values assume that the converter executables are known by your system (e.g. set in your `$PATH`).  
+NB: The default values are in a configuration file located in the package's `configfiles/env/` folder.

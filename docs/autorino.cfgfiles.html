@@ -51,10 +51,12 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package complete reference</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="autorino.api.html">autorino.api package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.bin.html">autorino.bin package</a></li>
@@ -91,7 +93,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="autorino.html">autorino package complete reference</a></li>
+          <li class="breadcrumb-item"><a href="autorino.html">autorino package</a></li>
       <li class="breadcrumb-item active">autorino.cfgfiles package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/autorino.cfgfiles.rst.txt" rel="nofollow"> View page source</a>
@@ -230,6 +232,10 @@ False otherwise.</p>
 <dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Obsolete since 2025-04 and cfgfile v &gt;= 20.0</p>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -239,16 +245,66 @@ False otherwise.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.get_incl_cfg_paths">
+<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">get_incl_cfg_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_cfg_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#get_incl_cfg_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.get_incl_cfg_paths" title="Link to this definition"></a></dt>
+<dd><p>Generates a list of absolute paths for included configuration files.</p>
+<p>This function processes the ‘include’ section of a configuration dictionary,
+translates the paths using a translator function, and converts them to
+absolute paths relative to the provided site configuration file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_inp</strong> (<em>dict</em>) – A dictionary containing the configuration data, including an ‘include’ key
+with paths to additional configuration files.</p></li>
+<li><p><strong>site_cfg_path</strong> (<em>str</em>) – The absolute path to the site configuration file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of absolute paths for the included configuration files.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.get_incl_strategy">
+<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">get_incl_strategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strat_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#get_incl_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.get_incl_strategy" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the merging strategy for configuration files.</p>
+<p>This function maps a string representing a merging strategy to the corresponding
+<cite>mergedeep.Strategy</cite> enum value. Supported strategies are ‘append’ and ‘replace’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strat_str</strong> (<em>str</em>) – The merging strategy as a string. Valid values are ‘append’ or ‘replace’.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The corresponding merging strategy.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>mergedeep.Strategy</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the provided strategy string is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.load_cfg">
-<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">load_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configfile_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#load_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.load_cfg" title="Link to this definition"></a></dt>
-<dd><p>Loads quickly a configuration file (YAML format) without interpretation.</p>
+<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">load_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#load_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.load_cfg" title="Link to this definition"></a></dt>
+<dd><p>Loads quickly one or several configuration files (YAML format) <strong>without interpretation</strong>.</p>
 <p>This function reads a YAML configuration file from the specified path and returns the parsed content.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>configfile_path</strong> (<em>str</em>) – The path to the configuration file.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg_path</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em>) – The path(s) to the configuration file.
+If a list is provided, the config files are merged</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The parsed content of the configuration file.</p>
+<dd class="field-even"><p>The parsed/merged content of the configuration files.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
@@ -258,7 +314,7 @@ False otherwise.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.read_cfg">
-<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">read_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configfile_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_cfg_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#read_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.read_cfg" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">read_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site_cfg_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_cfg_paths_xtra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#read_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.read_cfg" title="Link to this definition"></a></dt>
 <dd><p>Read and interpret a configuration file (YAML format) and
 return a list of StepGnss objects to be launched sequentially.</p>
 <p>This function takes in a path to a configuration file,
@@ -270,17 +326,23 @@ The EpochRange object, if provided, will override the epoch ranges given in the 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>configfile_path</strong> (<em>str</em>) – The path to the configuration file.</p></li>
+<li><p><strong>site_cfg_path</strong> (<em>str</em>) – The path to the configuration file.
+Should be a single file here (no list).</p></li>
 <li><p><strong>epoch_range</strong> (<a class="reference internal" href="autorino.common.html#autorino.common.eporng_cls.EpochRange" title="autorino.common.eporng_cls.EpochRange"><em>EpochRange</em></a><em>, </em><em>optional</em>) – An EpochRange object which will override the epoch ranges
 given in the configuration file. Default is None.</p></li>
-<li><p><strong>main_cfg_path</strong> (<em>str</em><em>, </em><em>optional</em>) – The path to the main configuration file. Default is None.</p></li>
+<li><p><strong>include_cfg_paths_xtra</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – The path to the include configuration file.
+If a list is provided, the include config files are merged.
+It overrides the files given with the ‘include’ keyword
+in the site configuration file.
+Default is None.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – A flag indicating whether to print the configuration</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>steps_lis_lis</strong> (<em>list</em>) – A list of lists of StepGnss objects to be launched sequentially.</p></li>
 <li><p><strong>steps_dic_dic</strong> (<em>dict</em>) – A dictionary of dictionaries of StepGnss.</p></li>
-<li><p><strong>y_station</strong> (<em>dict</em>) – A dictionary of station information.</p></li>
+<li><p><strong>y_use</strong> (<em>dict</em>) – The parsed/merged content of the configuration file as dictionary.</p></li>
 </ul>
 </p>
 </dd>
@@ -288,8 +350,8 @@ given in the configuration file. Default is None.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.read_cfg_sessions">
-<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">read_cfg_sessions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_sessions_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range_inp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_station</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#read_cfg_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.read_cfg_sessions" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.read_cfg_core">
+<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">read_cfg_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range_inp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#read_cfg_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.read_cfg_core" title="Link to this definition"></a></dt>
 <dd><p>Reads and interprets session configurations from a dictionary
 and returns lists and dictionaries of StepGnss objects.</p>
 <p>This function processes session configurations,
@@ -298,10 +360,9 @@ of StepGnss objects based on the provided session configurations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y_sessions_dict</strong> (<em>dict</em>) – A dictionary containing session configurations.</p></li>
+<li><p><strong>y_inp</strong> (<em>dict</em>) – A dictionary a site configuration.</p></li>
 <li><p><strong>epoch_range_inp</strong> (<a class="reference internal" href="autorino.common.html#autorino.common.eporng_cls.EpochRange" title="autorino.common.eporng_cls.EpochRange"><em>EpochRange</em></a><em>, </em><em>optional</em>) – An EpochRange object which will override the epoch ranges given
 in the session configurations. Default is None.</p></li>
-<li><p><strong>y_station</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary containing station information. Default is None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -315,15 +376,52 @@ in the session configurations. Default is None.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.read_cfg_legacy">
+<span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">read_cfg_legacy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_main</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#read_cfg_legacy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.read_cfg_legacy" title="Link to this definition"></a></dt>
+<dd><p>Handles legacy configuration files with the ‘FROM_MAIN’ keyword.</p>
+<p>This function processes configuration files with a version less than 20.0,
+where the ‘FROM_MAIN’ keyword is used to indicate that values should be
+inherited from a main configuration file. If the main configuration file
+is not provided or cannot be found, an error is raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_inp</strong> (<em>dict</em>) – The input configuration dictionary (site-specific configuration).</p></li>
+<li><p><strong>y_main</strong> (<em>dict</em><em> or </em><em>None</em>) – The main configuration dictionary. If None, the function will check
+for the presence of the ‘FROM_MAIN’ keyword in the input configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated configuration dictionary, where values from the main
+configuration file have been merged into the input configuration.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If the ‘FROM_MAIN’ keyword is used in the input configuration but
+    no main configuration file is provided.</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Obsolete since 2025-04 and cfgfile v &gt;= 20.0</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.run_steps">
 <span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">run_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps_lis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_select_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_steps_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#run_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.run_steps" title="Link to this definition"></a></dt>
 <dd><p>Executes the steps in the provided list.</p>
-<p>This function takes a list of StepGnss objects, an optional list of selected steps,
+<p>This function takes a list of StepGnss objects,
+an optional list of selected steps,
 and an optional boolean flag for printing tables.
 It iterates over the list of StepGnss objects and executes
 the ‘download’ or ‘convert’ method depending on the type of the step.
-If a list of selected steps is provided, only the steps in the list will be executed.
-If the ‘verbose’ flag is set to True, the tables will be printed during the execution of the steps.</p>
+If a list of selected steps is provided,
+only the steps in the list will be executed.
+If the ‘verbose’ flag is set to True,
+the tables will be printed during the execution of the steps.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -353,12 +451,46 @@ Default is False.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.step_cls_select">
 <span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">step_cls_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#step_cls_select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.step_cls_select" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Selects the appropriate class for a given step name.</p>
+<p>This function maps a step name to its corresponding class, which is used
+to handle specific GNSS processing steps such as ‘download’, ‘convert’,
+‘split’, or ‘splice’. If the step name is unknown, a warning is logged,
+and None is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>step_name</strong> (<em>str</em>) – The name of the step for which the corresponding class is to be selected.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The class corresponding to the given step name, or None if the step name is unknown.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>class or None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Supported step names and their corresponding classes:</dt><dd><ul>
+<li><p>‘download’: arodwl.DownloadGnss</p></li>
+<li><p>‘convert’: arocnv.ConvertGnss</p></li>
+<li><p>‘split’: arohdl.SplitGnss</p></li>
+<li><p>‘splice’: arohdl.SpliceGnss</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Logs a warning if the step name is not recognized.</p></li>
+</ul>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.cfgfiles.cfgfile_read.update_w_main_dic">
 <span class="sig-prename descclassname"><span class="pre">autorino.cfgfiles.cfgfile_read.</span></span><span class="sig-name descname"><span class="pre">update_w_main_dic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specific_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'FROM_MAIN'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/cfgfiles/cfgfile_read.html#update_w_main_dic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.cfgfiles.cfgfile_read.update_w_main_dic" title="Link to this definition"></a></dt>
 <dd><p>Updates a dictionary with another dictionary.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Obsolete since 2025-04 and cfgfile v &gt;= 20.0</p>
+</div>
 </dd></dl>
 
 </section>

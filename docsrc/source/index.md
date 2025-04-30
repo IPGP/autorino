@@ -60,7 +60,8 @@ Contents
    installation
    external_converters
    simple_expl
-   config_files
+   config_files_nutshell
+   config_files_details
    under_hood
    cookbook
    autorino

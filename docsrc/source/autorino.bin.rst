@@ -9,6 +9,14 @@ autorino.bin package
 Submodules
 ----------
 
+autorino.bin.autorino\_cfgfile\_check module
+--------------------------------------------
+
+.. automodule:: autorino.bin.autorino_cfgfile_check
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 autorino.bin.autorino\_cfgfile\_run module
 ------------------------------------------
 

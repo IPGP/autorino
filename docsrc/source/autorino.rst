@@ -1,5 +1,5 @@
-autorino package complete reference
-===================================
+autorino package
+================
 
 .. automodule:: autorino
    :members:

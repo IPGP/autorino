@@ -1,22 +1,18 @@
 ```{eval-rst}
-.. _config_files:
+.. _config_files_nutshell:
 ```
 
-## The configuration files
+## configuration files in a nutshell
 
 _autorino_ relies on YAML configuration files to perform its _workflow_ 
 (i.e. set of _steps_) operations.
 
-### The _env_ configuration file
-
-Described in the _Setting up the environment_ and _Setting up external utilities_ 
-sections above.
-
-### The _sites_ configuration files
+### The _sites_ configuration file's main sections
 
 It contains the site-specific information and configuration under the main `station` block. 
 Then, it is organized in different sub-blocks:
 * `site`: site's name, its coordinates, and metadata
+* `include`: list of the configuration files to include in the current configuration file, see next section.
 * `device`: manually define the device's (receiver and antenna) characteristics if metadata are not provided in 
 `site` block 
 * `access` : connexion protocols, login and password etc...
@@ -45,12 +41,16 @@ A step has the following generic structure:
 * `epoch_range`: the epoch range of the step. (see above) 
 * `options`: a dictionary of options specific to the step 
 
-### The _main_ configuration file
+### The include section
 
-It contains the "standard" configuration for an _autorino_ workflow,
-i.e. all the parameters, paths, options ... which are the same for all stations.
-_main_ values can be called and used in the _sites_ configuration files using the alias `FROM_MAIN`
-(see below).
+The `include` section allows you to include other configuration files in the current configuration file.
+This is useful for modularizing your configuration and reusing common settings across different files.
+The `include` section is a list of file paths to the configuration files you want to include.
+The included files are processed in the order they are listed, and their contents are merged into the current configuration file, but __prior__ to it.
+In other words, the values of the first included file is loaded before the next one, and then the next one overrides the values.
+The current configuration file is processed after all the included files have been processed.
+The included files can be either absolute or relative paths.
+This means that if there are any overlapping keys or sections, the values from the included files will overwrite the values in the current file.
 
 ### Aliases in the configuration files
 
@@ -67,6 +67,8 @@ e.g. `%Y` for the year, `%H` for the hour, `%j` for the day of year, etc...
 The environment variables can also be used as aliases. They follow the `<$ENVVAR>` convention,
 using `$` and between `<` & `>`, e.g. `<$HOME>` for the home directory.
 
-Per default values can be called and used in the configuration files using the alias:
-* `FROM_MAIN`. Then, the value is taken from the _main_ configuration file, see above
-* `FROM_SESSION`. Then, the value is taken from the `session` block
+### reserved keyword
+
+Per default values can be called and used in the configuration files using reserved keywords:
+* `FROM_SESSION`: Then, the value is taken from the `session` block
+

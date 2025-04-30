@@ -27,12 +27,14 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "-m",
-        "--main_config",
+        "-i",
+        "--include_config",
         type=str,
         nargs="+",
-        help="The main configuration file to be used.",
         default=None,
+        help="The include configuration files to be used for development or advanced purposes. "
+        "If a list is provided, all files in the list will be included. "
+        "These files override the `include` section of the main configuration file.",
     )
     parser.add_argument(
         "-s",
@@ -113,7 +115,7 @@ def main():
     args = parser.parse_args()
 
     config = args.config
-    main_config = args.main_config
+    include_config = args.include_config
     start = args.start
     end = args.end
     period = args.period
@@ -125,7 +127,7 @@ def main():
 
     aroapi.cfgfile_run(
         cfg_in=config,
-        main_cfg_in=main_config,
+        incl_cfg_in=include_config,
         list_sites=list_sites,
         ignore_sites=ignore_sites,
         epo_srt=start,

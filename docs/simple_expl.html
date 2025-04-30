@@ -23,7 +23,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="The configuration files" href="config_files.html" />
+    <link rel="next" title="configuration files in a nutshell" href="config_files_nutshell.html" />
     <link rel="prev" title="External GNSS converters" href="external_converters.html" /> 
 </head>
 
@@ -52,11 +52,6 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started: some simple examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#convert-raw-file-to-rinex-in-api-mode">Convert RAW file to RINEX in API mode</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-minimal-example">convert_rnx function minimal example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-definition"><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="#convert-raw-file-to-rinex-in-cli-mode">Convert RAW file to RINEX in CLI mode</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#autorino-convert-rnx-minimal-example"><code class="docutils literal notranslate"><span class="pre">autorino_convert_rnx</span></code> minimal example</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#autorino-convert-rnx-help"><code class="docutils literal notranslate"><span class="pre">autorino_convert_rnx</span></code> help</a></li>
@@ -67,12 +62,18 @@
 <li class="toctree-l3"><a class="reference internal" href="#autorino-cfgfile-run-help"><code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> help</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#convert-raw-file-to-rinex-in-api-mode">Convert RAW file to RINEX in API mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-minimal-example">convert_rnx function minimal example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-definition"><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
-<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package complete reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
         </div>
@@ -101,33 +102,6 @@
              
   <section id="getting-started-some-simple-examples">
 <span id="simple-expl"></span><h1>Getting started: some simple examples<a class="headerlink" href="#getting-started-some-simple-examples" title="Link to this heading"></a></h1>
-<section id="convert-raw-file-to-rinex-in-api-mode">
-<h2>Convert RAW file to RINEX in API mode<a class="headerlink" href="#convert-raw-file-to-rinex-in-api-mode" title="Link to this heading"></a></h2>
-<p>The most basic and common operation that autorino can perform is to convert some
-RAW files to RINEX.</p>
-<section id="convert-rnx-function-minimal-example">
-<h3>convert_rnx function minimal example<a class="headerlink" href="#convert-rnx-function-minimal-example" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-
-<span class="c1">### Find all BINEX files in a folder</span>
-<span class="n">p</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/raw_data/are_stored/&quot;</span>
-<span class="n">l</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;*BNX&quot;</span><span class="p">)</span>
-
-<span class="c1">### Define the output folder</span>
-<span class="n">out_dir</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/rinex_data/will_be_saved/&quot;</span>
-<span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">out_dir</span>
-
-<span class="c1">### Call the conversion function</span>
-<span class="n">arocmn</span><span class="o">.</span><span class="n">convert_rnx</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">out_dir</span><span class="p">,</span><span class="n">tmp_dir</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="convert-rnx-function-definition">
-<h3><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition<a class="headerlink" href="#convert-rnx-function-definition" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx">go to source code</a></p>
-</section>
-</section>
 <section id="convert-raw-file-to-rinex-in-cli-mode">
 <h2>Convert RAW file to RINEX in CLI mode<a class="headerlink" href="#convert-raw-file-to-rinex-in-cli-mode" title="Link to this heading"></a></h2>
 <section id="autorino-convert-rnx-minimal-example">
@@ -227,6 +201,33 @@ RAW files to RINEX.</p>
 </div>
 </section>
 </section>
+<section id="convert-raw-file-to-rinex-in-api-mode">
+<h2>Convert RAW file to RINEX in API mode<a class="headerlink" href="#convert-raw-file-to-rinex-in-api-mode" title="Link to this heading"></a></h2>
+<p>The most basic and common operation that autorino can perform is to convert some
+RAW files to RINEX.</p>
+<section id="convert-rnx-function-minimal-example">
+<h3>convert_rnx function minimal example<a class="headerlink" href="#convert-rnx-function-minimal-example" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="c1">### Find all BINEX files in a folder</span>
+<span class="n">p</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/raw_data/are_stored/&quot;</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;*BNX&quot;</span><span class="p">)</span>
+
+<span class="c1">### Define the output folder</span>
+<span class="n">out_dir</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/rinex_data/will_be_saved/&quot;</span>
+<span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">out_dir</span>
+
+<span class="c1">### Call the conversion function</span>
+<span class="n">arocmn</span><span class="o">.</span><span class="n">convert_rnx</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">out_dir</span><span class="p">,</span><span class="n">tmp_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="convert-rnx-function-definition">
+<h3><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition<a class="headerlink" href="#convert-rnx-function-definition" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx">go to source code</a></p>
+</section>
+</section>
 </section>
 
 
@@ -234,7 +235,7 @@ RAW files to RINEX.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="external_converters.html" class="btn btn-neutral float-left" title="External GNSS converters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="config_files.html" class="btn btn-neutral float-right" title="The configuration files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="config_files_nutshell.html" class="btn btn-neutral float-right" title="configuration files in a nutshell" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

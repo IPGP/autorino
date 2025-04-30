@@ -51,10 +51,12 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package complete reference</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="autorino.api.html">autorino.api package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.bin.html">autorino.bin package</a></li>
@@ -95,7 +97,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="autorino.html">autorino package complete reference</a></li>
+          <li class="breadcrumb-item"><a href="autorino.html">autorino package</a></li>
       <li class="breadcrumb-item active">autorino.common package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/autorino.common.rst.txt" rel="nofollow"> View page source</a>
@@ -1286,7 +1288,24 @@ and write it as ‘fpath_out’ value in the table</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.guess_out_files">
 <span class="sig-name descname"><span class="pre">guess_out_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.guess_out_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.guess_out_files" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Generates output file paths for each row in the table and updates the table.</p>
+<p>This method iterates over the rows of the table, constructs the output file path
+for each input file, and updates the <cite>fpath_out</cite> column in the table. It also
+ensures that the output directory exists and checks the validity of the output files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of output file paths generated for the table rows.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The output directory is created if it does not exist.</p></li>
+<li><p>The <cite>check_local_files</cite> method is called to validate the output files.</p></li>
+</ul>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.inp_dir">
@@ -1422,6 +1441,37 @@ If ‘reset_table’ is True, it resets the current table before loading the new
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_chk_local">
+<span class="sig-name descname"><span class="pre">mono_chk_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_chk_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_chk_local" title="Link to this definition"></a></dt>
+<dd><p>Checks the existence and validity of a local file for a specific row in the table.</p>
+<p>This method verifies if the file specified in the <cite>fpath_&lt;io&gt;</cite> column of the table exists
+and is non-empty. It updates the corresponding <cite>ok_&lt;io&gt;</cite> and <cite>size_&lt;io&gt;</cite> columns in the table
+based on the file’s existence and size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table to check.</p></li>
+<li><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies whether to check the input (<cite>inp</cite>) or output (<cite>out</cite>) file path.
+Default is <cite>out</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The absolute path of the file if it exists and is valid, otherwise None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>If the file path is not initialized (NaN), the method sets <cite>ok_&lt;io&gt;</cite> to False.</p></li>
+<li><p>If the file exists and is non-empty, the method sets <cite>ok_&lt;io&gt;</cite> to True and updates <cite>size_&lt;io&gt;</cite>
+with the file size.</p></li>
+<li><p>If the file does not exist or is empty, the method sets <cite>ok_&lt;io&gt;</cite> to False and <cite>size_&lt;io&gt;</cite> to NaN.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_decompress">
 <span class="sig-name descname"><span class="pre">mono_decompress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fpath_inp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_ok_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ok_inp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_decompress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_decompress" title="Link to this definition"></a></dt>
 <dd><p>“on row” method</p>
@@ -1456,8 +1506,41 @@ Default is ‘ok_inp’.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_guess_rnx">
+<span class="sig-name descname"><span class="pre">mono_guess_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_guess_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_guess_rnx" title="Link to this definition"></a></dt>
+<dd><p>Guesses the local RINEX file path for a given row in the table.</p>
+<p>This method determines the local RINEX file path based on the epoch range
+and site information for a specific row in the table. It supports both
+input (<cite>inp</cite>) and output (<cite>out</cite>) modes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table for which the RINEX file path is to be guessed.</p></li>
+<li><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies whether to guess the input (<cite>inp</cite>) or output (<cite>out</cite>) file path.
+Default is <cite>out</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The guessed local RINEX file path.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the <cite>io</cite> parameter is not <cite>inp</cite> or <cite>out</cite>.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The method ensures that the timezone information is removed from the
+epoch start and end times to avoid compatibility issues with <cite>rinexmod</cite>.</p></li>
+<li><p>The guessed file path is stored in the <cite>fpath_&lt;io&gt;</cite> column of the table.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_mv_final">
-<span class="sig-name descname"><span class="pre">mono_mv_final</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fpath_out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_mv_final"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_mv_final" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">mono_mv_final</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fpath_out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_mv_final"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_mv_final" title="Link to this definition"></a></dt>
 <dd><p>“on row” method</p>
 <p>Moves the ‘table_col’ entry to a final destination based <strong>on out_dir</strong> for each row of the table.</p>
 <p>This method is applied on each row of the table. It checks if the ‘ok_out’ column is True for the row.
@@ -1483,6 +1566,8 @@ Defaults to ‘fpath_out’.</p></li>
 <li><p><strong>copy_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the file is copied to the final destination
 instead of being moved.
 Default is False.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – Force the move/copy if the file already exists
+Default is False</p></li>
 <li><p><strong>mono_mv_inpout</strong> (<em>See also</em>)</p></li>
 </ul>
 </dd>
@@ -1497,7 +1582,7 @@ Default is False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_mv_inpout">
-<span class="sig-name descname"><span class="pre">mono_mv_inpout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_mv_inpout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_mv_inpout" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">mono_mv_inpout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_mv_inpout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_mv_inpout" title="Link to this definition"></a></dt>
 <dd><p>Moves or copies the input file to the output file.</p>
 <p>This method checks if the input file (<cite>fpath_inp</cite>) is valid and then moves or
 copies it to the output file path (<cite>fpath_out</cite>).
@@ -1508,6 +1593,8 @@ It validates the move or copy operation and updates the table accordingly.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table to process.</p></li>
 <li><p><strong>copy_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the file is copied instead of moved. Default is False.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – Force the move/copy if the file already exists
+Default is False</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1616,8 +1703,10 @@ It validates the move or copy operation and updates the table accordingly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) – The mode of operation. Can be ‘inpout’ to move/copy files from input to output path,
-or ‘final’ to move/copy files to the final destination. Default is ‘inpout’.</p></li>
+<li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em>) – The mode of operation. Can be:
+‘inpout’ to move/copy files from input to output path,
+‘final’ to move/copy files to the final destination.
+Default is ‘inpout’.</p></li>
 <li><p><strong>copy_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the files are copied instead of moved. Default is False.</p></li>
 <li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, forces the operation even if the input files are not valid. Default is False.</p></li>
 </ul>
@@ -2158,7 +2247,7 @@ Otherwise, it takes the first 4 characters of the input, converts them to upperc
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.common.step_fcts.move_core">
-<span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">move_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#move_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.move_core" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">move_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#move_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.move_core" title="Link to this definition"></a></dt>
 <dd><p>Moves or copies a file from the source to the destination.</p>
 <p>This function attempts to copy or move a file from the source path to the destination path.
 If the operation is successful, it logs the action and returns the path of the moved/copied file.
@@ -2169,6 +2258,8 @@ If the operation fails, it logs the error and returns None.</p>
 <li><p><strong>src</strong> (<em>str</em>) – The source file path.</p></li>
 <li><p><strong>dest</strong> (<em>str</em>) – The destination file path.</p></li>
 <li><p><strong>copy_only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the file is copied instead of moved. Default is False.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – Force the move/copy if the file already exists
+Default is False</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2276,6 +2367,26 @@ Keywords are case-sensitive and must not be prefixed with a dollar sign ($).</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>If a keyword in the path does not exist in the dictionary, it will remain unchanged in the translated path.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.common.translate.abs_path_wrt">
+<span class="sig-prename descclassname"><span class="pre">autorino.common.translate.</span></span><span class="sig-name descname"><span class="pre">abs_path_wrt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relative_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_abs_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/translate.html#abs_path_wrt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.translate.abs_path_wrt" title="Link to this definition"></a></dt>
+<dd><p>Converts a relative path to an absolute path with respect to another absolute file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>relative_path</strong> (<em>str</em>) – The relative path to be converted.</p></li>
+<li><p><strong>base_abs_path</strong> (<em>str</em>) – The absolute path of the base file or directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The absolute path.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

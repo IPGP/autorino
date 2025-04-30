@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>autorino package complete reference &mdash; autorino  documentation</title>
+  <title>autorino package &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
@@ -51,10 +51,12 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">autorino package complete reference</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">autorino package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="autorino.api.html">autorino.api package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.bin.html">autorino.bin package</a></li>
@@ -86,7 +88,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">autorino package complete reference</li>
+      <li class="breadcrumb-item active">autorino package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/autorino.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -97,7 +99,7 @@
            <div itemprop="articleBody">
              
   <section id="module-autorino">
-<span id="autorino-package-complete-reference"></span><h1>autorino package complete reference<a class="headerlink" href="#module-autorino" title="Link to this heading"></a></h1>
+<span id="autorino-package"></span><h1>autorino package<a class="headerlink" href="#module-autorino" title="Link to this heading"></a></h1>
 <p>Created on 07/04/2025 15:01:05</p>
 <p>&#64;author: psakic</p>
 <section id="subpackages">
@@ -139,6 +141,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.bin.html">autorino.bin package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="autorino.bin.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="autorino.bin.html#module-autorino.bin.autorino_cfgfile_check">autorino.bin.autorino_cfgfile_check module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autorino.bin.html#autorino.bin.autorino_cfgfile_check.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="autorino.bin.html#module-autorino.bin.autorino_cfgfile_run">autorino.bin.autorino_cfgfile_run module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="autorino.bin.html#autorino.bin.autorino_cfgfile_run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
@@ -166,7 +172,6 @@
 <li class="toctree-l2"><a class="reference internal" href="autorino.cfgenv.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="autorino.cfgenv.html#module-autorino.cfgenv.env_read">autorino.cfgenv.env_read module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgenv.html#autorino.cfgenv.env_read.read_env"><code class="docutils literal notranslate"><span class="pre">read_env()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="autorino.cfgenv.html#autorino.cfgenv.env_read.update_recursive"><code class="docutils literal notranslate"><span class="pre">update_recursive()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -181,9 +186,12 @@
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._is_cfg_bloc_active"><code class="docutils literal notranslate"><span class="pre">_is_cfg_bloc_active()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.check_from_main"><code class="docutils literal notranslate"><span class="pre">check_from_main()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.format_dir_path"><code class="docutils literal notranslate"><span class="pre">format_dir_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_cfg_paths"><code class="docutils literal notranslate"><span class="pre">get_incl_cfg_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_strategy"><code class="docutils literal notranslate"><span class="pre">get_incl_strategy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.load_cfg"><code class="docutils literal notranslate"><span class="pre">load_cfg()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg"><code class="docutils literal notranslate"><span class="pre">read_cfg()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_sessions"><code class="docutils literal notranslate"><span class="pre">read_cfg_sessions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_core"><code class="docutils literal notranslate"><span class="pre">read_cfg_core()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_legacy"><code class="docutils literal notranslate"><span class="pre">read_cfg_legacy()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.run_steps"><code class="docutils literal notranslate"><span class="pre">run_steps()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.step_cls_select"><code class="docutils literal notranslate"><span class="pre">step_cls_select()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.update_w_main_dic"><code class="docutils literal notranslate"><span class="pre">update_w_main_dic()</span></code></a></li>
@@ -319,7 +327,9 @@
 <li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.load_tab_inpdir"><code class="docutils literal notranslate"><span class="pre">StepGnss.load_tab_inpdir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.load_tab_prev_tab"><code class="docutils literal notranslate"><span class="pre">StepGnss.load_tab_prev_tab()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="autorino.common.html#id1"><code class="docutils literal notranslate"><span class="pre">StepGnss.log_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_chk_local"><code class="docutils literal notranslate"><span class="pre">StepGnss.mono_chk_local()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_decompress"><code class="docutils literal notranslate"><span class="pre">StepGnss.mono_decompress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_guess_rnx"><code class="docutils literal notranslate"><span class="pre">StepGnss.mono_guess_rnx()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_mv_final"><code class="docutils literal notranslate"><span class="pre">StepGnss.mono_mv_final()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_mv_inpout"><code class="docutils literal notranslate"><span class="pre">StepGnss.mono_mv_inpout()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_mv_validat"><code class="docutils literal notranslate"><span class="pre">StepGnss.mono_mv_validat()</span></code></a></li>
@@ -371,6 +381,7 @@
 <li class="toctree-l3"><a class="reference internal" href="autorino.common.html#autorino.common.translate._translator_env_variables"><code class="docutils literal notranslate"><span class="pre">_translator_env_variables()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.common.html#autorino.common.translate._translator_epoch"><code class="docutils literal notranslate"><span class="pre">_translator_epoch()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.common.html#autorino.common.translate._translator_keywords"><code class="docutils literal notranslate"><span class="pre">_translator_keywords()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.common.html#autorino.common.translate.abs_path_wrt"><code class="docutils literal notranslate"><span class="pre">abs_path_wrt()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.common.html#autorino.common.translate.translator"><code class="docutils literal notranslate"><span class="pre">translator()</span></code></a></li>
 </ul>
 </li>

@@ -49,10 +49,11 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
-<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package complete reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
         </div>
@@ -185,6 +186,8 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autorino.common.html#autorino.common.translate.abs_path_wrt">abs_path_wrt() (in module autorino.common.translate)</a>
+</li>
       <li><a href="autorino.check.html#autorino.check.check_cls.CheckGnss.analyze_rnxs">analyze_rnxs() (autorino.check.check_cls.CheckGnss method)</a>
 </li>
       <li><a href="autorino.download.html#autorino.download.dwl_cls.DownloadGnss.ask_local_raw">ask_local_raw() (autorino.download.dwl_cls.DownloadGnss method)</a>
@@ -259,6 +262,13 @@
 
       <ul>
         <li><a href="autorino.bin.html#module-autorino.bin">module</a>
+</li>
+      </ul></li>
+      <li>
+    autorino.bin.autorino_cfgfile_check
+
+      <ul>
+        <li><a href="autorino.bin.html#module-autorino.bin.autorino_cfgfile_check">module</a>
 </li>
       </ul></li>
       <li>
@@ -734,16 +744,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.convert.html#autorino.convert.cnv_fcts.get_current_user_grp">get_current_user_grp() (in module autorino.convert.cnv_fcts)</a>
 </li>
+      <li><a href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_cfg_paths">get_incl_cfg_paths() (in module autorino.cfgfiles.cfgfile_read)</a>
+</li>
+      <li><a href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_strategy">get_incl_strategy() (in module autorino.cfgfiles.cfgfile_read)</a>
+</li>
       <li><a href="autorino.convert.html#autorino.convert.cnv_fcts.get_owner">get_owner() (in module autorino.convert.cnv_fcts)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.get_step_type">get_step_type() (autorino.common.step_cls.StepGnss method)</a>
 </li>
       <li><a href="autorino.check.html#autorino.check.check_fcts.get_tabult_raw">get_tabult_raw() (in module autorino.check.check_fcts)</a>
 </li>
-      <li><a href="autorino.handle.html#autorino.handle.handle_cls.HandleGnss.group_by_epochs">group_by_epochs() (autorino.handle.handle_cls.HandleGnss method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autorino.handle.html#autorino.handle.handle_cls.HandleGnss.group_by_epochs">group_by_epochs() (autorino.handle.handle_cls.HandleGnss method)</a>
+</li>
       <li><a href="autorino.download.html#autorino.download.dwl_cls.DownloadGnss.guess_local_raw">guess_local_raw() (autorino.download.dwl_cls.DownloadGnss method)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.guess_local_rnx">guess_local_rnx() (autorino.common.step_cls.StepGnss method)</a>
@@ -844,9 +858,11 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autorino.bin.html#autorino.bin.autorino_cfgfile_run.main">main() (in module autorino.bin.autorino_cfgfile_run)</a>
+      <li><a href="autorino.bin.html#autorino.bin.autorino_cfgfile_check.main">main() (in module autorino.bin.autorino_cfgfile_check)</a>
 
       <ul>
+        <li><a href="autorino.bin.html#autorino.bin.autorino_cfgfile_run.main">(in module autorino.bin.autorino_cfgfile_run)</a>
+</li>
         <li><a href="autorino.bin.html#autorino.bin.autorino_check_rnx.main">(in module autorino.bin.autorino_check_rnx)</a>
 </li>
         <li><a href="autorino.bin.html#autorino.bin.autorino_check_rnx_old.main">(in module autorino.bin.autorino_check_rnx_old)</a>
@@ -901,6 +917,8 @@
         <li><a href="autorino.api.html#module-autorino.api.split_rnx">autorino.api.split_rnx</a>
 </li>
         <li><a href="autorino.bin.html#module-autorino.bin">autorino.bin</a>
+</li>
+        <li><a href="autorino.bin.html#module-autorino.bin.autorino_cfgfile_check">autorino.bin.autorino_cfgfile_check</a>
 </li>
         <li><a href="autorino.bin.html#module-autorino.bin.autorino_cfgfile_run">autorino.bin.autorino_cfgfile_run</a>
 </li>
@@ -979,11 +997,15 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_chk_local">mono_chk_local() (autorino.common.step_cls.StepGnss method)</a>
+</li>
       <li><a href="autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss.mono_convert">mono_convert() (autorino.convert.cnv_cls.ConvertGnss method)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_decompress">mono_decompress() (autorino.common.step_cls.StepGnss method)</a>
 </li>
       <li><a href="autorino.download.html#autorino.download.dwl_cls.DownloadGnss.mono_fetch">mono_fetch() (autorino.download.dwl_cls.DownloadGnss method)</a>
+</li>
+      <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_guess_rnx">mono_guess_rnx() (autorino.common.step_cls.StepGnss method)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.mono_mv_final">mono_mv_final() (autorino.common.step_cls.StepGnss method)</a>
 </li>
@@ -1055,16 +1077,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg">read_cfg() (in module autorino.cfgfiles.cfgfile_read)</a>
 </li>
-      <li><a href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_sessions">read_cfg_sessions() (in module autorino.cfgfiles.cfgfile_read)</a>
+      <li><a href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_core">read_cfg_core() (in module autorino.cfgfiles.cfgfile_read)</a>
+</li>
+      <li><a href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_legacy">read_cfg_legacy() (in module autorino.cfgfiles.cfgfile_read)</a>
 </li>
       <li><a href="autorino.cfgenv.html#autorino.cfgenv.env_read.read_env">read_env() (in module autorino.cfgenv.env_read)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.remov_tmp_files">remov_tmp_files() (autorino.common.step_cls.StepGnss method)</a>
 </li>
-      <li><a href="autorino.common.html#autorino.common.step_fcts.rnxs2step_obj">rnxs2step_obj() (in module autorino.common.step_fcts)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autorino.common.html#autorino.common.step_fcts.rnxs2step_obj">rnxs2step_obj() (in module autorino.common.step_fcts)</a>
+</li>
       <li><a href="autorino.common.html#autorino.common.eporng_fcts.round_date">round_date() (in module autorino.common.eporng_fcts)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.eporng_fcts.round_date_legacy">round_date_legacy() (in module autorino.common.eporng_fcts)</a>
@@ -1189,16 +1213,14 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autorino.cfgenv.html#autorino.cfgenv.env_read.update_recursive">update_recursive() (in module autorino.cfgenv.env_read)</a>
-</li>
       <li><a href="autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.update_w_main_dic">update_w_main_dic() (in module autorino.cfgfiles.cfgfile_read)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.updt_eporng_tab">updt_eporng_tab() (autorino.common.step_cls.StepGnss method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.updt_epotab_rnx">updt_epotab_rnx() (autorino.common.step_cls.StepGnss method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.updt_epotab_tz">updt_epotab_tz() (autorino.common.step_cls.StepGnss method)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.updt_rnxmodopts">updt_rnxmodopts() (autorino.common.step_cls.StepGnss method)</a>

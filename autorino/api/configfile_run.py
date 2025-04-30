@@ -21,7 +21,7 @@ logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 def cfgfile_run(
     cfg_in,
-    main_cfg_in,
+    incl_cfg_in,
     list_sites=None,
     ignore_sites=False,
     epo_srt=None,
@@ -42,8 +42,10 @@ def cfgfile_run(
     cfg_in : str
         The input configuration file or directory of configuration files.
         If a directory is provided, all files ending with '.yml' will be used.
-    main_cfg_in : str or list of str
-        The main configuration file to be used.
+    incl_cfg_in : str or list of str
+        The include configuration files to be used for development/advanced purposes.
+        If a list is provided, all files in the list will be included.
+        It will override the `include` section of the `cfg_in` configuration file.
     list_sites : list, optional
         A list of site identifiers to filter the configuration files.
          If provided, only configurations for sites in this list will be processed.
@@ -133,7 +135,7 @@ def cfgfile_run(
         # Read the configuration and run the steps
         # step_lis_lis is a list of list because you can have several sessions in the same configuration file
         steps_lis_lis, steps_dic_dic, y_use = arocfg.read_cfg(
-            site_cfg_path=cfg_use, include_cfg_paths_xtra=main_cfg_in, epoch_range=epoch_range
+            site_cfg_path=cfg_use, include_cfg_paths_xtra=incl_cfg_in, epoch_range=epoch_range
         )
 
         for steps_lis in steps_lis_lis:

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>autorino.bin.autorino_check_rnx &mdash; autorino  documentation</title>
+  <title>autorino.bin.autorino_cfgfile_check &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
@@ -71,7 +71,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">autorino.bin.autorino_check_rnx</li>
+      <li class="breadcrumb-item active">autorino.bin.autorino_cfgfile_check</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -80,75 +80,60 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for autorino.bin.autorino_check_rnx</h1><div class="highlight"><pre>
+  <h1>Source code for autorino.bin.autorino_cfgfile_check</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on 27/01/2025 20:18:31</span>
+<span class="sd">Created on 29/04/2025 12:18:06</span>
 
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="c1">#!/usr/bin/env python3</span>
-<span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on 27/01/2025 20:18:31</span>
-
-<span class="sd">A CLI program to call the check_rnx function.</span>
-
-<span class="sd">Usage:</span>
-<span class="sd">    python autorino_check_rnx.py --input_dir_parent &lt;input_dir_parent&gt; --input_dir_structure &lt;input_dir_structure&gt; --epoch_start &lt;epoch_start&gt; --epoch_end &lt;epoch_end&gt; --output &lt;output_file&gt; [--print_check_tabulate] [--sites_list &lt;site1,site2,...&gt;]</span>
-
-<span class="sd">&quot;&quot;&quot;</span>
-
+<span class="kn">import</span> <span class="nn">autorino.cfgfiles</span> <span class="k">as</span> <span class="nn">arocfg</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">autorino.api.check_rnx</span> <span class="kn">import</span> <span class="n">check_rnx</span>
-
+<span class="kn">import</span> <span class="nn">yaml</span>
 
 <div class="viewcode-block" id="main">
-<a class="viewcode-back" href="../../../autorino.bin.html#autorino.bin.autorino_check_rnx.main">[docs]</a>
+<a class="viewcode-back" href="../../../autorino.bin.html#autorino.bin.autorino_cfgfile_check.main">[docs]</a>
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Call the check_rnx function.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Check autorino configuration file&quot;</span><span class="p">,</span>
+        <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--config&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The input site configuration file or directory of sites configuration files. &quot;</span>
+        <span class="s2">&quot;If a directory is provided, all files ending with &#39;.yml&#39; will be used.&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--input_dir_parent&quot;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the parent input directory.&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--input_dir_structure&quot;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Input directory structure.&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--epoch_start&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Start epoch.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="s2">&quot;--epoch_end&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;End epoch.&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--output&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the output files. (csv, plot, etc.)&quot;</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-l&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--sites_list&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--include_config&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
         <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Comma-separated list of sites.&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The main configuration file to be used.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--output&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The output path where to write the checked configuration.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
-    <span class="n">sites_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">sites_list</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">sites_list</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="n">_</span> <span class="p">,</span> <span class="n">_</span> <span class="p">,</span> <span class="n">yout</span><span class="o">=</span> <span class="n">arocfg</span><span class="o">.</span><span class="n">read_cfg</span><span class="p">(</span><span class="n">site_cfg_path</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                    <span class="n">include_cfg_paths_xtra</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">include_config</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1"># Call the check_rnx function</span>
-    <span class="n">_</span> <span class="o">=</span> <span class="n">check_rnx</span><span class="p">(</span>
-        <span class="n">inp_dir_parent</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input_dir_parent</span><span class="p">,</span>
-        <span class="n">inp_dir_structure</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input_dir_structure</span><span class="p">,</span>
-        <span class="n">epoch_start</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">epoch_start</span><span class="p">,</span>
-        <span class="n">epoch_end</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">epoch_end</span><span class="p">,</span>
-        <span class="n">sites_list</span><span class="o">=</span><span class="n">sites_list</span><span class="p">,</span>
-        <span class="n">output_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">yout</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">))</span></div>
 
 
 

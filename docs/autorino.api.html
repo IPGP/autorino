@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="autorino.bin package" href="autorino.bin.html" />
-    <link rel="prev" title="autorino package complete reference" href="autorino.html" /> 
+    <link rel="prev" title="autorino package" href="autorino.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -51,10 +51,12 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package complete reference</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.api package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -96,7 +98,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="autorino.html">autorino package complete reference</a></li>
+          <li class="breadcrumb-item"><a href="autorino.html">autorino package</a></li>
       <li class="breadcrumb-item active">autorino.api package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/autorino.api.rst.txt" rel="nofollow"> View page source</a>
@@ -173,7 +175,7 @@
 <p>&#64;author: psakic</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.api.configfile_run.cfgfile_run">
-<span class="sig-prename descclassname"><span class="pre">autorino.api.configfile_run.</span></span><span class="sig-name descname"><span class="pre">cfgfile_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">main_cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_srt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_select_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_steps_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/configfile_run.html#cfgfile_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.configfile_run.cfgfile_run" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.api.configfile_run.</span></span><span class="sig-name descname"><span class="pre">cfgfile_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_srt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_select_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_steps_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/configfile_run.html#cfgfile_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.configfile_run.cfgfile_run" title="Link to this definition"></a></dt>
 <dd><p>Run the Autorino configuration files.</p>
 <p>This function takes in a configuration file or a directory of configuration files,
 reads the configuration, and runs the steps specified in the configuration.</p>
@@ -182,7 +184,9 @@ reads the configuration, and runs the steps specified in the configuration.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cfg_in</strong> (<em>str</em>) – The input configuration file or directory of configuration files.
 If a directory is provided, all files ending with ‘.yml’ will be used.</p></li>
-<li><p><strong>main_cfg_in</strong> (<em>str</em>) – The main configuration file to be used.</p></li>
+<li><p><strong>incl_cfg_in</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em>) – The include configuration files to be used for development/advanced purposes.
+If a list is provided, all files in the list will be included.
+It will override the <cite>include</cite> section of the <cite>cfg_in</cite> configuration file.</p></li>
 <li><p><strong>list_sites</strong> (<em>list</em><em>, </em><em>optional</em>) – <dl class="simple">
 <dt>A list of site identifiers to filter the configuration files.</dt><dd><p>If provided, only configurations for sites in this list will be processed.
 Default is None.</p>
@@ -225,7 +229,7 @@ Default is False.</p></li>
 <p>&#64;author: psakic</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.api.convert_rnx.convert_rnx">
-<span class="sig-prename descclassname"><span class="pre">autorino.api.convert_rnx.</span></span><span class="sig-name descname"><span class="pre">convert_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&lt;SITE_ID4&gt;/%Y/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/convert_rnx.html#convert_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.convert_rnx.convert_rnx" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.api.convert_rnx.</span></span><span class="sig-name descname"><span class="pre">convert_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&lt;SITE_ID4&gt;/%Y/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rnx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/convert_rnx.html#convert_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.convert_rnx.convert_rnx" title="Link to this definition"></a></dt>
 <dd><p>Frontend function that performs RAW &gt; RINEX conversion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -263,7 +267,9 @@ Defaults to None.</p></li>
 </dd>
 </dl>
 </p></li>
-<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the conversion will be forced even if the output files already exist.
+<li><p><strong>force_rnx</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the conversion will be forced even if the output files already exist.
+Defaults to False.</p></li>
+<li><p><strong>force_raw</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the RAW file archiving will be forced even if the output files already exist.
 Defaults to False.</p></li>
 <li><p><strong>raw_out_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory where RAW files will be archived.
 No delete will occur, your RAW files are sacred.
@@ -492,7 +498,7 @@ Possible inputs are:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="autorino.html" class="btn btn-neutral float-left" title="autorino package complete reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="autorino.html" class="btn btn-neutral float-left" title="autorino package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="autorino.bin.html" class="btn btn-neutral float-right" title="autorino.bin package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

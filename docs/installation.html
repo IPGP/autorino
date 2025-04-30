@@ -55,10 +55,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
-<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package complete reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
         </div>
@@ -105,14 +107,18 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 </section>
 <section id="setting-up-the-environment">
 <h2>Setting up the environment<a class="headerlink" href="#setting-up-the-environment" title="Link to this heading"></a></h2>
-<p>You need to set up the environment variable <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code> to point to the <em>autorino</em>’s configuration file.</p>
+<p>You need to set up the environment variables <code class="docutils literal notranslate"><span class="pre">$AUTORINO_DIR</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code>
+to describe <em>autorino</em>’s configuration file.</p>
 <p>In your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> file, add the following lines:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AUTORINO_ENV</span><span class="o">=</span><span class="s2">&quot;/home/user/path_to/autorino/configfiles/env/autorino_env.yml&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AUTORINO_DIR</span><span class="o">=</span><span class="s2">&quot;/home/user/path_to/autorino/configfiles/env/autorino_env.yml&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">AUTORINO_ENV</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AUTORINO_ENV</span><span class="si">}</span><span class="s2">/configfiles/main/autorino_main_cfg.yml&quot;</span>
 </pre></div>
 </div>
-<p>This configuration file is a YAML file that contains the paths to the different GNSS raw data converters, described in the next section below.</p>
-<p>If <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code> is not set, <em>autorino</em> will use the default configuration file located in the package’s <code class="docutils literal notranslate"><span class="pre">configfiles/env/</span></code> folder.<br />
-Per defaults values assume that the converter executables are known by your system and (e.g. set in your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code>).</p>
+<p>This <em>main</em> configuration file is a YAML file that contains an <code class="docutils literal notranslate"><span class="pre">environement</span></code> section.
+It defines the paths to the different GNSS raw data converters, described in the next section.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code> is not set, <em>autorino</em> will use the default values.<br />
+Per defaults values assume that the converter executables are known by your system (e.g. set in your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code>).<br />
+NB: The default values are in a configuration file located in the package’s <code class="docutils literal notranslate"><span class="pre">configfiles/env/</span></code> folder.</p>
 </section>
 </section>
 

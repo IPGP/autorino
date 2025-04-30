@@ -4,31 +4,6 @@
 
 ## Getting started: some simple examples
 
-### Convert RAW file to RINEX in API mode
-
-The most basic and common operation that autorino can perform is to convert some
-RAW files to RINEX.
-
-#### convert_rnx function minimal example
-``` python
-import autorino.common as arocmn
-import glob
-
-### Find all BINEX files in a folder
-p = "/home/user/where_your/raw_data/are_stored/"
-l = glob.glob(p,"*BNX")
-
-### Define the output folder
-out_dir = "/home/user/where_your/rinex_data/will_be_saved/"
-tmp_dir = out_dir
-
-### Call the conversion function
-arocmn.convert_rnx(l,out_dir,tmp_dir)
-```
-
-#### `convert_rnx` function definition
-[go to source code](https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx)
-
 ### Convert RAW file to RINEX in CLI mode
 
 #### `autorino_convert_rnx` minimal example
@@ -121,3 +96,28 @@ options:
                         are the ones in the config file (download, convert...)
   -f, --force           force the execution of the steps
 ```
+
+### Convert RAW file to RINEX in API mode
+
+The most basic and common operation that autorino can perform is to convert some
+RAW files to RINEX.
+
+#### convert_rnx function minimal example
+``` python
+import autorino.common as arocmn
+import glob
+
+### Find all BINEX files in a folder
+p = "/home/user/where_your/raw_data/are_stored/"
+l = glob.glob(p,"*BNX")
+
+### Define the output folder
+out_dir = "/home/user/where_your/rinex_data/will_be_saved/"
+tmp_dir = out_dir
+
+### Call the conversion function
+arocmn.convert_rnx(l,out_dir,tmp_dir)
+```
+
+#### `convert_rnx` function definition
+[go to source code](https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx)
