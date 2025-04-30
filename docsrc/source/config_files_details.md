@@ -2,7 +2,7 @@
 .. _config_files_details:
 ```
 
-# Autorino Configuration File Details
+# Configuration files details
 
 ## Configuration File Structure
 

@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'autorino'
-copyright = '2025, Pierre Sakic'
+copyright = '2025 - Pierre Sakic'
 author = 'Pierre Sakic'
 
 # -- General configuration ---------------------------------------------------
@@ -19,7 +19,9 @@ extensions = [
     "sphinx.ext.viewcode",      # Add links to source code
     "sphinx.ext.intersphinx",   # Link to other projects' docs
     "myst_parser",              # Markdown support (optional)
-    "sphinx_rtd_dark_mode"
+    "sphinx_rtd_dark_mode",
+    'sphinxarg.ext',
+    'sphinxcontrib.programoutput'
 ]
 
 templates_path = ['_templates']

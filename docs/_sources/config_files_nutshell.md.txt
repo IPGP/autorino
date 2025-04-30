@@ -2,7 +2,7 @@
 .. _config_files_nutshell:
 ```
 
-## configuration files in a nutshell
+## Configuration files in a nutshell
 
 _autorino_ relies on YAML configuration files to perform its _workflow_ 
 (i.e. set of _steps_) operations.
@@ -11,8 +11,11 @@ _autorino_ relies on YAML configuration files to perform its _workflow_
 
 It contains the site-specific information and configuration under the main `station` block. 
 Then, it is organized in different sub-blocks:
-* `site`: site's name, its coordinates, and metadata
+* `environment`: global settings for the GNSS data processing environment, including paths to software tools and general application settings.
+  * `conv_software_paths`: paths to GNSS raw data converters
+  * `general`: general settings for the configuration file
 * `include`: list of the configuration files to include in the current configuration file, see next section.
+* `site`: site's name, its coordinates, and metadata
 * `device`: manually define the device's (receiver and antenna) characteristics if metadata are not provided in 
 `site` block 
 * `access` : connexion protocols, login and password etc...

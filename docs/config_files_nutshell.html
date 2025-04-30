@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>configuration files in a nutshell &mdash; autorino  documentation</title>
+  <title>Configuration files in a nutshell &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
@@ -23,7 +23,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Autorino Configuration File Details" href="config_files_details.html" />
+    <link rel="next" title="Configuration files details" href="config_files_details.html" />
     <link rel="prev" title="Getting started: some simple examples" href="simple_expl.html" /> 
 </head>
 
@@ -52,14 +52,14 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">configuration files in a nutshell</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files in a nutshell</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#the-sites-configuration-file-s-main-sections">The <em>sites</em> configuration file’s main sections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-include-section">The include section</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#aliases-in-the-configuration-files">Aliases in the configuration files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reserved-keyword">reserved keyword</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Autorino Configuration File Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration files details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
@@ -79,7 +79,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">configuration files in a nutshell</li>
+      <li class="breadcrumb-item active">Configuration files in a nutshell</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/config_files_nutshell.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -90,7 +90,7 @@
            <div itemprop="articleBody">
              
   <section id="configuration-files-in-a-nutshell">
-<span id="config-files-nutshell"></span><h1>configuration files in a nutshell<a class="headerlink" href="#configuration-files-in-a-nutshell" title="Link to this heading"></a></h1>
+<span id="config-files-nutshell"></span><h1>Configuration files in a nutshell<a class="headerlink" href="#configuration-files-in-a-nutshell" title="Link to this heading"></a></h1>
 <p><em>autorino</em> relies on YAML configuration files to perform its <em>workflow</em>
 (i.e. set of <em>steps</em>) operations.</p>
 <section id="the-sites-configuration-file-s-main-sections">
@@ -98,8 +98,14 @@
 <p>It contains the site-specific information and configuration under the main <code class="docutils literal notranslate"><span class="pre">station</span></code> block.
 Then, it is organized in different sub-blocks:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">site</span></code>: site’s name, its coordinates, and metadata</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">environment</span></code>: global settings for the GNSS data processing environment, including paths to software tools and general application settings.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">conv_software_paths</span></code>: paths to GNSS raw data converters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">general</span></code>: general settings for the configuration file</p></li>
+</ul>
+</li>
 <li><p><code class="docutils literal notranslate"><span class="pre">include</span></code>: list of the configuration files to include in the current configuration file, see next section.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">site</span></code>: site’s name, its coordinates, and metadata</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">device</span></code>: manually define the device’s (receiver and antenna) characteristics if metadata are not provided in
 <code class="docutils literal notranslate"><span class="pre">site</span></code> block</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">access</span></code> : connexion protocols, login and password etc…</p></li>
@@ -177,13 +183,13 @@ using <code class="docutils literal notranslate"><span class="pre">$</span></cod
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="simple_expl.html" class="btn btn-neutral float-left" title="Getting started: some simple examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="config_files_details.html" class="btn btn-neutral float-right" title="Autorino Configuration File Details" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="config_files_details.html" class="btn btn-neutral float-right" title="Configuration files details" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
