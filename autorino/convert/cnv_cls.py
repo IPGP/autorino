@@ -187,10 +187,10 @@ class ConvertGnss(arocmn.StepGnss):
         ### guess and deactivate existing local RINEX files
         # generate the potential local files
         self.guess_local_rnx()
+        # tests if the input local files are here
+        self.check_local_files("inp")
         # tests if the output local files are already there
         self.check_local_files("out")
-        # tests if the input local files are already there
-        self.check_local_files("inp")
         # be sure ok_xxx columns are booleans
         self.table_ok_cols_bool()
         # switch ok_inp to False if the output files are already there
@@ -297,7 +297,7 @@ class ConvertGnss(arocmn.StepGnss):
             #############################################################
 
             # +++++ FINAL MOVE
-            self.mono_mv_final(irow)
+            self.mono_mv_final(irow, force=force)
 
         # ++++ remove temporary files
         self.remov_tmp_files()

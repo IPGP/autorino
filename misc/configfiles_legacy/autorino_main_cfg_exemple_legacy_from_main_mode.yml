@@ -1,4 +1,4 @@
-cfgfile_version: 15.1 # describe the structure of the configuration file
+cfgfile_version: 16.0 # describe the structure of the configuration file
 station:
     site:
       operator: "AUTORINO_OPERATOR"

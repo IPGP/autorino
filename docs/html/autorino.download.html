@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.download package &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="autorino.handle package" href="autorino.handle.html" />
+    <link rel="prev" title="autorino.convert package" href="autorino.convert.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package complete reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="autorino.api.html">autorino.api package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.bin.html">autorino.bin package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgenv.html">autorino.cfgenv package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html">autorino.cfgfiles package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfglog.html">autorino.cfglog package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.check.html">autorino.check package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.common.html">autorino.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.convert.html">autorino.convert package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.download package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.download.dwl_cls">autorino.download.dwl_cls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.download.dwl_fcts">autorino.download.dwl_fcts module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.handle.html">autorino.handle package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="autorino.html">autorino package complete reference</a></li>
+      <li class="breadcrumb-item active">autorino.download package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/autorino.download.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-autorino.download">
+<span id="autorino-download-package"></span><h1>autorino.download package<a class="headerlink" href="#module-autorino.download" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-autorino.download.dwl_cls">
+<span id="autorino-download-dwl-cls-module"></span><h2>autorino.download.dwl_cls module<a class="headerlink" href="#module-autorino.download.dwl_cls" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_cls.</span></span><span class="sig-name descname"><span class="pre">DownloadGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss" title="autorino.common.step_cls.StepGnss"><code class="xref py py-class docutils literal notranslate"><span class="pre">StepGnss</span></code></a></p>
+<p>A class to handle the downloading of GNSS data.</p>
+<section id="inherits-from">
+<h3>Inherits from<a class="headerlink" href="#inherits-from" title="Link to this heading"></a></h3>
+<p>arocmn.StepGnss</p>
+<dl class="field-list">
+<dt class="field-odd">param out_dir<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The output directory where the downloaded files will be stored.</p>
+</dd>
+<dt class="field-even">type out_dir<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param tmp_dir<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The temporary directory used during the download process.</p>
+</dd>
+<dt class="field-even">type tmp_dir<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param log_dir<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The directory where log files will be stored.</p>
+</dd>
+<dt class="field-even">type log_dir<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">param epoch_range<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The range of epochs for which data will be downloaded.</p>
+</dd>
+<dt class="field-even">type epoch_range<span class="colon">:</span></dt>
+<dd class="field-even"><p>EpochRange</p>
+</dd>
+<dt class="field-odd">param access<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary containing access information such as protocol, hostname, login, and password.</p>
+</dd>
+<dt class="field-even">type access<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">param site<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The site information. Default is None.</p>
+</dd>
+<dt class="field-even">type site<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict, optional</p>
+</dd>
+<dt class="field-odd">param session<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The session information. Default is None.</p>
+</dd>
+<dt class="field-even">type session<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict, optional</p>
+</dd>
+<dt class="field-odd">param options<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Additional options for the download process. Default is None.</p>
+</dd>
+<dt class="field-even">type options<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict, optional</p>
+</dd>
+<dt class="field-odd">param metadata<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt>The metadata to be included in the converted RINEX files. Possible inputs are:</dt><dd><ul class="simple">
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object.</p></li>
+</ul>
+<p>Defaults to None.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">type metadata<span class="colon">:</span></dt>
+<dd class="field-even"><p>str or list, optional</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">access</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the DownloadGnss object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out_dir</strong> (<em>str</em>) – The output directory where the downloaded files will be stored.</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em>) – The temporary directory used during the download process.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em>) – The directory where log files will be stored.</p></li>
+<li><p><strong>epoch_range</strong> (<a class="reference internal" href="autorino.common.html#autorino.common.eporng_cls.EpochRange" title="autorino.common.eporng_cls.EpochRange"><em>EpochRange</em></a>) – The range of epochs for which data will be downloaded.</p></li>
+<li><p><strong>access</strong> (<em>dict</em>) – A dictionary containing access information such as protocol, hostname, login, and password.</p></li>
+<li><p><strong>site</strong> (<em>dict</em><em>, </em><em>optional</em>) – The site information. Default is None.</p></li>
+<li><p><strong>session</strong> (<em>dict</em><em>, </em><em>optional</em>) – The session information. Default is None.</p></li>
+<li><p><strong>options</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional options for the download process. Default is None.</p></li>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <dl>
+<dt>The metadata to be included in the converted RINEX files. Possible inputs are:</dt><dd><ul>
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object.</p></li>
+</ul>
+<p>Defaults to None.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.ask_local_raw">
+<span class="sig-name descname"><span class="pre">ask_local_raw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.ask_local_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.ask_local_raw" title="Link to this definition"></a></dt>
+<dd><p>Guess the paths and name of the local raw files based on the
+EpochRange and  table’s fpath_inp basename i.e. the theoretical remote file name
+generated with <cite>guess_remot_raw()</cite>.</p>
+<p>see also method <code class="docutils literal notranslate"><span class="pre">guess_remot_raw()</span></code>,</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.ask_remote_raw">
+<span class="sig-name descname"><span class="pre">ask_remote_raw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.ask_remote_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.ask_remote_raw" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the list of remote files from the server.</p>
+<p>This method guesses the remote directories and then lists the files
+in those directories based on the protocol specified in the access
+information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of remote file paths.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.download">
+<span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_find_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invalidate_small_local_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ping_max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ping_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.download"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.download" title="Link to this definition"></a></dt>
+<dd><p>Frontend method to download files from a GNSS receiver</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, prints detailed information during the download process. Default is False.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, forces the download even if the files already exist locally. Default is False.</p></li>
+<li><p><strong>remote_find_method</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to find remote files.
+Can be ‘ask’ to list files from the server (for FTP only) or ‘guess’ to guess file paths.
+Default is ‘ask’.</p></li>
+<li><p><strong>invalidate_small_local_files</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, invalidates small local files to ensure they are re-downloaded. Default is True.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – Timeout in seconds for the download operations. Default is 60.</p></li>
+<li><p><strong>max_try</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of retry attempts for the download operations. Default is 4.</p></li>
+<li><p><strong>sleep_time</strong> (<em>int</em><em>, </em><em>optional</em>) – Sleep time in seconds between retry attempts. Default is 5.</p></li>
+<li><p><strong>ping_max_try</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of retry attempts for pinging the remote server. Default is 4.</p></li>
+<li><p><strong>ping_timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – Timeout in seconds for pinging the remote server. Default is 20.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.fetch_remote_files">
+<span class="sig-name descname"><span class="pre">fetch_remote_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.fetch_remote_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.fetch_remote_files" title="Link to this definition"></a></dt>
+<dd><p>will download locally the files which have been identified by
+the guess_remote_files method</p>
+<p>exploits the fname_remote column of the DownloadGnss.table
+attribute</p>
+<p>This <cite>fetch_remote_files</cite> method is for the download stricly speaking.
+Ìn operation, use the <cite>download</cite> method which does a broader
+preliminary actions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.guess_local_raw">
+<span class="sig-name descname"><span class="pre">guess_local_raw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.guess_local_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.guess_local_raw" title="Link to this definition"></a></dt>
+<dd><p>Guess the paths and name of the local raw files based on the
+EpochRange and <cite>inp_file_regex</cite> attributes of the DownloadGnss object</p>
+<p>see also method <code class="docutils literal notranslate"><span class="pre">guess_remot_raw()</span></code>,</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.guess_remot_raw">
+<span class="sig-name descname"><span class="pre">guess_remot_raw</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.guess_remot_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.guess_remot_raw" title="Link to this definition"></a></dt>
+<dd><p>Guess the paths and name of the remote files based on the
+Session and EpochRange attributes of the DownloadGnss</p>
+<p>see also method <code class="docutils literal notranslate"><span class="pre">guess_local_raw()</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.guess_remote_dirs">
+<span class="sig-name descname"><span class="pre">guess_remote_dirs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.guess_remote_dirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.guess_remote_dirs" title="Link to this definition"></a></dt>
+<dd><p>this method is specific for ask_remote_raw
+guessing the directories is different from guessing the files:
+* no hostname
+* no filename (obviously)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.inp_basename">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inp_basename</span></span><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.inp_basename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.inp_dirname">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inp_dirname</span></span><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.inp_dirname" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.mono_fetch">
+<span class="sig-name descname"><span class="pre">mono_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.mono_fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.mono_fetch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.ping_remote">
+<span class="sig-name descname"><span class="pre">ping_remote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ping_max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ping_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.ping_remote"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.ping_remote" title="Link to this definition"></a></dt>
+<dd><p>Ping the remote server to check if it is reachable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_cls.DownloadGnss.set_ftp_obj">
+<span class="sig-name descname"><span class="pre">set_ftp_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_cls.html#DownloadGnss.set_ftp_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_cls.DownloadGnss.set_ftp_obj" title="Link to this definition"></a></dt>
+<dd><p>Create the FTP object for the FTP protocol.</p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-autorino.download.dwl_fcts">
+<span id="autorino-download-dwl-fcts-module"></span><h2>autorino.download.dwl_fcts module<a class="headerlink" href="#module-autorino.download.dwl_fcts" title="Link to this heading"></a></h2>
+<p>Created on Mon Mar 27 09:16:34 2023</p>
+<p>&#64;author: psakic</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.AutorinoDownloadError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">AutorinoDownloadError</span></span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#AutorinoDownloadError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.AutorinoDownloadError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#autorino.download.dwl_fcts.AutorinoError" title="autorino.download.dwl_fcts.AutorinoError"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutorinoError</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.AutorinoError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">AutorinoError</span></span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#AutorinoError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.AutorinoError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.TqdmToLogger">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">TqdmToLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#TqdmToLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.TqdmToLogger" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StringIO</span></code></p>
+<p>Output stream for TQDM which will output to logger module instead of
+the StdOut.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.TqdmToLogger.buf">
+<span class="sig-name descname"><span class="pre">buf</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#autorino.download.dwl_fcts.TqdmToLogger.buf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.TqdmToLogger.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#TqdmToLogger.flush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.TqdmToLogger.flush" title="Link to this definition"></a></dt>
+<dd><p>Flush write buffers, if applicable.</p>
+<p>This is not implemented for read-only and non-blocking streams.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.TqdmToLogger.level">
+<span class="sig-name descname"><span class="pre">level</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#autorino.download.dwl_fcts.TqdmToLogger.level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.TqdmToLogger.logger">
+<span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#autorino.download.dwl_fcts.TqdmToLogger.logger" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.TqdmToLogger.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#TqdmToLogger.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.TqdmToLogger.write" title="Link to this definition"></a></dt>
+<dd><p>Write string to file.</p>
+<p>Returns the number of characters written, which is always equal to
+the length of the string.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.check_file_size">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">check_file_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#check_file_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.check_file_size" title="Link to this definition"></a></dt>
+<dd><p>Check the size of a file and log a warning if it is too
+small to be useful.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) – The path to the file to check.</p></li>
+<li><p><strong>min_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum file size in bytes. Default is 1000 bytes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>ok_size</strong> (<em>bool</em>) – True if the file size is acceptable, otherwise False.</p></li>
+<li><p><strong>file_size</strong> (<em>int</em>) – The size of the file in bytes</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.download_ftp">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">download_ftp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftp_obj_inp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#download_ftp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.download_ftp" title="Link to this definition"></a></dt>
+<dd><p>Download a file from an FTP server with retry logic and progress bar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – The URL of the file to download.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em>) – The directory where the downloaded file will be saved.</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – The username for FTP login.
+Overrided by the ftp_obj_inp parameter.</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – The password for FTP login.
+Overrided by the ftp_obj_inp parameter.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for FTP connection in seconds. Default is 15 seconds.</p></li>
+<li><p><strong>max_try</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of retry attempts in case of failure. Default is 3.</p></li>
+<li><p><strong>sleep_time</strong> (<em>int</em><em>, </em><em>optional</em>) – The sleep time between retry attempts in seconds. Default is 5 seconds.</p></li>
+<li><p><strong>ftp_obj_inp</strong> (<em>ftplib.FTP</em><em>, </em><em>optional</em>) – An existing FTP object to use for the connection.
+Overrides the username and password parameters.
+Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the downloaded file, or an empty string if the download failed.
+If something goes wrong, the function will raise an AutorinoDownloadError
+(no empty string or None).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#autorino.download.dwl_fcts.AutorinoDownloadError" title="autorino.download.dwl_fcts.AutorinoDownloadError"><strong>AutorinoDownloadError</strong></a> – If the download fails after the maximum number of retry attempts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.download_http">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">download_http</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#download_http"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.download_http" title="Link to this definition"></a></dt>
+<dd><p>Download a file from an HTTP server with retry logic and progress bar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – The URL of the file to download.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em>) – The directory where the downloaded file will be saved.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for the HTTP connection in seconds. Default is 120 seconds.</p></li>
+<li><p><strong>max_try</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of retry attempts in case of failure. Default is 4.</p></li>
+<li><p><strong>sleep_time</strong> (<em>int</em><em>, </em><em>optional</em>) – The sleep time between retry attempts in seconds. Default is 5 seconds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The path to the downloaded file, or an empty string if the download failed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#autorino.download.dwl_fcts.AutorinoDownloadError" title="autorino.download.dwl_fcts.AutorinoDownloadError"><strong>AutorinoDownloadError</strong></a> – If the download fails after the maximum number of retry attempts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.ftp_create_obj">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">ftp_create_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sleep_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#ftp_create_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.ftp_create_obj" title="Link to this definition"></a></dt>
+<dd><p>Create an FTP object, and retry in case of a timeout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hostname_inp</strong> (<em>str</em>) – The hostname of the FTP server.</p></li>
+<li><p><strong>username</strong> (<em>str</em><em>, </em><em>optional</em>) – The username for FTP login. Default is None.</p></li>
+<li><p><strong>password</strong> (<em>str</em><em>, </em><em>optional</em>) – The password for FTP login. Default is None.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for FTP connection in seconds. Default is 15 seconds.</p></li>
+<li><p><strong>max_try</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of retry attempts in case of failure. Default is 3.</p></li>
+<li><p><strong>sleep_time</strong> (<em>int</em><em>, </em><em>optional</em>) – The sleep time between retry attempts in seconds. Default is 5 seconds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The FTP object if the connection is successful, otherwise None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ftplib.FTP or None</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TimeoutError</strong> – If the connection fails after the maximum number of retry attempts.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.join_url">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">join_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#join_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.join_url" title="Link to this definition"></a></dt>
+<dd><p>a wrapper to classical join to format correctly the URL</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.list_remote_ftp">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">list_remote_ftp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_try</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftp_obj_inp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#list_remote_ftp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.list_remote_ftp" title="Link to this definition"></a></dt>
+<dd><p>List files in a remote FTP directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hostname</strong> (<em>str</em>) – The hostname of the FTP server.</p></li>
+<li><p><strong>remote_dir</strong> (<em>str</em>) – The remote directory to list files from.</p></li>
+<li><p><strong>username</strong> (<em>str</em><em>, </em><em>optional</em>) – The username for FTP login. Default is None.</p></li>
+<li><p><strong>password</strong> (<em>str</em><em>, </em><em>optional</em>) – The password for FTP login. Default is None.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for FTP connection in seconds. Default is 15 seconds.</p></li>
+<li><p><strong>max_try</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of retry attempts in case of failure. Default is 3.</p></li>
+<li><p><strong>ftp_obj_inp</strong> (<em>ftplib.FTP</em><em>, </em><em>optional</em>) – An existing FTP object to use for the connection. Default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of file paths in the remote directory.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#autorino.download.dwl_fcts.AutorinoDownloadError" title="autorino.download.dwl_fcts.AutorinoDownloadError"><strong>AutorinoDownloadError</strong></a> – If the FTP connection fails or if username/password are missing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.list_remote_http">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">list_remote_http</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remote_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#list_remote_http"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.list_remote_http" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.ping">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">ping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ping_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#ping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.ping" title="Link to this definition"></a></dt>
+<dd><p>Executes the ping command and captures the output.</p>
+<p>This function sends a single ICMP echo request to the specified
+host and captures the round-trip time (RTT) from the output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<em>str</em>) – The hostname or IP address to ping.</p></li>
+<li><p><strong>ping_timeout</strong> (<em>int</em><em>, </em><em>optional</em>) – The timeout for the ping command in seconds. Default is 10 seconds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The round-trip time (RTT) in seconds if the ping is successful,
+otherwise None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.download.dwl_fcts.size_remote_file_http">
+<span class="sig-prename descclassname"><span class="pre">autorino.download.dwl_fcts.</span></span><span class="sig-name descname"><span class="pre">size_remote_file_http</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/download/dwl_fcts.html#size_remote_file_http"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.download.dwl_fcts.size_remote_file_http" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="autorino.convert.html" class="btn btn-neutral float-left" title="autorino.convert package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="autorino.handle.html" class="btn btn-neutral float-right" title="autorino.handle package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

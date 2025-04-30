@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.common.eporng_cls &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            autorino
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.common.eporng_cls</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.common.eporng_cls</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Jan  8 15:47:58 2024</span>
+
+<span class="sd">@author: psakic</span>
+
+<span class="sd">This module, eporng_cls.py, provides a class for handling ranges of epochs.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+
+<span class="c1">#### Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">aro_env_dict</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="EpochRange">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_cls.EpochRange">[docs]</a>
+<span class="k">class</span> <span class="nc">EpochRange</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class used to represent a range of epochs.</span>
+
+<span class="sd">    ...</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    period : str</span>
+<span class="sd">        the rounding period. Use the pandas&#39; frequency aliases convention.</span>
+<span class="sd">    round_method : str</span>
+<span class="sd">        the method used for rounding the epochs.</span>
+<span class="sd">    tz : str</span>
+<span class="sd">        the timezone used for the epochs.</span>
+<span class="sd">    _epoch1_raw : datetime</span>
+<span class="sd">        the raw start of the epoch range.</span>
+<span class="sd">    _epoch2_raw : datetime</span>
+<span class="sd">        the raw end of the epoch range.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    eporng_list(end_bound=False):</span>
+<span class="sd">        Computes the list of epochs corresponding to the EpochRange.</span>
+<span class="sd">    is_valid():</span>
+<span class="sd">        Checks if the epoch range is valid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EpochRange.__init__">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_cls.EpochRange.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">epoch1</span><span class="p">,</span> <span class="n">epoch2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1d&quot;</span><span class="p">,</span> <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs all the necessary attributes for the epoch range object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            epoch1 : str, datetime, pd.Timestamp, pd.NaT, list</span>
+<span class="sd">                the start of the epoch range.</span>
+<span class="sd">            epoch2 : str, datetime, pd.Timestamp, pd.NaT</span>
+<span class="sd">                the end of the epoch range.</span>
+<span class="sd">            period : str, optional</span>
+<span class="sd">                the rounding period. Use the pandas&#39; frequency aliases convention.</span>
+<span class="sd">            round_method : str, optional</span>
+<span class="sd">                the method used for rounding the epochs.</span>
+<span class="sd">            tz : str, optional</span>
+<span class="sd">                the timezone used for the epochs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch1_raw</span> <span class="o">=</span> <span class="n">epoch1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch2_raw</span> <span class="o">=</span> <span class="n">epoch2</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="n">period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">round_method</span> <span class="o">=</span> <span class="n">round_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tz</span> <span class="o">=</span> <span class="n">tz</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_epoch1_raw</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch2_raw</span>
+        <span class="p">):</span>  <span class="c1"># 1) regular case: a start and an end are given</span>
+            <span class="n">_epoch1tmp</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">datepars_intrpt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_epoch1_raw</span><span class="p">)</span>
+            <span class="n">_epoch2tmp</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">datepars_intrpt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_epoch2_raw</span><span class="p">)</span>
+            <span class="n">_epoch_min_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">((</span><span class="n">_epoch1tmp</span><span class="p">,</span> <span class="n">_epoch2tmp</span><span class="p">))</span>
+            <span class="n">_epoch_max_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">((</span><span class="n">_epoch1tmp</span><span class="p">,</span> <span class="n">_epoch2tmp</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">epoch_start</span> <span class="o">=</span> <span class="n">_epoch_min_tmp</span>  <span class="c1">### setter bellow</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epoch_end</span> <span class="o">=</span> <span class="n">_epoch_max_tmp</span>  <span class="c1">### setter bellow</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">manual_range</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_manu_range_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_epoch1_raw</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch2_raw</span>
+        <span class="p">):</span>  <span class="c1"># 2) case a start is given as a list, but no end</span>
+            <span class="n">_epoch1tmp</span> <span class="o">=</span> <span class="p">[</span><span class="n">arocmn</span><span class="o">.</span><span class="n">datepars_intrpt</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch1_raw</span><span class="p">]</span>
+            <span class="n">_epoch_min_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">_epoch1tmp</span><span class="p">)</span>
+            <span class="n">_epoch_max_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">_epoch1tmp</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">epoch_start</span> <span class="o">=</span> <span class="n">_epoch_min_tmp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epoch_end</span> <span class="o">=</span> <span class="n">_epoch_max_tmp</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">manual_range</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_manu_range_list</span> <span class="o">=</span> <span class="n">_epoch1tmp</span></div>
+
+
+    <span class="c1">## NB: I think it is a bad idea to have an attribute (property) to get the list of epochs</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">, period </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_start</span><span class="p">),</span>
+            <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_end</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1">############ getters and setters</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">epoch_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the start of the epoch range.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_start</span>
+
+    <span class="nd">@epoch_start</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">epoch_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the start of the epoch range.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_start</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">datepars_intrpt</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tz</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_start</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">round_date</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_method</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the end of the epoch range.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span>
+
+    <span class="nd">@epoch_end</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the end of the epoch range.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">datepars_intrpt</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tz</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">round_date</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_method</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">period_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a period, e.g. 15min, 1H...</span>
+<span class="sd">        Returns the value (e.g. 15, 1) and the unit (e.g. min, H)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">numbers</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[0-9]+&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+        <span class="n">alphabets</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-zA-Z]+&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">numbers</span><span class="p">))</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">alphabets</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">val</span><span class="p">,</span> <span class="n">unit</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">period_as_timedelta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a period, e.g. 15min, 1H...</span>
+<span class="sd">        return in as a pandas Timedelta</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+
+    <span class="c1">########### methods</span>
+<div class="viewcode-block" id="EpochRange.eporng_list">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_cls.EpochRange.eporng_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">eporng_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end_bound</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the list of epochs corresponding to the EpochRange.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        end_bound : bool, optional</span>
+<span class="sd">            If True, gives the end bound of the range. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of epochs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">manual_range</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eporng_list_manual</span><span class="p">(</span><span class="n">end_bound</span><span class="o">=</span><span class="n">end_bound</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">eporng_list_regular</span><span class="p">(</span><span class="n">end_bound</span><span class="o">=</span><span class="n">end_bound</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EpochRange.eporng_list_manual">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_cls.EpochRange.eporng_list_manual">[docs]</a>
+    <span class="k">def</span> <span class="nf">eporng_list_manual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end_bound</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the list of epochs for a forced range.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        end_bound : bool, optional</span>
+<span class="sd">            If True, gives the end bound of the range. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of epochs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eporng_list_manual</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No forced range list available&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">end_bound</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_manu_range_list</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># subtract also one second for security reason</span>
+            <span class="n">plus_one</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_manu_range_list</span><span class="p">)</span> <span class="o">+</span> <span class="n">plus_one</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="s2">&quot;1s&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="EpochRange.eporng_list_regular">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_cls.EpochRange.eporng_list_regular">[docs]</a>
+    <span class="k">def</span> <span class="nf">eporng_list_regular</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end_bound</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the list of epochs corresponding to the EpochRange</span>
+<span class="sd">        if end_bound = True, give the end bound of the range</span>
+<span class="sd">        (start bound is generated per default)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        end_bound : bool, optional</span>
+<span class="sd">            If True, gives the end bound of the range.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of epochs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>  <span class="c1">### NaT case</span>
+            <span class="n">eporng</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">NaT</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">end_bound</span><span class="p">:</span>  <span class="c1">### start bound</span>
+            <span class="n">eprrng_srt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">epoch_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span>
+            <span class="p">)</span>
+            <span class="n">eporng</span> <span class="o">=</span> <span class="n">eprrng_srt</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1">### end bound</span>
+            <span class="n">plus_one</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_as_timedelta</span>
+            <span class="n">eprrng_end</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">epoch_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_end</span> <span class="o">+</span> <span class="n">plus_one</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span>
+            <span class="p">)</span>
+            <span class="c1"># subtract also one second for security reason</span>
+            <span class="c1"># first element is the epoch start, thus we remove it</span>
+            <span class="n">eporng</span> <span class="o">=</span> <span class="n">eprrng_end</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">eporng</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EpochRange.is_valid">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_cls.EpochRange.is_valid">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the epoch range is valid.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the epoch range is valid, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_start</span><span class="p">)</span> <span class="ow">or</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_end</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="EpochRange.extra_margin_splice">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_cls.EpochRange.extra_margin_splice">[docs]</a>
+    <span class="k">def</span> <span class="nf">extra_margin_splice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the extra margin for splicing operations.</span>
+
+<span class="sd">        Leica raw files  can be a bit over their nominal end,</span>
+<span class="sd">        so we need to add a margin to the splicing operation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">period_as_timedelta</span> <span class="o">&gt;=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="s2">&quot;1 day&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="s2">&quot;1 hour&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="s2">&quot;1 minute&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

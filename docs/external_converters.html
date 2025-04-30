@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>External GNSS converters &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The configuration files" href="config_files.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">External GNSS converters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#download-external-gnss-converters">Download external GNSS converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#leica">Leica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#septentrio">Septentrio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#topcon">Topcon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#binex">BINEX</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#detailed-procedure">detailed procedure</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#trimble-official-linux-converter">Trimble (official Linux converter)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trimble-unofficial-dockerized-converter">Trimble (unofficial dockerized converter)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trimble-s-runpkr00">Trimble’s runpkr00</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#teqc">teqc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rinex-handling-software">RINEX handling software</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-external-utilities">Setting up external utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-recommended-receipe-for-setting-up-the-external-utilities">A recommended receipe for setting up the external utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package complete reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">External GNSS converters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/external_converters.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="external-gnss-converters">
+<span id="external-converters"></span><h1>External GNSS converters<a class="headerlink" href="#external-gnss-converters" title="Link to this heading"></a></h1>
+<section id="download-external-gnss-converters">
+<h2>Download external GNSS converters<a class="headerlink" href="#download-external-gnss-converters" title="Link to this heading"></a></h2>
+<p>To properly use the <em>autorino</em> package, you need to install the official GNSS raw data converters from the different
+GNSS manufacturers websites.
+You can find the official converters here:</p>
+<section id="leica">
+<h3>Leica<a class="headerlink" href="#leica" title="Link to this heading"></a></h3>
+<p>converter here: <a class="reference external" href="https://myworld-portal.leica-geosystems.com/s/fr/application?c__app=downloads">mdb2rinex</a><br />
+Go in: <em>Products &amp; Services &gt; Downloads &gt; GNSS Products &gt; GRxx receiver &gt; Tools &gt; MDB to RINEX Converter for LINUX.</em><br />
+see IGSMAIL-8341 for more details.</p>
+</section>
+<section id="septentrio">
+<h3>Septentrio<a class="headerlink" href="#septentrio" title="Link to this heading"></a></h3>
+<p>converter here: <a class="reference external" href="https://www.septentrio.com/en/products/software/rxtools#resources">sbf2rin</a></p>
+</section>
+<section id="topcon">
+<h3>Topcon<a class="headerlink" href="#topcon" title="Link to this heading"></a></h3>
+<p>converter here: <a class="reference external" href="https://mytopcon.topconpositioning.com/support/products/tps2rin-converter">tps2rin</a><br />
+<em>autorino</em> will emulate it with <em>wine</em>. Be sure to have <code class="docutils literal notranslate"><span class="pre">wine</span></code> installed on your computer. Detailled precedure will be added soon.</p>
+</section>
+<section id="binex">
+<h3>BINEX<a class="headerlink" href="#binex" title="Link to this heading"></a></h3>
+<p>converter here: <a class="reference external" href="https://github.com/rtklibexplorer/RTKLIB">convbin</a><br />
+<em>convbin</em> is part of the RTKLIB package. You can install it from the RTKLIB (explorer version) github repository.</p>
+<section id="detailed-procedure">
+<h4>detailed procedure<a class="headerlink" href="#detailed-procedure" title="Link to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/rtklibexplorer/RTKLIB.git
+<span class="nb">cd</span><span class="w"> </span>RTKLIB/app/consapp/convbin/gcc
+make
+</pre></div>
+</div>
+<p>The compiled binary <code class="docutils literal notranslate"><span class="pre">convbin</span></code> will be in the <code class="docutils literal notranslate"><span class="pre">RTKLIB/app/consapp/convbin/gcc</span></code> folder.</p>
+</section>
+</section>
+<section id="trimble-official-linux-converter">
+<h3>Trimble (official Linux converter)<a class="headerlink" href="#trimble-official-linux-converter" title="Link to this heading"></a></h3>
+<p>Ask Trimble support for the official Linux converter <em>t0xConverter</em>.</p>
+</section>
+<section id="trimble-unofficial-dockerized-converter">
+<h3>Trimble (unofficial dockerized converter)<a class="headerlink" href="#trimble-unofficial-dockerized-converter" title="Link to this heading"></a></h3>
+<p>converter here: <a class="reference external" href="https://github.com/IPGP/trm2rinex-docker-ovs">trm2rinex-docker-ovs</a><br />
+This docker image is a wrapper around Trimble’s official converter <em>trm2rinex</em> which is not available for Linux.<br />
+It relies on Trimble’s official converter for Windows <code class="docutils literal notranslate"><span class="pre">ConvertToRinex</span></code> available
+<a class="reference external" href="https://geospatial.trimble.com/en/support">here</a> &amp; <a class="reference external" href="https://trl.trimble.com/docushare/dsweb/Get/Document-1051259/">there</a>.</p>
+</section>
+<section id="trimble-s-runpkr00">
+<h3>Trimble’s runpkr00<a class="headerlink" href="#trimble-s-runpkr00" title="Link to this heading"></a></h3>
+<p>for legacy RINEX2 conversion with <em>teqc</em>
+converter here: <a class="reference external" href="https://kb.unavco.org/article/trimble-runpkr00-latest-versions-744.html">runpkr00</a></p>
+</section>
+<section id="teqc">
+<h3>teqc<a class="headerlink" href="#teqc" title="Link to this heading"></a></h3>
+<p>for legacy RINEX2 conversion with the well-known but discontinued UNAVCO’s <em>teqc</em> software
+converter here: <a class="reference external" href="https://www.unavco.org/software/data-management/teqc/teqc.html">teqc</a></p>
+</section>
+<section id="rinex-handling-software">
+<h3>RINEX handling software<a class="headerlink" href="#rinex-handling-software" title="Link to this heading"></a></h3>
+<p>You might also need RINEX handeling software:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.unavco.org/software/data-management/teqc/teqc.html">teqc</a>  (for legacy RINEX2 only)</p></li>
+<li><p><a class="reference external" href="https://www.gfz-potsdam.de/en/section/global-geodetic-observation-and-modelling/software/gfzrinex/">GFZRNX</a></p></li>
+<li><p>IGN’s <em>converto</em></p></li>
+</ul>
+<p>NB: GFZRNX usage is <strong>not allowed</strong> in <em>routine mode</em> without a proper commercial license. Be sure to comply with it.</p>
+</section>
+</section>
+<section id="setting-up-external-utilities">
+<h2>Setting up external utilities<a class="headerlink" href="#setting-up-external-utilities" title="Link to this heading"></a></h2>
+<p>Be sur to have set <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code> environment variable to point to the <code class="docutils literal notranslate"><span class="pre">env</span></code> configuration file.
+(see dedicated section above)</p>
+<p>Once the converters are installed, you need to set the converter paths in the <em>autorino</em>’s <code class="docutils literal notranslate"><span class="pre">env</span></code> configuration file.</p>
+<p>To configure the external utilities, you can:</p>
+<ol class="arabic simple">
+<li><p>set the full executable’s paths to the in the <code class="docutils literal notranslate"><span class="pre">env</span></code> configuration file</p></li>
+<li><p>set the paths in your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code> environment variable, and then simply set the executable’s names in the <code class="docutils literal notranslate"><span class="pre">env</span></code>
+configuration file.</p></li>
+</ol>
+<p>The authors recommend the second option, as it is more flexible and easier to maintain.</p>
+</section>
+<section id="a-recommended-receipe-for-setting-up-the-external-utilities">
+<h2>A recommended receipe for setting up the external utilities<a class="headerlink" href="#a-recommended-receipe-for-setting-up-the-external-utilities" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Create a directory for the GNSS converters in your prefered location, e.g. your <code class="docutils literal notranslate"><span class="pre">$HOME</span></code>.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>/your/favorite/location/converters_gnss
+<span class="nb">cd</span><span class="w"> </span>/your/favorite/location/converters_gnss
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Create a subdirectory with a version name, typically the date of the download.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>vYYYYMMDD
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Copy the GNSS converters in the version directory. Do not forget to make each of them executable with <code class="docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">+x</span></code></p></li>
+<li><p>Create a symbolic link called <code class="docutils literal notranslate"><span class="pre">operational</span></code>, pointing to the version directory.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ln<span class="w"> </span>-s<span class="w"> </span>vYYYYMMDD<span class="w"> </span>operational
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Edit your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> file to add the <code class="docutils literal notranslate"><span class="pre">operationnal</span></code> virtual folder to your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code>, and then make its content available in the whole environnement.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/your/favorite/location/converters_gnss/operational
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>If you want to update some conversion software, create a new version directory, set the new software inside, and update the <code class="docutils literal notranslate"><span class="pre">operational</span></code> symbolic link.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config_files.html" class="btn btn-neutral float-right" title="The configuration files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.bin package &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="autorino.cfgenv package" href="autorino.cfgenv.html" />
+    <link rel="prev" title="autorino.api package" href="autorino.api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files.html">The configuration files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package complete reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="autorino.api.html">autorino.api package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.bin package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.bin.autorino_cfgfile_run">autorino.bin.autorino_cfgfile_run module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.bin.autorino_check_rnx">autorino.bin.autorino_check_rnx module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.bin.autorino_check_rnx_old">autorino.bin.autorino_check_rnx_old module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.bin.autorino_convert_rnx">autorino.bin.autorino_convert_rnx module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.bin.autorino_trimble_filelist">autorino.bin.autorino_trimble_filelist module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgenv.html">autorino.cfgenv package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html">autorino.cfgfiles package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfglog.html">autorino.cfglog package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.check.html">autorino.check package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.common.html">autorino.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.convert.html">autorino.convert package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.download.html">autorino.download package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.handle.html">autorino.handle package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="autorino.html">autorino package complete reference</a></li>
+      <li class="breadcrumb-item active">autorino.bin package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/autorino.bin.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-autorino.bin">
+<span id="autorino-bin-package"></span><h1>autorino.bin package<a class="headerlink" href="#module-autorino.bin" title="Link to this heading"></a></h1>
+<p>Created on 07/04/2025 15:57:34</p>
+<p>&#64;author: psakic</p>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-autorino.bin.autorino_cfgfile_run">
+<span id="autorino-bin-autorino-cfgfile-run-module"></span><h2>autorino.bin.autorino_cfgfile_run module<a class="headerlink" href="#module-autorino.bin.autorino_cfgfile_run" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.bin.autorino_cfgfile_run.main">
+<span class="sig-prename descclassname"><span class="pre">autorino.bin.autorino_cfgfile_run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/bin/autorino_cfgfile_run.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.bin.autorino_cfgfile_run.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-autorino.bin.autorino_check_rnx">
+<span id="autorino-bin-autorino-check-rnx-module"></span><h2>autorino.bin.autorino_check_rnx module<a class="headerlink" href="#module-autorino.bin.autorino_check_rnx" title="Link to this heading"></a></h2>
+<p>Created on 27/01/2025 20:18:31</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.bin.autorino_check_rnx.main">
+<span class="sig-prename descclassname"><span class="pre">autorino.bin.autorino_check_rnx.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/bin/autorino_check_rnx.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.bin.autorino_check_rnx.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-autorino.bin.autorino_check_rnx_old">
+<span id="autorino-bin-autorino-check-rnx-old-module"></span><h2>autorino.bin.autorino_check_rnx_old module<a class="headerlink" href="#module-autorino.bin.autorino_check_rnx_old" title="Link to this heading"></a></h2>
+<p>Created on 18/01/2025 17:30:33</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.bin.autorino_check_rnx_old.main">
+<span class="sig-prename descclassname"><span class="pre">autorino.bin.autorino_check_rnx_old.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/bin/autorino_check_rnx_old.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.bin.autorino_check_rnx_old.main" title="Link to this definition"></a></dt>
+<dd><p>Shell function to call check_rinex with command-line arguments.</p>
+</dd></dl>
+
+</section>
+<section id="module-autorino.bin.autorino_convert_rnx">
+<span id="autorino-bin-autorino-convert-rnx-module"></span><h2>autorino.bin.autorino_convert_rnx module<a class="headerlink" href="#module-autorino.bin.autorino_convert_rnx" title="Link to this heading"></a></h2>
+<p>Created on 30/05/2024 16:22:55</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.bin.autorino_convert_rnx._prep_raws_inp">
+<span class="sig-prename descclassname"><span class="pre">autorino.bin.autorino_convert_rnx.</span></span><span class="sig-name descname"><span class="pre">_prep_raws_inp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/bin/autorino_convert_rnx.html#_prep_raws_inp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.bin.autorino_convert_rnx._prep_raws_inp" title="Link to this definition"></a></dt>
+<dd><p>see also step_fcts.import_files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.bin.autorino_convert_rnx.main">
+<span class="sig-prename descclassname"><span class="pre">autorino.bin.autorino_convert_rnx.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/bin/autorino_convert_rnx.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.bin.autorino_convert_rnx.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-autorino.bin.autorino_trimble_filelist">
+<span id="autorino-bin-autorino-trimble-filelist-module"></span><h2>autorino.bin.autorino_trimble_filelist module<a class="headerlink" href="#module-autorino.bin.autorino_trimble_filelist" title="Link to this heading"></a></h2>
+<p>Created on 19/09/2024 16:02:51</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.bin.autorino_trimble_filelist.main">
+<span class="sig-prename descclassname"><span class="pre">autorino.bin.autorino_trimble_filelist.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/bin/autorino_trimble_filelist.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.bin.autorino_trimble_filelist.main" title="Link to this definition"></a></dt>
+<dd><p>Shell function to call trimble_filelist_html with command-line arguments.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="autorino.api.html" class="btn btn-neutral float-left" title="autorino.api package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="autorino.cfgenv.html" class="btn btn-neutral float-right" title="autorino.cfgenv package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
