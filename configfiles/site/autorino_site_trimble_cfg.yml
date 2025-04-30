@@ -9,10 +9,6 @@ station:
         site_id: SITE00FRA
         domes: 00000M000
         position_xyz: [0.,0.,0.]
-        # operator: DEFINED IN MAIN
-        # agency: DEFINED IN MAIN
-        # country: DEFINED IN MAIN
-        # sitelog_path: DEFINED IN MAIN # can be a specific file or a directory path containing the sitelogs. We recomment to not use directory aliases (e.g. <$HOME>) for a faster import
     device:
         attributes_from_sitelog: False # Choose if the device attribute will come from a sitelog given with `sitelog_path` or the values below
         ant_type: 'ASH701975.01A   NONE' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab

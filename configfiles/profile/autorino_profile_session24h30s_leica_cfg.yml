@@ -4,7 +4,7 @@ station:
             steps:
                 download:
                     active: True
-                    inp_dir_parent: "/SD Card/Data/" # "/SD Card/Data/<name>/<SITE4>/%Y/%m/%d"
+                    inp_dir_parent: "/SD Card/Data/"
                     inp_dir_structure: "<SITE_ID4>_30s_MDB/<SITE_ID4>/%Y/%m/%d"
                     inp_file_regex:  "<SITE_ID4>%j.\\.m[0-9]{2}"
                 convert:
