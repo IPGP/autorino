@@ -11,13 +11,13 @@ station:
         position_xyz: [0.,0.,0.]
     device:
         attributes_from_sitelog: False # Choose if the device attribute will come from a sitelog given with `sitelog_path` or the values below
-        ant_type: 'ASH701975.01A   NONE' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        ant_type: 'TRM55971.00     NONE' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
         ant_sn: '12345678' # Antenna Serial Number
         ecc_une: [0.,0.,0.] # Eccentricity Up North East
-        rec_type: 'TPS GB-1000' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+        rec_type: 'TRIMBLE NETR9' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
         rec_sn: '' # Receiver Serial Number
         rec_fw: '' # Receiver firmware version
-        rec_manufacturer: 'TOPCON' # a free field for advanced usages    
+        rec_manufacturer: 'TRIMBLE' # a free field for advanced usages
     access:
         protocol: 'ftp'
         hostname: '192.168.0.1' ## IP address or URL

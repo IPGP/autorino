@@ -190,35 +190,6 @@ include = ["autorino*"] # package names should match these glob patterns (["*"] 
 #exclude = []  # exclude packages matching these glob patterns (empty by default)
 #namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
-
-
-
-#[tool.versioningit.vcs]
-## The method key:
-#method = "git"  # <- The method name
-#
-## Parameters to pass to the method:
-#match = ["v*"]
-#default-tag = "1.0.0"
-#
-#
-#[tool.versioningit.format]
-## Format used when there have been commits since the most recent tag:
-#distance = "{base_version}.post{distance}+{vcs}{rev}"
-## Example formatted version: 1.2.3.post42+ge174a1f
-#
-## Format used when there are uncommitted changes:
-#dirty = "{base_version}+d{build_date:%Y%m%d}"
-## Example formatted version: 1.2.3+d20230922
-#
-## Format used when there are both commits and uncommitted changes:
-#distance-dirty = "{base_version}.post{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
-## Example formatted version: 1.2.3.post42+ge174a1f.d20230922
-
-## Parameters to pass to the method:
-#match = ["v*"]
-#default-tag = "1.0.0"
-
 [tool.bumpversion]
 current_version = "2.0.0-beta0"  # REQUIRED, although can be dynamic
 
@@ -259,7 +230,6 @@ message = "Bump version: {current_version} → {new_version}"
 setup_hooks = []
 pre_commit_hooks = []
 post_commit_hooks = []
-
 
 [tool.bumpversion.parts.pre_l]
 values = ["beta",  "final"]
