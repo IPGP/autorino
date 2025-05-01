@@ -220,10 +220,14 @@ include = ["autorino*"] # package names should match these glob patterns (["*"] 
 #default-tag = "1.0.0"
 
 [tool.bumpversion]
-current_version = "2.0.0-beta0"  # REQUIRED, although can be dynamic
+current_version = "1.3.1"  # REQUIRED, although can be dynamic
+
+
+##### SIMPLE CYCLE - MAJOR.MINOR.PATCH #####
 #parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
 #serialize = ["{major}.{minor}.{patch}"]
 
+##### MORE COMPLEX CYCLE - MAJOR.MINOR.PATCH-PRERELEASE #####
 parse = """(?x)
     (?P<major>0|[1-9]\\d*)\\.
     (?P<minor>0|[1-9]\\d*)\\.
@@ -238,10 +242,6 @@ serialize = [
     "{major}.{minor}.{patch}-{pre_l}{pre_n}",
     "{major}.{minor}.{patch}",
 ]
-
-[tool.bumpversion.parts.pre_l]
-values = ["beta",  "final"]
-optional_value = "final"
 
 search = "{current_version}"
 replace = "{new_version}"
@@ -261,18 +261,12 @@ pre_commit_hooks = []
 post_commit_hooks = []
 
 
+[tool.bumpversion.parts.pre_l]
+values = ["beta",  "final"]
+optional_value = "final" # optional value for pre-release label ('final' wont appear in the version string)
+
 [[tool.bumpversion.files]]
 filename = "README.md"
-#parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
-#serialize = ["{major}.{minor}.{patch}"]
-
-#parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(?:-(?P[a-zA-Z]+)\\.(?P<prenum>\\d+))?"
-#serialize = [
-#    "{major}.{minor}.{patch}-beta.{prenum}",
-#    "{major}.{minor}.{patch}"
-#]
-
-
 search = "Version: {current_version}"
 replace = "Version: {new_version}"
 
@@ -284,28 +278,10 @@ regex = true
 
 [[tool.bumpversion.files]]
 filename = "autorino/__init__.py"
-#parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
-#serialize = ["{major}.{minor}.{patch}"]
-
-#parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(?:-(?P[a-zA-Z]+)\\.(?P<prenum>\\d+))?"
-#serialize = [
-#    "{major}.{minor}.{patch}-beta.{prenum}",
-#    "{major}.{minor}.{patch}"
-#]
-
 search = "{current_version}"
 replace = "{new_version}"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
-#parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
-#serialize = ["{major}.{minor}.{patch}"]
-
-#parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(?:-(?P[a-zA-Z]+)\\.(?P<prenum>\\d+))?"
-#serialize = [
-#    "{major}.{minor}.{patch}-beta.{prenum}",
-#    "{major}.{minor}.{patch}"
-#]
-
 search = 'version = "{current_version}"'
 replace = 'version = "{new_version}"'
