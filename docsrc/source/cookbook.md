@@ -21,41 +21,32 @@ See the next chapters [configuration files in a nutshell](config_files_nutshell.
 #### Examples
 
 We set the configuration file path in an environment variable `$ARO_CFGFILE`.
-
 ```bash
 ARO_CFGFILE=${AUTORINO_DIR}/configfiles/site/autorino_site_cfg.yml
 ```
 
 ##### Launching for specific dates
-
 Run all config files in the sites/terrestrial folder for a 10-day period in the past starting from January 1, 2025
-
 ```bash
 autorino_cfgfile_run -s '2025-01-01' -e '10 day ago' -c ${ARO_CFGFILE}
 ```
 
 ##### Launching specific steps
-
 Use `-ss/--select_steps`. For example, to run only the download and conversion steps:
-
 ```bash
 autorino_cfgfile_run -ss download convert -c ${ARO_CFGFILE}
 ```
 
 ##### Excluding specific steps
-
 Use `-ss/--select_steps` to select the steps to exclude, then activate `-es/--exclude_steps_select`.
-
 ```bash
-autorino_cfgfile_run -ss download -es -m ${ARO_CFG_MAIN_FILE} -c ${ARO_CFGFILE}
+autorino_cfgfile_run -ss download -es -c ${ARO_CFGFILE}
 ```
 
 ##### Launching for specific sites
-
-Use `-ls/--list_sites` to run a specific site. For example, to run the site `SOUF00GLP` & `BULG00GLP`:
-
+Use `-l/--list_sites` to run a specific site. For example, to run the site `SOUF00GLP` & `BULG00GLP`:
 ```bash
-autorino_cfgfile_run -ls SOUF00GLP BULG00GLP -m ${ARO_CFG_MAIN_FILE} -c ${ARO_CFGFILE}
+autorino_cfgfile_run -l SOUF00GLP BULG00GLP -c ${ARO_CFGFILE}
 ```
 
 ### Receipe #2: convert RAW to RINEX files
@@ -108,7 +99,3 @@ arocmn.convert_rnx(l,out_dir,tmp_dir)
 ```{eval-rst}
 .. autofunction:: autorino.api.convert_rnx
 ```
-
-#### `convert_rnx` function definition
-
-[go to source code](https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx)

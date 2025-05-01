@@ -55,10 +55,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
@@ -110,8 +109,8 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <p>You need to set up the environment variables <code class="docutils literal notranslate"><span class="pre">$AUTORINO_DIR</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code>
 to describe <em>autorino</em>’s configuration file.</p>
 <p>In your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> file, add the following lines:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AUTORINO_DIR</span><span class="o">=</span><span class="s2">&quot;/home/user/path_to/autorino/configfiles/env/autorino_env.yml&quot;</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">AUTORINO_ENV</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AUTORINO_ENV</span><span class="si">}</span><span class="s2">/configfiles/main/autorino_main_cfg.yml&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AUTORINO_DIR</span><span class="o">=</span><span class="s2">&quot;/home/user/path_to/autorino/&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">AUTORINO_ENV</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">AUTORINO_DIR</span><span class="si">}</span><span class="s2">/configfiles/main/autorino_main_cfg.yml&quot;</span>
 </pre></div>
 </div>
 <p>This <em>main</em> configuration file is a YAML file that contains an <code class="docutils literal notranslate"><span class="pre">environement</span></code> section.

@@ -28,8 +28,8 @@ to describe _autorino_'s configuration file.
 
 In your `.bashrc` or `.bash_profile` file, add the following lines:
 ```bash
-export AUTORINO_DIR="/home/user/path_to/autorino/configfiles/env/autorino_env.yml"
-export AUTORINO_ENV="${AUTORINO_ENV}/configfiles/main/autorino_main_cfg.yml"
+export AUTORINO_DIR="/home/user/path_to/autorino/"
+export AUTORINO_ENV="${AUTORINO_DIR}/configfiles/main/autorino_main_cfg.yml"
 ```
 
 This _main_ configuration file is a YAML file that contains an `environement` section.

@@ -77,7 +77,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#autorino.api.convert_rnx"><code class="docutils literal notranslate"><span class="pre">convert_rnx()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-definition"><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition</a></li>
 </ul>
 </li>
 </ul>
@@ -214,14 +213,14 @@ Examples:
 <section id="excluding-specific-steps">
 <h4>Excluding specific steps<a class="headerlink" href="#excluding-specific-steps" title="Link to this heading"></a></h4>
 <p>Use <code class="docutils literal notranslate"><span class="pre">-ss/--select_steps</span></code> to select the steps to exclude, then activate <code class="docutils literal notranslate"><span class="pre">-es/--exclude_steps_select</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-ss<span class="w"> </span>download<span class="w"> </span>-es<span class="w"> </span>-m<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFG_MAIN_FILE</span><span class="si">}</span><span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-ss<span class="w"> </span>download<span class="w"> </span>-es<span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
 </pre></div>
 </div>
 </section>
 <section id="launching-for-specific-sites">
 <h4>Launching for specific sites<a class="headerlink" href="#launching-for-specific-sites" title="Link to this heading"></a></h4>
-<p>Use <code class="docutils literal notranslate"><span class="pre">-ls/--list_sites</span></code> to run a specific site. For example, to run the site <code class="docutils literal notranslate"><span class="pre">SOUF00GLP</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">BULG00GLP</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-ls<span class="w"> </span>SOUF00GLP<span class="w"> </span>BULG00GLP<span class="w"> </span>-m<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFG_MAIN_FILE</span><span class="si">}</span><span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-l/--list_sites</span></code> to run a specific site. For example, to run the site <code class="docutils literal notranslate"><span class="pre">SOUF00GLP</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">BULG00GLP</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-l<span class="w"> </span>SOUF00GLP<span class="w"> </span>BULG00GLP<span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
 </pre></div>
 </div>
 </section>
@@ -404,10 +403,6 @@ Defaults to <cite>out_structure</cite> if not provided.</p></li>
 </dl>
 </dd></dl>
 
-</section>
-<section id="convert-rnx-function-definition">
-<h3><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition<a class="headerlink" href="#convert-rnx-function-definition" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx">go to source code</a></p>
 </section>
 </section>
 </section>

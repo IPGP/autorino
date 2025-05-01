@@ -23,7 +23,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting started: some simple examples" href="simple_expl.html" />
+    <link rel="next" title="autorino’s exemple cookbook" href="cookbook.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">External GNSS converters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-external-utilities">Setting up external utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#download-external-gnss-converters">Download external GNSS converters</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#leica">Leica</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#septentrio">Septentrio</a></li>
@@ -66,14 +67,12 @@
 <li class="toctree-l3"><a class="reference internal" href="#rinex-handling-software">RINEX handling software</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#setting-up-external-utilities">Setting up external utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#a-recommended-receipe-for-setting-up-the-external-utilities">A recommended receipe for setting up the external utilities</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
@@ -104,6 +103,20 @@
              
   <section id="external-gnss-converters">
 <span id="external-converters"></span><h1>External GNSS converters<a class="headerlink" href="#external-gnss-converters" title="Link to this heading"></a></h1>
+<section id="setting-up-external-utilities">
+<h2>Setting up external utilities<a class="headerlink" href="#setting-up-external-utilities" title="Link to this heading"></a></h2>
+<p>Be sur to have set <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code> environment variable to point to the configuration file containing the <code class="docutils literal notranslate"><span class="pre">environment</span></code>
+section, typically the <em>main</em> configuration file (<code class="docutils literal notranslate"><span class="pre">autorino_main_cfg.yml</span></code>).</p>
+<p>Once each manufacturer’s converter is downloaded and installed (see below), you need to set the path to each
+you need to set the converter paths in the <code class="docutils literal notranslate"><span class="pre">environment</span></code> section of the <em>main</em> configuration file.</p>
+<p>To configure the external utilities, you can:</p>
+<ol class="arabic simple">
+<li><p>set the full executable’s paths in the <code class="docutils literal notranslate"><span class="pre">environment</span></code> section.</p></li>
+<li><p>set the paths in your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code> environment variable, and then simply set the executable’s names in the <code class="docutils literal notranslate"><span class="pre">env</span></code>
+configuration file.</p></li>
+</ol>
+<p>The authors recommend the second option, as it is more flexible and easier to maintain.</p>
+</section>
 <section id="download-external-gnss-converters">
 <h2>Download external GNSS converters<a class="headerlink" href="#download-external-gnss-converters" title="Link to this heading"></a></h2>
 <p>To properly use the <em>autorino</em> package, you need to install the official GNSS raw data converters from the different
@@ -122,7 +135,8 @@ see IGSMAIL-8341 for more details.</p>
 <section id="topcon">
 <h3>Topcon<a class="headerlink" href="#topcon" title="Link to this heading"></a></h3>
 <p>converter here: <a class="reference external" href="https://mytopcon.topconpositioning.com/support/products/tps2rin-converter">tps2rin</a><br />
-<em>autorino</em> will emulate it with <em>wine</em>. Be sure to have <code class="docutils literal notranslate"><span class="pre">wine</span></code> installed on your computer. Detailled precedure will be added soon.</p>
+<em>autorino</em> will emulate it with <em>wine</em>. Be sure to have <code class="docutils literal notranslate"><span class="pre">wine</span></code> installed on your computer. Detailled precedure will be
+added soon.</p>
 </section>
 <section id="binex">
 <h3>BINEX<a class="headerlink" href="#binex" title="Link to this heading"></a></h3>
@@ -170,19 +184,6 @@ converter here: <a class="reference external" href="https://www.unavco.org/softw
 <p>NB: GFZRNX usage is <strong>not allowed</strong> in <em>routine mode</em> without a proper commercial license. Be sure to comply with it.</p>
 </section>
 </section>
-<section id="setting-up-external-utilities">
-<h2>Setting up external utilities<a class="headerlink" href="#setting-up-external-utilities" title="Link to this heading"></a></h2>
-<p>Be sur to have set <code class="docutils literal notranslate"><span class="pre">$AUTORINO_ENV</span></code> environment variable to point to the <code class="docutils literal notranslate"><span class="pre">env</span></code> configuration file.
-(see dedicated section above)</p>
-<p>Once the converters are installed, you need to set the converter paths in the <em>autorino</em>’s <code class="docutils literal notranslate"><span class="pre">env</span></code> configuration file.</p>
-<p>To configure the external utilities, you can:</p>
-<ol class="arabic simple">
-<li><p>set the full executable’s paths to the in the <code class="docutils literal notranslate"><span class="pre">env</span></code> configuration file</p></li>
-<li><p>set the paths in your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code> environment variable, and then simply set the executable’s names in the <code class="docutils literal notranslate"><span class="pre">env</span></code>
-configuration file.</p></li>
-</ol>
-<p>The authors recommend the second option, as it is more flexible and easier to maintain.</p>
-</section>
 <section id="a-recommended-receipe-for-setting-up-the-external-utilities">
 <h2>A recommended receipe for setting up the external utilities<a class="headerlink" href="#a-recommended-receipe-for-setting-up-the-external-utilities" title="Link to this heading"></a></h2>
 <ul class="simple">
@@ -206,13 +207,15 @@ configuration file.</p></li>
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Edit your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> file to add the <code class="docutils literal notranslate"><span class="pre">operationnal</span></code> virtual folder to your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code>, and then make its content available in the whole environnement.</p></li>
+<li><p>Edit your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code> file to add the <code class="docutils literal notranslate"><span class="pre">operationnal</span></code> virtual folder to your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code>, and then make
+its content available in the whole environnement.</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/your/favorite/location/converters_gnss/operational
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>If you want to update some conversion software, create a new version directory, set the new software inside, and update the <code class="docutils literal notranslate"><span class="pre">operational</span></code> symbolic link.</p></li>
+<li><p>If you want to update some conversion software, create a new version directory, set the new software inside, and
+update the <code class="docutils literal notranslate"><span class="pre">operational</span></code> symbolic link.</p></li>
 </ul>
 </section>
 </section>
@@ -222,7 +225,7 @@ configuration file.</p></li>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="simple_expl.html" class="btn btn-neutral float-right" title="Getting started: some simple examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cookbook.html" class="btn btn-neutral float-right" title="autorino’s exemple cookbook" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
