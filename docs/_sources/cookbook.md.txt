@@ -8,7 +8,7 @@
 
 Call `autorino_cfgfile_run` to run an _autorino_ workflow i.e. a set of _steps_.  
 The workflow is defined in a YAML _site_ configuration file.  
-See the next chapters [Ccnfiguration files in a nutshell](config_files_nutshell.md) &
+See the next chapters [configuration files in a nutshell](config_files_nutshell.md) &
 [configuration files details](config_files_details.md) for more details.
 
 #### Synopsis

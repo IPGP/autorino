@@ -33,7 +33,6 @@ based on _autorino_'s spinoff tool [_rinexmod_](https://github.com/IPGP/rinexmod
 * [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
 * [Patrice Boissier](https://github.com/PBoissier) (OVPF-IPGP, La Réunion, France)
 * [Jean-Marie Saurel](https://github.com/jmsaurel) (IPGP-OVS, Paris, France)
-* [Cyprien Griot](https://github.com/cyprien-griot) (OVPF-IPGP, La Réunion, France)
 * [Diane Pacaud](https://github.com/DianouPac) (OVPF-IPGP, La Réunion, France)
 
 **Contact e-mail:** sakic@ipgp.fr
