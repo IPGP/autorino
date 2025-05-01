@@ -54,16 +54,15 @@ Indices and tables
 Contents
 --------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    self
    installation
    external_converters
-   simple_expl
+   cookbook
    config_files_nutshell
    config_files_details
    under_hood
-   cookbook
    autorino
 ```
 

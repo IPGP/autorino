@@ -50,11 +50,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration files details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
@@ -134,26 +133,66 @@ based on <em>autorino</em>’s spinoff tool <a class="reference external" href="
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="external_converters.html#download-external-gnss-converters">Download external GNSS converters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_converters.html#download-external-gnss-converters">Download external GNSS converters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#leica">Leica</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#septentrio">Septentrio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#topcon">Topcon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#binex">BINEX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#trimble-official-linux-converter">Trimble (official Linux converter)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#trimble-unofficial-dockerized-converter">Trimble (unofficial dockerized converter)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#trimble-s-runpkr00">Trimble’s runpkr00</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#teqc">teqc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_converters.html#rinex-handling-software">RINEX handling software</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="external_converters.html#setting-up-external-utilities">Setting up external utilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="external_converters.html#a-recommended-receipe-for-setting-up-the-external-utilities">A recommended receipe for setting up the external utilities</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="simple_expl.html#convert-raw-file-to-rinex-in-cli-mode">Convert RAW file to RINEX in CLI mode</a></li>
-<li class="toctree-l2"><a class="reference internal" href="simple_expl.html#call-a-step-workflow-in-cli-mode">Call a Step workflow in CLI mode</a></li>
-<li class="toctree-l2"><a class="reference internal" href="simple_expl.html#convert-raw-file-to-rinex-in-api-mode">Convert RAW file to RINEX in API mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s exemple cookbook</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#receipe-1-run-an-autorino-workflow">Receipe #1: run an <em>autorino</em> workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cookbook.html#synopsis">Synopsis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cookbook.html#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#receipe-2-convert-raw-to-rinex-files">Receipe #2: convert RAW to RINEX files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cookbook.html#id1">Synopsis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#receipe-3-check-a-configuration-file">Receipe #3: Check a configuration file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cookbook.html#id2">Synopsis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cookbook.html#receipe-4-convert-raw-file-to-rinex-in-api-mode">Receipe #4: Convert RAW file to RINEX in API mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cookbook.html#convert-rnx-function-minimal-example">convert_rnx function minimal example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cookbook.html#convert-rnx-function-docstring">convert_rnx function docstring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cookbook.html#convert-rnx-function-definition"><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#the-sites-configuration-file-s-main-sections">The <em>sites</em> configuration file’s main sections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#the-include-section">The include section</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#aliases-in-the-configuration-files">Aliases in the configuration files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#reserved-keyword">reserved keyword</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#location-of-the-configuration-files">Location of the configuration files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#the-include-section">The include section</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="config_files_nutshell.html#example-of-the-include-section">Example of the include section</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration files details</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="config_files_details.html#configuration-file-structure">Configuration File Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#the-configuration-file-s-main-sections">The configuration file’s main sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#aliases-in-the-configuration-files">Aliases in the configuration files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config_files_nutshell.html#reserved-keywords">Reserved keywords</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config_files_details.html#configuration-file-structure">Configuration File Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="config_files_details.html#cfgfile-version">1. <code class="docutils literal notranslate"><span class="pre">cfgfile_version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_files_details.html#environment">2. <code class="docutils literal notranslate"><span class="pre">environment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_files_details.html#station">3. <code class="docutils literal notranslate"><span class="pre">station</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_files_details.html#sessions">4. <code class="docutils literal notranslate"><span class="pre">sessions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_files_details.html#workflow-steps">5. Workflow Steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_files_details.html#aliases">6. Aliases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="config_files_details.html#reserved-keywords">7. Reserved Keywords</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="config_files_details.html#notes">Notes</a></li>
 </ul>
 </li>
@@ -162,14 +201,20 @@ based on <em>autorino</em>’s spinoff tool <a class="reference external" href="
 <li class="toctree-l2"><a class="reference internal" href="under_hood.html#a-simple-exemple">A simple exemple</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s cookbook</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cookbook.html#receipe-1-run-an-autorino-workflow">Receipe #1: run an <em>autorino</em> workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cookbook.html#receipe-2-convert-raw-to-rinex-files">Receipe #2: convert RAW to RINEX files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cookbook.html#check-a-configuration-file">Check a configuration file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="autorino.api.html">autorino.api package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.bin.html">autorino.bin package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgenv.html">autorino.cfgenv package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfgfiles.html">autorino.cfgfiles package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.cfglog.html">autorino.cfglog package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.check.html">autorino.check package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.common.html">autorino.common package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.convert.html">autorino.convert package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.download.html">autorino.download package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="autorino.handle.html">autorino.handle package</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a></li>
 </ul>
 </li>
 </ul>

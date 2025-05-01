@@ -48,11 +48,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">configuration files in a nutshell</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Autorino Configuration File Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s Cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -101,7 +100,7 @@
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="convert_rnx">
-<a class="viewcode-back" href="../../../autorino.api.html#autorino.api.convert_rnx.convert_rnx">[docs]</a>
+<a class="viewcode-back" href="../../../cookbook.html#autorino.api.convert_rnx.convert_rnx">[docs]</a>
 <span class="k">def</span> <span class="nf">convert_rnx</span><span class="p">(</span>
     <span class="n">inp_raws</span><span class="p">,</span>
     <span class="n">out_dir</span><span class="p">,</span>
@@ -145,7 +144,8 @@
 <span class="sd">    rinexmod_options : dict, optional</span>
 <span class="sd">        The options for modifying the RINEX files during the conversion. Defaults to None.</span>
 <span class="sd">    metadata : str or list, optional</span>
-<span class="sd">        The metadata to be included in the converted RINEX files. Possible inputs are:</span>
+<span class="sd">        The metadata to be included in the converted RINEX files.</span>
+<span class="sd">        Possible inputs are:</span>
 <span class="sd">         * list of string (sitelog file paths),</span>
 <span class="sd">         * single string (single sitelog file path)</span>
 <span class="sd">         * single string (directory containing the sitelogs)</span>
@@ -222,7 +222,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>autorino’s cookbook &mdash; autorino  documentation</title>
+  <title>autorino’s exemple cookbook &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
@@ -23,8 +23,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="autorino package" href="autorino.html" />
-    <link rel="prev" title="Under the hood" href="under_hood.html" /> 
+    <link rel="next" title="Configuration files in a nutshell" href="config_files_nutshell.html" />
+    <link rel="prev" title="External GNSS converters" href="external_converters.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -51,11 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration files details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>autorino</em>’s cookbook</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>autorino</em>’s exemple cookbook</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#receipe-1-run-an-autorino-workflow">Receipe #1: run an <em>autorino</em> workflow</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a><ul>
@@ -71,12 +67,24 @@
 <li class="toctree-l3"><a class="reference internal" href="#id1">Synopsis</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#check-a-configuration-file">Check a configuration file</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#receipe-3-check-a-configuration-file">Receipe #3: Check a configuration file</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id2">Synopsis</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#receipe-4-convert-raw-file-to-rinex-in-api-mode">Receipe #4: Convert RAW file to RINEX in API mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-minimal-example">convert_rnx function minimal example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-docstring">convert_rnx function docstring</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#autorino.api.convert_rnx"><code class="docutils literal notranslate"><span class="pre">convert_rnx()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-definition"><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
@@ -94,7 +102,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active"><em>autorino</em>’s cookbook</li>
+      <li class="breadcrumb-item active"><em>autorino</em>’s exemple cookbook</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cookbook.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -104,11 +112,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="autorino-s-cookbook">
-<span id="cookbook"></span><h1><em>autorino</em>’s cookbook<a class="headerlink" href="#autorino-s-cookbook" title="Link to this heading"></a></h1>
+  <section id="autorino-s-exemple-cookbook">
+<span id="cookbook"></span><h1><em>autorino</em>’s exemple cookbook<a class="headerlink" href="#autorino-s-exemple-cookbook" title="Link to this heading"></a></h1>
 <section id="receipe-1-run-an-autorino-workflow">
 <h2>Receipe #1: run an <em>autorino</em> workflow<a class="headerlink" href="#receipe-1-run-an-autorino-workflow" title="Link to this heading"></a></h2>
-<p>Call <code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> to run an <em>autorino</em> workflow.</p>
+<p>Call <code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> to run an <em>autorino</em> workflow i.e. a set of <em>steps</em>.<br />
+The workflow is defined in a YAML <em>site</em> configuration file.<br />
+See the next chapters <a class="reference internal" href="config_files_nutshell.html"><span class="std std-doc">Ccnfiguration files in a nutshell</span></a> &amp;
+<a class="reference internal" href="config_files_details.html"><span class="std std-doc">configuration files details</span></a> for more details.</p>
 <section id="synopsis">
 <h3>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading"></a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_cfgfile_run --help
@@ -283,8 +294,8 @@ options:
 </div>
 </section>
 </section>
-<section id="check-a-configuration-file">
-<h2>Check a configuration file<a class="headerlink" href="#check-a-configuration-file" title="Link to this heading"></a></h2>
+<section id="receipe-3-check-a-configuration-file">
+<h2>Receipe #3: Check a configuration file<a class="headerlink" href="#receipe-3-check-a-configuration-file" title="Link to this heading"></a></h2>
 <p>Call <code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_check</span></code> to check the import of a configuration file, especially its <em>include</em>.</p>
 <section id="id2">
 <h3>Synopsis<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
@@ -311,14 +322,102 @@ options:
 </div>
 </section>
 </section>
+<section id="receipe-4-convert-raw-file-to-rinex-in-api-mode">
+<h2>Receipe #4: Convert RAW file to RINEX in API mode<a class="headerlink" href="#receipe-4-convert-raw-file-to-rinex-in-api-mode" title="Link to this heading"></a></h2>
+<p>The most basic and common operation that autorino can perform is to convert some
+RAW files to RINEX.</p>
+<section id="convert-rnx-function-minimal-example">
+<h3>convert_rnx function minimal example<a class="headerlink" href="#convert-rnx-function-minimal-example" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="c1">### Find all BINEX files in a folder</span>
+<span class="n">p</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/raw_data/are_stored/&quot;</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;*BNX&quot;</span><span class="p">)</span>
+
+<span class="c1">### Define the output folder</span>
+<span class="n">out_dir</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/rinex_data/will_be_saved/&quot;</span>
+<span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">out_dir</span>
+
+<span class="c1">### Call the conversion function</span>
+<span class="n">arocmn</span><span class="o">.</span><span class="n">convert_rnx</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">out_dir</span><span class="p">,</span><span class="n">tmp_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="convert-rnx-function-docstring">
+<h3>convert_rnx function docstring<a class="headerlink" href="#convert-rnx-function-docstring" title="Link to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.convert_rnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.</span></span><span class="sig-name descname"><span class="pre">convert_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'&lt;SITE_ID4&gt;/%Y/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rnx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/convert_rnx.html#convert_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.convert_rnx" title="Link to this definition"></a></dt>
+<dd><p>Frontend function that performs RAW &gt; RINEX conversion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp_raws</strong> (<em>list</em>) – The input RAW files to be converted.
+The input can be:
+* a python list
+* a text file path containing a list of files
+* a tuple containing several text files path
+* a directory path.</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em>) – The output directory where the converted files will be stored.</p></li>
+<li><p><strong>out_structure</strong> (<em>str</em><em>, </em><em>optional</em>) – The structure of the output directory.
+If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
+See README.md for more information.
+Typical values are ‘&lt;SITE_ID4&gt;/%Y/’ or ‘%Y/%j/’.
+Default value is ‘&lt;SITE_ID4&gt;/%Y/’.</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The temporary directory used during the conversion process.
+If not provided, it defaults to &lt;out_dir&gt;/tmp_convert_rnx.
+Defaults to None.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>The directory where logs will be stored. If not provided, it defaults to tmp_dir.</dt><dd><p>Defaults to None.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – The options for modifying the RINEX files during the conversion. Defaults to None.</p></li>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>The metadata to be included in the converted RINEX files.
+Possible inputs are:</p>
+<blockquote>
+<div><ul>
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object.</p></li>
+</ul>
+<p>Defaults to None.</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>force_rnx</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the conversion will be forced even if the output files already exist.
+Defaults to False.</p></li>
+<li><p><strong>force_raw</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the RAW file archiving will be forced even if the output files already exist.
+Defaults to False.</p></li>
+<li><p><strong>raw_out_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory where RAW files will be archived.
+No delete will occur, your RAW files are sacred.
+Defaults to None.</p></li>
+<li><p><strong>raw_out_structure</strong> (<em>str</em><em>, </em><em>optional</em>) – Structure for archiving RAW files.
+Defaults to <cite>out_structure</cite> if not provided.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="convert-rnx-function-definition">
+<h3><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition<a class="headerlink" href="#convert-rnx-function-definition" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx">go to source code</a></p>
+</section>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="under_hood.html" class="btn btn-neutral float-left" title="Under the hood" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="autorino.html" class="btn btn-neutral float-right" title="autorino package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="external_converters.html" class="btn btn-neutral float-left" title="External GNSS converters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config_files_nutshell.html" class="btn btn-neutral float-right" title="Configuration files in a nutshell" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -51,11 +51,10 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration files details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s Cookbook</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="autorino.html">autorino package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.api package</a><ul>
@@ -255,8 +254,10 @@ Defaults to None.</p></li>
 </dl>
 </p></li>
 <li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – The options for modifying the RINEX files during the conversion. Defaults to None.</p></li>
-<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <dl>
-<dt>The metadata to be included in the converted RINEX files. Possible inputs are:</dt><dd><ul>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>The metadata to be included in the converted RINEX files.
+Possible inputs are:</p>
+<blockquote>
+<div><ul>
 <li><p>list of string (sitelog file paths),</p></li>
 <li><p>single string (single sitelog file path)</p></li>
 <li><p>single string (directory containing the sitelogs)</p></li>
@@ -264,8 +265,7 @@ Defaults to None.</p></li>
 <li><p>single MetaData object.</p></li>
 </ul>
 <p>Defaults to None.</p>
-</dd>
-</dl>
+</div></blockquote>
 </p></li>
 <li><p><strong>force_rnx</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the conversion will be forced even if the output files already exist.
 Defaults to False.</p></li>

@@ -60,7 +60,8 @@ def convert_rnx(
     rinexmod_options : dict, optional
         The options for modifying the RINEX files during the conversion. Defaults to None.
     metadata : str or list, optional
-        The metadata to be included in the converted RINEX files. Possible inputs are:
+        The metadata to be included in the converted RINEX files.
+        Possible inputs are:
          * list of string (sitelog file paths),
          * single string (single sitelog file path)
          * single string (directory containing the sitelogs)

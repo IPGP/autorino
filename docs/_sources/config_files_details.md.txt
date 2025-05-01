@@ -2,7 +2,7 @@
 .. _config_files_details:
 ```
 
-# Configuration files details
+# Configuration file details
 
 ## Configuration File Structure
 
