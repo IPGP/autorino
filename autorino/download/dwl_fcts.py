@@ -347,6 +347,7 @@ def download_ftp(
         raise AutorinoDownloadError
 
     filename = url_fname
+    ftp_obj.sendcmd("TYPE I")
     file_size = ftp_obj.size(filename)
     output_path = os.path.join(output_dir, filename)
     try_count = 0
