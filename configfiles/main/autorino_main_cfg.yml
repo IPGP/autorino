@@ -35,6 +35,7 @@ station:
             general:
                 active : True # Indicates if the session is active.
                 name: 24h30s # Name of the session.
+                data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
                 tmp_dir_parent: '/<$HOME>/autorino_workflow_tests/tmp' # Parent directory for temporary files.
                 tmp_dir_structure: '' # Structure for temporary directories.
                 log_dir_parent: '/<$HOME>/autorino_workflow_tests/log' # Parent directory for log files.
