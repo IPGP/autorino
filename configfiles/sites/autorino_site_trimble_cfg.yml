@@ -5,8 +5,8 @@ include:
     - ../profile/autorino_profile_session24h30s_trimble_cfg.yml
 station:
     site:
-        name: 'Your Site Full Name'
-        site_id: SITE00FRA
+        name: 'Your Site Full Free Name' # Your Site Full Free Name
+        site_id: SITE00FRA # Your Site 9-char. code
         domes: 00000M000
         position_xyz: [0.,0.,0.]
     device:
