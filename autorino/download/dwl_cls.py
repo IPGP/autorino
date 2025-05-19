@@ -259,9 +259,7 @@ class DownloadGnss(arocmn.StepGnss):
         epo_lis = []
 
         if self.inp_file_regex:
-            logger.debug(
-                "remote files will be filtered with regex: %s", self.inp_file_regex
-            )
+            logger.debug(f"remote files will be filtered with regex: {self.inp_file_regex} (aliases not translated yet)")
         else:
             logger.debug("no regex filtering will be applied to remote files")
 
