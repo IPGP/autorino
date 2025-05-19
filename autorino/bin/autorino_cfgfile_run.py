@@ -8,12 +8,12 @@ def main():
         description="Assisted Unloading, Treatment and Organization of RINEX observations",
         epilog=(
             "Examples:\n"
-            "  * run all the config files within cfgfiles_dir directory, using a main config file and per default epoch ranges:\n"
-            "    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml\n"
+            "  * run all the config files within cfgfiles_dir directory, using per default epoch ranges:\n"
+            "    autorino_cfgfile_run -c cfgfiles_dir\n"
             "  * run the config file site_cfg.yml from the 1st January 2025 for a range of 10 days:\n"
             "    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e '10 days ago'\n"
             "  * run download and convert steps only for HOUZ00GLP & BORG00REU sites only:\n"
-            "    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -l HOUZ00GLP BORG00REU -sc download convert"
+            "    autorino_cfgfile_run -c cfgfiles_dir -l HOUZ00GLP BORG00REU -st download convert"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -85,7 +85,7 @@ def main():
         "Default is False.",
     )
     parser.add_argument(
-        "-sc",
+        "-st",
         "--steps_select_list",
         type=str,
         nargs="+",
@@ -96,7 +96,7 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "-es",
+        "-xst",
         "--exclude_steps_select",
         action="store_true",
         help="If True the selected steps indicated in step_select_list are excluded. "

@@ -48,10 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
@@ -93,6 +92,7 @@
 <span class="kn">import</span> <span class="nn">jinja2</span>
 <span class="kn">import</span> <span class="nn">geodezyx</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 
 <div class="viewcode-block" id="feed_template">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfiles_utils.feed_template">[docs]</a>
@@ -124,7 +124,7 @@
     <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_values</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;#########################################&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">current_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="s2">&quot;outdirsub&quot;</span> <span class="ow">in</span> <span class="n">df_values</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="n">outdirsub</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;outdirsub&quot;</span><span class="p">])</span>

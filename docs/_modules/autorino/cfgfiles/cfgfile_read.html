@@ -48,10 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
@@ -519,6 +518,8 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">load_table_msg_str</span><span class="p">,</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">())</span>
             <span class="n">stp_rnx_inp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">stp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_mode</span><span class="o">=</span><span class="s2">&quot;given&quot;</span><span class="p">,</span> <span class="n">input_rinexs</span><span class="o">=</span><span class="n">stp_rnx_inp</span><span class="p">,</span> <span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;rinexmod&#39;</span><span class="p">:</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">rinexmod</span><span class="p">(</span><span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
 
         <span class="c1">##### close the step</span>
 

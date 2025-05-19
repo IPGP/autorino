@@ -48,10 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
@@ -146,9 +145,9 @@
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata_inp</span>
 
     <span class="c1"># get the site (4chars) as a list</span>
-    <span class="n">site4_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">site4char</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">]</span>
+    <span class="n">site4_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">site_id4</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">]</span>
     <span class="c1"># get the site (9chars) as a list</span>
-    <span class="c1"># site9_list = [s.site9char for s in metadata]</span>
+    <span class="c1"># site9_list = [s.site_id9 for s in metadata]</span>
 
     <span class="n">site9_list</span> <span class="o">=</span> <span class="p">[]</span>
 

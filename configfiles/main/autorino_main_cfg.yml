@@ -36,9 +36,9 @@ station:
                 active : True # Indicates if the session is active.
                 name: 24h30s # Name of the session.
                 data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
-                tmp_dir_parent: '/<$HOME>/autorino_workflow_tests/tmp' # Parent directory for temporary files.
+                tmp_dir_parent: '/<$HOME>/autorino_workflow/tmp' # Parent directory for temporary files.
                 tmp_dir_structure: '' # Structure for temporary directories.
-                log_dir_parent: '/<$HOME>/autorino_workflow_tests/log' # Parent directory for log files.
+                log_dir_parent: '/<$HOME>/autorino_workflow/log' # Parent directory for log files.
                 log_dir_structure: '' # Structure for log directories.
             epoch_range:
                 epoch1: '10 days ago UTC' # Start of the epoch range.
@@ -50,7 +50,7 @@ station:
                 download: ###### DOWNLOAD STEP DEFINITION
                     active : True # Indicates if the download step is active.
                     # inp_dir_parent, inp_dir_structure & inp_file_regex are defined in sites cfg.
-                    out_dir_parent: '/<$HOME>/autorino_workflow_tests/raw' # Parent directory for output files.
+                    out_dir_parent: '/<$HOME>/autorino_workflow/raw' # Parent directory for output files.
                     out_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for output directories.
                     epoch_range:
                         FROM_SESSION # Use the session's epoch range.
@@ -67,10 +67,10 @@ station:
                         ping_max_try: 4 # Maximum number of ping retries.
                 convert: ###### CONVERT STEP DEFINITION
                     active : True # Indicates if the convert step is active.
-                    inp_dir_parent: '/<$HOME>/autorino_workflow_tests/raw' # Parent directory for input files.
+                    inp_dir_parent: '/<$HOME>/autorino_workflow/raw' # Parent directory for input files.
                     inp_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for input directories.
                     inp_file_regex:  ".*<SITE_ID4>.*" # Regular expression for input file names.
-                    out_dir_parent: '/<$HOME>/autorino_workflow_tests/rnx' # Parent directory for output files.
+                    out_dir_parent: '/<$HOME>/autorino_workflow/rnx' # Parent directory for output files.
                     out_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for output directories.
                     epoch_range:
                         FROM_SESSION # Use the session's epoch range.

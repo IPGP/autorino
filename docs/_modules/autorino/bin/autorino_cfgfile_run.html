@@ -48,10 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
@@ -93,12 +92,12 @@
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Assisted Unloading, Treatment and Organization of RINEX observations&quot;</span><span class="p">,</span>
         <span class="n">epilog</span><span class="o">=</span><span class="p">(</span>
             <span class="s2">&quot;Examples:</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;  * run all the config files within cfgfiles_dir directory, using a main config file and per default epoch ranges:</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;  * run all the config files within cfgfiles_dir directory, using per default epoch ranges:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;    autorino_cfgfile_run -c cfgfiles_dir</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;  * run the config file site_cfg.yml from the 1st January 2025 for a range of 10 days:</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e &#39;10 days ago&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;  * run download and convert steps only for HOUZ00GLP &amp; BORG00REU sites only:</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -l HOUZ00GLP BORG00REU -sc download convert&quot;</span>
+            <span class="s2">&quot;    autorino_cfgfile_run -c cfgfiles_dir -l HOUZ00GLP BORG00REU -st download convert&quot;</span>
         <span class="p">),</span>
         <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">,</span>
     <span class="p">)</span>
@@ -170,7 +169,7 @@
         <span class="s2">&quot;Default is False.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-sc&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-st&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--steps_select_list&quot;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
         <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
@@ -181,7 +180,7 @@
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-es&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-xs&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--exclude_steps_select&quot;</span><span class="p">,</span>
         <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If True the selected steps indicated in step_select_list are excluded. &quot;</span>
