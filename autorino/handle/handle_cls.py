@@ -981,3 +981,99 @@ class SplitGnss(HandleGnss):
 
         return frnxtmp
 
+
+class RinexmodGnss(HandleGnss):
+    def __init__(
+        self,
+        out_dir,
+        tmp_dir,
+        log_dir,
+        inp_dir=None,
+        inp_file_regex=None,
+        epoch_range=None,
+        site=None,
+        session=None,
+        options=None,
+        metadata=None,
+    ):
+        """
+        Initialize a RinexmodGnss object.
+
+        This constructor initializes a RinexmodGnss object,
+        which is used for a stand-alone application of RinexMod
+        actions on RINEX files.
+        It inherits from the HandleGnss class.
+
+        Parameters
+        ----------
+        out_dir : str
+            The output directory for the modified RINEX files.
+        tmp_dir : str
+            The temporary directory for intermediate files.
+        log_dir : str
+            The directory for log files.
+        inp_dir : str, optional
+            The input directory for raw files. Default is None.
+        inp_file_regex : str, optional
+            The regular expression for filtering input files. Default is None.
+        epoch_range : EpochRange, optional
+            The range of epochs to be processed. Default is None.
+        site : dict, optional
+            Information about the site. Default is None.
+        session : dict, optional
+            Information about the session. Default is None.
+        options : dict, optional
+            Additional options for the modification operation. Default is None.
+        metadata : dict, optional
+            Metadata for the modification operation. Default is None.
+        """
+        super().__init__(
+            out_dir=out_dir,
+            tmp_dir=tmp_dir,
+            log_dir=log_dir,
+            inp_dir=inp_dir,
+            inp_file_regex=inp_file_regex,
+            epoch_range=epoch_range,
+            site=site,
+            session=session,
+            options=options,
+            metadata=metadata,
+        )
+
+    def rinexmod(self, **rinexmod_options_inp):
+        """
+        Apply RINEX modifications to the data.
+
+        This method iterates over the rows of the table and applies RINEX modifications
+        using the specified options. It checks if the operation is valid for each row
+        before proceeding.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Additional options for the RINEX modification. These options are updated
+            for each row using the `updt_rnxmodopts` method.
+
+        Returns
+        -------
+        None
+        """
+        for irow, row in self.table.iterrows():
+            # Check if the operation is valid for the current row
+            if not self.mono_ok_check(irow, "rinexmod"):
+                continue
+
+            # Update the RINEX modification options for the current row
+            rinexmod_options_use = self.updt_rnxmodopts(
+                rinexmod_options_inp, irow, debug_print=False
+            )
+
+            # Apply the RINEX modification using the updated options
+            self.mono_rinexmod(
+                irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
+            )
+
+
+
+
+
