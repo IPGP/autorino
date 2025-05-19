@@ -50,7 +50,7 @@ station:
                     active : True # Indicates if the download step is active.
                     # inp_dir_parent, inp_dir_structure & inp_file_regex are defined in sites cfg.
                     out_dir_parent: '/<$HOME>/autorino_workflow_tests/raw' # Parent directory for output files.
-                    out_dir_structure: '%Y/%j/raw' # Structure for output directories.
+                    out_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for output directories.
                     epoch_range:
                         FROM_SESSION # Use the session's epoch range.
                     options:
@@ -67,10 +67,10 @@ station:
                 convert: ###### CONVERT STEP DEFINITION
                     active : True # Indicates if the convert step is active.
                     inp_dir_parent: '/<$HOME>/autorino_workflow_tests/raw' # Parent directory for input files.
-                    inp_dir_structure: <SITE_ID9>/%Y/%j # Structure for input directories.
+                    inp_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for input directories.
                     inp_file_regex:  ".*<SITE_ID4>.*" # Regular expression for input file names.
                     out_dir_parent: '/<$HOME>/autorino_workflow_tests/rnx' # Parent directory for output files.
-                    out_dir_structure: <SITE_ID9>/%Y%j # Structure for output directories.
+                    out_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for output directories.
                     epoch_range:
                         FROM_SESSION # Use the session's epoch range.
                     options:
