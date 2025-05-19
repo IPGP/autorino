@@ -422,6 +422,8 @@ def run_steps(
             logger.info(load_table_msg_str, stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
+        elif stp.get_step_type() == 'rinexmod':
+            stp.rinexmod(**stp.options)
 
         ##### close the step
 
