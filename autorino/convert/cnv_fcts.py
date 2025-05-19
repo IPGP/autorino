@@ -61,9 +61,9 @@ def site_list_from_metadata(metadata_inp):
         metadata = metadata_inp
 
     # get the site (4chars) as a list
-    site4_list = [s.site4char for s in metadata]
+    site4_list = [s.site_id4 for s in metadata]
     # get the site (9chars) as a list
-    # site9_list = [s.site9char for s in metadata]
+    # site9_list = [s.site_id9 for s in metadata]
 
     site9_list = []
 
