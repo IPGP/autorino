@@ -10,6 +10,7 @@ import re
 import jinja2
 import geodezyx
 import os
+import datetime
 
 def feed_template(template_full_path, df_values, outdir, out_fname_prefix):
     """
@@ -39,7 +40,7 @@ def feed_template(template_full_path, df_values, outdir, out_fname_prefix):
     for irow, row in df_values.iterrows():
         print(irow, "#########################################")
         print(row)
-        result = template.render(row.to_dict())
+        result = template.render(row.to_dict(), current_time=datetime.datetime.utcnow())
 
         if "outdirsub" in df_values.columns:
             outdirsub = os.path.join(outdir, row["outdirsub"])
