@@ -344,7 +344,7 @@ def run_steps(
         Default is None.
     exclude_steps_select : bool, optional
         If True the selected steps indicated in step_select_list are excluded.
-        It is the opposite behavior of the regular one using steps_select_list
+        It is the opposite behavior of the regular one using steps_list
         Default is False.
     verbose : bool, optional
         A flag indicating whether to print the tables during the execution of the steps.
@@ -375,7 +375,7 @@ def run_steps(
 
         # Check if there are selected steps to be run
         if len(steps_select_list) > 0:
-            # Forced case: steps_select_list contains the steps to be run only
+            # Forced case: steps_list contains the steps to be run only
             if (
                 not exclude_steps_select
                 and stp.get_step_type() not in steps_select_list
@@ -386,7 +386,7 @@ def run_steps(
                     steps_select_list,
                 )
                 continue
-            # Exclusion case: steps_select_list contains steps to be excluded
+            # Exclusion case: steps_list contains steps to be excluded
             elif exclude_steps_select and stp.get_step_type() in steps_select_list:
                 logger.warning(
                     "step %s skipped, selected in %s",

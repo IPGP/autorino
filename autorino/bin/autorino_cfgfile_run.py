@@ -66,8 +66,8 @@ def main():
         default="1D",
     )
     parser.add_argument(
-        "-l",
-        "--list_sites",
+        "-si",
+        "--sites_list",
         type=str,
         nargs="+",
         help="list of site identifiers ('site_id') in the config file"
@@ -77,16 +77,16 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "-is",
-        "--ignore_sites",
+        "-xsi",
+        "--exclude_sites",
         action="store_true",
-        help="If True, the sites in --list_sites will be ignored."
-        "It is the opposed behavior of the regular one using list_sites."
+        help="If True, the sites in --sites_list will be ignored."
+        "It is the opposed behavior of the regular one using sites_list."
         "Default is False.",
     )
     parser.add_argument(
-        "-st",
-        "--steps_select_list",
+        "-sp",
+        "--steps_list",
         type=str,
         nargs="+",
         help="A list of selected steps to be executed. "
@@ -96,11 +96,11 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "-xst",
-        "--exclude_steps_select",
+        "-xsp",
+        "--exclude_steps",
         action="store_true",
         help="If True the selected steps indicated in step_select_list are excluded. "
-        "It is the opposite behavior of the regular one using steps_select_list. "
+        "It is the opposite behavior of the regular one using steps_list. "
         "Default is False.",
     )
     parser.add_argument(
@@ -119,22 +119,22 @@ def main():
     start = args.start
     end = args.end
     period = args.period
-    list_sites = args.list_sites
-    ignore_sites = args.ignore_sites
-    steps_select_list = args.steps_select_list
-    exclude_steps_select = args.exclude_steps_select
+    sites_list = args.sites_list
+    exclude_sites = args.exclude_sites
+    steps_list = args.steps_list
+    exclude_steps = args.exclude_steps
     force = args.force
 
     aroapi.cfgfile_run(
         cfg_in=config,
         incl_cfg_in=include_config,
-        list_sites=list_sites,
-        ignore_sites=ignore_sites,
+        sites_list=sites_list,
+        exclude_sites=exclude_sites,
         epo_srt=start,
         epo_end=end,
         period=period,
-        steps_select_list=steps_select_list,
-        exclude_steps_select=exclude_steps_select,
+        steps_list=steps_list,
+        exclude_steps=exclude_steps_select,
         force=force,
     )
 
