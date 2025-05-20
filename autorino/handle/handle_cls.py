@@ -1100,6 +1100,6 @@ class RinexmodGnss(HandleGnss):
             self.mono_rinexmod(
                 irow,
                 out_dir=self.out_dir,
-                table_col='fpath_inp'
+                table_col='fpath_inp',
                 rinexmod_options=rinexmod_options_use
             )
