@@ -1083,6 +1083,9 @@ class RinexmodGnss(HandleGnss):
 
         self.print_table()
 
+        print(self.table['fpath_inp'])
+        print(self.table["fpath_out"])
+
         for irow, row in self.table.iterrows():
             # Check if the operation is valid for the current row
             if not self.mono_ok_check(irow, "rinexmod"):
@@ -1097,8 +1100,3 @@ class RinexmodGnss(HandleGnss):
             self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
             )
-
-
-
-
-
