@@ -309,6 +309,8 @@ def step_cls_select(step_name):
         return arohdl.SplitGnss
     elif step_name == "splice":
         return arohdl.SpliceGnss
+    elif step_name == "rinexmod":
+        return arohdl.RinexmodGnss
     else:
         logger.warning("unknown step %s in cfgfiles file, skip", step_name)
         return None
