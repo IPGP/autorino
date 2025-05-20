@@ -116,6 +116,8 @@ class RinexmodGnss(arohdlcls.HandleGnss):
             BOLD_SRT + ">>>>>> Modding RINEX files (stand-alone rinexmod)" + BOLD_END
         )
 
+
+
         # set the ok_inp to True per default
         self.table["ok_inp"] = True
 
