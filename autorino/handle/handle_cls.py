@@ -1081,6 +1081,8 @@ class RinexmodGnss(HandleGnss):
         # Find the input RINEX files
         # stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
 
+        self.print_table()
+
         for irow, row in self.table.iterrows():
             # Check if the operation is valid for the current row
             if not self.mono_ok_check(irow, "rinexmod"):
