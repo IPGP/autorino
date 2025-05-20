@@ -348,7 +348,9 @@ class HandleGnss(arocmn.StepGnss):
             else:
                 patrn = ".*"
 
-            local_paths_list_epo = utils.find_recursive(local_dir_use, pattern=patrn, regex=True)
+            local_paths_list_epo = utils.find_recursive(
+                local_dir_use, pattern=patrn, regex=True
+            )
             local_paths_list.extend(local_paths_list_epo)
 
         logger.info("nbr local files found: %s", len(local_paths_list))
@@ -390,7 +392,9 @@ class HandleGnss(arocmn.StepGnss):
                 method_msg
                 + "find local RINEX files and convert them to a StepGnss object"
             )
-            stp_obj_rnxs_inp = self.find_local_inp(return_as_step_obj=True, rnx3_regex=True)
+            stp_obj_rnxs_inp = self.find_local_inp(
+                return_as_step_obj=True, rnx3_regex=True
+            )
         elif input_mode == "given":
             if not input_rinexs:
                 logger.error("input mode is 'given' but no input_rinexs provided")
@@ -424,7 +428,9 @@ class HandleGnss(arocmn.StepGnss):
 
         return stp_obj_rnxs_inp
 
-    def conv_softs_opts(self, irow, handle_software, conv_options_sup=[], conv_kwoptions_sup=dict()):
+    def conv_softs_opts(
+        self, irow, handle_software, conv_options_sup=[], conv_kwoptions_sup=dict()
+    ):
         if handle_software == "converto":
             conv_kwoptions_basis = {
                 "-st": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d%H%M%S"),
@@ -434,8 +440,8 @@ class HandleGnss(arocmn.StepGnss):
         elif handle_software == "gfzrnx":
             duration = int(
                 (
-                        self.table.loc[irow, "epoch_end"]
-                        - self.table.loc[irow, "epoch_srt"]
+                    self.table.loc[irow, "epoch_end"]
+                    - self.table.loc[irow, "epoch_srt"]
                 ).total_seconds()
             )
             conv_kwoptions_basis = {
@@ -450,7 +456,7 @@ class HandleGnss(arocmn.StepGnss):
         conv_option_out = conv_options_basis + conv_options_sup
         conv_kwoption_out = {**conv_kwoptions_basis, **conv_kwoptions_sup}
 
-        return conv_option_out , conv_kwoption_out
+        return conv_option_out, conv_kwoption_out
 
     #   _____       _ _
     #  / ____|     | (_)
@@ -595,7 +601,9 @@ class SpliceGnss(HandleGnss):
 
         return None
 
-    def splice_core(self, handle_software="converto", rinexmod_options=None, rm_inp_files=False):
+    def splice_core(
+        self, handle_software="converto", rinexmod_options=None, rm_inp_files=False
+    ):
         """
         Perform the core splicing operation.
 
@@ -645,9 +653,8 @@ class SpliceGnss(HandleGnss):
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
 
-            #if rm_inp_files:
-            #IMPLEMENT ME !!!!!!
-
+            # if rm_inp_files:
+            # IMPLEMENT ME !!!!!!
 
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
@@ -701,9 +708,9 @@ class SpliceGnss(HandleGnss):
 
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
-            conv_options, conv_kwoptions = self.conv_softs_opts(irow,
-                                                                handle_software=handle_software,
-                                                                conv_options_sup=["-cat"])
+            conv_options, conv_kwoptions = self.conv_softs_opts(
+                irow, handle_software=handle_software, conv_options_sup=["-cat"]
+            )
             try:
                 time.sleep(1)
                 frnx_spliced, _ = arocnv.converter_run(
@@ -957,8 +964,9 @@ class SplitGnss(HandleGnss):
 
         frnx_inp = self.table.loc[irow, table_col]
 
-        conv_options, conv_kwoptions = self.conv_softs_opts(irow,
-                                                            handle_software=handle_software)
+        conv_options, conv_kwoptions = self.conv_softs_opts(
+            irow, handle_software=handle_software
+        )
         try:
             frnxtmp, _ = arocnv.converter_run(
                 frnx_inp,
@@ -1040,7 +1048,7 @@ class RinexmodGnss(HandleGnss):
             metadata=metadata,
         )
 
-    def rinexmod(self, **rinexmod_options_inp):
+    def rinexmod(self, verbose=False, force=False, rinexmod_options=None):
         """
         Apply RINEX modifications to the data.
 
@@ -1063,7 +1071,9 @@ class RinexmodGnss(HandleGnss):
         self.set_logfile()
 
         # Log the start of the splitting operation
-        logger.info(BOLD_SRT + ">>>>>> Modding RINEX files (stand-alone rinexmod)" + BOLD_END)
+        logger.info(
+            BOLD_SRT + ">>>>>> Modding RINEX files (stand-alone rinexmod)" + BOLD_END
+        )
 
         # set the ok_inp to True per default
         self.table["ok_inp"] = True
@@ -1075,13 +1085,14 @@ class RinexmodGnss(HandleGnss):
         # switch ok_inp to False if the output files are already there
         self.filter_ok_out()
         # if force is True, force the splicing operation
-        # if force:
-        #    self.force("split")
+        if force:
+            self.force("split")
 
         # Find the input RINEX files
         # stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
 
-        self.print_table()
+        if verbose:
+            self.print_table()
 
         for irow, row in self.table.iterrows():
             # Check if the operation is valid for the current row
@@ -1090,18 +1101,16 @@ class RinexmodGnss(HandleGnss):
 
             # Update the RINEX modification options for the current row
             rinexmod_options_use = self.updt_rnxmodopts(
-                rinexmod_options_inp, irow, debug_print=False
+                rinexmod_options, irow, debug_print=False
             )
 
             # Apply the RINEX modification using the updated options
             self.mono_rinexmod(
                 irow,
-                out_dir=self.tmp_dir_rinexmoded,
-                table_col='fpath_inp',
-                rinexmod_options=rinexmod_options_use
+                out_dir=self.out_dir,
+                table_col="fpath_inp",
+                rinexmod_options=rinexmod_options_use,
             )
 
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow)
-
-
