@@ -516,7 +516,8 @@ class StepGnss:
         # Add each attribute from the site and session dictionaries to the translation dictionary
         for dic in (self.site, self.session):
             for k, v in dic.items():
-                trsltdict[k] = v
+                trsltdict[k.lower()] = v.lower()
+                trsltdict[k.upper()] = v.upper()
 
         # Add each variation of the site id to the translation dictionary
         for s in ("site_id", "site_id4", "site_id9"):
