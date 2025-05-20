@@ -174,7 +174,7 @@
 <p>&#64;author: psakic</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.api.configfile_run.cfgfile_run">
-<span class="sig-prename descclassname"><span class="pre">autorino.api.configfile_run.</span></span><span class="sig-name descname"><span class="pre">cfgfile_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_srt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_select_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_steps_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/configfile_run.html#cfgfile_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.configfile_run.cfgfile_run" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.api.configfile_run.</span></span><span class="sig-name descname"><span class="pre">cfgfile_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incl_cfg_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sites_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_sites</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_srt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epo_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1D'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/configfile_run.html#cfgfile_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.configfile_run.cfgfile_run" title="Link to this definition"></a></dt>
 <dd><p>Run the Autorino configuration files.</p>
 <p>This function takes in a configuration file or a directory of configuration files,
 reads the configuration, and runs the steps specified in the configuration.</p>
@@ -186,13 +186,13 @@ If a directory is provided, all files ending with ‘.yml’ will be used.</p></
 <li><p><strong>incl_cfg_in</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em>) – The include configuration files to be used for development/advanced purposes.
 If a list is provided, all files in the list will be included.
 It will override the <cite>include</cite> section of the <cite>cfg_in</cite> configuration file.</p></li>
-<li><p><strong>list_sites</strong> (<em>list</em><em>, </em><em>optional</em>) – <dl class="simple">
+<li><p><strong>sites_list</strong> (<em>list</em><em>, </em><em>optional</em>) – <dl class="simple">
 <dt>A list of site identifiers to filter the configuration files.</dt><dd><p>If provided, only configurations for sites in this list will be processed.
 Default is None.</p>
 </dd>
 </dl>
 </p></li>
-<li><p><strong>ignore_sites</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the site in sites_list will be ignored.
+<li><p><strong>exclude_sites</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the site in sites_list will be ignored.
 It is the opposed behavior of the regular one using sites_list.
 Default is False.</p></li>
 <li><p><strong>epo_srt</strong> (<em>str</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – The start date for the epoch range.
@@ -201,10 +201,10 @@ Can be a file path; if so, the file contains a list of start epochs
 Default is None.</p></li>
 <li><p><strong>epo_end</strong> (<em>str</em><em>, </em><em>optional</em>) – The end date for the epoch range. Default is None.</p></li>
 <li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – The period for the epoch range. Default is “1D”.</p></li>
-<li><p><strong>steps_select_list</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of selected steps to be executed.
+<li><p><strong>steps_list</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of selected steps to be executed.
 If not provided, all steps in ‘steps_lis’ will be executed.
 Default is None.</p></li>
-<li><p><strong>exclude_steps_select</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True the selected steps indicated in step_select_list are excluded.
+<li><p><strong>exclude_steps</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True the selected steps indicated in step_select_list are excluded.
 It is the opposite behavior of the regular one using steps_select_list
 Default is False.</p></li>
 <li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the steps will be executed even if the output files already exist.

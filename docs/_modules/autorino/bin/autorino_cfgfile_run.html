@@ -97,7 +97,7 @@
             <span class="s2">&quot;  * run the config file site_cfg.yml from the 1st January 2025 for a range of 10 days:</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e &#39;10 days ago&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;  * run download and convert steps only for HOUZ00GLP &amp; BORG00REU sites only:</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;    autorino_cfgfile_run -c cfgfiles_dir -l HOUZ00GLP BORG00REU -st download convert&quot;</span>
+            <span class="s2">&quot;    autorino_cfgfile_run -c cfgfiles_dir -si HOUZ00GLP BORG00REU -sp download convert&quot;</span>
         <span class="p">),</span>
         <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">,</span>
     <span class="p">)</span>
@@ -150,41 +150,41 @@
         <span class="n">default</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-l&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--list_sites&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-si&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--sites_list&quot;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
         <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list of site identifiers (&#39;site_id&#39;) in the config file&quot;</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list of site identifiers (&#39;site_id&#39;) in the config file &quot;</span>
         <span class="s2">&quot;to filter the configuration files. &quot;</span>
         <span class="s2">&quot;If provided, only configurations for sites in this list will be processed. &quot;</span>
         <span class="s2">&quot;Default is None.&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-is&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--ignore_sites&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-xsi&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--exclude_sites&quot;</span><span class="p">,</span>
         <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If True, the sites in --list_sites will be ignored.&quot;</span>
-        <span class="s2">&quot;It is the opposed behavior of the regular one using list_sites.&quot;</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If True, the sites in --sites_list will be ignored. &quot;</span>
+        <span class="s2">&quot;This is the opposed behavior of the regular one using sites_list.&quot;</span>
         <span class="s2">&quot;Default is False.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-st&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--steps_select_list&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-sp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--steps_list&quot;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
         <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;A list of selected steps to be executed. &quot;</span>
-        <span class="s2">&quot;If not provided, all steps in &#39;steps_list&#39; will be executed. &quot;</span>
-        <span class="s2">&quot;Accepted steps are: &#39;download&#39;, &#39;convert&#39;, &#39;splice&#39;, &#39;split&#39;. &quot;</span>
+        <span class="s2">&quot;If not provided, all steps in the configuration file will be executed. &quot;</span>
         <span class="s2">&quot;Default is None.&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;download&quot;</span><span class="p">,</span> <span class="s2">&quot;convert&quot;</span><span class="p">,</span> <span class="s2">&quot;split&quot;</span><span class="p">,</span> <span class="s2">&quot;splice&quot;</span><span class="p">,</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">],</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-xs&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--exclude_steps_select&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-xsp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--exclude_steps&quot;</span><span class="p">,</span>
         <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If True the selected steps indicated in step_select_list are excluded. &quot;</span>
-        <span class="s2">&quot;It is the opposite behavior of the regular one using steps_select_list. &quot;</span>
+        <span class="s2">&quot;This is the opposite behavior of the regular one using steps_list. &quot;</span>
         <span class="s2">&quot;Default is False.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -203,22 +203,22 @@
     <span class="n">start</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">start</span>
     <span class="n">end</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">end</span>
     <span class="n">period</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">period</span>
-    <span class="n">list_sites</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">list_sites</span>
-    <span class="n">ignore_sites</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">ignore_sites</span>
-    <span class="n">steps_select_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">steps_select_list</span>
-    <span class="n">exclude_steps_select</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_steps_select</span>
+    <span class="n">sites_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">sites_list</span>
+    <span class="n">exclude_sites</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_sites</span>
+    <span class="n">steps_list</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">steps_list</span>
+    <span class="n">exclude_steps</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_steps</span>
     <span class="n">force</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">force</span>
 
     <span class="n">aroapi</span><span class="o">.</span><span class="n">cfgfile_run</span><span class="p">(</span>
         <span class="n">cfg_in</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
         <span class="n">incl_cfg_in</span><span class="o">=</span><span class="n">include_config</span><span class="p">,</span>
-        <span class="n">list_sites</span><span class="o">=</span><span class="n">list_sites</span><span class="p">,</span>
-        <span class="n">ignore_sites</span><span class="o">=</span><span class="n">ignore_sites</span><span class="p">,</span>
+        <span class="n">sites_list</span><span class="o">=</span><span class="n">sites_list</span><span class="p">,</span>
+        <span class="n">exclude_sites</span><span class="o">=</span><span class="n">exclude_sites</span><span class="p">,</span>
         <span class="n">epo_srt</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
         <span class="n">epo_end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
         <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span>
-        <span class="n">steps_select_list</span><span class="o">=</span><span class="n">steps_select_list</span><span class="p">,</span>
-        <span class="n">exclude_steps_select</span><span class="o">=</span><span class="n">exclude_steps_select</span><span class="p">,</span>
+        <span class="n">steps_list</span><span class="o">=</span><span class="n">steps_list</span><span class="p">,</span>
+        <span class="n">exclude_steps</span><span class="o">=</span><span class="n">exclude_steps</span><span class="p">,</span>
         <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
     <span class="p">)</span></div>
 

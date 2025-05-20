@@ -152,7 +152,6 @@ def ftp_create_obj(
             return None
 
 
-
 def list_remote_ftp(
     hostname,
     remote_dir,

@@ -440,7 +440,7 @@
 <span class="sd">        Default is None.</span>
 <span class="sd">    exclude_steps_select : bool, optional</span>
 <span class="sd">        If True the selected steps indicated in step_select_list are excluded.</span>
-<span class="sd">        It is the opposite behavior of the regular one using steps_select_list</span>
+<span class="sd">        It is the opposite behavior of the regular one using steps_list</span>
 <span class="sd">        Default is False.</span>
 <span class="sd">    verbose : bool, optional</span>
 <span class="sd">        A flag indicating whether to print the tables during the execution of the steps.</span>
@@ -471,7 +471,7 @@
 
         <span class="c1"># Check if there are selected steps to be run</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps_select_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># Forced case: steps_select_list contains the steps to be run only</span>
+            <span class="c1"># Forced case: steps_list contains the steps to be run only</span>
             <span class="k">if</span> <span class="p">(</span>
                 <span class="ow">not</span> <span class="n">exclude_steps_select</span>
                 <span class="ow">and</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">steps_select_list</span>
@@ -482,7 +482,7 @@
                     <span class="n">steps_select_list</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="c1"># Exclusion case: steps_select_list contains steps to be excluded</span>
+            <span class="c1"># Exclusion case: steps_list contains steps to be excluded</span>
             <span class="k">elif</span> <span class="n">exclude_steps_select</span> <span class="ow">and</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="ow">in</span> <span class="n">steps_select_list</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;step </span><span class="si">%s</span><span class="s2"> skipped, selected in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>

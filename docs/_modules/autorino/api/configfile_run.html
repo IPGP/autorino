@@ -106,13 +106,13 @@
 <span class="k">def</span> <span class="nf">cfgfile_run</span><span class="p">(</span>
     <span class="n">cfg_in</span><span class="p">,</span>
     <span class="n">incl_cfg_in</span><span class="p">,</span>
-    <span class="n">list_sites</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">ignore_sites</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">sites_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_sites</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">epo_srt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">epo_end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span>
-    <span class="n">steps_select_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">exclude_steps_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">steps_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_steps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -130,11 +130,11 @@
 <span class="sd">        The include configuration files to be used for development/advanced purposes.</span>
 <span class="sd">        If a list is provided, all files in the list will be included.</span>
 <span class="sd">        It will override the `include` section of the `cfg_in` configuration file.</span>
-<span class="sd">    list_sites : list, optional</span>
+<span class="sd">    sites_list : list, optional</span>
 <span class="sd">        A list of site identifiers to filter the configuration files.</span>
 <span class="sd">         If provided, only configurations for sites in this list will be processed.</span>
 <span class="sd">         Default is None.</span>
-<span class="sd">    ignore_sites : bool, optional</span>
+<span class="sd">    exclude_sites : bool, optional</span>
 <span class="sd">        If True, the site in sites_list will be ignored.</span>
 <span class="sd">        It is the opposed behavior of the regular one using sites_list.</span>
 <span class="sd">        Default is False.</span>
@@ -147,11 +147,11 @@
 <span class="sd">        The end date for the epoch range. Default is None.</span>
 <span class="sd">    period : str, optional</span>
 <span class="sd">        The period for the epoch range. Default is &quot;1D&quot;.</span>
-<span class="sd">    steps_select_list : list, optional</span>
+<span class="sd">    steps_list : list, optional</span>
 <span class="sd">        A list of selected steps to be executed.</span>
 <span class="sd">        If not provided, all steps in &#39;steps_lis&#39; will be executed.</span>
 <span class="sd">        Default is None.</span>
-<span class="sd">    exclude_steps_select : bool, optional</span>
+<span class="sd">    exclude_steps : bool, optional</span>
 <span class="sd">        If True the selected steps indicated in step_select_list are excluded.</span>
 <span class="sd">        It is the opposite behavior of the regular one using steps_select_list</span>
 <span class="sd">        Default is False.</span>
@@ -199,16 +199,16 @@
 
     <span class="c1"># Process each configuration file</span>
     <span class="k">for</span> <span class="n">cfg_use</span> <span class="ow">in</span> <span class="n">cfg_use_lis</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">list_sites</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sites_list</span><span class="p">:</span>
             <span class="c1"># Quick load to check if the site is in the list or not</span>
             <span class="n">y_quick</span> <span class="o">=</span> <span class="n">arocfg</span><span class="o">.</span><span class="n">load_cfg</span><span class="p">(</span><span class="n">cfg_path</span><span class="o">=</span><span class="n">cfg_use</span><span class="p">)</span>
             <span class="n">site_quick</span> <span class="o">=</span> <span class="n">y_quick</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">][</span><span class="s2">&quot;site&quot;</span><span class="p">][</span><span class="s2">&quot;site_id&quot;</span><span class="p">]</span>
-            <span class="c1">### case 1: list_sites are the sites we want</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_sites</span> <span class="ow">and</span> <span class="p">(</span><span class="n">site_quick</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">list_sites</span><span class="p">):</span>
+            <span class="c1">### case 1: sites_list are the sites we want</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">exclude_sites</span> <span class="ow">and</span> <span class="p">(</span><span class="n">site_quick</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sites_list</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping site </span><span class="si">%s</span><span class="s2"> (not in sites list)&quot;</span><span class="p">,</span> <span class="n">site_quick</span><span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="c1">### case 2: list_sites are the sites we ignore</span>
-            <span class="k">elif</span> <span class="n">ignore_sites</span> <span class="ow">and</span> <span class="p">(</span><span class="n">site_quick</span> <span class="ow">in</span> <span class="n">list_sites</span><span class="p">):</span>
+            <span class="c1">### case 2: sites_list are the sites we ignore</span>
+            <span class="k">elif</span> <span class="n">exclude_sites</span> <span class="ow">and</span> <span class="p">(</span><span class="n">site_quick</span> <span class="ow">in</span> <span class="n">sites_list</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping site </span><span class="si">%s</span><span class="s2"> (in ignored sites list)&quot;</span><span class="p">,</span> <span class="n">site_quick</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="c1">### case 3: regular case</span>
@@ -225,8 +225,8 @@
         <span class="k">for</span> <span class="n">steps_lis</span> <span class="ow">in</span> <span class="n">steps_lis_lis</span><span class="p">:</span>
             <span class="n">arocfg</span><span class="o">.</span><span class="n">run_steps</span><span class="p">(</span>
                 <span class="n">steps_lis</span><span class="p">,</span>
-                <span class="n">steps_select_list</span><span class="o">=</span><span class="n">steps_select_list</span><span class="p">,</span>
-                <span class="n">exclude_steps_select</span><span class="o">=</span><span class="n">exclude_steps_select</span><span class="p">,</span>
+                <span class="n">steps_select_list</span><span class="o">=</span><span class="n">steps_list</span><span class="p">,</span>
+                <span class="n">exclude_steps_select</span><span class="o">=</span><span class="n">exclude_steps</span><span class="p">,</span>
                 <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
             <span class="p">)</span>
 
