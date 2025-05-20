@@ -145,7 +145,7 @@ def ftp_create_obj(
             logger.error("Unable to create FTP object: %s", str(e))
             return None
         except ftplib.error_perm as e:
-            logger.error("Unable to create FTP object, wrong login/password: %s", str(e))
+            logger.error("Unable to create FTP object: %s", str(e))
             return None
         except Exception as e:
             logger.error("Unable to create FTP object: %s", str(e))
