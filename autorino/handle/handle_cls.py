@@ -1098,5 +1098,8 @@ class RinexmodGnss(HandleGnss):
 
             # Apply the RINEX modification using the updated options
             self.mono_rinexmod(
-                irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
+                irow,
+                out_dir=self.out_dir,
+                table_col='fpath_inp'
+                rinexmod_options=rinexmod_options_use
             )
