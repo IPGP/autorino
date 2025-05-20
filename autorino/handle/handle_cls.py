@@ -1058,6 +1058,29 @@ class RinexmodGnss(HandleGnss):
         -------
         None
         """
+
+        # set the log file
+        self.set_logfile()
+
+        # Log the start of the splitting operation
+        logger.info(BOLD_SRT + ">>>>>> Modding RINEX files (stand-alone rinexmod)" + BOLD_END)
+
+        # set the ok_inp to True per default
+        self.table["ok_inp"] = True
+
+        # generate the potential local files
+        self.guess_local_rnx()
+        # tests if the output local files are already there
+        self.check_local_files("out")
+        # switch ok_inp to False if the output files are already there
+        self.filter_ok_out()
+        # if force is True, force the splicing operation
+        # if force:
+        #    self.force("split")
+
+        # Find the input RINEX files
+        # stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
+
         for irow, row in self.table.iterrows():
             # Check if the operation is valid for the current row
             if not self.mono_ok_check(irow, "rinexmod"):
