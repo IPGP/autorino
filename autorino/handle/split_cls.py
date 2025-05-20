@@ -244,7 +244,7 @@ class SplitGnss(arohdlcls.HandleGnss):
         ):
             return None
 
-        # definition of the output directory (after the action)
+        # definition of the output directory
         if out_dir:
             out_dir_main_use = out_dir
         elif hasattr(self, "tmp_dir_converted"):
@@ -255,7 +255,6 @@ class SplitGnss(arohdlcls.HandleGnss):
         out_dir_use = self.translate_path(
             out_dir_main_use, self.table.loc[irow, "epoch_srt"]
         )
-        #### SOMETHING WEIRD HERE: out_dir_use is redefined
 
         frnx_inp = self.table.loc[irow, table_col]
 

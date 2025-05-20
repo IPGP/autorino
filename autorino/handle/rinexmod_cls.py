@@ -116,8 +116,6 @@ class RinexmodGnss(arohdlcls.HandleGnss):
             BOLD_SRT + ">>>>>> Modding RINEX files (stand-alone rinexmod)" + BOLD_END
         )
 
-
-
         # set the ok_inp to True per default
         self.table["ok_inp"] = True
 
@@ -147,13 +145,14 @@ class RinexmodGnss(arohdlcls.HandleGnss):
                 rinexmod_options, irow, debug_print=False
             )
 
+            out_dir_use = self.translate_path(
+                self.out_dir, self.table.loc[irow, "epoch_srt"]
+            )
+
             # Apply the RINEX modification using the updated options
             self.mono_rinexmod(
                 irow,
-                out_dir=self.tmp_dir_rinexmoded,
+                out_dir=out_dir_use,
                 table_col="fpath_inp",
                 rinexmod_options=rinexmod_options_use,
             )
-
-            if self.tmp_dir_rinexmoded != self.out_dir:
-                self.mono_mv_final(irow, self.out_dir)
