@@ -100,6 +100,7 @@ def convert_rnx(
     log_dir = log_dir or tmp_dir
     out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
 
+    ###### Convert RAW > RINEX files
     inp_raws_chunked = geodezyx.utils.chunkIt(inp_raws, processes)
 
     args_wrap = []
@@ -147,6 +148,8 @@ def convert_rnx(
             cpy_raw = arocmn.StepGnss(raw_out_dir_use, tmp_dir, log_dir, metadata=metadata)
             debug_print = False
 
+            # the table from the ConvertGnss object
+            # is necessary to get the epoch
             cpy_raw.load_tab_prev_tab(cnv.table)
             cpy_raw.table["fpath_inp"] = cnv.table["fpath_inp"]
             cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)

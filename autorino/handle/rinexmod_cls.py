@@ -89,7 +89,7 @@ class RinexmodGnss(arohdlcls.HandleGnss):
             metadata=metadata,
         )
 
-    def rinexmod(self, verbose=False, force=False, rinexmod_options=None, guess_local_rnx=False):
+    def rinexmod(self, verbose=False, force=False, rinexmod_options=None):
         """
         Apply RINEX modifications to the data.
 
@@ -119,6 +119,7 @@ class RinexmodGnss(arohdlcls.HandleGnss):
         # set the ok_inp to True per default
         self.table["ok_inp"] = True
 
+        guess_local_rnx = False
         if guess_local_rnx:
             # generate the potential local files
             self.guess_local_rnx()
@@ -129,7 +130,7 @@ class RinexmodGnss(arohdlcls.HandleGnss):
 
         # if force is True, force the splicing operation
         if force:
-            self.force("split")
+            self.force("rinexmod")
 
         # Find the input RINEX files
         # stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)

@@ -1333,12 +1333,16 @@ class StepGnss:
 
         self.table["fpath_inp"] = input_table["fpath_out"].values
         self.table["size_inp"] = input_table["size_out"].values
+
+        self.table.loc[self.table["fpath_inp"].isna(), "fpath_inp"] = "none"
+
+        self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
+
         self.table["site"] = input_table["site"].values
         # epoch_srt and epoch_end are supposed to be timezone aware
         self.table["epoch_srt"] = input_table["epoch_srt"].values
         self.table["epoch_end"] = input_table["epoch_end"].values
-        self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
 
         return None
 

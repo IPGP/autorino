@@ -268,7 +268,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
             out_dir_main_use = self.tmp_dir
 
         spc_row = self.table.loc[irow, "fpath_inp"]
-        if not isinstance(spc_row, HandleGnss):
+        if not isinstance(spc_row, arohdlcls.HandleGnss):
             logger.error(
                 f"fpath_inp is not a HandleGnss object: {self.table.loc[irow]:}"
             )
