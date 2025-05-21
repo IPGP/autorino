@@ -13,10 +13,12 @@ import logging
 import autorino.cfgenv.env_read as aroenv
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 
+import multiprocessing as mp
 import geodezyx.utils
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
+
 
 def conver_raw_wrap(args):
     raws, out_dir_use, tmp_dir, log_dir, metadata, force_rnx, rinexmod_options = args
@@ -24,6 +26,7 @@ def conver_raw_wrap(args):
     cnv.load_tab_filelist(raws)
     cnv.convert(force=force_rnx, rinexmod_options=rinexmod_options)
     return cnv
+
 
 def convert_rnx(
     inp_raws,
@@ -37,7 +40,7 @@ def convert_rnx(
     force_raw=False,
     raw_out_dir=None,
     raw_out_structure=None,
-    processes=1
+    processes=1,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -104,22 +107,38 @@ def convert_rnx(
 
     inp_raws_chunked = geodezyx.utils.chunkIt(inp_raws, processes)
 
+    args_wrap = []
+    for raws in inp_raws_chunked:
+        args = (
+            raws,
+            out_dir_use,
+            tmp_dir,
+            log_dir,
+            metadata,
+            force_rnx,
+            rinexmod_options,
+        )
+        args_wrap.append(args)
+
     # Parallel RAW > RINEX conversion
     results = []
 
     # PoolExec = ThreadPoolExecutor
     PoolExec = ProcessPoolExecutor
 
-    with PoolExec(max_workers=processes) as executor:
-        futures = [
-            executor.submit(
-                conver_raw_wrap,
-                (raws, out_dir_use, tmp_dir, log_dir, metadata, force_rnx, rinexmod_options)
-            )
-            for raws in inp_raws_chunked
-        ]
-        for f in as_completed(futures):
-            results.append(f.result())
+    # with PoolExec(max_workers=processes) as executor:
+    #     futures = [executor.submit(conver_raw_wrap, args) for args in args_wrap]
+    #     for f in as_completed(futures):
+    #         results.append(f.result())
+
+    # Use multiprocessing to process the dates
+    pool = mp.Pool(processes=processes)
+    try:
+        _ = pool.map(conver_raw_wrap, args_wrap, chunksize=1)
+    except Exception as e:
+        logger.error("error in the pool.map : %s", e)
+
+    pool.close()
 
     ###### Archive the RAW files
     if raw_out_dir:
