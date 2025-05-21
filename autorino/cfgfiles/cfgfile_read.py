@@ -161,21 +161,21 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
     """
 
     # ++++ METADATA
-    # Load as sitelog
-
     y_station = y_inp["station"]
     y_sessions = y_station["sessions"]
-
+    # Load metadata as external sitelog(s)
     if y_station["device"]["attributes_from_sitelog"]:
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
             # Load the metadata if the path is a directory or a file
+            print("AAAAAAAAAAAAAA is dir")
             metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
         else:
             # If not, consider it as a string
             # (because the path might be translated later in the object)
+            print("AAAAAAAAAAAAAA is path")
             metadata = slpath
-    # Load as device block
+    # Load metadata as device block
     else:
         metadata = _device2mda(y_station)
 
@@ -483,7 +483,7 @@ def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
     #     )
     #     raise FileNotFoundError(None, parent_dir_key + mkdir_err_msg)
 
-    if not os.path.isdir(parent_dir_out): 
+    if not os.path.isdir(parent_dir_out):
         logger.error(parent_dir_out + mkdir_err_msg)
         raise FileNotFoundError(None, parent_dir_out + mkdir_err_msg)
     else:
