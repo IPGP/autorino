@@ -82,7 +82,7 @@ def main():
         "-tmp",
         "--tmp_dir",
         help="The temporary directory used during the conversion process. "
-             "If not provided, it defaults to <$HOME>/tmp_convert_rnx. ",
+             "If not provided, it defaults to <$HOME>/autorino_workflow/tmp. ",
         default='<$HOME>/autorino_workflow/tmp',
     )
     parser.add_argument(
@@ -128,6 +128,15 @@ def main():
         default=1,
     )
 
+    parser.add_argument(
+        "-fpt",
+        "--filter_prev_tables",
+        action="store_true",
+        help="If set, filters and skips previously converted files "
+             "with tables stored in the tmp tables directory.",
+        default=False,
+    )
+
     args = parser.parse_args()
 
     aroapi.convert_rnx(
@@ -143,6 +152,7 @@ def main():
         raw_out_dir=args.raw_out_dir,
         raw_out_structure=args.raw_out_structure,
         processes=args.processes,
+        filter_prev_tables=args.filter_prev_tables,
     )
 
 

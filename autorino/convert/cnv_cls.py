@@ -126,6 +126,7 @@ class ConvertGnss(arocmn.StepGnss):
         force=False,
         rinexmod_options=None,
         converter="auto",
+        filter_prev_tables=False,
     ):
         """
         "total action" method
@@ -151,6 +152,10 @@ class ConvertGnss(arocmn.StepGnss):
             The converter to be used for the conversion.
             If not specified, the best converter is automatically selected.
             Default is 'auto'.
+        filter_prev_tables : bool, optional
+            If True, filters and skip previously converted files
+            with tables stored in the tmp tables directory.
+            Default is False.
 
         Returns
         -------
@@ -199,7 +204,6 @@ class ConvertGnss(arocmn.StepGnss):
         if force:
             self.force("convert")
 
-        filter_prev_tables = False
         if filter_prev_tables:
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_tables)
             # Filter previous tables stored in log_dir

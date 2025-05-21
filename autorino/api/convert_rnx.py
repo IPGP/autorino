@@ -19,15 +19,6 @@ import geodezyx.utils
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
-
-def conver_raw_wrap(args):
-    raws, out_dir_use, tmp_dir, log_dir, metadata, force_rnx, rinexmod_options = args
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
-    cnv.load_tab_filelist(raws)
-    cnv.convert(force=force_rnx, rinexmod_options=rinexmod_options)
-    return cnv
-
-
 def convert_rnx(
     inp_raws,
     out_dir,
@@ -41,6 +32,7 @@ def convert_rnx(
     raw_out_dir=None,
     raw_out_structure=None,
     processes=1,
+    filter_prev_tables=False
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -95,7 +87,10 @@ def convert_rnx(
         Defaults to `out_structure` if not provided.
     processes : int, optional
         Number of processes to use for parallel conversion. Default is 1.
-
+    filter_prev_tables : bool, optional
+        If True, filters and skip previously converted files
+        with tables stored in the tmp tables directory.
+        Default is False.
 
     Returns
     -------
@@ -117,28 +112,29 @@ def convert_rnx(
             metadata,
             force_rnx,
             rinexmod_options,
+            filter_prev_tables
         )
         args_wrap.append(args)
 
     # Parallel RAW > RINEX conversion
-    results = []
 
-    # PoolExec = ThreadPoolExecutor
-    PoolExec = ProcessPoolExecutor
+    #### ++++ new style concurrent.futures
+    cnv_out_lis = []
+    # pool_exec = ThreadPoolExecutor
+    pool_exec = ProcessPoolExecutor
+    with pool_exec(max_workers=processes) as executor:
+        futures = [executor.submit(convert_raw_wrap, args) for args in args_wrap]
+        for f in as_completed(futures):
+            cnv_out_lis.append(f.result())
 
-    # with PoolExec(max_workers=processes) as executor:
-    #     futures = [executor.submit(conver_raw_wrap, args) for args in args_wrap]
-    #     for f in as_completed(futures):
-    #         results.append(f.result())
-
-    # Use multiprocessing to process the dates
-    pool = mp.Pool(processes=processes)
-    try:
-        _ = pool.map(conver_raw_wrap, args_wrap, chunksize=1)
-    except Exception as e:
-        logger.error("error in the pool.map : %s", e)
-
-    pool.close()
+    #### ++++ classic multiprocessing
+    # pool = mp.Pool(processes=processes)
+    # try:
+    #     _ = pool.map(convert_raw_wrap, args_wrap, chunksize=1)
+    # except Exception as e:
+    #     logger.error("error in the pool.map : %s", e)
+    #
+    # pool.close()
 
     ###### Archive the RAW files
     if raw_out_dir:
@@ -147,19 +143,63 @@ def convert_rnx(
             raw_out_structure = out_structure
         raw_out_dir_use = str(os.path.join(raw_out_dir, raw_out_structure))
 
-        cpy_raw = arocmn.StepGnss(raw_out_dir_use, tmp_dir, log_dir, metadata=metadata)
+        for cnv in cnv_out_lis:
+            cpy_raw = arocmn.StepGnss(raw_out_dir_use, tmp_dir, log_dir, metadata=metadata)
+            debug_print = False
 
-        debug_print = False
+            cpy_raw.load_tab_prev_tab(cnv.table)
+            cpy_raw.table["fpath_inp"] = cnv.table["fpath_inp"]
+            cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
+            cpy_raw.print_table() if debug_print else None
+            cpy_raw.guess_out_files()
+            cpy_raw.print_table() if debug_print else None
+            cpy_raw.filter_ok_out()
+            cpy_raw.print_table() if debug_print else None
+            cpy_raw.move_files(mode="inpout", force=force_raw, copy_only=True)
+            cpy_raw.print_table() if debug_print else None
 
-        cpy_raw.load_tab_prev_tab(cnv.table)
-        cpy_raw.table["fpath_inp"] = cnv.table["fpath_inp"]
-        cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
-        cpy_raw.print_table() if debug_print else None
-        cpy_raw.guess_out_files()
-        cpy_raw.print_table() if debug_print else None
-        cpy_raw.filter_ok_out()
-        cpy_raw.print_table() if debug_print else None
-        cpy_raw.move_files(mode="inpout", force=force_raw, copy_only=True)
-        cpy_raw.print_table() if debug_print else None
+    return cnv_out_lis
 
-    return results
+
+def convert_raw_wrap(args):
+    """
+    Wrapper function for converting RAW GNSS files to RINEX format.
+
+    Parameters
+    ----------
+    args : tuple
+        A tuple containing the following arguments:
+        - raws : list
+            List of RAW files to be converted.
+        - out_dir_use : str
+            The output directory where the converted files will be stored.
+        - tmp_dir : str
+            Temporary directory used during the conversion process.
+        - log_dir : str
+            Directory where logs will be stored.
+        - metadata : str or list
+            Metadata to be included in the converted RINEX files.
+        - force_rnx : bool
+            If True, forces the conversion even if output files already exist.
+        - rinexmod_options : dict
+            Options for modifying the RINEX files during the conversion.
+        - filter_prev_tables : bool
+            If True, filters and skips previously converted files with
+            tables stored in the tmp tables directory.
+
+    Returns
+    -------
+    arocnv.ConvertGnss
+        An instance of the `ConvertGnss` class containing the results of the conversion.
+    """
+    raws, out_dir_use, tmp_dir, log_dir, metadata, force_rnx, rinexmod_options, filter_prev_tables = args
+    # Initialize the ConvertGnss object with the provided directories and metadata
+    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    # Load the list of RAW files to be converted
+    cnv.load_tab_filelist(raws)
+    # Perform the conversion with the specified options
+    cnv.convert(force=force_rnx, rinexmod_options=rinexmod_options,
+                filter_prev_tables=filter_prev_tables)
+    # Return the ConvertGnss object containing the conversion results
+    return cnv
+
