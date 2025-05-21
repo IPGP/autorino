@@ -37,7 +37,7 @@ def convert_rnx(
     force_raw=False,
     raw_out_dir=None,
     raw_out_structure=None,
-    processes=1,
+    processes=1
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -102,12 +102,12 @@ def convert_rnx(
     log_dir = log_dir or tmp_dir
     out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
 
-    processes = 10
     inp_raws_chunked = geodezyx.utils.chunkIt(inp_raws, processes)
 
     # Parallel RAW > RINEX conversion
     results = []
-    with ProcessPoolExecutor() as executor:
+
+    with ProcessPoolExecutor(max_workers=processes) as executor:
         futures = [
             executor.submit(
                 conver_raw_wrap,
