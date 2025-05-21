@@ -1306,7 +1306,7 @@ class StepGnss:
 
         return flist
 
-    def load_tab_prev_tab(self, input_table, reset_table=True):
+    def load_tab_prev_tab(self, input_table, reset_table=True, drop_na=False):
         """
         Loads the table from the previous step's table.
 
@@ -1331,10 +1331,11 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
+        if drop_na:
+            input_table = input_table.dropna(subset=["fpath_out", "size_out"])
+
         self.table["fpath_inp"] = input_table["fpath_out"].values
         self.table["size_inp"] = input_table["size_out"].values
-
-        self.table.loc[self.table["fpath_inp"].isna(), "fpath_inp"] = "none"
 
         self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)

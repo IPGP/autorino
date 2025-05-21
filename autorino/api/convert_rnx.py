@@ -150,7 +150,7 @@ def convert_rnx(
 
             # the table from the ConvertGnss object
             # is necessary to get the epoch
-            cpy_raw.load_tab_prev_tab(cnv.table)
+            cpy_raw.load_tab_prev_tab(cnv.table, drop_na=True)
             cpy_raw.table["fpath_inp"] = cnv.table["fpath_inp"]
             cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
             cpy_raw.print_table() if debug_print else None
