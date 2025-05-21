@@ -107,7 +107,8 @@ def convert_rnx(
     # Parallel RAW > RINEX conversion
     results = []
 
-    PoolExec = ThreadPoolExecutor # ProcessPoolExecutor
+    # PoolExec = ThreadPoolExecutor
+    PoolExec = ProcessPoolExecutor
 
     with PoolExec(max_workers=processes) as executor:
         futures = [
