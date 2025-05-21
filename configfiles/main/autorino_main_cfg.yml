@@ -34,7 +34,7 @@ station:
         session_01D30S:
             general:
                 active: True # Indicates if the session is active.
-                name: "01D30S" # Free name of the session (must be the same as the 'session_XXXXX' key suffix).
+                session_name: "01D30S" # Free name of the session (must be the same as the 'session_XXXXX' key suffix).
                 data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
                 tmp_dir_parent: '/<$HOME>/autorino_workflow/tmp' # Parent directory for temporary files.
                 tmp_dir_structure: '' # Structure for temporary directories.

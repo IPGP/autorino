@@ -424,7 +424,7 @@ def run_steps(
             logger.info(load_table_msg_str, stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
-        elif stp.get_step_type() == 'rinexmod':
+        elif stp.get_step_type() == "rinexmod":
             stp.load_tab_inpdir(update_epochs=True)
             stp.rinexmod(**stp.options)
 
@@ -467,30 +467,25 @@ def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
     """
     parent_dir_out = arocmn.translator(parent_dir)
 
-    if parent_dir_out == "FROM_MAIN":
-        # case when the parent directory is not defined in the main cfgfiles file
+    mkdir_err_msg = " does not exists, create it manually first (mkdir -p ...)"
 
-        if not parent_dir_key:
-            parent_dir_key = "a directory"
+    ### FROM_MAIN is obsolete, this if test too
+    # if parent_dir_out == "FROM_MAIN":
+    #     # case when the parent directory is not defined in the main cfgfiles file
+    #
+    #     if not parent_dir_key:
+    #         parent_dir_key = "a directory"
+    #
+    #     logger.error(
+    #         "%s is not correctly defined in the main cfgfiles file "
+    #         "(FROM_MAIN can not be replaced)",
+    #         parent_dir_key,
+    #     )
+    #     raise FileNotFoundError(None, parent_dir_key + mkdir_err_msg)
 
-        logger.error(
-            "%s is not correctly defined in the main cfgfiles file "
-            "(FROM_MAIN can not be replaced)",
-            parent_dir_key,
-        )
-        raise FileNotFoundError(
-            None,
-            parent_dir_key + " do not exists, create it manually first (mkdir -p ...)",
-        )
-
-    elif not os.path.isdir(parent_dir_out):  # standard case
-        logger.error(
-            "%s do not exists, create it first manually (mkdir -p ...)", parent_dir_out
-        )
-        raise FileNotFoundError(
-            None,
-            parent_dir_out + " do not exists, create it manually first (mkdir -p ...)",
-        )
+    if not os.path.isdir(parent_dir_out): 
+        logger.error(parent_dir_out + mkdir_err_msg)
+        raise FileNotFoundError(None, parent_dir_out + mkdir_err_msg)
     else:
         return None
 
