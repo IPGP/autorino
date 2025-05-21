@@ -168,12 +168,10 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
             # Load the metadata if the path is a directory or a file
-            print("AAAAAAAAAAAAAA is dir")
             metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
         else:
-            # If not, consider it as a string
-            # (because the path might be translated later in the object)
-            print("AAAAAAAAAAAAAA is path")
+            # If not, keep the path it as a string
+            # (because it might contain aliases and be translated later in the object)
             metadata = slpath
     # Load metadata as device block
     else:
