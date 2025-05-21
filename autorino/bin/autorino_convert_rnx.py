@@ -83,14 +83,14 @@ def main():
         "--tmp_dir",
         help="The temporary directory used during the conversion process. "
              "If not provided, it defaults to <$HOME>/tmp_convert_rnx. ",
-        default='<$HOME>/tmp_convert_rnx',
+        default='<$HOME>/autorino_workflow/tmp',
     )
     parser.add_argument(
         "-log",
         "--log_dir",
         help="The directory where logs will be stored. "
-             "If not provided, it defaults to tmp_dir ",
-        default=None,
+             "If not provided, it defaults to <$HOME>/autorino_workflow/log",
+        default='<$HOME>/autorino_workflow/log',
     )
     parser.add_argument(
         "-rimo",
@@ -100,6 +100,7 @@ def main():
              "The options must be provided in a dictionnary represented as a string "
              "e.g. '{longname: False, filename_style: basic}' "
              "Defaults to None",
+        default=None,
     )
 
     parser.add_argument(
@@ -114,7 +115,7 @@ def main():
         "-rt",
         "--raw_out_structure",
         help="Structure for archiving RAW files. "
-             "Defaults to the same structure as the output directory if not provided.",
+             "Defaults to the same structure as the output directory (-o/--out_dir) if not provided.",
         default=None,
     )
 
