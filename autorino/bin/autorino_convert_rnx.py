@@ -119,6 +119,15 @@ def main():
         default=None,
     )
 
+    parser.add_argument(
+        "-p",
+        "--processes",
+        type=int,
+        help="Number of processes to use for conversion. "
+             "Defaults to 1 (single process).",
+        default=1,
+    )
+
     args = parser.parse_args()
 
     aroapi.convert_rnx(
@@ -133,6 +142,7 @@ def main():
         force_raw=args.force_raw,
         raw_out_dir=args.raw_out_dir,
         raw_out_structure=args.raw_out_structure,
+        processes=args.processes,
     )
 
 

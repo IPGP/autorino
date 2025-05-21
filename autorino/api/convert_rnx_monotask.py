@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on 18/09/2024 18:24:43
+Created on 21/05/2025 15:18:00
 
 @author: psakic
 """
@@ -9,21 +9,14 @@ Created on 18/09/2024 18:24:43
 import os
 import autorino.convert as arocnv
 import autorino.common as arocmn
+
+#### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
-from concurrent.futures import ProcessPoolExecutor, as_completed
-
-import geodezyx.utils
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
-def conver_raw_wrap(args):
-    raws, out_dir_use, tmp_dir, log_dir, metadata, force_rnx, rinexmod_options = args
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
-    cnv.load_tab_filelist(raws)
-    cnv.convert(force=force_rnx, rinexmod_options=rinexmod_options)
-    return cnv
 
 def convert_rnx(
     inp_raws,
@@ -37,7 +30,6 @@ def convert_rnx(
     force_raw=False,
     raw_out_dir=None,
     raw_out_structure=None,
-    processes=1,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -90,33 +82,25 @@ def convert_rnx(
     raw_out_structure : str, optional
         Structure for archiving RAW files.
         Defaults to `out_structure` if not provided.
-    processes : int, optional
-        Number of processes to use for parallel conversion. Default is 1.
 
 
     Returns
     -------
     None
     """
+
     tmp_dir = tmp_dir or os.path.join(out_dir, "tmp_convert_rnx")
     log_dir = log_dir or tmp_dir
     out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
 
-    processes = 10
-    inp_raws_chunked = geodezyx.utils.chunkIt(inp_raws, processes)
-
-    # Parallel RAW > RINEX conversion
-    results = []
-    with ProcessPoolExecutor() as executor:
-        futures = [
-            executor.submit(
-                conver_raw_wrap,
-                (raws, out_dir_use, tmp_dir, log_dir, metadata, force_rnx, rinexmod_options)
-            )
-            for raws in inp_raws_chunked
-        ]
-        for f in as_completed(futures):
-            results.append(f.result())
+    ###### Convert RAW > RINEX files
+    raws_use = inp_raws
+    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    cnv.load_tab_filelist(raws_use)
+    cnv.convert(
+        force=force_rnx,
+        rinexmod_options=rinexmod_options,
+    )
 
     ###### Archive the RAW files
     if raw_out_dir:
@@ -140,4 +124,4 @@ def convert_rnx(
         cpy_raw.move_files(mode="inpout", force=force_raw, copy_only=True)
         cpy_raw.print_table() if debug_print else None
 
-    return results
+    return cnv
