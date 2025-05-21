@@ -141,16 +141,9 @@ def ftp_create_obj(
             else:
                 print(e)
                 time.sleep(sleep_time)
-        except OSError as e:
+        except (OSError, ftplib.error_perm, Exception) as e:
             logger.error("Unable to create FTP object: %s", str(e))
             return None
-        except ftplib.error_perm as e:
-            logger.error("Unable to create FTP object: %s", str(e))
-            return None
-        except Exception as e:
-            logger.error("Unable to create FTP object: %s", str(e))
-            return None
-
 
 def list_remote_ftp(
     hostname,
