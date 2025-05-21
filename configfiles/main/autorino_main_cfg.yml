@@ -1,7 +1,7 @@
 # Configuration file for the Autorino project.
 # This YAML file defines the structure and settings for the environment, station, and sessions.
 
-cfgfile_version: 20.1 # Version of the configuration file format.
+cfgfile_version: 20.2 # Version of the configuration file format.
 
 ######### DEFINITION OF THE ENVIRONMENT
 environment:
@@ -31,10 +31,10 @@ station:
       country: "France" # Country name in ISO 3166 format.
       sitelog_path: <$HOME>/sitelogs/ # Path to site logs (file or directory).
     sessions:
-        session_24h30s:
+        session_01D30S:
             general:
-                active : True # Indicates if the session is active.
-                name: 24h30s # Name of the session.
+                active: True # Indicates if the session is active.
+                name: "01D30S" # Free name of the session (must be the same as the 'session_XXXXX' key suffix).
                 data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
                 tmp_dir_parent: '/<$HOME>/autorino_workflow/tmp' # Parent directory for temporary files.
                 tmp_dir_structure: '' # Structure for temporary directories.
@@ -45,7 +45,7 @@ station:
                 epoch2: 'yesterday at 23:59 UTC' # End of the epoch range.
                 period: "1D" # Time period using Pandas offset aliases.
                 round_method: "floor" # Method to round timestamps.
-                tz : 'UTC' # Timezone for the session.
+                tz: 'UTC' # Timezone for the session.
             steps:
                 download: ###### DOWNLOAD STEP DEFINITION
                     active : True # Indicates if the download step is active.

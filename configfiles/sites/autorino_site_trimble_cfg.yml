@@ -1,8 +1,8 @@
 ### other structure for the session(s) 
-cfgfile_version: 20.1 # describe the structure of the configuration file
+cfgfile_version: 20.2 # describe the structure of the configuration file
 include:
     - ../main/autorino_main_cfg.yml
-    - ../profile/autorino_profile_session24h30s_trimble_cfg.yml
+    - ../profile/autorino_profile_session_01D30S_trimble_cfg.yml
 station:
     site:
         name: 'Your Site Full Free Name' # Your Site Full Free Name

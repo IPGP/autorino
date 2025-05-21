@@ -1,9 +1,9 @@
-cfgfile_version: 20.1 # Version of the configuration file format.
+cfgfile_version: 20.2 # Version of the configuration file format.
 station:
     access:
         datalink: "vsat" # prevent download of several stations with the same datalink at the same time
     sessions:
-        session_24h30s:
+        session_01D30S:
             steps:
                 download:
                     options:
