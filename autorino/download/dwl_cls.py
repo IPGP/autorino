@@ -154,7 +154,11 @@ class DownloadGnss(arocmn.StepGnss):
 
         rmot_paths_list = []
 
-        for epoch in self.epoch_range.eporng_list():  ### go for irow !
+        #for epoch in self.epoch_range.eporng_list():  ### go for irow ! ### IMPROVE ME !!!
+
+        for irow, row in self.table.iterrows():
+            #epoch = row["epoch_srt"]
+
             ### guess the potential remote files
             rmot_dir_use = str(self.inp_dir)
             rmot_fname_use = str(self.inp_file_regex)
@@ -163,16 +167,16 @@ class DownloadGnss(arocmn.StepGnss):
                 self.access["protocol"], hostname_use, rmot_dir_use, rmot_fname_use
             )
 
-            rmot_path_use = self.translate_path(rmot_path_use, epoch, make_dir=False)
+            rmot_path_use = self.translate_path(rmot_path_use, row["epoch_srt"], make_dir=False)
 
             rmot_fname_use = os.path.basename(rmot_path_use)
 
             rmot_paths_list.append(rmot_path_use)
 
-            iepoch = self.table[self.table["epoch_srt"] == epoch].index[0]
+            #iepoch = self.table[self.table["epoch_srt"] == epoch].index[0]
 
-            self.table.loc[iepoch, "fname"] = rmot_fname_use
-            self.table.loc[iepoch, "fpath_inp"] = rmot_path_use
+            self.table.loc[irow, "fname"] = rmot_fname_use
+            self.table.loc[irow, "fpath_inp"] = rmot_path_use
             logger.debug("remote file guessed: %s", rmot_path_use)
 
         # for guess, all input files are considered as ok a priori
@@ -194,22 +198,26 @@ class DownloadGnss(arocmn.StepGnss):
 
         local_paths_list = []
 
-        for epoch in self.epoch_range.eporng_list():  # go for irow !
+        # for epoch in self.epoch_range.eporng_list():  # go for irow ! ### IMPROVE ME !!!
+
+        for irow, row in self.table.iterrows():
+            #epoch = row["epoch_srt"]
+
             # guess the potential local files
             local_dir_use = str(self.out_dir)
             local_fname_use = str(self.inp_file_regex)
             local_path_use = os.path.join(local_dir_use, local_fname_use)
 
-            local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
+            local_path_use = self.translate_path(local_path_use, row["epoch_srt"], make_dir=False)
 
             local_fname_use = os.path.basename(local_path_use)
 
             local_paths_list.append(local_path_use)
 
-            iepoch = self.table[self.table["epoch_srt"] == epoch].index
+            # iepoch = self.table[self.table["epoch_srt"] == epoch].index
 
-            self.table.loc[iepoch, "fname"] = local_fname_use
-            self.table.loc[iepoch, "fpath_out"] = local_path_use
+            self.table.loc[irow, "fname"] = local_fname_use
+            self.table.loc[irow, "fpath_out"] = local_path_use
             logger.debug("local file guessed: %s", local_path_use)
 
         logger.info("nbr local raw files guessed: %s", len(local_paths_list))
