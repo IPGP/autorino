@@ -11,7 +11,7 @@ import autorino.convert as arocnv
 import autorino.common as arocmn
 import logging
 import autorino.cfgenv.env_read as aroenv
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 
 import geodezyx.utils
 
@@ -107,7 +107,9 @@ def convert_rnx(
     # Parallel RAW > RINEX conversion
     results = []
 
-    with ProcessPoolExecutor(max_workers=processes) as executor:
+    PoolExec = ThreadPoolExecutor # ProcessPoolExecutor
+
+    with PoolExec(max_workers=processes) as executor:
         futures = [
             executor.submit(
                 conver_raw_wrap,
