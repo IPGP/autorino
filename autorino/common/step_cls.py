@@ -1331,8 +1331,10 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
+        print(input_table.to_string())
         if drop_na:
             input_table = input_table.dropna(subset=["fpath_out", "size_out"])
+        print(input_table.to_string())
 
         self.table["fpath_inp"] = input_table["fpath_out"].values
         self.table["size_inp"] = input_table["size_out"].values
