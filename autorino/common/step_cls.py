@@ -1409,33 +1409,33 @@ class StepGnss:
         None
         """
 
-        ### more pythonic, less intuitive (and does not work well)
-        self.table.reset_index(inplace=True)
-        df_prev_tab.reset_index(inplace=True)
-
-        # Merge to get updated values for matching rows
-        df_merged = self.table.merge(
-            df_prev_tab[[col_ref] + get_cols],
-            on=col_ref,
-            how="left",
-            suffixes=("", "_prev")
-        )
-        # Update only the specified columns
-        for col in get_cols:
-            prev_col = f"{col}_prev"
-            if prev_col in df_merged:
-                self.table[col] = df_merged[prev_col].combine_first(self.table[col])
-
-        # ## less pythonic, more intuitive
+        ### too pythonic, less intuitive (and does not work well)
+        # self.table.reset_index(inplace=True)
+        # df_prev_tab.reset_index(inplace=True)
+        #
+        # # Merge to get updated values for matching rows
+        # df_merged = self.table.merge(
+        #     df_prev_tab[[col_ref] + get_cols],
+        #     on=col_ref,
+        #     how="left",
+        #     suffixes=("", "_prev")
+        # )
+        # # Update only the specified columns
         # for col in get_cols:
-        #     if col in df_prev_tab.columns:
-        #         mask = self.table[col_ref].isin(df_prev_tab[col_ref])
-        #         matched = self.table.loc[mask, col_ref]
-        #         for idx in matched.index:
-        #             prev_value = df_prev_tab.loc[
-        #                 df_prev_tab[col_ref] == self.table.at[idx, col_ref], col
-        #             ].values[0]
-        #             self.table.at[idx, col] = prev_value
+        #     prev_col = f"{col}_prev"
+        #     if prev_col in df_merged:
+        #         self.table[col] = df_merged[prev_col].combine_first(self.table[col])
+
+        ## less pythonic, more intuitive
+        for col in get_cols:
+            if col in df_prev_tab.columns:
+                mask = self.table[col_ref].isin(df_prev_tab[col_ref])
+                matched = self.table.loc[mask, col_ref]
+                for idx in matched.index:
+                    prev_value = df_prev_tab.loc[
+                        df_prev_tab[col_ref] == self.table.at[idx, col_ref], col
+                    ].values[0]
+                    self.table.at[idx, col] = prev_value
 
         for epocol in ["epoch_srt", "epoch_end"]:
             if epocol in get_cols:
