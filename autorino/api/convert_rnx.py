@@ -23,7 +23,7 @@ logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 def convert_rnx(
     inp_raws,
     out_dir,
-    out_structure="<SITE_ID4>/%Y/",
+    out_structure="%Y/%j",
     tmp_dir=None,
     log_dir=None,
     rinexmod_options=None,
@@ -54,7 +54,7 @@ def convert_rnx(
         If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
         See README.md for more information.
         Typical values are '<SITE_ID4>/%Y/' or '%Y/%j/'.
-        Default value is '<SITE_ID4>/%Y/'.
+        Default value is '%Y/%j/'.
     tmp_dir : str, optional
         The temporary directory used during the conversion process.
         If not provided, it defaults to <out_dir>/tmp_convert_rnx.
@@ -97,6 +97,12 @@ def convert_rnx(
     -------
     None
     """
+
+    if not metadata:
+        logger.warning("No metadata (sitelogs...) provided while highly recommended.")
+        logger.warning("Be sure of what you are doing! (check -m option)")
+
+
     tmp_dir = tmp_dir or os.path.join(out_dir, "tmp_convert_rnx")
     log_dir = log_dir or tmp_dir
     out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
@@ -152,9 +158,9 @@ def convert_rnx(
 
         # the table from the ConvertGnss object
         # is necessary to get the epoch
-        cpy_raw.load_tab_prev_tab(cnv_table_cat, drop_na=True)
-        cpy_raw.table["fpath_inp"] = cnv_table_cat["fpath_inp"]
-        cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
+        cpy_raw.load_tab_prev_tab(cnv_table_cat, drop_na=False, new_inp_is_prev="inp")
+        cpy_raw.print_table() if debug_print else None
+        cpy_raw.filter_na(["epoch_srt","epoch_end"])
         cpy_raw.print_table() if debug_print else None
         cpy_raw.guess_out_files()
         cpy_raw.print_table() if debug_print else None
@@ -207,4 +213,3 @@ def convert_raw_wrap(args):
                 filter_prev_tables=filter_prev_tables)
     # Return the ConvertGnss object containing the conversion results
     return cnv
-

@@ -1205,13 +1205,16 @@ class StepGnss:
 
         self.table_ok_cols_bool()
 
+        # we define the FORMATTERS (i.e. functions) for each column
         form = dict()
         form["fraw"] = _shrink_str
         form["fpath_inp"] = _shrink_str
         form["fpath_out"] = _shrink_str
 
-        form["epoch_srt"] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
-        form["epoch_end"] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
+        print_time = lambda t: t.strftime("%y-%m-%d %H:%M:%S") if not pd.isna(t) else "NaT"
+        form["epoch_srt"] = print_time
+        form["epoch_end"] = print_time
+
 
         str_out = self.table.to_string(max_colwidth=max_colwidth + 1, formatters=form)
         # add +1 in max_colwidth for safety
@@ -1306,7 +1309,8 @@ class StepGnss:
 
         return flist
 
-    def load_tab_prev_tab(self, input_table, reset_table=True, drop_na=False):
+    def load_tab_prev_tab(self, prev_table, reset_table=True, drop_na=False,
+                          new_inp_is_prev="out"):
         """
         Loads the table from the previous step's table.
 
@@ -1318,7 +1322,7 @@ class StepGnss:
 
         Parameters
         ----------
-        input_table : pandas.DataFrame
+        prev_table : pandas.DataFrame
             The table from the previous step in the processing chain. It should contain 'fpath_out', 'size_out',
             'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
         reset_table : bool, optional
@@ -1331,21 +1335,30 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
-        print(input_table.to_string())
+        print(prev_table)
         if drop_na:
-            input_table = input_table.dropna(subset=["fpath_out", "size_out"])
-        print(input_table.to_string())
+            prev_table = prev_table.dropna(subset=["fpath_out", "size_out"])
+        print(prev_table)
 
-        self.table["fpath_inp"] = input_table["fpath_out"].values
-        self.table["size_inp"] = input_table["size_out"].values
+        if new_inp_is_prev == "out":
+            self.table["fpath_inp"] = prev_table["fpath_out"].values
+            self.table["size_inp"] = prev_table["size_out"].values
+        elif new_inp_is_prev == "inp":
+            self.table["fpath_inp"] = prev_table["fpath_inp"].values
+            self.table["size_inp"] = prev_table["size_inp"].values
+        else:
+            raise ValueError("new_inp_is_prev must be 'out' or 'inp'")
 
-        self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
-        self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
+        isfile_lbd = lambda x: os.path.isfile(x) if isinstance(x,str) else "none"
+        basnam_lbd = lambda x: os.path.basename(x) if isinstance(x,str) else "none"
 
-        self.table["site"] = input_table["site"].values
+        self.table["ok_inp"] = self.table["fpath_inp"].apply(isfile_lbd)
+        self.table["fname"] = self.table["fpath_inp"].apply(basnam_lbd)
+
+        self.table["site"] = prev_table["site"].values
         # epoch_srt and epoch_end are supposed to be timezone aware
-        self.table["epoch_srt"] = input_table["epoch_srt"].values
-        self.table["epoch_end"] = input_table["epoch_end"].values
+        self.table["epoch_srt"] = prev_table["epoch_srt"].values
+        self.table["epoch_end"] = prev_table["epoch_end"].values
 
         return None
 
@@ -2102,97 +2115,41 @@ class StepGnss:
             out = self.table[self.table[col]]
         return out
 
-    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
-        """
-        Updates the rinexmod options dictionnary.
 
-        This method updates the rinexmod options based on the provided input options and the current
-        state of the StepGnss object. It handles default options, merges them with input options, and sets
-        specific options like metadata and site name/marker.
+    def filter_na(self, cols=None):
+        """
+        Filters the table to remove rows with NaN values in the specified columns,
+        and prints the dropped rows.
 
         Parameters
         ----------
-        rinexmod_options_inp : dict, optional
-            Input options for RINEX modification. Default is None.
-        irow : int, optional
-            Row index for setting the site name/marker from the table. Default is None.
-        debug_print : bool, optional
-            If True, prints the RINEX modification options for debugging purposes. Default is False.
+        cols : list, optional
+            The list of columns to check for NaN values.
+            If None, all columns are checked.
 
         Returns
         -------
-        dict
-            Updated RINEX modification options.
+        pandas.DataFrame
+            The dropped rows.
         """
 
-        if not rinexmod_options_inp:
-            rinexmod_options_inp = dict()
+        if cols is None:
+            cols = self.table.columns.tolist()
 
-        # just a shorter alias
-        rimopts_inp = rinexmod_options_inp
+        # Identify rows to be dropped
+        isna_bool = self.table[cols].isna().any(axis=1)
+        dropped_rows = self.table[isna_bool]
+        if not dropped_rows.empty:
+            logger.warning("row(s) filtered, NaN/NaT values in: %s", cols)
+            for irow, row in dropped_rows.iterrows():
+                logger.warning(row)
 
-        # default options/arguments for rinexmod
-        rimopts_def = {
-            # 'marker': 'XXXX', # forced below
-            # 'sitelog': metadata, # forced below
-            "compression": "gz",
-            # "longname": True, # managed below
-            "force_rnx_load": True,
-            "verbose": False,
-            "filename_style": "basic",
-            "full_history": True,
-        }
+        # Return filtered table
+        self.table = self.table[~isna_bool]
+        self.table.reset_index(drop=True, inplace=True)
 
-        # handle the specific case of a station.info input
-        # necessary for users using the station.info input (like EK@ENS)
-        update_sitelog = True
-        if not rimopts_inp.get("sitelog") and rimopts_inp.get("station_info"):
-            rimopts_def.pop("sitelog", None)
-            update_sitelog = False
+        return dropped_rows
 
-        # create the working copy of the default options
-        rimopts_out = rimopts_def.copy()
-        rimopts_wrk = rimopts_inp.copy()
-
-        # print the initial state
-        if debug_print:
-            logger.debug("default options for rinexmod: %s", rimopts_def)
-            logger.debug("input options for rinexmod: %s", rimopts_inp)
-
-        # +++ set #1: the metadata/sitelog
-        if update_sitelog:
-            rimopts_wrk["sitelog"] = self.metadata
-
-        # +++ set #2: site name/marker
-        if "marker" in rimopts_inp.keys():
-            rimopts_wrk["marker"] = rimopts_inp["marker"]
-        elif irow is not None:
-            rimopts_wrk["marker"] = self.table.loc[irow, "site"]
-        elif self.site_id9:
-            rimopts_wrk["marker"] = self.site_id9
-        else:
-            logger.warning(
-                "unable to set the marker (irow is %s, self.site_id9 is %s)",
-                irow,
-                self.site_id9,
-            )
-        # better give nothing rather than XXXX00XXX (nasty side effects)
-        if rimopts_wrk["marker"] == "XXXX00XXX":
-            rimopts_wrk.pop("marker", None)
-
-        # +++ set #3: the short/longname
-        # if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
-        if not any(k in rimopts_wrk for k in ("shortname", "longname")):
-            rimopts_wrk["shortname"] = False
-            rimopts_wrk["longname"] = True
-
-        # DO THE UPDATE HERE
-        rimopts_out.update(rimopts_wrk)
-
-        if debug_print:
-            logger.debug("final options for rinexmod: %s", rimopts_wrk)
-
-        return rimopts_out
 
     #               _   _                   _ _                           _ _    __                                 __
     #     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
@@ -2291,6 +2248,100 @@ class StepGnss:
             self.table.loc[irow, "ok_out"] = False
 
         return bool_ok
+
+
+    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
+        """
+        Updates the rinexmod options dictionnary.
+
+        This method updates the rinexmod options based on the provided input options and the current
+        state of the StepGnss object. It handles default options, merges them with input options, and sets
+        specific options like metadata and site name/marker.
+
+        Parameters
+        ----------
+        rinexmod_options_inp : dict, optional
+            Input options for RINEX modification. Default is None.
+        irow : int, optional
+            Row index for setting the site name/marker from the table. Default is None.
+        debug_print : bool, optional
+            If True, prints the RINEX modification options for debugging purposes. Default is False.
+
+        Returns
+        -------
+        dict
+            Updated RINEX modification options.
+        """
+
+        if not rinexmod_options_inp:
+            rinexmod_options_inp = dict()
+
+        # just a shorter alias
+        rimopts_inp = rinexmod_options_inp
+
+        # default options/arguments for rinexmod
+        rimopts_def = {
+            # 'marker': 'XXXX', # forced below
+            # 'sitelog': metadata, # forced below
+            "compression": "gz",
+            # "longname": True, # managed below
+            "force_rnx_load": True,
+            "verbose": False,
+            "filename_style": "basic",
+            "full_history": True,
+        }
+
+        # handle the specific case of a station.info input
+        # necessary for users using the station.info input (like EK@ENS)
+        update_sitelog = True
+        if not rimopts_inp.get("sitelog") and rimopts_inp.get("station_info"):
+            rimopts_def.pop("sitelog", None)
+            update_sitelog = False
+
+        # create the working copy of the default options
+        rimopts_out = rimopts_def.copy()
+        rimopts_wrk = rimopts_inp.copy()
+
+        # print the initial state
+        if debug_print:
+            logger.debug("default options for rinexmod: %s", rimopts_def)
+            logger.debug("input options for rinexmod: %s", rimopts_inp)
+
+        # +++ set #1: the metadata/sitelog
+        if update_sitelog:
+            rimopts_wrk["sitelog"] = self.metadata
+
+        # +++ set #2: site name/marker
+        if "marker" in rimopts_inp.keys():
+            rimopts_wrk["marker"] = rimopts_inp["marker"]
+        elif irow is not None:
+            rimopts_wrk["marker"] = self.table.loc[irow, "site"]
+        elif self.site_id9:
+            rimopts_wrk["marker"] = self.site_id9
+        else:
+            logger.warning(
+                "unable to set the marker (irow is %s, self.site_id9 is %s)",
+                irow,
+                self.site_id9,
+            )
+        # better give nothing rather than XXXX00XXX (nasty side effects)
+        if rimopts_wrk["marker"] == "XXXX00XXX":
+            rimopts_wrk.pop("marker", None)
+
+        # +++ set #3: the short/longname
+        # if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
+        if not any(k in rimopts_wrk for k in ("shortname", "longname")):
+            rimopts_wrk["shortname"] = False
+            rimopts_wrk["longname"] = True
+
+        # DO THE UPDATE HERE
+        rimopts_out.update(rimopts_wrk)
+
+        if debug_print:
+            logger.debug("final options for rinexmod: %s", rimopts_wrk)
+
+        return rimopts_out
+
 
     def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
