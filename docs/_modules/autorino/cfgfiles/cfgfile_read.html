@@ -251,21 +251,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># ++++ METADATA</span>
-    <span class="c1"># Load as sitelog</span>
-
     <span class="n">y_station</span> <span class="o">=</span> <span class="n">y_inp</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">]</span>
     <span class="n">y_sessions</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;sessions&quot;</span><span class="p">]</span>
-
+    <span class="c1"># Load metadata as external sitelog(s)</span>
     <span class="k">if</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">][</span><span class="s2">&quot;attributes_from_sitelog&quot;</span><span class="p">]:</span>
         <span class="n">slpath</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">][</span><span class="s2">&quot;sitelog_path&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">slpath</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">slpath</span><span class="p">):</span>
             <span class="c1"># Load the metadata if the path is a directory or a file</span>
             <span class="n">metadata</span> <span class="o">=</span> <span class="n">rinexmod_api</span><span class="o">.</span><span class="n">metadata_input_manage</span><span class="p">(</span><span class="n">slpath</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># If not, consider it as a string</span>
-            <span class="c1"># (because the path might be translated later in the object)</span>
+            <span class="c1"># If not, keep the path it as a string</span>
+            <span class="c1"># (because it might contain aliases and be translated later in the object)</span>
             <span class="n">metadata</span> <span class="o">=</span> <span class="n">slpath</span>
-    <span class="c1"># Load as device block</span>
+    <span class="c1"># Load metadata as device block</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">_device2mda</span><span class="p">(</span><span class="n">y_station</span><span class="p">)</span>
 
@@ -402,6 +400,8 @@
         <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SplitGnss</span>
     <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;splice&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SpliceGnss</span>
+    <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">RinexmodGnss</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;unknown step </span><span class="si">%s</span><span class="s2"> in cfgfiles file, skip&quot;</span><span class="p">,</span> <span class="n">step_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
@@ -518,7 +518,8 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">load_table_msg_str</span><span class="p">,</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">())</span>
             <span class="n">stp_rnx_inp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">stp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_mode</span><span class="o">=</span><span class="s2">&quot;given&quot;</span><span class="p">,</span> <span class="n">input_rinexs</span><span class="o">=</span><span class="n">stp_rnx_inp</span><span class="p">,</span> <span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;rinexmod&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">stp</span><span class="o">.</span><span class="n">rinexmod</span><span class="p">(</span><span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
 
         <span class="c1">##### close the step</span>
@@ -563,30 +564,25 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parent_dir_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">translator</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">parent_dir_out</span> <span class="o">==</span> <span class="s2">&quot;FROM_MAIN&quot;</span><span class="p">:</span>
-        <span class="c1"># case when the parent directory is not defined in the main cfgfiles file</span>
+    <span class="n">mkdir_err_msg</span> <span class="o">=</span> <span class="s2">&quot; does not exists, create it manually first (mkdir -p ...)&quot;</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_dir_key</span><span class="p">:</span>
-            <span class="n">parent_dir_key</span> <span class="o">=</span> <span class="s2">&quot;a directory&quot;</span>
+    <span class="c1">### FROM_MAIN is obsolete, this if test too</span>
+    <span class="c1"># if parent_dir_out == &quot;FROM_MAIN&quot;:</span>
+    <span class="c1">#     # case when the parent directory is not defined in the main cfgfiles file</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if not parent_dir_key:</span>
+    <span class="c1">#         parent_dir_key = &quot;a directory&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1">#     logger.error(</span>
+    <span class="c1">#         &quot;%s is not correctly defined in the main cfgfiles file &quot;</span>
+    <span class="c1">#         &quot;(FROM_MAIN can not be replaced)&quot;,</span>
+    <span class="c1">#         parent_dir_key,</span>
+    <span class="c1">#     )</span>
+    <span class="c1">#     raise FileNotFoundError(None, parent_dir_key + mkdir_err_msg)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not correctly defined in the main cfgfiles file &quot;</span>
-            <span class="s2">&quot;(FROM_MAIN can not be replaced)&quot;</span><span class="p">,</span>
-            <span class="n">parent_dir_key</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="n">parent_dir_key</span> <span class="o">+</span> <span class="s2">&quot; do not exists, create it manually first (mkdir -p ...)&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">parent_dir_out</span><span class="p">):</span>  <span class="c1"># standard case</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> do not exists, create it first manually (mkdir -p ...)&quot;</span><span class="p">,</span> <span class="n">parent_dir_out</span>
-        <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-            <span class="kc">None</span><span class="p">,</span>
-            <span class="n">parent_dir_out</span> <span class="o">+</span> <span class="s2">&quot; do not exists, create it manually first (mkdir -p ...)&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">parent_dir_out</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">parent_dir_out</span> <span class="o">+</span> <span class="n">mkdir_err_msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent_dir_out</span> <span class="o">+</span> <span class="n">mkdir_err_msg</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 

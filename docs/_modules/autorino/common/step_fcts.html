@@ -301,6 +301,80 @@
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">tab_df_stk</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="print_tbl_core">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.print_tbl_core">[docs]</a>
+<span class="k">def</span> <span class="nf">print_tbl_core</span><span class="p">(</span><span class="n">table_inp</span><span class="p">,</span> <span class="n">max_colwidth</span><span class="o">=</span><span class="mi">33</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prints the table of the StepGnss object with specified formatting.</span>
+
+<span class="sd">    This method formats and prints the table of the StepGnss object. It shrinks the strings in the &#39;fraw&#39;,</span>
+<span class="sd">    &#39;fpath_inp&#39;, and &#39;fpath_out&#39; columns to a specified maximum length and formats the &#39;epoch_srt&#39; and &#39;epoch_end&#39;</span>
+<span class="sd">    columns as strings</span>
+<span class="sd">    with a specific date-time format. The method then prints the formatted table to the logger.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    table_inp : pd.DataFrame</span>
+<span class="sd">        The input table to be formatted and printed.</span>
+
+<span class="sd">    max_colwidth : int, optional</span>
+<span class="sd">        The maximum column width for the output table. Default is 33.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The formatted table as a string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_shrink_str</span><span class="p">(</span><span class="n">str_inp</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="n">max_colwidth</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shrinks a string to a specified maximum length.</span>
+
+<span class="sd">        This function shrinks a string to a specified maximum length by keeping the first and last parts</span>
+<span class="sd">        of the string and replacing the middle part with &#39;..&#39;.</span>
+<span class="sd">        The length of the first and last parts is half of the maximum length.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        str_inp : str</span>
+<span class="sd">            The input string to be shrunk.</span>
+<span class="sd">        maxlen : int, optional</span>
+<span class="sd">            The maximum length of the output string.</span>
+<span class="sd">            Default is the value of the &#39;max_colwidth&#39; parameter of the</span>
+<span class="sd">            &#39;verbose&#39; method.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The shrunk string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">str_inp</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">maxlen</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">str_inp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">halflen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">maxlen</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">str_out_shrink</span> <span class="o">=</span> <span class="n">str_inp</span><span class="p">[:</span><span class="n">halflen</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;..&quot;</span> <span class="o">+</span> <span class="n">str_inp</span><span class="p">[</span><span class="o">-</span><span class="n">halflen</span><span class="p">:]</span>
+            <span class="k">return</span> <span class="n">str_out_shrink</span>
+
+    <span class="n">table_inp</span><span class="o">.</span><span class="n">table_ok_cols_bool</span><span class="p">()</span>
+
+    <span class="c1"># we define the FORMATTERS (i.e. functions) for each column</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">form</span><span class="p">[</span><span class="s2">&quot;fraw&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_shrink_str</span>
+    <span class="n">form</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_shrink_str</span>
+    <span class="n">form</span><span class="p">[</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_shrink_str</span>
+
+    <span class="n">print_time</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;NaT&quot;</span>
+    <span class="p">)</span>
+    <span class="n">form</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">print_time</span>
+    <span class="n">form</span><span class="p">[</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">print_time</span>
+
+    <span class="n">str_out</span> <span class="o">=</span> <span class="n">table_inp</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">max_colwidth</span><span class="o">=</span><span class="n">max_colwidth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">formatters</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+    <span class="c1"># add +1 in max_colwidth for safety</span>
+
+    <span class="k">return</span> <span class="n">str_out</span></div>
+
+
 
 <div class="viewcode-block" id="is_ok">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.is_ok">[docs]</a>
@@ -440,9 +514,9 @@
 
 
 
-<div class="viewcode-block" id="move_core">
-<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.move_core">[docs]</a>
-<span class="k">def</span> <span class="nf">move_core</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="move_copy_core">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.move_copy_core">[docs]</a>
+<span class="k">def</span> <span class="nf">move_copy_core</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Moves or copies a file from the source to the destination.</span>
 
@@ -515,8 +589,6 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;level critical&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span></div>
-
-
 
 </pre></div>
 

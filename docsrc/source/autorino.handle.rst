@@ -16,3 +16,27 @@ autorino.handle.handle\_cls module
    :members:
    :undoc-members:
    :show-inheritance:
+
+autorino.handle.rinexmod\_cls module
+------------------------------------
+
+.. automodule:: autorino.handle.rinexmod_cls
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autorino.handle.splice\_cls module
+----------------------------------
+
+.. automodule:: autorino.handle.splice_cls
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+autorino.handle.split\_cls module
+---------------------------------
+
+.. automodule:: autorino.handle.split_cls
+   :members:
+   :undoc-members:
+   :show-inheritance:

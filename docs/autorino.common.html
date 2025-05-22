@@ -1141,6 +1141,25 @@ or a list of strings representing the exclusion list.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.filter_na">
+<span class="sig-name descname"><span class="pre">filter_na</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.filter_na"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.filter_na" title="Link to this definition"></a></dt>
+<dd><p>Filters the table to remove rows with NaN values in the specified columns,
+and prints the dropped rows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cols</strong> (<em>list</em><em>, </em><em>optional</em>) – The list of columns to check for NaN values.
+If None, all columns are checked.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The dropped rows.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.filter_ok_out">
 <span class="sig-name descname"><span class="pre">filter_ok_out</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.filter_ok_out"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.filter_ok_out" title="Link to this definition"></a></dt>
 <dd><p>Filters the raw files based on the ‘ok_out’ boolean column of the object’s table.</p>
@@ -1413,7 +1432,7 @@ Default is False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.load_tab_prev_tab">
-<span class="sig-name descname"><span class="pre">load_tab_prev_tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.load_tab_prev_tab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.load_tab_prev_tab" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load_tab_prev_tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prev_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_na</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_inp_is_prev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.load_tab_prev_tab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.load_tab_prev_tab" title="Link to this definition"></a></dt>
 <dd><p>Loads the table from the previous step’s table.</p>
 <p>This method takes the table from the previous step in the processing chain and uses it to update the current
 step’s table.
@@ -1423,7 +1442,7 @@ If ‘reset_table’ is True, it resets the current table before loading the new
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_table</strong> (<em>pandas.DataFrame</em>) – The table from the previous step in the processing chain. It should contain ‘fpath_out’, ‘size_out’,
+<li><p><strong>prev_table</strong> (<em>pandas.DataFrame</em>) – The table from the previous step in the processing chain. It should contain ‘fpath_out’, ‘size_out’,
 ‘fname’, ‘site’, ‘epoch_srt’, ‘epoch_end’, and ‘ok_inp’ columns.</p></li>
 <li><p><strong>reset_table</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the current table is reset before loading the new data. Default is True.</p></li>
 </ul>
@@ -2245,8 +2264,8 @@ Otherwise, it takes the first 4 characters of the input, converts them to upperc
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="autorino.common.step_fcts.move_core">
-<span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">move_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#move_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.move_core" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_fcts.move_copy_core">
+<span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">move_copy_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#move_copy_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.move_copy_core" title="Link to this definition"></a></dt>
 <dd><p>Moves or copies a file from the source to the destination.</p>
 <p>This function attempts to copy or move a file from the source path to the destination path.
 If the operation is successful, it logs the action and returns the path of the moved/copied file.
@@ -2266,6 +2285,30 @@ Default is False</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.common.step_fcts.print_tbl_core">
+<span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">print_tbl_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_colwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#print_tbl_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.print_tbl_core" title="Link to this definition"></a></dt>
+<dd><p>Prints the table of the StepGnss object with specified formatting.</p>
+<p>This method formats and prints the table of the StepGnss object. It shrinks the strings in the ‘fraw’,
+‘fpath_inp’, and ‘fpath_out’ columns to a specified maximum length and formats the ‘epoch_srt’ and ‘epoch_end’
+columns as strings
+with a specific date-time format. The method then prints the formatted table to the logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table_inp</strong> (<em>pd.DataFrame</em>) – The input table to be formatted and printed.</p></li>
+<li><p><strong>max_colwidth</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum column width for the output table. Default is 33.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The formatted table as a string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>

@@ -123,8 +123,8 @@
              <span class="s2">&quot;If provided, the converted files will be &quot;</span>
              <span class="s2">&quot;stored in a subdirectory of out_dir following this structure. &quot;</span>
              <span class="s2">&quot;See README.md for more information. &quot;</span>
-             <span class="s2">&quot;Typical values are &#39;&lt;SITE_ID4&gt;/</span><span class="si">%%</span><span class="s2">Y/&#39; or &#39;</span><span class="si">%%</span><span class="s2">Y/</span><span class="si">%%</span><span class="s2">j/.&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&lt;SITE_ID4&gt;/%Y/&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;Typical values are &#39;&lt;SITE_ID4&gt;/</span><span class="si">%%</span><span class="s2">Y/&#39; or &#39;</span><span class="si">%%</span><span class="s2">Y/</span><span class="si">%%</span><span class="s2">j/ (default).&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;%Y/%j&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -166,15 +166,15 @@
         <span class="s2">&quot;-tmp&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--tmp_dir&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The temporary directory used during the conversion process. &quot;</span>
-             <span class="s2">&quot;If not provided, it defaults to &lt;$HOME&gt;/tmp_convert_rnx. &quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&lt;$HOME&gt;/tmp_convert_rnx&#39;</span><span class="p">,</span>
+             <span class="s2">&quot;If not provided, it defaults to &lt;$HOME&gt;/autorino_workflow/tmp. &quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&lt;$HOME&gt;/autorino_workflow/tmp&#39;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;-log&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--log_dir&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The directory where logs will be stored. &quot;</span>
-             <span class="s2">&quot;If not provided, it defaults to tmp_dir &quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="s2">&quot;If not provided, it defaults to &lt;$HOME&gt;/autorino_workflow/log&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&lt;$HOME&gt;/autorino_workflow/log&#39;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;-rimo&quot;</span><span class="p">,</span>
@@ -184,6 +184,7 @@
              <span class="s2">&quot;The options must be provided in a dictionnary represented as a string &quot;</span>
              <span class="s2">&quot;e.g. &#39;{longname: False, filename_style: basic}&#39; &quot;</span>
              <span class="s2">&quot;Defaults to None&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -198,8 +199,26 @@
         <span class="s2">&quot;-rt&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--raw_out_structure&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Structure for archiving RAW files. &quot;</span>
-             <span class="s2">&quot;Defaults to the same structure as the output directory if not provided.&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;Defaults to the same structure as the output directory (-o/--out_dir) if not provided.&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-p&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--processes&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of processes to use for conversion. &quot;</span>
+             <span class="s2">&quot;Defaults to 1 (single process).&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-fpt&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--filter_prev_tables&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If set, filters and skips previously converted files &quot;</span>
+             <span class="s2">&quot;with tables stored in the tmp tables directory.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
@@ -216,6 +235,8 @@
         <span class="n">force_raw</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">force_raw</span><span class="p">,</span>
         <span class="n">raw_out_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">raw_out_dir</span><span class="p">,</span>
         <span class="n">raw_out_structure</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">raw_out_structure</span><span class="p">,</span>
+        <span class="n">processes</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">processes</span><span class="p">,</span>
+        <span class="n">filter_prev_tables</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">filter_prev_tables</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 

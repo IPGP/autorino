@@ -33,14 +33,6 @@ autorino.bin.autorino\_check\_rnx module
    :undoc-members:
    :show-inheritance:
 
-autorino.bin.autorino\_check\_rnx\_old module
----------------------------------------------
-
-.. automodule:: autorino.bin.autorino_check_rnx_old
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 autorino.bin.autorino\_convert\_rnx module
 ------------------------------------------
 

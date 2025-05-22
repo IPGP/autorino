@@ -243,7 +243,11 @@
 
         <span class="n">rmot_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_range</span><span class="o">.</span><span class="n">eporng_list</span><span class="p">():</span>  <span class="c1">### go for irow !</span>
+        <span class="c1">#for epoch in self.epoch_range.eporng_list():  ### go for irow ! ### IMPROVE ME !!!</span>
+
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="c1">#epoch = row[&quot;epoch_srt&quot;]</span>
+
             <span class="c1">### guess the potential remote files</span>
             <span class="n">rmot_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_dir</span><span class="p">)</span>
             <span class="n">rmot_fname_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">)</span>
@@ -252,16 +256,16 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">],</span> <span class="n">hostname_use</span><span class="p">,</span> <span class="n">rmot_dir_use</span><span class="p">,</span> <span class="n">rmot_fname_use</span>
             <span class="p">)</span>
 
-            <span class="n">rmot_path_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">rmot_path_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">],</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
             <span class="n">rmot_fname_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">)</span>
 
             <span class="n">rmot_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">)</span>
 
-            <span class="n">iepoch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">epoch</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1">#iepoch = self.table[self.table[&quot;epoch_srt&quot;] == epoch].index[0]</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_fname_use</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_path_use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_fname_use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_path_use</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;remote file guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rmot_path_use</span><span class="p">)</span>
 
         <span class="c1"># for guess, all input files are considered as ok a priori</span>
@@ -286,22 +290,26 @@
 
         <span class="n">local_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_range</span><span class="o">.</span><span class="n">eporng_list</span><span class="p">():</span>  <span class="c1"># go for irow !</span>
+        <span class="c1"># for epoch in self.epoch_range.eporng_list():  # go for irow ! ### IMPROVE ME !!!</span>
+
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="c1">#epoch = row[&quot;epoch_srt&quot;]</span>
+
             <span class="c1"># guess the potential local files</span>
             <span class="n">local_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span>
             <span class="n">local_fname_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">)</span>
             <span class="n">local_path_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_dir_use</span><span class="p">,</span> <span class="n">local_fname_use</span><span class="p">)</span>
 
-            <span class="n">local_path_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">local_path_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">],</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
             <span class="n">local_fname_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">)</span>
 
             <span class="n">local_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">)</span>
 
-            <span class="n">iepoch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">epoch</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+            <span class="c1"># iepoch = self.table[self.table[&quot;epoch_srt&quot;] == epoch].index</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_fname_use</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_path_use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_fname_use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_path_use</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;local file guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">local_path_use</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;nbr local raw files guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_paths_list</span><span class="p">))</span>
@@ -505,9 +513,9 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Remote server </span><span class="si">%s</span><span class="s2"> is not reachable.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;Remote server </span><span class="si">%s</span><span class="s2"> is reachable. (</span><span class="si">%f</span><span class="s2"> ms)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Remote server </span><span class="si">%s</span><span class="s2"> is reachable. (</span><span class="si">%d</span><span class="s2"> ms)&quot;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">],</span>
-                <span class="n">ping_out</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">ping_out</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ping_out</span></div>

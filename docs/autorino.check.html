@@ -64,10 +64,9 @@
 <li class="toctree-l3"><a class="reference internal" href="autorino.cfglog.html">autorino.cfglog package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.check package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-autorino.check.check_cls">autorino.check.check_cls module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-autorino.check.check_fcts">autorino.check.check_fcts module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-autorino.check.check_old">autorino.check.check_old module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-autorino.check.trimble_filelist_html">autorino.check.trimble_filelist_html module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autorino-check-check-cls-module">autorino.check.check_cls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autorino-check-check-fcts-module">autorino.check.check_fcts module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#autorino-check-trimble-filelist-html-module">autorino.check.trimble_filelist_html module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.common.html">autorino.common package</a></li>
@@ -105,264 +104,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-autorino.check">
-<span id="autorino-check-package"></span><h1>autorino.check package<a class="headerlink" href="#module-autorino.check" title="Link to this heading"></a></h1>
+  <section id="autorino-check-package">
+<h1>autorino.check package<a class="headerlink" href="#autorino-check-package" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-autorino.check.check_cls">
-<span id="autorino-check-check-cls-module"></span><h2>autorino.check.check_cls module<a class="headerlink" href="#module-autorino.check.check_cls" title="Link to this heading"></a></h2>
-<p>Created on 27/01/2025 09:35:53</p>
-<p>&#64;author: psakic</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="autorino.check.check_cls.CheckGnss">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.check.check_cls.</span></span><span class="sig-name descname"><span class="pre">CheckGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="autorino.handle.html#autorino.handle.handle_cls.HandleGnss" title="autorino.handle.handle_cls.HandleGnss"><code class="xref py py-class docutils literal notranslate"><span class="pre">HandleGnss</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="autorino.check.check_cls.CheckGnss.analyze_rnxs">
-<span class="sig-name descname"><span class="pre">analyze_rnxs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss.analyze_rnxs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss.analyze_rnxs" title="Link to this definition"></a></dt>
-<dd><p>this function do the basic analysis of the table of RINEXs</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Flags meaning</p>
-<ul class="simple">
-<li><p>0 = OK</p></li>
-<li><p>1 = missing RINEX or critical content</p></li>
-<li><p>2 = incomplete RINEX</p></li>
-</ul>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="autorino.check.check_cls.CheckGnss.check">
-<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss.check" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="autorino-check-check-cls-module">
+<h2>autorino.check.check_cls module<a class="headerlink" href="#autorino-check-check-cls-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-autorino.check.check_fcts">
-<span id="autorino-check-check-fcts-module"></span><h2>autorino.check.check_fcts module<a class="headerlink" href="#module-autorino.check.check_fcts" title="Link to this heading"></a></h2>
-<p>Created on 27/01/2025 18:53:22</p>
-<p>&#64;author: psakic</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_fcts.color">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_fcts.</span></span><span class="sig-name descname"><span class="pre">color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_fcts.html#color"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_fcts.color" title="Link to this definition"></a></dt>
-<dd><p>This function returns a color according to the value of the input.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>val</strong> (<em>float</em>) – The value to be colored.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>str</strong></p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>color</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_fcts.colorize_list">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_fcts.</span></span><span class="sig-name descname"><span class="pre">colorize_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_fcts.html#colorize_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_fcts.colorize_list" title="Link to this definition"></a></dt>
-<dd><p>This function colorizes a list of values.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>list_inp</strong> (<em>list</em>) – The list of values to be colorized.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>list</strong></p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of colorized values</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_fcts.get_tabult_raw">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_fcts.</span></span><span class="sig-name descname"><span class="pre">get_tabult_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chk_tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">short_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_fcts.html#get_tabult_raw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_fcts.get_tabult_raw" title="Link to this definition"></a></dt>
-<dd><p>This function returns a tabulated string of the check table.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>chk_tab</strong> (<em>pd.DataFrame</em>) – The check table.</p></li>
-<li><p><strong>short_label</strong> (<em>bool</em><em>, </em><em>optional</em>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>tabu_chk_col</strong> (<em>str</em>) – The tabulated string of the check table with colored values.</p></li>
-<li><p><strong>tabu_chk_bnw</strong> (<em>str</em>) – The tabulated string of the check table with black and white values.</p></li>
-<li><p><strong>df_chk_sum</strong> (<em>pd.DataFrame</em>) – The values of the check table summarized in a dataframe.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="autorino-check-check-fcts-module">
+<h2>autorino.check.check_fcts module<a class="headerlink" href="#autorino-check-check-fcts-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-autorino.check.check_old">
-<span id="autorino-check-check-old-module"></span><h2>autorino.check.check_old module<a class="headerlink" href="#module-autorino.check.check_old" title="Link to this heading"></a></h2>
-<p>Created on Fri Jun  2 10:56:52 2023</p>
-<p>&#64;author: psakic</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_old._analyze_rinex">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_old.</span></span><span class="sig-name descname"><span class="pre">_analyze_rinex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_in</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_old.html#_analyze_rinex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_old._analyze_rinex" title="Link to this definition"></a></dt>
-<dd><p>this function do the basic analysis of a DataFrame containing
-RINEX paths in a “fpath” column</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df_in</strong> (<em>DataFrame</em>) – DataFrame RINEX paths in a “fpath” column.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>df_out</strong> – Enhanced version of df_in (copied first) with the RINEX infos.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DataFrame</p>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Flags meaning</p>
-<ul class="simple">
-<li><p>0 = OK</p></li>
-<li><p>1 = missing RINEX or critical content</p></li>
-<li><p>2 = incomplete RINEX</p></li>
-</ul>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_old._row_color_formater">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_old.</span></span><span class="sig-name descname"><span class="pre">_row_color_formater</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_simple_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_full_in</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_old.html#_row_color_formater"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_old._row_color_formater" title="Link to this definition"></a></dt>
-<dd><p>Format a df_simple DataFrame with colors
-Need <a href="#id1"><span class="problematic" id="id2">df_full_</span></a> in to gat the flags values</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_old._simple_row">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_old.</span></span><span class="sig-name descname"><span class="pre">_simple_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_dat_in</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_old.html#_simple_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_old._simple_row" title="Link to this definition"></a></dt>
-<dd><p>Simplfy the date-grouped RINEX DataFrame in a one-line summary with
-just the completeness (“%”)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df_dat_in</strong> (<em>DataFrame</em>) – A date-grouped RINEX DataFrame.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>df_simple_out</strong> – One line simplfied version of df_dat_in.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DataFrame (mono-row)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_old._site_missing_in_date">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_old.</span></span><span class="sig-name descname"><span class="pre">_site_missing_in_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_dat_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sites_all</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_old.html#_site_missing_in_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_old._site_missing_in_date" title="Link to this definition"></a></dt>
-<dd><p>Identify the missing RINEX for a date
-and add they with dummy values in
-a date-grouped DataFrame</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>df_dat_in</strong> (<em>DataFrame</em>) – A date-grouped RINEX DataFrame
-(generated with _analyze_rinex and grouped with .groupby()).</p></li>
-<li><p><strong>sites_all</strong> (<em>list</em>) – a list of all site possible.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>df_dat_out</strong> – Enhanced version of df_dat_in (copied first) with the missing RINEX</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DataFrame</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.check_old.check_rinex">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.check_old.</span></span><span class="sig-name descname"><span class="pre">check_rinex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rinex_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_concat_df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_old.html#check_rinex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_old.check_rinex" title="Link to this definition"></a></dt>
-<dd><p>Frontend to check the validity of RINEXs (downloaded/converted)</p>
-<p>DataFrame tables are returned to gives an overview of the RINEXs</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rinex_dir</strong> (<em>str</em>) – parent directory of a RINEX archive.
-the complete directory and sub-dirs. will be crawled</p></li>
-<li><p><strong>start</strong> (<em>datetime</em>) – start date of the wished period.</p></li>
-<li><p><strong>end</strong> (<em>datetime</em>) – end date of the wished period.</p></li>
-<li><p><strong>silent</strong> (<em>bool</em><em>, </em><em>optional</em>) – do not print the tables in the console
-The default is False (tables will be printed).</p></li>
-<li><p><strong>return_concat_df</strong> (<em>bool</em><em>, </em><em>optional</em>) – Instead of a daily print of the tables,
-all the analyzed days are stacked in single tables.
-Result is slower but more pretty.
-The default is False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>df_analyze_out</strong> (<em>DataFrame</em>) – A Table with all the details of the analyzed RINEXs.</p></li>
-<li><p><strong>df_simple_color_out</strong> (<em>DataFrame</em>) – A synoptic Table with simply the completeness of analyzed RINEXs.</p></li>
-<li><p><strong>df_issue_out</strong> (<em>DataFrame</em>) – A detailed Table for the problematic analyzed RINEXs.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-autorino.check.trimble_filelist_html">
-<span id="autorino-check-trimble-filelist-html-module"></span><h2>autorino.check.trimble_filelist_html module<a class="headerlink" href="#module-autorino.check.trimble_filelist_html" title="Link to this heading"></a></h2>
-<p>Created on 12/09/2024 11:11:20</p>
-<p>&#64;author: psakic</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.trimble_filelist_html.download_html_page">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.trimble_filelist_html.</span></span><span class="sig-name descname"><span class="pre">download_html_page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/trimble_filelist_html.html#download_html_page"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.trimble_filelist_html.download_html_page" title="Link to this definition"></a></dt>
-<dd><p>Download a webpage and save its content to a file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>url_inp</strong> (<em>str</em>) – The URL of the webpage to download.</p></li>
-<li><p><strong>output_file_inp</strong> (<em>str</em>) – The file path where the content will be saved.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The path to the downloaded file if successful, otherwise None.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.trimble_filelist_html.extract_trimble_filelist">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.trimble_filelist_html.</span></span><span class="sig-name descname"><span class="pre">extract_trimble_filelist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.{4}______[0-9]{12}A\\.T02'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_csv_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/trimble_filelist_html.html#extract_trimble_filelist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.trimble_filelist_html.extract_trimble_filelist" title="Link to this definition"></a></dt>
-<dd><p>Extract the list of Trimble files from an HTML file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>html_files</strong> (<em>list</em><em> or </em><em>str</em>) – The path to the HTML files. If a single file is provided, it should be a string.</p></li>
-<li><p><strong>pattern</strong> (<em>str</em><em>, </em><em>optional</em>) – The regex pattern to match the Trimble files. Default is “.{4}______[0-9]{12}A.T02”.</p></li>
-<li><p><strong>output_csv_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory where the CSV files will be saved. If None, CSV files will not be saved. Default is None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of Trimble files extracted from the HTML file.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.check.trimble_filelist_html.trimble_filelist_html">
-<span class="sig-prename descclassname"><span class="pre">autorino.check.trimble_filelist_html.</span></span><span class="sig-name descname"><span class="pre">trimble_filelist_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1M'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'download/Internal/%Y%m'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/trimble_filelist_html.html#trimble_filelist_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.trimble_filelist_html.trimble_filelist_html" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="autorino-check-trimble-filelist-html-module">
+<h2>autorino.check.trimble_filelist_html module<a class="headerlink" href="#autorino-check-trimble-filelist-html-module" title="Link to this heading"></a></h2>
 </section>
 </section>
 

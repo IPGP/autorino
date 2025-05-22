@@ -25,14 +25,6 @@ autorino.check.check\_fcts module
    :undoc-members:
    :show-inheritance:
 
-autorino.check.check\_old module
---------------------------------
-
-.. automodule:: autorino.check.check_old
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 autorino.check.trimble\_filelist\_html module
 ---------------------------------------------
 

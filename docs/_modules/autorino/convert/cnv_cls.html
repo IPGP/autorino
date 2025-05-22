@@ -215,6 +215,7 @@
         <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">converter</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="n">filter_prev_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;total action&quot; method</span>
@@ -240,6 +241,10 @@
 <span class="sd">            The converter to be used for the conversion.</span>
 <span class="sd">            If not specified, the best converter is automatically selected.</span>
 <span class="sd">            Default is &#39;auto&#39;.</span>
+<span class="sd">        filter_prev_tables : bool, optional</span>
+<span class="sd">            If True, filters and skip previously converted files</span>
+<span class="sd">            with tables stored in the tmp tables directory.</span>
+<span class="sd">            Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -288,7 +293,6 @@
         <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="s2">&quot;convert&quot;</span><span class="p">)</span>
 
-        <span class="n">filter_prev_tables</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">filter_prev_tables</span><span class="p">:</span>
             <span class="n">prv_tbl_df</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">load_previous_tables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_tables</span><span class="p">)</span>
             <span class="c1"># Filter previous tables stored in log_dir</span>
