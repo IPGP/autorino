@@ -230,6 +230,11 @@ def list_remote_ftp(
         logger.error("FTP directory change failed: %s", str(e))
         logger.error("Wished destination: %s", remote_dir_use)
         return []
+    except EOFError as e:
+        logger.error("FTP cwd failed: %s %s", remote_dir_use, str(e))
+        return []
+
+
 
     # Retrieve list of files
     try:
