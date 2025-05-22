@@ -1178,8 +1178,6 @@ class StepGnss:
 
         str_out = arocmn.print_tab_core(
             self.table,
-            no_print=no_print,
-            no_return=no_return,
             max_colwidth=max_colwidth,
         )
 
@@ -1274,9 +1272,7 @@ class StepGnss:
 
         return flist
 
-    def load_tab_prev_tab(
-        self, prev_table, reset_table=True, new_inp_is_prev="out"
-    ):
+    def load_tab_prev_tab(self, prev_table, reset_table=True, new_inp_is_prev="out"):
         """
         Loads the table from the previous step's table.
 
@@ -1389,8 +1385,12 @@ class StepGnss:
 
         return None
 
-    def get_vals_prev_tab(self, df_prev_tab, col_ref="fpath_inp",
-                            get_cols=["site", "epoch_srt", "epoch_end"]):
+    def get_vals_prev_tab(
+        self,
+        df_prev_tab,
+        col_ref="fpath_inp",
+        get_cols=["site", "epoch_srt", "epoch_end"],
+    ):
         """
         Updates columns in self.table with values from df_prev_tab for matching col_ref entries.
 
@@ -1428,12 +1428,11 @@ class StepGnss:
         ## less pythonic, more intuitive
         for col in get_cols:
             if col in df_prev_tab.columns:
-                mask = self.table[col_ref].isin(df_prev_tab[col_ref])
-                matched = self.table.loc[mask, col_ref]
+                mask1 = self.table[col_ref].isin(df_prev_tab[col_ref])
+                matched = self.table.loc[mask1, col_ref]
                 for idx in matched.index:
-                    prev_value = df_prev_tab.loc[
-                        df_prev_tab[col_ref] == self.table.at[idx, col_ref], col
-                    ].values[0]
+                    mask2 = self.table.at[idx, col_ref] == df_prev_tab[col_ref]
+                    prev_value = df_prev_tab.loc[mask2, col].values[0]
                     self.table.at[idx, col] = prev_value
 
         for epocol in ["epoch_srt", "epoch_end"]:
