@@ -1998,6 +1998,37 @@ class StepGnss:
 
         return flist_out
 
+    def get_prev_tab(self, df_prev_tab, col_ref="fpath_inp",
+                            get_cols=["site", "epoch_srt", "epoch_end"]):
+        """
+        Updates columns in self.table with values from df_prev_tab for matching col_ref entries.
+
+        Parameters
+        ----------
+        df_prev_tab : pandas.DataFrame
+            The previous table to update from.
+        col_ref : str, optional
+            The column to match on. Default is 'fpath_inp'.
+        get_cols : list, optional
+            The columns to update. Default is ['site', 'epoch_srt', 'epoch_end'].
+
+        Returns
+        -------
+        None
+        """
+        # Merge to get updated values for matching rows
+        merged = self.table.merge(
+            df_prev_tab[[col_ref] + get_cols],
+            on=col_ref,
+            how="left",
+            suffixes=("", "_prev")
+        )
+        # Update only the specified columns
+        for col in get_cols:
+            prev_col = f"{col}_prev"
+            if prev_col in merged:
+                self.table[col] = merged[prev_col].combine_first(self.table[col])
+
     def filter_prev_tab(self, df_prev_tab):
         """
         Filters the raw files based on their presence in previous conversion tables.
@@ -2010,7 +2041,7 @@ class StepGnss:
         Parameters
         ----------
         df_prev_tab : pandas.DataFrame
-            The previous conversion tables stored as a DataFrame.
+            The previous conversion tables concatenated and stored as a DataFrame.
 
         Returns
         -------
