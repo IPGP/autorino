@@ -1176,7 +1176,7 @@ class StepGnss:
 
         self.table_ok_cols_bool()
 
-        str_out = arocmn.print_tbl_core(
+        str_out = arocmn.print_tab_core(
             self.table,
             no_print=no_print,
             no_return=no_return,
@@ -1408,33 +1408,38 @@ class StepGnss:
         -------
         None
         """
-        # # Merge to get updated values for matching rows
-        # df_merged = self.table.merge(
-        #     df_prev_tab[[col_ref] + get_cols],
-        #     on=col_ref,
-        #     how="left",
-        #     suffixes=("", "_prev")
-        # )
-        # # Update only the specified columns
-        # for col in get_cols:
-        #     prev_col = f"{col}_prev"
-        #     if prev_col in df_merged:
-        #         self.table[col] = df_merged[prev_col].combine_first(self.table[col])
 
+        ### more pythonic, less intuitive (and does not work well)
+        self.table.reset_index(inplace=True)
+        df_prev_tab.reset_index(inplace=True)
+
+        # Merge to get updated values for matching rows
+        df_merged = self.table.merge(
+            df_prev_tab[[col_ref] + get_cols],
+            on=col_ref,
+            how="left",
+            suffixes=("", "_prev")
+        )
+        # Update only the specified columns
         for col in get_cols:
-            if col in df_prev_tab.columns:
-                mask = self.table[col_ref].isin(df_prev_tab[col_ref])
-                matched = self.table.loc[mask, col_ref]
-                for idx in matched.index:
-                    prev_value = df_prev_tab.loc[
-                        df_prev_tab[col_ref] == self.table.at[idx, col_ref], col
-                    ].values[0]
-                    self.table.at[idx, col] = prev_value
+            prev_col = f"{col}_prev"
+            if prev_col in df_merged:
+                self.table[col] = df_merged[prev_col].combine_first(self.table[col])
+
+        # ## less pythonic, more intuitive
+        # for col in get_cols:
+        #     if col in df_prev_tab.columns:
+        #         mask = self.table[col_ref].isin(df_prev_tab[col_ref])
+        #         matched = self.table.loc[mask, col_ref]
+        #         for idx in matched.index:
+        #             prev_value = df_prev_tab.loc[
+        #                 df_prev_tab[col_ref] == self.table.at[idx, col_ref], col
+        #             ].values[0]
+        #             self.table.at[idx, col] = prev_value
 
         for epocol in ["epoch_srt", "epoch_end"]:
             if epocol in get_cols:
                 self.table[epocol] = pd.to_datetime(self.table[epocol])
-
 
     def force(self, step_name=""):
         """
@@ -2152,7 +2157,7 @@ class StepGnss:
         dropped_rows = self.table[isna_bool]
         if not dropped_rows.empty:
             logger.warning("row(s) filtered bc. NaN/NaT values in: %s", cols)
-            logger.warning(arocmn.print_tbl_core(dropped_rows))
+            logger.warning(arocmn.print_tab_core(dropped_rows))
 
         # Return filtered table
         self.table = self.table[~isna_bool]

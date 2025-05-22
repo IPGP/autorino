@@ -198,9 +198,9 @@ def load_previous_tables(log_dir):
     # Read and concatenate non-empty DataFrames from the found files
     tab_df_stk = [pd.read_csv(t) for t in tables_files if not pd.read_csv(t).empty]
 
-    return pd.concat(tab_df_stk) if tab_df_stk else pd.DataFrame([])
+    return pd.concat(tab_df_stk, ignore_index=True) if tab_df_stk else pd.DataFrame([])
 
-def print_tbl_core(table_inp, max_colwidth=33):
+def print_tab_core(table_inp, max_colwidth=33):
     """
     Prints the table of the StepGnss object with specified formatting.
 
