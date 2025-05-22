@@ -1998,7 +1998,7 @@ class StepGnss:
 
         return flist_out
 
-    def get_prev_tab(self, df_prev_tab, col_ref="fpath_inp",
+    def get_vals_prev_tab(self, df_prev_tab, col_ref="fpath_inp",
                             get_cols=["site", "epoch_srt", "epoch_end"]):
         """
         Updates columns in self.table with values from df_prev_tab for matching col_ref entries.
@@ -2028,6 +2028,10 @@ class StepGnss:
             prev_col = f"{col}_prev"
             if prev_col in merged:
                 self.table[col] = merged[prev_col].combine_first(self.table[col])
+
+        for epocol in ["epoch_srt", "epoch_end"]:
+            if epocol in merged:
+                self.table[epocol] = pd.to_datetime(self.table[epocol])
 
     def filter_prev_tab(self, df_prev_tab):
         """
