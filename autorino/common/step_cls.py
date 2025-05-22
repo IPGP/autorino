@@ -1174,7 +1174,9 @@ class StepGnss:
             The formatted table as a string if 'no_return' is False. Otherwise, None.
         """
 
-        str_out = print_tbl_core(
+        self.table_ok_cols_bool()
+
+        str_out = arocmn.print_tbl_core(
             self.table,
             no_print=no_print,
             no_return=no_return,

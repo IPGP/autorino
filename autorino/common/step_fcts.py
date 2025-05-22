@@ -194,15 +194,11 @@ def load_previous_tables(log_dir):
     if not tables_files:
         logger.warning("No previous tables found in the log directory.")
         return pd.DataFrame([])
-    else:
-        # If files are found, read each file into a DataFrame and concatenate them into a single DataFrame
-        tab_df_stk = []
-        for t in tables_files:
-            tab_df = pd.read_csv(t)
-            # if not len(tab_df) == 0:
-            tab_df_stk.append(tab_df)
 
-        return pd.concat(tab_df_stk)
+    # Read and concatenate non-empty DataFrames from the found files
+    tab_df_stk = [pd.read_csv(t) for t in tables_files if not pd.read_csv(t).empty]
+
+    return pd.concat(tab_df_stk) if tab_df_stk else pd.DataFrame([])
 
 def print_tbl_core(table_inp, max_colwidth=33):
     """
@@ -255,8 +251,6 @@ def print_tbl_core(table_inp, max_colwidth=33):
             halflen = int((maxlen / 2) - 1)
             str_out_shrink = str_inp[:halflen] + ".." + str_inp[-halflen:]
             return str_out_shrink
-
-    table_inp.table_ok_cols_bool()
 
     # we define the FORMATTERS (i.e. functions) for each column
     form = dict()
