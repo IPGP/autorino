@@ -81,7 +81,7 @@ def convert_rnx(
         Defaults to False.
     raw_out_dir : str, optional
         Directory where RAW files will be archived.
-        No delete will occur, your RAW files are sacred.
+        No move/delete will occur, your input RAW files are sacred.
         Defaults to None.
     raw_out_structure : str, optional
         Structure for archiving RAW files.
@@ -154,7 +154,7 @@ def convert_rnx(
         cnv_table_cat = pd.concat([cnv.table for cnv in cnv_out_lis],ignore_index=True)
 
         cpy_raw = arocmn.StepGnss(raw_out_dir_use, tmp_dir, log_dir, metadata=metadata)
-        debug_print = True
+        debug_print = False
 
         # the table from the ConvertGnss object
         # is necessary to get the epoch

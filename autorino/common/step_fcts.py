@@ -204,6 +204,77 @@ def load_previous_tables(log_dir):
 
         return pd.concat(tab_df_stk)
 
+def print_tbl_core(table_inp, max_colwidth=33):
+    """
+    Prints the table of the StepGnss object with specified formatting.
+
+    This method formats and prints the table of the StepGnss object. It shrinks the strings in the 'fraw',
+    'fpath_inp', and 'fpath_out' columns to a specified maximum length and formats the 'epoch_srt' and 'epoch_end'
+    columns as strings
+    with a specific date-time format. The method then prints the formatted table to the logger.
+
+    Parameters
+    ----------
+    table_inp : pd.DataFrame
+        The input table to be formatted and printed.
+
+    max_colwidth : int, optional
+        The maximum column width for the output table. Default is 33.
+
+    Returns
+    -------
+    str
+        The formatted table as a string.
+    """
+
+    def _shrink_str(str_inp, maxlen=max_colwidth):
+        """
+        Shrinks a string to a specified maximum length.
+
+        This function shrinks a string to a specified maximum length by keeping the first and last parts
+        of the string and replacing the middle part with '..'.
+        The length of the first and last parts is half of the maximum length.
+
+        Parameters
+        ----------
+        str_inp : str
+            The input string to be shrunk.
+        maxlen : int, optional
+            The maximum length of the output string.
+            Default is the value of the 'max_colwidth' parameter of the
+            'verbose' method.
+
+        Returns
+        -------
+        str
+            The shrunk string.
+        """
+        if len(str_inp) <= maxlen:
+            return str_inp
+        else:
+            halflen = int((maxlen / 2) - 1)
+            str_out_shrink = str_inp[:halflen] + ".." + str_inp[-halflen:]
+            return str_out_shrink
+
+    table_inp.table_ok_cols_bool()
+
+    # we define the FORMATTERS (i.e. functions) for each column
+    form = dict()
+    form["fraw"] = _shrink_str
+    form["fpath_inp"] = _shrink_str
+    form["fpath_out"] = _shrink_str
+
+    print_time = lambda t: (
+        t.strftime("%y-%m-%d %H:%M:%S") if not pd.isna(t) else "NaT"
+    )
+    form["epoch_srt"] = print_time
+    form["epoch_end"] = print_time
+
+    str_out = table_inp.to_string(max_colwidth=max_colwidth + 1, formatters=form)
+    # add +1 in max_colwidth for safety
+
+    return str_out
+
 
 def is_ok(val_inp):
     """
@@ -401,5 +472,3 @@ def log_tester():
     logger.critical("level critical")
 
     return None
-
-

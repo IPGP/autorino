@@ -1174,50 +1174,13 @@ class StepGnss:
             The formatted table as a string if 'no_return' is False. Otherwise, None.
         """
 
-        def _shrink_str(str_inp, maxlen=max_colwidth):
-            """
-            Shrinks a string to a specified maximum length.
+        str_out = print_tbl_core(
+            self.table,
+            no_print=no_print,
+            no_return=no_return,
+            max_colwidth=max_colwidth,
+        )
 
-            This function shrinks a string to a specified maximum length by keeping the first and last parts
-            of the string and replacing the middle part with '..'.
-            The length of the first and last parts is half of the maximum length.
-
-            Parameters
-            ----------
-            str_inp : str
-                The input string to be shrunk.
-            maxlen : int, optional
-                The maximum length of the output string.
-                Default is the value of the 'max_colwidth' parameter of the
-                'verbose' method.
-
-            Returns
-            -------
-            str
-                The shrunk string.
-            """
-            if len(str_inp) <= maxlen:
-                return str_inp
-            else:
-                halflen = int((maxlen / 2) - 1)
-                str_out_shrink = str_inp[:halflen] + ".." + str_inp[-halflen:]
-                return str_out_shrink
-
-        self.table_ok_cols_bool()
-
-        # we define the FORMATTERS (i.e. functions) for each column
-        form = dict()
-        form["fraw"] = _shrink_str
-        form["fpath_inp"] = _shrink_str
-        form["fpath_out"] = _shrink_str
-
-        print_time = lambda t: t.strftime("%y-%m-%d %H:%M:%S") if not pd.isna(t) else "NaT"
-        form["epoch_srt"] = print_time
-        form["epoch_end"] = print_time
-
-
-        str_out = self.table.to_string(max_colwidth=max_colwidth + 1, formatters=form)
-        # add +1 in max_colwidth for safety
         if not no_print:
             # print it in the logger (if silent , just return it)
             name = self.get_step_type(True)
@@ -1309,8 +1272,9 @@ class StepGnss:
 
         return flist
 
-    def load_tab_prev_tab(self, prev_table, reset_table=True, drop_na=False,
-                          new_inp_is_prev="out"):
+    def load_tab_prev_tab(
+        self, prev_table, reset_table=True, drop_na=False, new_inp_is_prev="out"
+    ):
         """
         Loads the table from the previous step's table.
 
@@ -1349,8 +1313,8 @@ class StepGnss:
         else:
             raise ValueError("new_inp_is_prev must be 'out' or 'inp'")
 
-        isfile_lbd = lambda x: os.path.isfile(x) if isinstance(x,str) else "none"
-        basnam_lbd = lambda x: os.path.basename(x) if isinstance(x,str) else "none"
+        isfile_lbd = lambda x: os.path.isfile(x) if isinstance(x, str) else "none"
+        basnam_lbd = lambda x: os.path.basename(x) if isinstance(x, str) else "none"
 
         self.table["ok_inp"] = self.table["fpath_inp"].apply(isfile_lbd)
         self.table["fname"] = self.table["fpath_inp"].apply(basnam_lbd)
@@ -2115,7 +2079,6 @@ class StepGnss:
             out = self.table[self.table[col]]
         return out
 
-
     def filter_na(self, cols=None):
         """
         Filters the table to remove rows with NaN values in the specified columns,
@@ -2140,16 +2103,14 @@ class StepGnss:
         isna_bool = self.table[cols].isna().any(axis=1)
         dropped_rows = self.table[isna_bool]
         if not dropped_rows.empty:
-            logger.warning("row(s) filtered, NaN/NaT values in: %s", cols)
-            for irow, row in dropped_rows.iterrows():
-                logger.warning(row)
+            logger.warning("row(s) filtered bc. NaN/NaT values in: %s", cols)
+            logger.warning(arocmn.print_tbl_core(dropped_rows))
 
         # Return filtered table
         self.table = self.table[~isna_bool]
         self.table.reset_index(drop=True, inplace=True)
 
         return dropped_rows
-
 
     #               _   _                   _ _                           _ _    __                                 __
     #     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
@@ -2249,7 +2210,6 @@ class StepGnss:
 
         return bool_ok
 
-
     def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
         """
         Updates the rinexmod options dictionnary.
@@ -2341,7 +2301,6 @@ class StepGnss:
             logger.debug("final options for rinexmod: %s", rimopts_wrk)
 
         return rimopts_out
-
 
     def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
