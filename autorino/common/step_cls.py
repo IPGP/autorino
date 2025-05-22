@@ -2493,7 +2493,7 @@ class StepGnss:
 
         file_to_mv = self.table.loc[irow, table_col]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(
+        file_moved = arocmn.move_copy_core(
             file_to_mv, outdir_trsl, copy_only=copy_only, force=force
         )
         ### ^^^^^ HERE IS THE MOVE
@@ -2533,7 +2533,7 @@ class StepGnss:
         file_src = self.table.loc[irow, "fpath_inp"]
         file_des = self.table.loc[irow, "fpath_out"]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(
+        file_moved = arocmn.move_copy_core(
             file_src, file_des, copy_only=copy_only, force=force
         )
         ### ^^^^^ HERE IS THE MOVE

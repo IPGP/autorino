@@ -331,7 +331,7 @@ def guess_sites_list(inp_fil):
     return sites_list
 
 
-def move_core(src, dest, copy_only=False, force=False):
+def move_copy_core(src, dest, copy_only=False, force=False):
     """
     Moves or copies a file from the source to the destination.
 
