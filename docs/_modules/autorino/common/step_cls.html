@@ -1341,7 +1341,9 @@
 <span class="sd">            The formatted table as a string if &#39;no_return&#39; is False. Otherwise, None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">str_out</span> <span class="o">=</span> <span class="n">print_tbl_core</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_ok_cols_bool</span><span class="p">()</span>
+
+        <span class="n">str_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">print_tab_core</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span>
             <span class="n">no_print</span><span class="o">=</span><span class="n">no_print</span><span class="p">,</span>
             <span class="n">no_return</span><span class="o">=</span><span class="n">no_return</span><span class="p">,</span>
@@ -1569,6 +1571,60 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="StepGnss.get_vals_prev_tab">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.get_vals_prev_tab">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_vals_prev_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_prev_tab</span><span class="p">,</span> <span class="n">col_ref</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span>
+                            <span class="n">get_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates columns in self.table with values from df_prev_tab for matching col_ref entries.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        df_prev_tab : pandas.DataFrame</span>
+<span class="sd">            The previous table to update from.</span>
+<span class="sd">        col_ref : str, optional</span>
+<span class="sd">            The column to match on. Default is &#39;fpath_inp&#39;.</span>
+<span class="sd">        get_cols : list, optional</span>
+<span class="sd">            The columns to update. Default is [&#39;site&#39;, &#39;epoch_srt&#39;, &#39;epoch_end&#39;].</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">### too pythonic, less intuitive (and does not work well)</span>
+        <span class="c1"># self.table.reset_index(inplace=True)</span>
+        <span class="c1"># df_prev_tab.reset_index(inplace=True)</span>
+        <span class="c1">#</span>
+        <span class="c1"># # Merge to get updated values for matching rows</span>
+        <span class="c1"># df_merged = self.table.merge(</span>
+        <span class="c1">#     df_prev_tab[[col_ref] + get_cols],</span>
+        <span class="c1">#     on=col_ref,</span>
+        <span class="c1">#     how=&quot;left&quot;,</span>
+        <span class="c1">#     suffixes=(&quot;&quot;, &quot;_prev&quot;)</span>
+        <span class="c1"># )</span>
+        <span class="c1"># # Update only the specified columns</span>
+        <span class="c1"># for col in get_cols:</span>
+        <span class="c1">#     prev_col = f&quot;{col}_prev&quot;</span>
+        <span class="c1">#     if prev_col in df_merged:</span>
+        <span class="c1">#         self.table[col] = df_merged[prev_col].combine_first(self.table[col])</span>
+
+        <span class="c1">## less pythonic, more intuitive</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">get_cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_prev_tab</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">col_ref</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">df_prev_tab</span><span class="p">[</span><span class="n">col_ref</span><span class="p">])</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">col_ref</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">matched</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                    <span class="n">prev_value</span> <span class="o">=</span> <span class="n">df_prev_tab</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="n">df_prev_tab</span><span class="p">[</span><span class="n">col_ref</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">col_ref</span><span class="p">],</span> <span class="n">col</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">prev_value</span>
+
+        <span class="k">for</span> <span class="n">epocol</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">epocol</span> <span class="ow">in</span> <span class="n">get_cols</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">epocol</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">epocol</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="StepGnss.force">
@@ -2232,7 +2288,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        df_prev_tab : pandas.DataFrame</span>
-<span class="sd">            The previous conversion tables stored as a DataFrame.</span>
+<span class="sd">            The previous conversion tables concatenated and stored as a DataFrame.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2334,7 +2390,7 @@
         <span class="n">dropped_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">isna_bool</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dropped_rows</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;row(s) filtered bc. NaN/NaT values in: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cols</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">arocmn</span><span class="o">.</span><span class="n">print_tbl_core</span><span class="p">(</span><span class="n">dropped_rows</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">print_tab_core</span><span class="p">(</span><span class="n">dropped_rows</span><span class="p">))</span>
 
         <span class="c1"># Return filtered table</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="o">~</span><span class="n">isna_bool</span><span class="p">]</span>

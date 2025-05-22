@@ -294,9 +294,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="s2">&quot;convert&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">filter_prev_tables</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading filter previous tables in: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_tables</span><span class="si">:}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">prv_tbl_df</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">load_previous_tables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_tables</span><span class="p">)</span>
             <span class="c1"># Filter previous tables stored in log_dir</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prv_tbl_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_vals_prev_tab</span><span class="p">(</span><span class="n">prv_tbl_df</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">filter_prev_tab</span><span class="p">(</span><span class="n">prv_tbl_df</span><span class="p">)</span>
             <span class="c1"># switch ok_inp to False if the output files are already there</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filter_ok_out</span><span class="p">()</span>

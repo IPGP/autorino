@@ -1188,7 +1188,7 @@ The method modifies the ‘ok_inp’ column of the object’s table to reflect t
 The method returns a list of filtered raw files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>df_prev_tab</strong> (<em>pandas.DataFrame</em>) – The previous conversion tables stored as a DataFrame.</p>
+<dd class="field-odd"><p><strong>df_prev_tab</strong> (<em>pandas.DataFrame</em>) – The previous conversion tables concatenated and stored as a DataFrame.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The list of filtered raw files.</p>
@@ -1292,6 +1292,24 @@ the last 4 characters are removed from the class name.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.get_vals_prev_tab">
+<span class="sig-name descname"><span class="pre">get_vals_prev_tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_prev_tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fpath_inp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['site',</span> <span class="pre">'epoch_srt',</span> <span class="pre">'epoch_end']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.get_vals_prev_tab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.get_vals_prev_tab" title="Link to this definition"></a></dt>
+<dd><p>Updates columns in self.table with values from df_prev_tab for matching col_ref entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_prev_tab</strong> (<em>pandas.DataFrame</em>) – The previous table to update from.</p></li>
+<li><p><strong>col_ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The column to match on. Default is ‘fpath_inp’.</p></li>
+<li><p><strong>get_cols</strong> (<em>list</em><em>, </em><em>optional</em>) – The columns to update. Default is [‘site’, ‘epoch_srt’, ‘epoch_end’].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2290,8 +2308,8 @@ Default is False</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="autorino.common.step_fcts.print_tbl_core">
-<span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">print_tbl_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_colwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#print_tbl_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.print_tbl_core" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_fcts.print_tab_core">
+<span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">print_tab_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_colwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#print_tab_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.print_tab_core" title="Link to this definition"></a></dt>
 <dd><p>Prints the table of the StepGnss object with specified formatting.</p>
 <p>This method formats and prints the table of the StepGnss object. It shrinks the strings in the ‘fraw’,
 ‘fpath_inp’, and ‘fpath_out’ columns to a specified maximum length and formats the ‘epoch_srt’ and ‘epoch_end’
