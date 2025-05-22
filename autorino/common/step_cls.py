@@ -1460,7 +1460,7 @@ class StepGnss:
         self.table["note"] = "force_" + step_name
         return None
 
-    def guess_local_rnx(self, io="out"):
+    def guess_local_rnx(self, io="out", shortname=False):
         """
         For a given site name and date in a table, guess the potential local RINEX files
         and write it as 'fpath_out' value in the table
@@ -1481,7 +1481,7 @@ class StepGnss:
 
         loc_paths_list = []
         for irow, row in self.table.iterrows():
-            loc_path = self.mono_guess_rnx(irow, io=io)
+            loc_path = self.mono_guess_rnx(irow, io=io, shortname=shortname)
             loc_paths_list.append(loc_path)
 
         logger.info("nbr local RINEX files guessed: %s", len(loc_paths_list))
@@ -2667,7 +2667,7 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
-    def mono_guess_rnx(self, irow, io="out"):
+    def mono_guess_rnx(self, irow, io="out", shortname=False):
         """
         Guesses the local RINEX file path for a given row in the table.
 
@@ -2719,17 +2719,20 @@ class StepGnss:
         prd_str = rinexmod.rinexfile.file_period_from_timedelta(epo_srt, epo_end)[0]
 
         # Generate the RINEX file name using site and session information
-        loc_fname = conv.statname_dt2rinexname_long(
-            self.site_id9,
-            epo_srt,
-            country="XXX",  # `site_id9` includes the country
-            data_source="R",  # Always "R" for autorino
-            file_period=prd_str,
-            data_freq=self.session["data_frequency"],
-            data_type="MO",
-            format_compression="crx.gz",
-            preset_type=None,
-        )
+        if not shortname:
+            loc_fname = conv.statname_dt2rinexname_long(
+                self.site_id9,
+                epo_srt,
+                country="XXX",  # `site_id9` includes the country
+                data_source="R",  # Always "R" for autorino
+                file_period=prd_str,
+                data_freq=self.session["data_frequency"],
+                data_type="MO",
+                format_compression="crx.gz",
+                preset_type=None,
+            )
+        else:
+            loc_fname = conv.statname_dt2rinexname(self.site_id9[:4], epo_srt, "d.gz")
 
         # Construct the full file path and translate it
         loc_path0 = os.path.join(loc_dir, loc_fname)

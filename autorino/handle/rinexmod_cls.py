@@ -121,8 +121,15 @@ class RinexmodGnss(arohdlcls.HandleGnss):
 
         guess_local_rnx = False
         if guess_local_rnx:
+
+            # special case if we downgrade the name
+            if rinexmod_options and "shortname" in rinexmod_options.keys():
+                shortname = rinexmod_options["shortname"]
+            else:
+                shortname = False
+
             # generate the potential local files
-            self.guess_local_rnx()
+            self.guess_local_rnx(shortname=shortname)
             # tests if the output local files are already there
             self.check_local_files("out")
             # switch ok_inp to False if the output files are already there
