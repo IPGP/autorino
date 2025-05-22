@@ -209,8 +209,8 @@ class ConvertGnss(arocmn.StepGnss):
             prv_tbl_df = arocmn.load_previous_tables(self.tmp_dir_tables)
             # Filter previous tables stored in log_dir
             if len(prv_tbl_df) > 0:
-                self.filter_prev_tab(prv_tbl_df)
                 self.get_prev_tab(prv_tbl_df)
+                self.filter_prev_tab(prv_tbl_df)
             # switch ok_inp to False if the output files are already there
             self.filter_ok_out()
 
