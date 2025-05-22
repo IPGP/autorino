@@ -6,18 +6,6 @@ Created on 27/01/2025 20:18:31
 @author: psakic
 """
 
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on 27/01/2025 20:18:31
-
-A CLI program to call the check_rnx function.
-
-Usage:
-    python autorino_check_rnx.py --input_dir_parent <input_dir_parent> --input_dir_structure <input_dir_structure> --epoch_start <epoch_start> --epoch_end <epoch_end> --output <output_file> [--print_check_tabulate] [--sites_list <site1,site2,...>]
-
-"""
-
 import argparse
 import pandas as pd
 from autorino.api.check_rnx import check_rnx
@@ -47,13 +35,13 @@ def main():
         "-l",
         "--sites_list",
         nargs="+",
-        help="Comma-separated list of sites.",
+        help="list of sites.",
         default=[],
     )
 
     args = parser.parse_args()
 
-    sites_list = args.sites_list if args.sites_list else []
+    #sites_list = args.sites_list if args.sites_list else []
 
     # Call the check_rnx function
     _ = check_rnx(
@@ -61,7 +49,7 @@ def main():
         inp_dir_structure=args.input_dir_structure,
         epoch_start=args.epoch_start,
         epoch_end=args.epoch_end,
-        sites_list=sites_list,
+        sites_list=args.sites_list,
         output_dir=args.output,
     )
 
