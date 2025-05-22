@@ -7,6 +7,7 @@ Created on 18/09/2024 18:24:43
 """
 
 import os
+import pandas as pd
 import autorino.convert as arocnv
 import autorino.common as arocmn
 import logging
@@ -144,22 +145,23 @@ def convert_rnx(
             raw_out_structure = out_structure
         raw_out_dir_use = str(os.path.join(raw_out_dir, raw_out_structure))
 
-        for cnv in cnv_out_lis:
-            cpy_raw = arocmn.StepGnss(raw_out_dir_use, tmp_dir, log_dir, metadata=metadata)
-            debug_print = False
+        cnv_table_cat = pd.concat([cnv.table for cnv in cnv_out_lis],ignore_index=True)
 
-            # the table from the ConvertGnss object
-            # is necessary to get the epoch
-            cpy_raw.load_tab_prev_tab(cnv.table, drop_na=True)
-            cpy_raw.table["fpath_inp"] = cnv.table["fpath_inp"]
-            cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
-            cpy_raw.print_table() if debug_print else None
-            cpy_raw.guess_out_files()
-            cpy_raw.print_table() if debug_print else None
-            cpy_raw.filter_ok_out()
-            cpy_raw.print_table() if debug_print else None
-            cpy_raw.move_files(mode="inpout", force=force_raw, copy_only=True)
-            cpy_raw.print_table() if debug_print else None
+        cpy_raw = arocmn.StepGnss(raw_out_dir_use, tmp_dir, log_dir, metadata=metadata)
+        debug_print = True
+
+        # the table from the ConvertGnss object
+        # is necessary to get the epoch
+        cpy_raw.load_tab_prev_tab(cnv_table_cat, drop_na=True)
+        cpy_raw.table["fpath_inp"] = cnv_table_cat["fpath_inp"]
+        cpy_raw.table["fname"] = cpy_raw.table["fpath_inp"].apply(os.path.basename)
+        cpy_raw.print_table() if debug_print else None
+        cpy_raw.guess_out_files()
+        cpy_raw.print_table() if debug_print else None
+        cpy_raw.filter_ok_out()
+        cpy_raw.print_table() if debug_print else None
+        cpy_raw.move_files(mode="inpout", force=force_raw, copy_only=True)
+        cpy_raw.print_table() if debug_print else None
 
     return cnv_out_lis
 
