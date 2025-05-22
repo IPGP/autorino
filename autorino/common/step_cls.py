@@ -2157,7 +2157,7 @@ class StepGnss:
         dropped_rows = self.table[isna_bool]
         if not dropped_rows.empty:
             logger.warning("row(s) filtered bc. NaN/NaT values in: %s", cols)
-            logger.warning(arocmn.print_tab_core(dropped_rows))
+            logger.warning("\n" + arocmn.print_tab_core(dropped_rows))
 
         # Return filtered table
         self.table = self.table[~isna_bool]
