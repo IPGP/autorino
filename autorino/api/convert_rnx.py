@@ -158,7 +158,7 @@ def convert_rnx(
 
         # the table from the ConvertGnss object
         # is necessary to get the epoch
-        cpy_raw.load_tab_prev_tab(cnv_table_cat, drop_na=False, new_inp_is_prev="inp")
+        cpy_raw.load_tab_prev_tab(cnv_table_cat, new_inp_is_prev="inp")
         cpy_raw.print_table() if debug_print else None
         cpy_raw.filter_na(["epoch_srt","epoch_end"])
         cpy_raw.print_table() if debug_print else None

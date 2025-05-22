@@ -1275,7 +1275,7 @@ class StepGnss:
         return flist
 
     def load_tab_prev_tab(
-        self, prev_table, reset_table=True, drop_na=False, new_inp_is_prev="out"
+        self, prev_table, reset_table=True, new_inp_is_prev="out"
     ):
         """
         Loads the table from the previous step's table.
@@ -1293,6 +1293,10 @@ class StepGnss:
             'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
         reset_table : bool, optional
             If True, the current table is reset before loading the new data. Default is True.
+        new_inp_is_prev : str, optional
+            Specifies whether the new input files are the previous
+            output files ('out') or the previous input files ('inp').
+            Default is 'out'.
 
         Returns
         -------
@@ -1300,11 +1304,6 @@ class StepGnss:
         """
         if reset_table:
             self._init_table(init_epoch=False)
-
-        print(prev_table)
-        if drop_na:
-            prev_table = prev_table.dropna(subset=["fpath_out", "size_out"])
-        print(prev_table)
 
         if new_inp_is_prev == "out":
             self.table["fpath_inp"] = prev_table["fpath_out"].values
@@ -1518,14 +1517,14 @@ class StepGnss:
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
 
-            # Update the table with the generated output file path
-            self.table.loc[irow, "fpath_out"] = fpath_out
-
-            # Check the validity of the output files
-            self.check_local_files(io="out")
-
             # Append the output file path to the list
             out_paths_list.append(fpath_out)
+
+        # Update the table with the generated output file path
+        self.table["fpath_out"] = out_paths_list
+
+        # Check the validity of the output files
+        self.check_local_files(io="out")
 
         return out_paths_list
 
