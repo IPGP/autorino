@@ -1390,6 +1390,52 @@ class StepGnss:
 
         return None
 
+    def get_vals_prev_tab(self, df_prev_tab, col_ref="fpath_inp",
+                            get_cols=["site", "epoch_srt", "epoch_end"]):
+        """
+        Updates columns in self.table with values from df_prev_tab for matching col_ref entries.
+
+        Parameters
+        ----------
+        df_prev_tab : pandas.DataFrame
+            The previous table to update from.
+        col_ref : str, optional
+            The column to match on. Default is 'fpath_inp'.
+        get_cols : list, optional
+            The columns to update. Default is ['site', 'epoch_srt', 'epoch_end'].
+
+        Returns
+        -------
+        None
+        """
+        # # Merge to get updated values for matching rows
+        # df_merged = self.table.merge(
+        #     df_prev_tab[[col_ref] + get_cols],
+        #     on=col_ref,
+        #     how="left",
+        #     suffixes=("", "_prev")
+        # )
+        # # Update only the specified columns
+        # for col in get_cols:
+        #     prev_col = f"{col}_prev"
+        #     if prev_col in df_merged:
+        #         self.table[col] = df_merged[prev_col].combine_first(self.table[col])
+
+        for col in get_cols:
+            if col in df_prev_tab.columns:
+                mask = self.table[col_ref].isin(df_prev_tab[col_ref])
+                matched = self.table.loc[mask, col_ref]
+                for idx in matched.index:
+                    prev_value = df_prev_tab.loc[
+                        df_prev_tab[col_ref] == self.table.at[idx, col_ref], col
+                    ].values[0]
+                    self.table.at[idx, col] = prev_value
+
+        for epocol in ["epoch_srt", "epoch_end"]:
+            if epocol in get_cols:
+                self.table[epocol] = pd.to_datetime(self.table[epocol])
+
+
     def force(self, step_name=""):
         """
         Enables the force mode for the current step.
@@ -1997,41 +2043,6 @@ class StepGnss:
         self.table["ok_inp"] = ok_inp_new
 
         return flist_out
-
-    def get_vals_prev_tab(self, df_prev_tab, col_ref="fpath_inp",
-                            get_cols=["site", "epoch_srt", "epoch_end"]):
-        """
-        Updates columns in self.table with values from df_prev_tab for matching col_ref entries.
-
-        Parameters
-        ----------
-        df_prev_tab : pandas.DataFrame
-            The previous table to update from.
-        col_ref : str, optional
-            The column to match on. Default is 'fpath_inp'.
-        get_cols : list, optional
-            The columns to update. Default is ['site', 'epoch_srt', 'epoch_end'].
-
-        Returns
-        -------
-        None
-        """
-        # Merge to get updated values for matching rows
-        merged = self.table.merge(
-            df_prev_tab[[col_ref] + get_cols],
-            on=col_ref,
-            how="left",
-            suffixes=("", "_prev")
-        )
-        # Update only the specified columns
-        for col in get_cols:
-            prev_col = f"{col}_prev"
-            if prev_col in merged:
-                self.table[col] = merged[prev_col].combine_first(self.table[col])
-
-        for epocol in ["epoch_srt", "epoch_end"]:
-            if epocol in merged:
-                self.table[epocol] = pd.to_datetime(self.table[epocol])
 
     def filter_prev_tab(self, df_prev_tab):
         """
