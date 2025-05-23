@@ -2682,6 +2682,9 @@ class StepGnss:
         io : str, optional
             Specifies whether to guess the input (`inp`) or output (`out`) file path.
             Default is `out`.
+        shortname : bool, optional
+            guess RINEX's shortname if True
+            Default is False.
 
         Returns
         -------
