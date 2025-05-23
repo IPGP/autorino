@@ -17,7 +17,6 @@ station:
         rec_type: 'TRIMBLE NETR9' # code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
         rec_sn: '' # Receiver Serial Number
         rec_fw: '' # Receiver firmware version
-        rec_manufacturer: 'TRIMBLE' # a free field for advanced usages
     access:
         protocol: 'ftp'
         hostname: '192.168.0.1' ## IP address or URL
