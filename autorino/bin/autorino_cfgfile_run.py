@@ -41,7 +41,9 @@ def main():
         "--start",
         type=str,
         help="The start date for the epoch range. "
-        "Can be a date e.g. '2025-01-01', '2025-001' or a literal e.g. '2 days ago'. "
+        "* a litteral, e.g. 'yesterday', '10 days ago' "
+        "* YYYY-DDD, year-day of year, e.g. 2025-140 "
+        "* YYYY-MM-DD, classic calendar date, e.g. 2025-05-20 "
         "Can also be a list; if so, each epoch is considered separately. "
         "Can also be a file path; if so, the file contains a list of start epochs. "
         "Default is None.",
@@ -52,7 +54,10 @@ def main():
         "--end",
         type=str,
         help="The end date for the epoch range. "
-        "Can be a date e.g. '2025-01-01', '2025-001' or a literal e.g. '2 days ago'. "
+        "The epoch can be formatted as: "
+        "* a litteral, e.g. 'yesterday', '10 days ago' "
+        "* YYYY-DDD, year-day of year, e.g. 2025-140 "
+        "* YYYY-MM-DD, classic calendar date, e.g. 2025-05-20 "
         "Default is None.",
         default=None,
     )
