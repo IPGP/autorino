@@ -35,7 +35,7 @@ from geodezyx import utils
 ##software paths
 import autorino.cfgenv.env_read as aroenv
 
-aro_env_soft_path = aroenv.aro_env_dict["conv_software_paths"]
+aro_env_soft_path = aroenv.ARO_ENV_DIC["conv_software_paths"]
 
 
 def _kw_options_dict2str(kw_options):
@@ -629,7 +629,9 @@ def cmd_build_sbf2rin(
     out_fpath = out_dir.joinpath(inp_raw_fpath.name + ".rnx_sbf2rin")
 
     cmd_list = (
-        [bin_path, "-f", inp_raw_fpath, "-o", out_fpath] + cmd_opt_list + cmd_kwopt_list
+        [bin_path, "-f", inp_raw_fpath, "-o", out_fpath, "-s"]
+        + cmd_opt_list
+        + cmd_kwopt_list
     )
     cmd_list = [str(e) for e in cmd_list]
     cmd_str = " ".join(cmd_list)

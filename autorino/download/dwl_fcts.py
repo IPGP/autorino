@@ -28,7 +28,7 @@ import logging
 import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
 # *****************************************************************************
@@ -141,10 +141,9 @@ def ftp_create_obj(
             else:
                 print(e)
                 time.sleep(sleep_time)
-        except OSError as e:
+        except (OSError, ftplib.error_perm, Exception) as e:
             logger.error("Unable to create FTP object: %s", str(e))
             return None
-
 
 def list_remote_ftp(
     hostname,
@@ -231,6 +230,11 @@ def list_remote_ftp(
         logger.error("FTP directory change failed: %s", str(e))
         logger.error("Wished destination: %s", remote_dir_use)
         return []
+    except EOFError as e:
+        logger.error("FTP cwd failed: %s %s", remote_dir_use, str(e))
+        return []
+
+
 
     # Retrieve list of files
     try:
@@ -347,6 +351,7 @@ def download_ftp(
         raise AutorinoDownloadError
 
     filename = url_fname
+    ftp_obj.sendcmd("TYPE I")
     file_size = ftp_obj.size(filename)
     output_path = os.path.join(output_dir, filename)
     try_count = 0

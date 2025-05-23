@@ -1,0 +1,19 @@
+cfgfile_version: 20.2 # Version of the configuration file format.
+station:
+    access:
+        datalink: "vsat" # prevent download of several stations with the same datalink at the same time
+    sessions:
+        session_01D30S:
+            steps:
+                download:
+                    options:
+                        force: False
+                        remote_find_method: guess # ask or guess
+                        # ask: get the actual remote file's list, for FTP
+                        # guess: pre-generate remote file's paths for HTTP (but also works with FTP)
+                        invalidate_small_local_files: True
+                        timeout: 600
+                        max_try: 4
+                        sleep_time: 5
+                        ping_max_try: 4
+                        ping_timeout: 20

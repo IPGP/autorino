@@ -1,0 +1,670 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.convert.cnv_cmd_run &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.convert.cnv_cmd_run</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.convert.cnv_cmd_run</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Feb 21 16:23:06 2023</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">PIPE</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">autorino.convert</span> <span class="k">as</span> <span class="nn">arocnv</span>
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
+
+<span class="c1">#### Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+<span class="c1">###################################################################</span>
+<span class="c1"># +++++ conversion function</span>
+
+
+<div class="viewcode-block" id="_convert_select">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run._convert_select">[docs]</a>
+<span class="k">def</span> <span class="nf">_convert_select</span><span class="p">(</span><span class="n">converter_inp</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    internal function for ``converter_run``.</span>
+<span class="sd">    Find the correct RAW &gt; RINEX converter and gives its corresponding attributes</span>
+
+<span class="sd">    Returns directly those attributes based on `converter_inp` keyword,</span>
+<span class="sd">    or can do a basic research based on the RAW file extension</span>
+
+<span class="sd">    See also autorino.conv_fcts.select_conv_odd_file</span>
+<span class="sd">    for the converter selection of oddly named files</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    converter_inp : str</span>
+<span class="sd">        name of the converter used.</span>
+<span class="sd">        see ``converter_run`` help for more details</span>
+<span class="sd">    inp_raw_fpath : Path, optional</span>
+<span class="sd">        RAW file path. used for converter research based on the RAW</span>
+<span class="sd">        file extension. The default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    converter_name : str</span>
+<span class="sd">        converter&#39;s name.</span>
+<span class="sd">    brand : str</span>
+<span class="sd">        converter&#39;s name/manufacturer.</span>
+<span class="sd">    cmd_build_fct : function</span>
+<span class="sd">        interface function with the converter to perform the conversion.</span>
+<span class="sd">        see ``converter_run``&#39;s help for more details</span>
+<span class="sd">    conv_regex_fct : function</span>
+<span class="sd">        interface function to find the converted file with a regular expression.</span>
+<span class="sd">    bin_options : list</span>
+<span class="sd">        options for the conversion program. The default is [].</span>
+<span class="sd">    bin_kwoptions : dict</span>
+<span class="sd">        keyword options for the conversion program. The default is dict().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">inp_raw_fpath</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;not converter nor input file given, </span><span class="se">\</span>
+<span class="s2">                  unable to returns the right conversion fcts&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span>
+
+    <span class="c1"># + for RINEX handeling, inp_raw_fpath can ben an iterable (list)</span>
+    <span class="c1"># + thus we just keep the 1st elt</span>
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
+        <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">inp_raw_fpath</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+        <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;.GZ&quot;</span><span class="p">,</span> <span class="s2">&quot;.7Z&quot;</span><span class="p">,</span> <span class="s2">&quot;.7ZIP&quot;</span><span class="p">,</span> <span class="s2">&quot;.ZIP&quot;</span><span class="p">,</span> <span class="s2">&quot;.Z&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is compressed&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="c1"># +++++ TRIMBLE</span>
+    <span class="c1"># preliminary tests: Trimble default converter must be extracted from the environment values</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;.T00&quot;</span><span class="p">,</span> <span class="s2">&quot;.T01&quot;</span><span class="p">,</span> <span class="s2">&quot;.T02&quot;</span><span class="p">,</span> <span class="s2">&quot;.T04&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+        <span class="n">converter_inp</span> <span class="o">=</span> <span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;trimble_default_software&quot;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Trimble default converter defined in environnement: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">converter_inp</span>
+        <span class="p">)</span>
+
+    <span class="c1"># main test for Trimble : choose the right converter</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;.T00&quot;</span><span class="p">,</span> <span class="s2">&quot;.T01&quot;</span><span class="p">,</span> <span class="s2">&quot;.T02&quot;</span><span class="p">,</span> <span class="s2">&quot;.T04&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;t0xconvert&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;t0xconvert&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Trimble (official converter)&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_t0xconvert</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_t0xconvert</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;.T00&quot;</span><span class="p">,</span> <span class="s2">&quot;.T01&quot;</span><span class="p">,</span> <span class="s2">&quot;.T02&quot;</span><span class="p">,</span> <span class="s2">&quot;.T04&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;trm2rinex&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;trm2rinex&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Trimble (unofficial Docker converter)&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_trm2rinex</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_trm2rinex</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="p">(</span><span class="s2">&quot;.T00&quot;</span><span class="p">,</span> <span class="s2">&quot;.T01&quot;</span><span class="p">,</span> <span class="s2">&quot;.T02&quot;</span><span class="p">,</span> <span class="s2">&quot;.T04&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;runpkr00&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;runpkr00&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Trimble (legacy converter)&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_runpkr00</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_runpkr00</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">elif</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;.TGD&quot;</span><span class="p">,</span> <span class="s2">&quot;TG!&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;teqc&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;teqc&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Trimble&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_teqc</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_teqc</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># +++++ ASHTECH</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;.([0-9]</span><span class="si">{3}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span> <span class="ow">and</span> <span class="n">fname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">):</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;teqc&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Ashtech&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_teqc</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_teqc</span>
+        <span class="n">yyyy</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">week</span><span class="p">,</span> <span class="n">dow</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="n">_ashtech_name_2_date</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+        <span class="n">ftype</span> <span class="o">=</span> <span class="n">fname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ftype</span> <span class="o">==</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span>
+            <span class="n">ftype</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-ash &quot;</span> <span class="o">+</span> <span class="n">ftype</span> <span class="o">+</span> <span class="s2">&quot; -week &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">week</span><span class="p">)]</span>
+        <span class="c1"># bin_kwoptions = {&quot;-week&quot;: str(week)}</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># +++++ LEICA</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;.(M[0-9]</span><span class="si">{2}</span><span class="s2">|MDB)&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span> <span class="ow">or</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;mdb2rinex&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;mdb2rinex&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Leica&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_mdb2rinex</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_mdb2rnx</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># +++++ SEPTENTRIO</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;.[0-9]</span><span class="si">{2}</span><span class="s2">_&quot;</span><span class="p">,</span> <span class="n">ext</span><span class="p">)</span> <span class="ow">or</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;sbf2rin&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;sbf2rin&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Septentrio&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_sbf2rin</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_void</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># +++++ GENERIC BINEX</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.BNX&quot;</span> <span class="ow">or</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;convbin&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;convbin&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Generic BINEX&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_convbin</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_convbin</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># +++++ TOPCON</span>
+    <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.TPS&quot;</span> <span class="ow">or</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;tps2rin&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;tps2rin&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;Topcon&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_tps2rin</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_tps2rin</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># +++++ GFZRNX</span>
+    <span class="k">elif</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;gfzrnx&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;gfzrnx&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;RINEX Handeling (GFZ)&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_gfzrnx</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_gfzrnx</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># +++++ CONVERTO</span>
+    <span class="k">elif</span> <span class="n">converter_inp</span> <span class="o">==</span> <span class="s2">&quot;converto&quot;</span><span class="p">:</span>
+        <span class="n">converter_name</span> <span class="o">=</span> <span class="s2">&quot;converto&quot;</span>
+        <span class="n">brand</span> <span class="o">=</span> <span class="s2">&quot;RINEX Handeling (IGN)&quot;</span>
+        <span class="n">cmd_build_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">cmd_build_converto</span>
+        <span class="n">conv_regex_fct</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_converto</span>
+        <span class="n">bin_options</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bin_kwoptions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;unable to find the right converter for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;input-given converter: </span><span class="si">%s</span><span class="s2">, maybe not implemented yet?&quot;</span><span class="p">,</span> <span class="n">converter_inp</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;brand &amp; converter selected: </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">brand</span><span class="p">,</span> <span class="n">converter_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">converter_name</span><span class="p">,</span>
+        <span class="n">brand</span><span class="p">,</span>
+        <span class="n">cmd_build_fct</span><span class="p">,</span>
+        <span class="n">conv_regex_fct</span><span class="p">,</span>
+        <span class="n">bin_options</span><span class="p">,</span>
+        <span class="n">bin_kwoptions</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># set current user as constant</span>
+<span class="n">USER</span><span class="p">,</span> <span class="n">GROUP</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">get_current_user_grp</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="converter_run">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run.converter_run">[docs]</a>
+<span class="k">def</span> <span class="nf">converter_run</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">converter</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
+    <span class="n">bin_options</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">remove_converted_annex_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cmd_build_fct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">conv_regex_fct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic function to run an external RAW &gt; RINEX conversion program.</span>
+<span class="sd">    It will detect automatically which converter has to be executed based on</span>
+<span class="sd">    input RAW file extension,</span>
+<span class="sd">    but this can be customized</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : Union[Path,str]</span>
+<span class="sd">        path of the input RAW file.</span>
+<span class="sd">        for RINEX Handeling (e.g. splice) a list of path is allowed.</span>
+<span class="sd">    out_dir : Union[Path,str]</span>
+<span class="sd">        destination directory of the converted RINEX.</span>
+<span class="sd">    converter : str, optional</span>
+<span class="sd">        name of the converter used.</span>
+<span class="sd">        Supports :</span>
+<span class="sd">            * &#39;auto&#39; (automatic choice based on the extension),</span>
+<span class="sd">            * &#39;trm2rnx&#39; (Trimble unofficial),</span>
+<span class="sd">            * &#39;t0xconvert&#39; (Trimble official),</span>
+<span class="sd">            * &#39;runpkr00&#39; (Trimble legacy),</span>
+<span class="sd">            * &#39;teqc&#39; (legacy conversion &amp; RINEX Handeling),</span>
+<span class="sd">            * &#39;mdb2rinex&#39; (Leica),</span>
+<span class="sd">            * &#39;sbf2rin&#39; (Septentrio),</span>
+<span class="sd">            * &#39;convbin&#39; (BINEX),</span>
+<span class="sd">            * &#39;tps2rin&#39; (Topcon),</span>
+<span class="sd">            * &#39;converto&#39; (RINEX Handeling)</span>
+<span class="sd">            * &#39;gfzrnx&#39; (RINEX Handeling)</span>
+<span class="sd">        see ``_convert_select`` function and ``cmd_build`` module</span>
+<span class="sd">        for more details.</span>
+<span class="sd">        The default is &#39;auto&#39;.</span>
+<span class="sd">    timeout : int, optional</span>
+<span class="sd">        timeout in second for the conversion program call.</span>
+<span class="sd">        The default is 60.</span>
+<span class="sd">    bin_options : list, optional</span>
+<span class="sd">        options for the conversion program. The default is [].</span>
+<span class="sd">    bin_kwoptions : dict, optional</span>
+<span class="sd">        keyword options for the conversion program. The default is dict().</span>
+<span class="sd">    bin_path : Union[Path,str], optional</span>
+<span class="sd">        path of the conversion program bin. The default is &quot;&quot;.</span>
+<span class="sd">    remove_converted_annex_files : bool, optional</span>
+<span class="sd">        remove or not the &#39;annex&#39; converted files.</span>
+<span class="sd">        i.e. the not navigation files (e.g. the navigtation RINEXs).</span>
+<span class="sd">        The default is True.</span>
+<span class="sd">    cmd_build_fct : function, optional</span>
+<span class="sd">        A custom function which build the command calling</span>
+<span class="sd">        the conversion program</span>
+<span class="sd">        See `cmd_build` module for more details.</span>
+<span class="sd">        The default is None.</span>
+<span class="sd">    conv_regex_fct : function, optional</span>
+<span class="sd">        A custom function which build the regular expression to find</span>
+<span class="sd">        the RINEX created during the conversion.</span>
+<span class="sd">        See `cmd_regex` module for more details.</span>
+<span class="sd">        The default is None.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    out_fpath</span>
+<span class="sd">        the path of the converted RINEX.</span>
+<span class="sd">    process_converter</span>
+<span class="sd">        The subprocess object which ran the conversion (for debug purposes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#### Convert the paths as Path objects</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+    <span class="c1">## for RINEX handeling, inp_raw_fpath can ben an iterable (list)</span>
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">inp_raw_fpath</span><span class="p">]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">raw_fpath_multi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">raw_fpath</span> <span class="o">=</span> <span class="n">raw_fpath_multi</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># a single file, most common case</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+        <span class="n">raw_fpath</span> <span class="o">=</span> <span class="n">raw_fpath_mono</span>
+
+    <span class="c1">#### Check if input file exists</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">raw_fpath_multi</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;input file: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;input file not found: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_fpath_multi</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;input file for conversion: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">raw_fpath_mono</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2"> input file for conversion&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_fpath_multi</span><span class="p">))</span>
+
+    <span class="c1"># _convert_select can manage both a single file of a list*</span>
+    <span class="c1"># then could handle both raw_fpath_mono or raw_fpath_multi</span>
+    <span class="c1"># thus alias variable raw_fpath will work in both cases</span>
+    <span class="c1"># *. but we thus we just keep the 1st list elt as the representent</span>
+    <span class="c1"># of the full list (we assue it homogene)</span>
+    <span class="n">out_conv_sel</span> <span class="o">=</span> <span class="n">_convert_select</span><span class="p">(</span><span class="n">converter</span><span class="p">,</span> <span class="n">raw_fpath</span><span class="p">)</span>
+    <span class="p">(</span>
+        <span class="n">converter_name</span><span class="p">,</span>
+        <span class="n">brand</span><span class="p">,</span>
+        <span class="n">cmd_build_fct_use</span><span class="p">,</span>
+        <span class="n">conv_regex_fct_use</span><span class="p">,</span>
+        <span class="n">bin_options_use</span><span class="p">,</span>
+        <span class="n">bin_kwoptions_use</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">=</span> <span class="n">out_conv_sel</span>
+
+    <span class="c1">#### Force the arocnv.cmd_build_fct, if any</span>
+    <span class="k">if</span> <span class="n">cmd_build_fct</span><span class="p">:</span>
+        <span class="n">cmd_build_fct_use</span> <span class="o">=</span> <span class="n">cmd_build_fct</span>
+
+    <span class="c1">#### Force the arocnv.conv_regex_fct, if any</span>
+    <span class="k">if</span> <span class="n">conv_regex_fct</span><span class="p">:</span>
+        <span class="n">conv_regex_fct_use</span> <span class="o">=</span> <span class="n">conv_regex_fct</span>
+
+    <span class="c1">#### Force the bin_options if any</span>
+    <span class="k">if</span> <span class="n">bin_options</span><span class="p">:</span>
+        <span class="n">bin_options_use</span> <span class="o">=</span> <span class="n">bin_options</span>
+
+    <span class="c1">#### Force the bin_kwoptions if any</span>
+    <span class="k">if</span> <span class="n">bin_kwoptions</span><span class="p">:</span>
+        <span class="n">bin_kwoptions_use</span> <span class="o">=</span> <span class="n">bin_kwoptions</span>
+
+    <span class="c1">#### build the command</span>
+    <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span> <span class="o">=</span> <span class="n">cmd_build_fct_use</span><span class="p">(</span>
+        <span class="n">raw_fpath</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="n">bin_options_use</span><span class="p">,</span> <span class="n">bin_kwoptions_use</span>
+    <span class="p">)</span>
+    <span class="c1">##### BIN PATH !!!!! XXXXX</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;conversion command: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cmd_str</span><span class="p">)</span>
+
+    <span class="c1">############# run the external conversion programm #############</span>
+    <span class="n">timeout_reached</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">process_converter</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">cmd_use</span><span class="p">,</span>
+            <span class="n">executable</span><span class="o">=</span><span class="s2">&quot;/bin/bash&quot;</span><span class="p">,</span>
+            <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+        <span class="n">process_converter</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">timeout_reached</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">end</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">exec_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">seconds</span> <span class="o">+</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">microseconds</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">6</span>
+
+    <span class="c1">#################################################################</span>
+
+    <span class="c1">###### check the output  on the conversion programm</span>
+    <span class="k">if</span> <span class="n">timeout_reached</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error while converting </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">raw_fpath_mono</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Timeout reached (</span><span class="si">%s</span><span class="s2"> seconds)&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">process_converter</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error while converting </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">raw_fpath_mono</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Converter&#39;s error message:&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">process_converter</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Conversion done (</span><span class="si">%7.4f</span><span class="s2"> sec.). Converter&#39;s output:&quot;</span><span class="p">,</span> <span class="n">exec_time</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">process_converter</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="c1">###### get the converted file</span>
+    <span class="c1">#### generate the regex matching the theoretical name for the converted file</span>
+    <span class="c1">#### if a list of input file is given, the 1st one is used as output name</span>
+    <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">conv_regex_fct_use</span><span class="p">(</span><span class="n">raw_fpath_mono</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="s2">&quot;regex for the converted files (main/annex.): </span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">conv_regex_main</span><span class="p">,</span>
+        <span class="n">conv_regex_annex</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1">#### find the converted file matching the regex</span>
+    <span class="n">conv_files_main</span><span class="p">,</span> <span class="n">conv_files_annex</span> <span class="o">=</span> <span class="n">find_conv_files</span><span class="p">(</span>
+        <span class="n">out_dir</span><span class="p">,</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">conv_files_main</span><span class="p">:</span>
+        <span class="n">out_fpath</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;✗ converted file not found&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conv_files_main</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;✓ conversion OK (</span><span class="si">%7.4f</span><span class="s2"> sec.), main file/size: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">exec_time</span><span class="p">,</span>
+            <span class="n">out_fpath</span><span class="p">,</span>
+            <span class="n">out_fpath</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># change ownership</span>
+    <span class="k">if</span> <span class="n">out_fpath</span><span class="p">:</span>
+        <span class="n">arocnv</span><span class="o">.</span><span class="n">change_owner</span><span class="p">(</span><span class="n">out_fpath</span><span class="p">,</span> <span class="n">USER</span><span class="p">,</span> <span class="n">GROUP</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">remove_converted_annex_files</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">conv_files_annex</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;converted annex file removed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">out_fpath</span><span class="p">),</span> <span class="n">process_converter</span></div>
+
+
+
+<span class="c1">#############################################################################</span>
+<span class="c1">### Low level functions</span>
+
+
+<div class="viewcode-block" id="find_conv_files">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run.find_conv_files">[docs]</a>
+<span class="k">def</span> <span class="nf">find_conv_files</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">pattern_main</span><span class="p">,</span> <span class="n">pattern_annex</span><span class="p">,</span> <span class="n">n_sec</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Searches for the files in a directory that were recently created (within the last n_sec seconds)</span>
+<span class="sd">    and match the main and annex patterns.</span>
+
+<span class="sd">    This function iterates over all files in the specified directory and checks</span>
+<span class="sd">    if they were created within the last n_sec seconds</span>
+<span class="sd">    and if their names match the main or annex patterns.</span>
+<span class="sd">    It returns two lists of files that match the main and annex patterns, respectively.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    directory : Path</span>
+<span class="sd">        The directory in which to search for files.</span>
+<span class="sd">    pattern_main : str</span>
+<span class="sd">        The regular expression pattern that the main files should match.</span>
+<span class="sd">    pattern_annex : str</span>
+<span class="sd">        The regular expression pattern that the annex files should match.</span>
+<span class="sd">    n_sec : int, optional</span>
+<span class="sd">        The number of seconds in the past to consider for file creation. Default is 10.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        The list of main files that were found.</span>
+<span class="sd">    list</span>
+<span class="sd">        The list of annex files that were found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">n_sec</span><span class="p">)</span>
+    <span class="n">files_main</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">files_annex</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">files_main_time</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">files_annex_time</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="n">created_time</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getctime</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="n">created_time</span> <span class="o">&lt;</span> <span class="n">delta</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern_main</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+                <span class="n">files_main</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                <span class="n">files_main_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">created_time</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">now</span> <span class="o">-</span> <span class="n">created_time</span> <span class="o">&lt;</span> <span class="n">delta</span> <span class="ow">and</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern_annex</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+                <span class="n">files_annex</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                <span class="n">files_annex_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">created_time</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="c1"># Sort the files found</span>
+    <span class="n">files_main</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">files_main_time</span><span class="p">,</span> <span class="n">files_main</span><span class="p">))]</span>
+    <span class="n">files_annex</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">files_annex_time</span><span class="p">,</span> <span class="n">files_annex</span><span class="p">))]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files_main</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Several converted main files found </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">files_main</span><span class="p">)</span>
+        <span class="n">files_main</span> <span class="o">=</span> <span class="p">[</span><span class="n">files_main</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Keeping most recent only: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">files_main</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">files_main</span><span class="p">,</span> <span class="n">files_annex</span></div>
+
+
+
+<span class="c1">## https://stackoverflow.com/questions/36495669/difference-between-terms-option-argument-and-parameter</span>
+<span class="c1">## https://tinf2.vub.ac.be/~dvermeir/mirrors/www-wks.acs.ohio-state.edu/unix_course/intro-14.html</span>
+<span class="c1">## https://discourse.ubuntu.com/t/command-structure/18556</span>
+
+
+<div class="viewcode-block" id="_ashtech_name_2_date">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run._ashtech_name_2_date">[docs]</a>
+<span class="k">def</span> <span class="nf">_ashtech_name_2_date</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the record date from an ASHTECH file name.</span>
+
+<span class="sd">    This function extracts the year, day of year, GPS week, and day of week from the name of an ASHTECH file.</span>
+<span class="sd">    It also returns the date as a Python datetime object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : Path</span>
+<span class="sd">        The path of the input ASHTECH file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The year extracted from the file name.</span>
+<span class="sd">    int</span>
+<span class="sd">        The day of the year extracted from the file name.</span>
+<span class="sd">    int</span>
+<span class="sd">        The GPS week extracted from the file name.</span>
+<span class="sd">    int</span>
+<span class="sd">        The day of the week extracted from the file name.</span>
+<span class="sd">    datetime</span>
+<span class="sd">        The date extracted from the file name as a Python datetime object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">doy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">stem</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+
+    <span class="k">if</span> <span class="n">yy</span> <span class="o">&lt;</span> <span class="mi">80</span><span class="p">:</span>
+        <span class="n">y2k</span> <span class="o">=</span> <span class="mi">2000</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y2k</span> <span class="o">=</span> <span class="mi">1900</span>
+
+    <span class="n">yyyy</span> <span class="o">=</span> <span class="n">y2k</span> <span class="o">+</span> <span class="n">yy</span>
+
+    <span class="n">date</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">doy2dt</span><span class="p">(</span><span class="n">yyyy</span><span class="p">,</span> <span class="n">doy</span><span class="p">)</span>
+    <span class="n">week</span><span class="p">,</span> <span class="n">dow</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">dt2gpstime</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">yyyy</span><span class="p">,</span> <span class="n">doy</span><span class="p">,</span> <span class="n">week</span><span class="p">,</span> <span class="n">dow</span><span class="p">,</span> <span class="n">date</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

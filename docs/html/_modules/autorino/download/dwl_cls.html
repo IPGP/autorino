@@ -1,0 +1,813 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.download.dwl_cls &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            autorino
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.download.dwl_cls</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.download.dwl_cls</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">autorino.download</span> <span class="k">as</span> <span class="nn">arodwl</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+
+<span class="c1"># +++ Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">aro_env_dict</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+<span class="c1"># pd.options.mode.chained_assignment = &quot;warn&quot;</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+
+<span class="n">BOLD_SRT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
+<span class="n">BOLD_END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+
+
+<div class="viewcode-block" id="DownloadGnss">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss">[docs]</a>
+<span class="k">class</span> <span class="nc">DownloadGnss</span><span class="p">(</span><span class="n">arocmn</span><span class="o">.</span><span class="n">StepGnss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to handle the downloading of GNSS data.</span>
+
+<span class="sd">    Inherits from</span>
+<span class="sd">    ----------</span>
+<span class="sd">    arocmn.StepGnss</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    out_dir : str</span>
+<span class="sd">        The output directory where the downloaded files will be stored.</span>
+<span class="sd">    tmp_dir : str</span>
+<span class="sd">        The temporary directory used during the download process.</span>
+<span class="sd">    log_dir : str</span>
+<span class="sd">        The directory where log files will be stored.</span>
+<span class="sd">    epoch_range : EpochRange</span>
+<span class="sd">        The range of epochs for which data will be downloaded.</span>
+<span class="sd">    access : dict</span>
+<span class="sd">        A dictionary containing access information such as protocol, hostname, login, and password.</span>
+<span class="sd">    site : dict, optional</span>
+<span class="sd">        The site information. Default is None.</span>
+<span class="sd">    session : dict, optional</span>
+<span class="sd">        The session information. Default is None.</span>
+<span class="sd">    options : dict, optional</span>
+<span class="sd">        Additional options for the download process. Default is None.</span>
+<span class="sd">    metadata : str or list, optional</span>
+<span class="sd">        The metadata to be included in the converted RINEX files. Possible inputs are:</span>
+<span class="sd">         * list of string (sitelog file paths),</span>
+<span class="sd">         * single string (single sitelog file path)</span>
+<span class="sd">         * single string (directory containing the sitelogs)</span>
+<span class="sd">         * list of MetaData objects</span>
+<span class="sd">         * single MetaData object.</span>
+<span class="sd">         Defaults to None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DownloadGnss.__init__">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">out_dir</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="p">,</span>
+        <span class="n">inp_dir</span><span class="p">,</span>
+        <span class="n">inp_file_regex</span><span class="p">,</span>
+        <span class="n">epoch_range</span><span class="p">,</span>
+        <span class="n">access</span><span class="p">,</span>
+        <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the DownloadGnss object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out_dir : str</span>
+<span class="sd">            The output directory where the downloaded files will be stored.</span>
+<span class="sd">        tmp_dir : str</span>
+<span class="sd">            The temporary directory used during the download process.</span>
+<span class="sd">        log_dir : str</span>
+<span class="sd">            The directory where log files will be stored.</span>
+<span class="sd">        epoch_range : EpochRange</span>
+<span class="sd">            The range of epochs for which data will be downloaded.</span>
+<span class="sd">        access : dict</span>
+<span class="sd">            A dictionary containing access information such as protocol, hostname, login, and password.</span>
+<span class="sd">        site : dict, optional</span>
+<span class="sd">            The site information. Default is None.</span>
+<span class="sd">        session : dict, optional</span>
+<span class="sd">            The session information. Default is None.</span>
+<span class="sd">        options : dict, optional</span>
+<span class="sd">            Additional options for the download process. Default is None.</span>
+<span class="sd">        metadata : str or list, optional</span>
+<span class="sd">            The metadata to be included in the converted RINEX files. Possible inputs are:</span>
+<span class="sd">             * list of string (sitelog file paths),</span>
+<span class="sd">             * single string (single sitelog file path)</span>
+<span class="sd">             * single string (directory containing the sitelogs)</span>
+<span class="sd">             * list of MetaData objects</span>
+<span class="sd">             * single MetaData object.</span>
+<span class="sd">             Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir</span><span class="p">,</span>
+            <span class="n">inp_file_regex</span><span class="o">=</span><span class="n">inp_file_regex</span><span class="p">,</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># specific to the DownloadGnss class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access</span> <span class="o">=</span> <span class="n">access</span>
+
+        <span class="c1"># initialize the ftp object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ftp_obj</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="c1"># legacy properties, specific to the DownloadGnss class</span>
+    <span class="c1">#### They become more or less useless since the implementation of self.inp_file_regex (2025-01)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inp_dirname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_dir</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inp_basename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_dir</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DownloadGnss.guess_remot_raw">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.guess_remot_raw">[docs]</a>
+    <span class="k">def</span> <span class="nf">guess_remot_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Guess the paths and name of the remote files based on the</span>
+<span class="sd">        Session and EpochRange attributes of the DownloadGnss</span>
+
+<span class="sd">        see also method ``guess_local_raw()``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;generic filename empty for </span><span class="si">%s</span><span class="s2">, the guessed remote filepaths will be wrong&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">hostname_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">]</span>
+
+        <span class="n">rmot_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_range</span><span class="o">.</span><span class="n">eporng_list</span><span class="p">():</span>  <span class="c1">### go for irow !</span>
+            <span class="c1">### guess the potential remote files</span>
+            <span class="n">rmot_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_dir</span><span class="p">)</span>
+            <span class="n">rmot_fname_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">)</span>
+
+            <span class="n">rmot_path_use</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">join_url</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">],</span> <span class="n">hostname_use</span><span class="p">,</span> <span class="n">rmot_dir_use</span><span class="p">,</span> <span class="n">rmot_fname_use</span>
+            <span class="p">)</span>
+
+            <span class="n">rmot_path_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">rmot_fname_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">)</span>
+
+            <span class="n">rmot_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">)</span>
+
+            <span class="n">iepoch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">epoch</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_fname_use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_path_use</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;remote file guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rmot_path_use</span><span class="p">)</span>
+
+        <span class="c1"># for guess, all input files are considered as ok a priori</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">rmot_paths_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rmot_paths_list</span><span class="p">)))</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;nbr remote files guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmot_paths_list</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">rmot_paths_list</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.guess_local_raw">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.guess_local_raw">[docs]</a>
+    <span class="k">def</span> <span class="nf">guess_local_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Guess the paths and name of the local raw files based on the</span>
+<span class="sd">        EpochRange and `inp_file_regex` attributes of the DownloadGnss object</span>
+
+<span class="sd">        see also method ``guess_remot_raw()``,</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">local_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_range</span><span class="o">.</span><span class="n">eporng_list</span><span class="p">():</span>  <span class="c1"># go for irow !</span>
+            <span class="c1"># guess the potential local files</span>
+            <span class="n">local_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span>
+            <span class="n">local_fname_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">)</span>
+            <span class="n">local_path_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_dir_use</span><span class="p">,</span> <span class="n">local_fname_use</span><span class="p">)</span>
+
+            <span class="n">local_path_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">local_fname_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">)</span>
+
+            <span class="n">local_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">)</span>
+
+            <span class="n">iepoch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">epoch</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_fname_use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iepoch</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_path_use</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;local file guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">local_path_use</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;nbr local raw files guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_paths_list</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">local_paths_list</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.guess_remote_dirs">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.guess_remote_dirs">[docs]</a>
+    <span class="k">def</span> <span class="nf">guess_remote_dirs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this method is specific for ask_remote_raw</span>
+<span class="sd">        guessing the directories is different from guessing the files:</span>
+<span class="sd">        * no hostname</span>
+<span class="sd">        * no filename (obviously)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rmot_dir_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">epoch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+            <span class="n">rmot_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_dirname</span><span class="p">)</span>
+            <span class="n">rmot_dir_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">rmot_dir_use</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_dir_use</span>
+            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dir_guessed&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">irow</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
+
+            <span class="n">rmot_dir_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmot_dir_use</span><span class="p">)</span>
+
+        <span class="n">rmot_dir_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">rmot_dir_list</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">rmot_dir_list</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.ask_remote_raw">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.ask_remote_raw">[docs]</a>
+    <span class="k">def</span> <span class="nf">ask_remote_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the list of remote files from the server.</span>
+
+<span class="sd">        This method guesses the remote directories and then lists the files</span>
+<span class="sd">        in those directories based on the protocol specified in the access</span>
+<span class="sd">        information.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of remote file paths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># guess the remote directories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guess_remote_dirs</span><span class="p">()</span>
+
+        <span class="n">rmot_fil_all_lis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">rmot_fil_epo_lis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">epo_lis</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;remote files will be filtered with regex: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;no regex filtering will be applied to remote files&quot;</span><span class="p">)</span>
+
+        <span class="c1"># step 1: iterate over the input table and list the remote files (table is updated in step 2)</span>
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">epoch</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+            <span class="n">rmot_dir_use</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;HTTP protocol doesn&#39;t support well file listing. Nasty effects may occur.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">rmot_fil_epo_bulk_lis</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">list_remote_http</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">],</span> <span class="n">rmot_dir_use</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;ftp&quot;</span><span class="p">:</span>
+                <span class="n">rmot_fil_epo_bulk_lis</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">list_remote_ftp</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">],</span>
+                    <span class="n">rmot_dir_use</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;login&quot;</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">],</span>
+                    <span class="n">ftp_obj_inp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ftp_obj</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;wrong protocol. Only &#39;http&#39; and &#39;ftp&#39; are supported.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span>
+
+            <span class="n">rmot_fil_epo_bulk_lis</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rmot_fil_epo_bulk_lis</span><span class="p">)</span>
+
+            <span class="c1">### match the right input structure, if a regex input is provided</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">:</span>
+                <span class="n">rmot_fname_theo</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">rmot_fil_epo_lis</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">f</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">rmot_fil_epo_bulk_lis</span>
+                    <span class="k">if</span> <span class="n">rmot_fname_theo</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rmot_fil_epo_lis</span> <span class="o">=</span> <span class="n">rmot_fil_epo_bulk_lis</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">%i</span><span class="s2"> remote files found on rec: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">rmot_fil_epo_lis</span><span class="p">),</span>
+                <span class="n">rmot_fil_epo_lis</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmot_fil_epo_lis</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmot_fil_epo_bulk_lis</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">%i</span><span class="s2"> files have been filtered out (non-matching regex)&quot;</span><span class="p">,</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">rmot_fil_epo_bulk_lis</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmot_fil_epo_lis</span><span class="p">),</span>
+                <span class="p">)</span>
+
+            <span class="n">rmot_fil_all_lis</span> <span class="o">=</span> <span class="n">rmot_fil_all_lis</span> <span class="o">+</span> <span class="n">rmot_fil_epo_lis</span>
+            <span class="n">epo_lis</span> <span class="o">=</span> <span class="n">epo_lis</span> <span class="o">+</span> <span class="p">[</span><span class="n">epoch</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmot_fil_epo_lis</span><span class="p">)</span>
+
+            <span class="c1"># re add protocol: (urltambouille)</span>
+            <span class="n">rmot_fil_epo_lis</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">arodwl</span><span class="o">.</span><span class="n">join_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">rmot_fil_epo_lis</span>
+            <span class="p">]</span>
+            <span class="c1"># legacy readd</span>
+            <span class="c1"># rmot_fil_epo_lis = [</span>
+            <span class="c1">#    self.access[&quot;protocol&quot;] + &quot;://&quot; + f for f in rmot_fil_epo_lis</span>
+            <span class="c1"># ]</span>
+
+            <span class="c1">## step 2: the table is updated with the files found</span>
+            <span class="n">new_rows_stk</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">rmot_fil</span> <span class="ow">in</span> <span class="n">rmot_fil_epo_lis</span><span class="p">:</span>
+                <span class="n">new_row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">new_row</span><span class="p">[</span><span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">rmot_fil</span><span class="p">)</span>
+                <span class="n">new_row</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_fil</span>
+                <span class="n">new_row</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">new_row</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">new_rows_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_row</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">new_rows_stk</span><span class="p">)],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+
+        <span class="c1"># step 3: remove the guessed directories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;dir_guessed&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;nbr remote files found on rec: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmot_fil_all_lis</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">rmot_fil_all_lis</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.ask_local_raw">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.ask_local_raw">[docs]</a>
+    <span class="k">def</span> <span class="nf">ask_local_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Guess the paths and name of the local raw files based on the</span>
+<span class="sd">        EpochRange and  table&#39;s fpath_inp basename i.e. the theoretical remote file name</span>
+<span class="sd">        generated with `guess_remot_raw()`.</span>
+
+<span class="sd">        see also method ``guess_remot_raw()``,</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">local_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">epoch</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+
+            <span class="c1"># guess the potential local files</span>
+            <span class="n">local_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span>
+            <span class="n">local_fname_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">])</span>
+            <span class="n">local_path_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_dir_use</span><span class="p">,</span> <span class="n">local_fname_use</span><span class="p">)</span>
+            <span class="n">local_path_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">local_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_path_use</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_fname_use</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">local_path_use</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;local file asked: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">local_path_use</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;nbr local raw files asked: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_paths_list</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">local_paths_list</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.ping_remote">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.ping_remote">[docs]</a>
+    <span class="k">def</span> <span class="nf">ping_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ping_max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">ping_timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ping the remote server to check if it is reachable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ping_out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">ping_max_try</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ping_out</span><span class="p">:</span>
+            <span class="n">ping_out</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">ping</span><span class="p">(</span>
+                <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">],</span> <span class="n">ping_timeout</span><span class="o">=</span><span class="n">ping_timeout</span>
+            <span class="p">)</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;attempt </span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2"> to ping </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">count</span><span class="p">,</span>
+                    <span class="n">ping_max_try</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ping_out</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Remote server </span><span class="si">%s</span><span class="s2"> is not reachable.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Remote server </span><span class="si">%s</span><span class="s2"> is reachable. (</span><span class="si">%f</span><span class="s2"> ms)&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">],</span>
+                <span class="n">ping_out</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ping_out</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.set_ftp_obj">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.set_ftp_obj">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_ftp_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create the FTP object for the FTP protocol.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ftp_obj</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">ftp_create_obj</span><span class="p">(</span>
+            <span class="n">hostname_inp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">],</span>
+            <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;login&quot;</span><span class="p">],</span>
+            <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">],</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="n">max_try</span><span class="o">=</span><span class="n">max_try</span><span class="p">,</span>
+            <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleep_time</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.download">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.download">[docs]</a>
+    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">remote_find_method</span><span class="o">=</span><span class="s2">&quot;ask&quot;</span><span class="p">,</span>
+        <span class="n">invalidate_small_local_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+        <span class="n">max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">ping_max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">ping_timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Frontend method to download files from a GNSS receiver</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, prints detailed information during the download process. Default is False.</span>
+<span class="sd">        force : bool, optional</span>
+<span class="sd">            If True, forces the download even if the files already exist locally. Default is False.</span>
+<span class="sd">        remote_find_method : str, optional</span>
+<span class="sd">            Method to find remote files.</span>
+<span class="sd">            Can be &#39;ask&#39; to list files from the server (for FTP only) or &#39;guess&#39; to guess file paths.</span>
+<span class="sd">            Default is &#39;ask&#39;.</span>
+<span class="sd">        invalidate_small_local_files : bool, optional</span>
+<span class="sd">            If True, invalidates small local files to ensure they are re-downloaded. Default is True.</span>
+<span class="sd">        timeout : int, optional</span>
+<span class="sd">            Timeout in seconds for the download operations. Default is 60.</span>
+<span class="sd">        max_try : int, optional</span>
+<span class="sd">            Maximum number of retry attempts for the download operations. Default is 4.</span>
+<span class="sd">        sleep_time : int, optional</span>
+<span class="sd">            Sleep time in seconds between retry attempts. Default is 5.</span>
+<span class="sd">        ping_max_try : int, optional</span>
+<span class="sd">            Maximum number of retry attempts for pinging the remote server. Default is 4.</span>
+<span class="sd">        ping_timeout : int, optional</span>
+<span class="sd">            Timeout in seconds for pinging the remote server. Default is 20.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_logfile</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">BOLD_SRT</span> <span class="o">+</span> <span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt; RAW files download&quot;</span> <span class="o">+</span> <span class="n">BOLD_END</span><span class="p">)</span>
+
+        <span class="c1"># Set up and clean temporary directories</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tmp_dirs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_tmp_dirs</span><span class="p">()</span>
+
+        <span class="c1"># Check the remote find method, and switch to &#39;guess&#39; if HTTP protocol is used</span>
+        <span class="k">if</span> <span class="n">remote_find_method</span> <span class="o">==</span> <span class="s2">&quot;ask&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;HTTP protocol doesn&#39;t support file listing (&#39;ask&#39; method).&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Switching to &#39;guess&#39; remote find method.&quot;</span><span class="p">)</span>
+            <span class="n">remote_find_method</span> <span class="o">=</span> <span class="s2">&quot;guess&quot;</span>
+
+        <span class="c1"># Ping the remote server to check if it is reachable</span>
+        <span class="n">ping_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ping_remote</span><span class="p">(</span>
+            <span class="n">ping_max_try</span><span class="o">=</span><span class="n">ping_max_try</span><span class="p">,</span> <span class="n">ping_timeout</span><span class="o">=</span><span class="n">ping_timeout</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ping_out</span><span class="p">:</span>
+            <span class="c1"># local raw are guessed anyway, to resume the next steps if download is not possible</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_raw</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Set up the DownloadGnss&#39;s FTP object if the protocol is FTP</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;ftp&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_ftp_obj</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">max_try</span><span class="o">=</span><span class="n">max_try</span><span class="p">,</span> <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleep_time</span><span class="p">)</span>
+
+        <span class="c1"># Guess remote raw file paths</span>
+        <span class="k">if</span> <span class="n">remote_find_method</span> <span class="o">==</span> <span class="s2">&quot;guess&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guess_remot_raw</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_raw</span><span class="p">()</span>
+        <span class="c1"># Ask remote raw file paths (works for FTP only!</span>
+        <span class="k">elif</span> <span class="n">remote_find_method</span> <span class="o">==</span> <span class="s2">&quot;ask&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ask_remote_raw</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ask_local_raw</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;Wrong remote_find_method: </span><span class="si">%s</span><span class="s2"> (&#39;ask&#39; or &#39;guess&#39; only are allowed)&quot;</span><span class="p">,</span>
+                <span class="n">remote_find_method</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+
+        <span class="c1"># Check local files and update table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">()</span>
+        <span class="c1"># be sure ok_xxx columns are booleans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_ok_cols_bool</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">invalidate_small_local_files</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">invalidate_small_local_files</span><span class="p">()</span>
+        <span class="c1"># switch ok_inp to False if the output files are already there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_ok_out</span><span class="p">()</span>
+
+        <span class="c1"># Force download if required</span>
+        <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="n">step_name</span><span class="o">=</span><span class="s2">&quot;download&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Log the number of files to be downloaded and excluded</span>
+        <span class="n">n_ok_inp</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">n_not_ok_inp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">n_tot_inp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%3i</span><span class="s2">/</span><span class="si">%3i</span><span class="s2"> files will be downloaded, </span><span class="si">%3i</span><span class="s2">/</span><span class="si">%3i</span><span class="s2"> files are excluded&quot;</span><span class="p">,</span>
+            <span class="n">n_ok_inp</span><span class="p">,</span>
+            <span class="n">n_tot_inp</span><span class="p">,</span>
+            <span class="n">n_not_ok_inp</span><span class="p">,</span>
+            <span class="n">n_tot_inp</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Print the table if verbose is enabled</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span>
+
+        <span class="c1"># Create a lockfile to ensure exclusive access during download</span>
+        <span class="n">lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_lockfile</span><span class="p">()</span>
+
+        <span class="c1">###############################</span>
+        <span class="c1"># +++ DOWNLOAD CORE a.k.a FETCH</span>
+        <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetch_remote_files</span><span class="p">(</span>
+                <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>  <span class="c1"># force argument is now redudant, because ok_inp can be forced with .force() method</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">max_try</span><span class="o">=</span><span class="n">max_try</span><span class="p">,</span>
+                <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleep_time</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">lock</span><span class="o">.</span><span class="n">lock_file</span><span class="p">)</span>
+        <span class="c1">###############################</span>
+
+        <span class="c1"># Print the table if verbose is enabled</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span>
+
+        <span class="c1"># close the log file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_logfile</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="DownloadGnss.fetch_remote_files">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.fetch_remote_files">[docs]</a>
+    <span class="k">def</span> <span class="nf">fetch_remote_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        will download locally the files which have been identified by</span>
+<span class="sd">        the guess_remote_files method</span>
+
+<span class="sd">        exploits the fname_remote column of the DownloadGnss.table</span>
+<span class="sd">        attribute</span>
+
+<span class="sd">        This `fetch_remote_files` method is for the download stricly speaking.</span>
+<span class="sd">        Ìn operation, use the `download` method which does a broader</span>
+<span class="sd">        preliminary actions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">download_files_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">file_dl_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_fetch</span><span class="p">(</span>
+                <span class="n">irow</span><span class="p">,</span>
+                <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>  <span class="c1"># force argument is now redudant, because ok_inp can be forced with .force() method</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">max_try</span><span class="o">=</span><span class="n">max_try</span><span class="p">,</span>
+                <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleep_time</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_dl_out</span><span class="p">:</span>
+                <span class="n">download_files_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_dl_out</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">download_files_list</span></div>
+
+
+    <span class="c1">#               _   _                   _ _                           _ _    __                                 __</span>
+    <span class="c1">#     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \</span>
+    <span class="c1">#    /  \   ___| |_ _  ___  _ __  ___   V V_ __ ___   ___  _ __   ___ V V  | | ___  _ __    _ __ _____      _____| |</span>
+    <span class="c1">#   / /\ \ / __| __| |/ _ \| &#39;_ \/ __|    | &#39;_ ` _ \ / _ \| &#39;_ \ / _ \     | |/ _ \| &#39;_ \  | &#39;__/ _ \ \ /\ / / __| |</span>
+    <span class="c1">#  / ____ \ (__| |_| | (_) | | | \__ \    | | | | | | (_) | | | | (_) |    | | (_) | | | | | | | (_) \ V  V /\__ \ |</span>
+    <span class="c1"># /_/    \_\___|\__|_|\___/|_| |_|___/    |_| |_| |_|\___/|_| |_|\___/     | |\___/|_| |_| |_|  \___/ \_/\_/ |___/ |</span>
+    <span class="c1">#                                                                           \_\                                 /_/</span>
+
+<div class="viewcode-block" id="DownloadGnss.mono_fetch">
+<a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_cls.DownloadGnss.mono_fetch">[docs]</a>
+    <span class="k">def</span> <span class="nf">mono_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fetch&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt;&gt; fetch remote raw file: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">])</span>
+
+        <span class="c1"># ++++++ use the guessed local file as destination or the generic directory</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">is_ok</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]):</span>
+            <span class="c1"># +++ the local file has not been guessed</span>
+            <span class="n">outdir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span>
+            <span class="n">outdir_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span>
+                <span class="n">outdir_use</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">],</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># +++ the local file has been guessed before</span>
+            <span class="n">outdir_use</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">])</span>
+
+        <span class="n">tmpdir_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_downloaded</span>
+
+        <span class="c1"># +++++ create the directory if it does not exist</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outdir_use</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir_use</span><span class="p">)</span>
+
+        <span class="c1"># +++++ download the file</span>
+        <span class="n">file_dl_tmp</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">file_dl_out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;ftp&quot;</span><span class="p">,</span> <span class="s2">&quot;http&quot;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;wrong protocol </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;http&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file_dl_tmp</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">download_http</span><span class="p">(</span>
+                    <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">],</span>
+                    <span class="n">output_dir</span><span class="o">=</span><span class="n">tmpdir_use</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                    <span class="n">max_try</span><span class="o">=</span><span class="n">max_try</span><span class="p">,</span>
+                    <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleep_time</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">dl_ok</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;HTTP download error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="n">dl_ok</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;protocol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;ftp&quot;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">file_dl_tmp</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">download_ftp</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">],</span>
+                    <span class="n">tmpdir_use</span><span class="p">,</span>
+                    <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;login&quot;</span><span class="p">],</span>
+                    <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">],</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                    <span class="n">max_try</span><span class="o">=</span><span class="n">max_try</span><span class="p">,</span>
+                    <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleep_time</span><span class="p">,</span>
+                    <span class="n">ftp_obj_inp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ftp_obj</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">dl_ok</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;FTP download error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="n">dl_ok</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># ++ this case should never happen since there is a protocol test at the begining</span>
+            <span class="n">dl_ok</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># +++++ check the downloaded file size</span>
+        <span class="k">if</span> <span class="n">dl_ok</span><span class="p">:</span>
+            <span class="n">dl_ok</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">check_file_size</span><span class="p">(</span><span class="n">file_dl_tmp</span><span class="p">)</span>
+
+        <span class="c1"># +++++ store the results in the table</span>
+        <span class="k">if</span> <span class="n">dl_ok</span><span class="p">:</span>
+            <span class="n">file_dl_out</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">file_dl_tmp</span><span class="p">,</span> <span class="n">outdir_use</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_dl_out</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_dl_tmp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">file_dl_out</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

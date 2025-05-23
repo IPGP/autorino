@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuration file details &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Under the hood" href="under_hood.html" />
+    <link rel="prev" title="Configuration files in a nutshell" href="config_files_nutshell.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration file details</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-file-structure">Configuration File Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cfgfile-version">1. <code class="docutils literal notranslate"><span class="pre">cfgfile_version</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#environment">2. <code class="docutils literal notranslate"><span class="pre">environment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subsections">Subsections:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#station">3. <code class="docutils literal notranslate"><span class="pre">station</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Subsections:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#sessions">4. <code class="docutils literal notranslate"><span class="pre">sessions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Subsections:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#workflow-steps">5. Workflow Steps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#generic-step-structure">Generic Step Structure:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-steps">Example Steps:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#aliases">6. Aliases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reserved-keywords">7. Reserved Keywords</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configuration file details</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/config_files_details.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration-file-details">
+<span id="config-files-details"></span><h1>Configuration file details<a class="headerlink" href="#configuration-file-details" title="Link to this heading"></a></h1>
+<section id="configuration-file-structure">
+<h2>Configuration File Structure<a class="headerlink" href="#configuration-file-structure" title="Link to this heading"></a></h2>
+<section id="cfgfile-version">
+<h3>1. <code class="docutils literal notranslate"><span class="pre">cfgfile_version</span></code><a class="headerlink" href="#cfgfile-version" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Purpose</strong>: Specifies the version of the configuration file format.</p></li>
+<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">cfgfile_version:</span> <span class="pre">20.1</span></code></p></li>
+</ul>
+</section>
+<section id="environment">
+<h3>2. <code class="docutils literal notranslate"><span class="pre">environment</span></code><a class="headerlink" href="#environment" title="Link to this heading"></a></h3>
+<p>Defines global settings for the GNSS data processing environment, including paths to software tools and general application settings.</p>
+<section id="subsections">
+<h4>Subsections:<a class="headerlink" href="#subsections" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">conv_software_paths</span></code></strong>: Specifies paths to GNSS raw data converters.</p>
+<ul>
+<li><p><strong>Keys</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">convbin</span></code>: Path to RTKLIB converter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mdb2rinex</span></code>: Path to Leica converter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sbf2rin</span></code>: Path to Septentrio converter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tps2rin</span></code>: Path to Topcon converter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t0xconvert</span></code>: Path to Trimble official converter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trm2rinex</span></code>: Path to Trimble unofficial docker converter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">runpkr00</span></code>: Path to Trimble legacy converter for TEQC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">converto</span></code>: Path to ConvertoCPP tool.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gfzrnx</span></code>: Path to GFZRNX tool.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teqc</span></code>: Path to TEQC tool.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">general</span></code></strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_level</span></code>: Logging verbosity (e.g., <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trimble_default_software</span></code>: Default Trimble converter to use (e.g., <code class="docutils literal notranslate"><span class="pre">trm2rinex</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cfg_merge_strategy</span></code>: Strategy for merging configuration files (<code class="docutils literal notranslate"><span class="pre">replace</span></code> or <code class="docutils literal notranslate"><span class="pre">additive</span></code>).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="station">
+<h3>3. <code class="docutils literal notranslate"><span class="pre">station</span></code><a class="headerlink" href="#station" title="Link to this heading"></a></h3>
+<p>Contains station-specific information and configuration.</p>
+<section id="id1">
+<h4>Subsections:<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">site</span></code></strong>: Metadata about the site.</p>
+<ul>
+<li><p><strong>Keys</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">operator</span></code>: Name of the site operator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">agency</span></code>: Name of the managing agency.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">country</span></code>: Country name in ISO 3166 format.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sitelog_path</span></code>: Path to site logs (file or directory).</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">sessions</span></code></strong>: Defines the characteristics of recording sessions.</p></li>
+</ul>
+</section>
+</section>
+<section id="sessions">
+<h3>4. <code class="docutils literal notranslate"><span class="pre">sessions</span></code><a class="headerlink" href="#sessions" title="Link to this heading"></a></h3>
+<p>Each session is defined under a <code class="docutils literal notranslate"><span class="pre">session_&lt;sessionname&gt;</span></code> block. It includes the following:</p>
+<section id="id2">
+<h4>Subsections:<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">general</span></code></strong>: General session settings.</p>
+<ul>
+<li><p><strong>Keys</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">active</span></code>: Boolean indicating if the session is active.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: Name of the session.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp_dir_parent</span></code>: Parent directory for temporary files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tmp_dir_structure</span></code>: Directory structure for temporary files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_dir_parent</span></code>: Parent directory for log files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">log_dir_structure</span></code>: Directory structure for log files.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">epoch_range</span></code></strong>: Time range for the session.</p>
+<ul>
+<li><p><strong>Keys</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">epoch1</span></code>: Start of the epoch range (e.g., <code class="docutils literal notranslate"><span class="pre">10</span> <span class="pre">days</span> <span class="pre">ago</span> <span class="pre">UTC</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epoch2</span></code>: End of the epoch range (e.g., <code class="docutils literal notranslate"><span class="pre">yesterday</span> <span class="pre">at</span> <span class="pre">23:59</span> <span class="pre">UTC</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">period</span></code>: Time period using Pandas offset aliases (e.g., <code class="docutils literal notranslate"><span class="pre">1D</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">round_method</span></code>: Method to round timestamps (e.g., <code class="docutils literal notranslate"><span class="pre">floor</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tz</span></code>: Timezone for the session (e.g., <code class="docutils literal notranslate"><span class="pre">UTC</span></code>).</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">steps</span></code></strong>: Workflow steps for the session.</p></li>
+</ul>
+</section>
+</section>
+<section id="workflow-steps">
+<h3>5. Workflow Steps<a class="headerlink" href="#workflow-steps" title="Link to this heading"></a></h3>
+<p>Each step represents a specific operation in the workflow (e.g., <code class="docutils literal notranslate"><span class="pre">download</span></code>, <code class="docutils literal notranslate"><span class="pre">convert</span></code>, <code class="docutils literal notranslate"><span class="pre">splice</span></code>, <code class="docutils literal notranslate"><span class="pre">split</span></code>).</p>
+<section id="generic-step-structure">
+<h4>Generic Step Structure:<a class="headerlink" href="#generic-step-structure" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong>Keys</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">active</span></code>: Boolean to enable or disable the step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inp_dir_parent</span></code>: Parent directory for input files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inp_dir_structure</span></code>: Directory structure for input files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">out_dir_parent</span></code>: Parent directory for output files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">out_dir_structure</span></code>: Directory structure for output files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epoch_range</span></code>: Time range for the step (can use <code class="docutils literal notranslate"><span class="pre">FROM_SESSION</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">options</span></code>: Step-specific options.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="example-steps">
+<h4>Example Steps:<a class="headerlink" href="#example-steps" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">download</span></code></strong>: Downloads GNSS data.</p>
+<ul>
+<li><p><strong>Options</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code>: Force re-download of files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">remote_find_method</span></code>: Method to find remote files (<code class="docutils literal notranslate"><span class="pre">ask</span></code> or <code class="docutils literal notranslate"><span class="pre">guess</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">invalidate_small_local_files</span></code>: Invalidate small local files (smaller than few kB) and force their download.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timeout</span></code>: Timeout for remote connections in seconds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_try</span></code>: Maximum number of retries for remote connections.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sleep_time</span></code>: Sleep time between retries in seconds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ping_timeout</span></code>: Timeout for pinging remote servers in seconds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ping_max_try</span></code>: Maximum number of ping retries.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">convert</span></code></strong>: Converts raw GNSS data to RINEX format.</p>
+<ul>
+<li><p><strong>Options</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">force</span></code>: Force re-conversion of files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">converter</span></code>: Converter to use (e.g., <code class="docutils literal notranslate"><span class="pre">auto</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rinexmod_options</span></code>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">compression</span></code>: Compression format for RINEX files (e.g., <code class="docutils literal notranslate"><span class="pre">gz</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">longname</span></code>: Use long file names.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force_rnx_load</span></code>: Force loading of RINEX files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code>: Enable verbose output.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">filename_style</span></code>: Style for file names (e.g., <code class="docutils literal notranslate"><span class="pre">basic</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">full_history</span></code>: Keep full history of operations.</p></li>
+<li><p>See <a class="reference external" href="https://github.com/IPGP/rinexmod/blob/master/README.md"><em>rinexmod</em> API documentation</a> for details.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="aliases">
+<h3>6. Aliases<a class="headerlink" href="#aliases" title="Link to this heading"></a></h3>
+<p>Aliases allow dynamic values in the configuration files. Examples:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;site_id4&gt;</span></code>: 4-character site name in lower case.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;site_id9&gt;</span></code>: 9-character site name in lower case.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;SITE_ID4&gt;</span></code>: 4-character site name in upper case.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;SITE_ID9&gt;</span></code>: 9-character site name in upper case.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;$HOME&gt;</span></code>: Environment variable for the home directory.</p></li>
+<li><p>Time-based aliases (e.g., <code class="docutils literal notranslate"><span class="pre">%Y</span></code> for year, <code class="docutils literal notranslate"><span class="pre">%j</span></code> for day of year).</p></li>
+</ul>
+</section>
+<section id="reserved-keywords">
+<h3>7. Reserved Keywords<a class="headerlink" href="#reserved-keywords" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">FROM_SESSION</span></code>: Inherits values from the session block.</p></li>
+</ul>
+</section>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Configuration files are modular and can be merged using the <code class="docutils literal notranslate"><span class="pre">cfg_merge_strategy</span></code>.</p></li>
+<li><p>Default values are assumed if certain parameters are not explicitly defined.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="config_files_nutshell.html" class="btn btn-neutral float-left" title="Configuration files in a nutshell" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="under_hood.html" class="btn btn-neutral float-right" title="Under the hood" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

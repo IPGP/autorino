@@ -1,0 +1,592 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.handle.handle_cls &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.handle.handle_cls</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.handle.handle_cls</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Wed Jan 10 15:00:40 2024</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># Create a logger object.</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
+
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">autorino.convert</span> <span class="k">as</span> <span class="nn">arocnv</span>
+
+<span class="c1"># +++ Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+<span class="n">BOLD_SRT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
+<span class="n">BOLD_END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+
+
+<div class="viewcode-block" id="HandleGnss">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.handle_cls.HandleGnss">[docs]</a>
+<span class="k">class</span> <span class="nc">HandleGnss</span><span class="p">(</span><span class="n">arocmn</span><span class="o">.</span><span class="n">StepGnss</span><span class="p">):</span>
+<div class="viewcode-block" id="HandleGnss.__init__">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.handle_cls.HandleGnss.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">out_dir</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="p">,</span>
+        <span class="n">inp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inp_file_regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a HandleGnss object.</span>
+
+<span class="sd">        This constructor initializes a HandleGnss object, which is used for handling</span>
+<span class="sd">        GNSS data processing. It inherits from the StepGnss class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out_dir : str</span>
+<span class="sd">            The output directory for the processed files.</span>
+<span class="sd">        tmp_dir : str</span>
+<span class="sd">            The temporary directory for intermediate files.</span>
+<span class="sd">        log_dir : str</span>
+<span class="sd">            The directory for log files.</span>
+<span class="sd">        inp_dir : str, optional</span>
+<span class="sd">            The input directory for raw files. Default is None.</span>
+<span class="sd">        epoch_range : EpochRange, optional</span>
+<span class="sd">            The range of epochs to be processed. Default is None.</span>
+<span class="sd">        site : dict, optional</span>
+<span class="sd">            Information about the site. Default is None.</span>
+<span class="sd">        session : dict, optional</span>
+<span class="sd">            Information about the session. Default is None.</span>
+<span class="sd">        options : dict, optional</span>
+<span class="sd">            Additional options for the processing operation. Default is None.</span>
+<span class="sd">        metadata : dict, optional</span>
+<span class="sd">            Metadata for the processing operation. Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir</span><span class="p">,</span>
+            <span class="n">inp_file_regex</span><span class="o">=</span><span class="n">inp_file_regex</span><span class="p">,</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HandleGnss.group_by_epochs">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.handle_cls.HandleGnss.group_by_epochs">[docs]</a>
+    <span class="k">def</span> <span class="nf">group_by_epochs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1d&quot;</span><span class="p">,</span>
+        <span class="n">rolling_period</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">rolling_ref</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">,</span>
+        <span class="n">drop_epoch_rnd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Group the data by epochs.</span>
+
+<span class="sd">        This method groups the data in the table by epochs, rounding the epochs according</span>
+<span class="sd">        to the specified period and method.</span>
+<span class="sd">        It creates a main HandleGnss object and individual</span>
+<span class="sd">        HandleGnss objects for each epoch group.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        period : str, optional</span>
+<span class="sd">            The period for rounding the epochs. Default is &quot;1d&quot;.</span>
+<span class="sd">        rolling_period : bool, optional</span>
+<span class="sd">            Whether to use a rolling period for rounding. Default is False.</span>
+<span class="sd">        rolling_ref : int, optional</span>
+<span class="sd">            The reference for the rolling period. Default is -1.</span>
+<span class="sd">        round_method : str, optional</span>
+<span class="sd">            The method for rounding the epochs. Default is &quot;floor&quot;.</span>
+<span class="sd">        drop_epoch_rnd : bool, optional</span>
+<span class="sd">            Whether to drop the temporary epoch_rnd column after grouping. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the main HandleGnss object and a list of individual</span>
+<span class="sd">            HandleGnss objects for each epoch group.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">epoch_rnd</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">round_epochs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">],</span>
+            <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span>
+            <span class="n">rolling_period</span><span class="o">=</span><span class="n">rolling_period</span><span class="p">,</span>
+            <span class="n">rolling_ref</span><span class="o">=</span><span class="n">rolling_ref</span><span class="p">,</span>
+            <span class="n">round_method</span><span class="o">=</span><span class="n">round_method</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_rnd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">epoch_rnd</span>
+
+        <span class="c1"># get the main Handle object which will describe the final spliced RINEXs</span>
+        <span class="n">spc_main_obj_epoch_range</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">epoch_rnd</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">epoch_rnd</span><span class="p">),</span>
+            <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span>
+            <span class="n">round_method</span><span class="o">=</span><span class="n">round_method</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">spc_main_obj</span> <span class="o">=</span> <span class="n">SpliceGnss</span><span class="p">(</span>
+            <span class="n">out_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">tmp_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span><span class="p">,</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">spc_main_obj_epoch_range</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="p">,</span>
+            <span class="n">session</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># get individual Handle objects</span>
+        <span class="n">grps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;epoch_rnd&quot;</span><span class="p">)</span>
+
+        <span class="n">spc_obj_lis_out</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">spc_main_obj</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2"> epoch group(s) found&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">grps</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i_tabgrp</span><span class="p">,</span> <span class="p">(</span><span class="n">t_tabgrp</span><span class="p">,</span> <span class="n">tabgrp</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">grps</span><span class="p">):</span>
+            <span class="n">spc_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">drop_epoch_rnd</span><span class="p">:</span>  <span class="c1"># remove the temporary epoch_rnd column</span>
+                <span class="n">tabgrp_bis</span> <span class="o">=</span> <span class="n">tabgrp</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;epoch_rnd&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># keep the temporary epoch_rnd column</span>
+                <span class="n">tabgrp_bis</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tabgrp</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;epoch group #</span><span class="si">%i</span><span class="s2">: from </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i_tabgrp</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t_tabgrp</span><span class="p">,</span> <span class="n">period</span>
+            <span class="p">)</span>
+
+            <span class="n">spc_obj</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">tabgrp_bis</span>
+            <span class="n">spc_obj</span><span class="o">.</span><span class="n">updt_eporng_tab</span><span class="p">()</span>
+            <span class="n">spc_obj_lis_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spc_obj</span><span class="p">)</span>
+
+            <span class="c1"># fill the main object with the individuals</span>
+            <span class="c1"># then &quot;fpath_inp&quot; is an individual SpliceGnss Object !</span>
+            <span class="n">spc_main_obj</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i_tabgrp</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spc_obj</span>
+            <span class="n">spc_main_obj</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i_tabgrp</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span>
+                <span class="n">spc_obj</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">spc_main_obj</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i_tabgrp</span><span class="p">,</span> <span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">spc_main_obj</span><span class="p">,</span> <span class="n">spc_obj_lis_out</span></div>
+
+
+<div class="viewcode-block" id="HandleGnss.feed_by_epochs">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.handle_cls.HandleGnss.feed_by_epochs">[docs]</a>
+    <span class="k">def</span> <span class="nf">feed_by_epochs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_obj_feeder</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;split&quot;</span><span class="p">,</span> <span class="n">print_table</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For a HandleGnss object, with a predefined epoch range</span>
+<span class="sd">        find the corresponding RINEX for splice/split in the step_obj_feeder StepGnss,</span>
+<span class="sd">        which a list of possible RINEXs candidates for the splice/split operation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        step_obj_feeder : StepGnss</span>
+<span class="sd">            StepGnss object, which a list of possible RINEXs candidates</span>
+<span class="sd">            for the splice/split operation</span>
+
+<span class="sd">        mode : str</span>
+<span class="sd">            split or splice</span>
+<span class="sd">            if split: for fpath_inp, only one RINEX is returned</span>
+<span class="sd">            (the need one for the split)</span>
+<span class="sd">            if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned</span>
+<span class="sd">            (all the needed ones for the splice)</span>
+
+<span class="sd">        print_table : bool, optional</span>
+<span class="sd">            If True, prints the tables for debugging purposes. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">(</span><span class="n">full_object_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;HandleGnss&quot;</span><span class="p">,</span> <span class="s2">&quot;SplitGnss&quot;</span><span class="p">,</span> <span class="s2">&quot;SpliceGnss&quot;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;feed_by_epochs works with HandleGnss, SplitGnss, SpliceGnss objects only (</span><span class="si">%s</span><span class="s2"> here)&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">print_table</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt; Feeding table:&quot;</span><span class="p">)</span>
+            <span class="n">step_obj_feeder</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt; Table to be feeded:&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span>
+                <span class="n">irow</span><span class="p">,</span>
+                <span class="s2">&quot;feed_by_epochs&quot;</span><span class="p">,</span>
+                <span class="n">fname_custom</span><span class="o">=</span><span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]),</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">site</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;site&quot;</span><span class="p">]</span>
+            <span class="n">epo_srt_to_feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+            <span class="n">epo_end_to_feed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;&gt;&gt;&gt;&gt; Feeding RINEXs for </span><span class="si">%s</span><span class="s2"> between </span><span class="si">%s</span><span class="s2"> &amp; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">site</span><span class="p">,</span>
+                <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="n">epo_srt_to_feed</span><span class="p">),</span>
+                <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="n">epo_end_to_feed</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;splice&quot;</span><span class="p">:</span>
+                <span class="n">epo_srt_bol</span> <span class="o">=</span> <span class="n">epo_srt_to_feed</span> <span class="o">&lt;=</span> <span class="n">step_obj_feeder</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+                <span class="c1"># For Leica, the end epoch of the RINEX can be after the theoretical one...</span>
+                <span class="c1"># we add one hour as margin, the splice software integrates the option</span>
+                <span class="c1"># to stop at the right epoch</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_range</span><span class="o">.</span><span class="n">extra_margin_splice</span><span class="p">()</span>
+                <span class="n">epo_end_bol</span> <span class="o">=</span> <span class="n">epo_end_to_feed</span> <span class="o">+</span> <span class="n">m</span> <span class="o">&gt;=</span> <span class="n">step_obj_feeder</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span>
+
+                <span class="c1"># epo_end_bol = np.array([True] * len(epo_end_to_feed))</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;split&quot;</span><span class="p">:</span>
+                <span class="n">epo_srt_bol</span> <span class="o">=</span> <span class="n">step_obj_feeder</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">epo_srt_to_feed</span>
+                <span class="n">epo_end_bol</span> <span class="o">=</span> <span class="n">step_obj_feeder</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">epo_end_to_feed</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;wrong mode value (accept &#39;splice&#39; or &#39;split&#39;): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+
+            <span class="n">epoch_bol</span> <span class="o">=</span> <span class="n">epo_srt_bol</span> <span class="o">&amp;</span> <span class="n">epo_end_bol</span>
+
+            <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="n">bol_stk</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">epo_srt_bol</span><span class="p">,</span> <span class="n">epo_end_bol</span><span class="p">,</span> <span class="n">epoch_bol</span><span class="p">))</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">bol_stk</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+
+            <span class="n">bol_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">epoch_bol</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">bol_sum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;no valid input RINEX between </span><span class="si">%s</span><span class="s2"> &amp; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="n">epo_srt_to_feed</span><span class="p">),</span>
+                    <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="n">epo_end_to_feed</span><span class="p">),</span>
+                <span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;split&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">bol_sum</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2"> (&gt;1) RINEX found for feed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bol_sum</span><span class="p">)</span>
+
+                <span class="n">rnxinp_row</span> <span class="o">=</span> <span class="n">step_obj_feeder</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">epoch_bol</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1">###### can be improved !</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rnxinp_row</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;found for feed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">rnxinp_row</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">])</span>
+
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;splice&quot;</span><span class="p">:</span>
+                <span class="n">spc_obj</span> <span class="o">=</span> <span class="n">HandleGnss</span><span class="p">(</span>
+                    <span class="n">out_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span>
+                    <span class="n">tmp_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">,</span>
+                    <span class="n">log_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span><span class="p">,</span>
+                    <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">site</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;site_id&quot;</span><span class="p">:</span> <span class="n">site</span><span class="p">},</span>
+                    <span class="n">session</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">spc_obj</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">step_obj_feeder</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">epoch_bol</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">spc_obj</span><span class="o">.</span><span class="n">updt_eporng_tab</span><span class="p">()</span>
+                <span class="n">spc_obj</span><span class="o">.</span><span class="n">updt_site_w_rnx_fname</span><span class="p">()</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;found for feed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">spc_obj</span><span class="p">))</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spc_obj</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># should not happend</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;no valid input RINEX between </span><span class="si">%s</span><span class="s2"> &amp; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="n">epo_srt_to_feed</span><span class="p">),</span>
+                    <span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="n">epo_end_to_feed</span><span class="p">),</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="HandleGnss.find_local_inp">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.handle_cls.HandleGnss.find_local_inp">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_local_inp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_as_step_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rnx3_regex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Guess the paths and name of the local raw files based on the</span>
+<span class="sd">        EpochRange and `inp_basename` attributes of the DownloadGnss object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        return_as_step_obj : bool, optional</span>
+<span class="sd">            If True, returns the result as a StepGnss object.</span>
+<span class="sd">            If False, returns a list of file paths. Default is True.</span>
+<span class="sd">        rnx3_regex : bool, optional</span>
+<span class="sd">            If True, uses a regex pattern for RINEX 3 filenames.</span>
+<span class="sd">            If False, uses a wildcard pattern. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        StepGnss or list</span>
+<span class="sd">            If return_as_step_obj is True, returns a StepGnss object populated with the found RINEX files.</span>
+<span class="sd">            If return_as_step_obj is False, returns a list of found file paths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">local_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_range</span><span class="o">.</span><span class="n">eporng_list</span><span class="p">(</span><span class="n">end_bound</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="c1"># guess the potential local files</span>
+            <span class="n">local_dir_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_dir</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">rnx3_regex</span><span class="p">:</span>
+                <span class="n">patrn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_id9</span> <span class="o">+</span> <span class="n">conv</span><span class="o">.</span><span class="n">rinex_regex_long_name</span><span class="p">()[</span><span class="mi">17</span><span class="p">:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">patrn</span> <span class="o">=</span> <span class="s2">&quot;.*&quot;</span>
+
+            <span class="n">local_paths_list_epo</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">find_recursive</span><span class="p">(</span>
+                <span class="n">local_dir_use</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">patrn</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">local_paths_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">local_paths_list_epo</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;nbr local files found: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_paths_list</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">return_as_step_obj</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">rnxs2step_obj</span><span class="p">(</span><span class="n">rnxs_lis_inp</span><span class="o">=</span><span class="n">local_paths_list</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">local_paths_list</span></div>
+
+
+<div class="viewcode-block" id="HandleGnss.load_input_rnxs">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.handle_cls.HandleGnss.load_input_rnxs">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_input_rnxs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_mode</span><span class="p">,</span> <span class="n">input_rinexs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the input RINEX files for handeling (splice or split).</span>
+
+<span class="sd">        This method retrieves the input RINEX files based on the specified input mode and input RINEXs.</span>
+<span class="sd">        It can find local input files or use a provided input list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_mode : str</span>
+<span class="sd">            The mode for finding input RINEX files. It can be:</span>
+<span class="sd">            - &quot;find&quot;: to find local input files.</span>
+<span class="sd">            - &quot;given&quot;: to use provided input RINEX files.</span>
+<span class="sd">        input_rinexs : str or list or StepGnss</span>
+<span class="sd">            The input RINEX files.</span>
+<span class="sd">            Only useful for &quot;given&quot; mode.</span>
+<span class="sd">            It can be:</span>
+<span class="sd">            - A list of RINEX file paths.</span>
+<span class="sd">            - An existing StepGnss object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        StepGnss or None</span>
+<span class="sd">            A StepGnss object containing the input RINEX files, or None if an error occurs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">method_msg</span> <span class="o">=</span> <span class="s2">&quot;input method to handle RINEXs: &quot;</span>
+
+        <span class="k">if</span> <span class="n">input_mode</span> <span class="o">==</span> <span class="s2">&quot;find&quot;</span><span class="p">:</span>
+            <span class="c1"># Find local RINEX files and convert them to a StepGnss object</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="n">method_msg</span>
+                <span class="o">+</span> <span class="s2">&quot;find local RINEX files and convert them to a StepGnss object&quot;</span>
+            <span class="p">)</span>
+            <span class="n">stp_obj_rnxs_inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_local_inp</span><span class="p">(</span>
+                <span class="n">return_as_step_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rnx3_regex</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">input_mode</span> <span class="o">==</span> <span class="s2">&quot;given&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">input_rinexs</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;input mode is &#39;given&#39; but no input_rinexs provided&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">input_rinexs</span><span class="p">):</span>
+                <span class="c1"># Convert a list of RINEX files to a StepGnss object</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="n">method_msg</span> <span class="o">+</span> <span class="s2">&quot;convert a RINEX files list to a StepGnss object&quot;</span>
+                <span class="p">)</span>
+                <span class="n">stp_obj_rnxs_inp</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">rnxs2step_obj</span><span class="p">(</span><span class="n">rnxs_lis_inp</span><span class="o">=</span><span class="n">input_rinexs</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_rinexs</span><span class="p">,</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">StepGnss</span><span class="p">):</span>
+                <span class="c1"># Use an existing StepGnss object containing the RINEX files</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="n">method_msg</span> <span class="o">+</span> <span class="s2">&quot;a StepGnss object containing the RINEX files&quot;</span>
+                <span class="p">)</span>
+                <span class="n">stp_obj_rnxs_inp</span> <span class="o">=</span> <span class="n">input_rinexs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Log an error if the input_rinexs value is invalid</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;wrong input_rinexs value for the creation of a StepGnss object: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">input_rinexs</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Log an error if the mode value is invalid</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;wrong mode value: </span><span class="si">%s</span><span class="s2"> (only &#39;find&#39; and &#39;given&#39; are valid)&quot;</span><span class="p">,</span> <span class="n">input_mode</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">stp_obj_rnxs_inp</span></div>
+
+
+<div class="viewcode-block" id="HandleGnss.conv_softs_opts">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.handle_cls.HandleGnss.conv_softs_opts">[docs]</a>
+    <span class="k">def</span> <span class="nf">conv_softs_opts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">handle_software</span><span class="p">,</span> <span class="n">conv_options_sup</span><span class="o">=</span><span class="p">[],</span> <span class="n">conv_kwoptions_sup</span><span class="o">=</span><span class="nb">dict</span><span class="p">()</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">handle_software</span> <span class="o">==</span> <span class="s2">&quot;converto&quot;</span><span class="p">:</span>
+            <span class="n">conv_kwoptions_basis</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;-st&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;-e&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="n">conv_options_basis</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-cat&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">handle_software</span> <span class="o">==</span> <span class="s2">&quot;gfzrnx&quot;</span><span class="p">:</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span>
+                    <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="n">conv_kwoptions_basis</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;-epo_beg&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;-d&quot;</span><span class="p">:</span> <span class="n">duration</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">conv_options_basis</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-f&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;wrong handle_software value: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">handle_software</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+
+        <span class="n">conv_option_out</span> <span class="o">=</span> <span class="n">conv_options_basis</span> <span class="o">+</span> <span class="n">conv_options_sup</span>
+        <span class="n">conv_kwoption_out</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">conv_kwoptions_basis</span><span class="p">,</span> <span class="o">**</span><span class="n">conv_kwoptions_sup</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">conv_option_out</span><span class="p">,</span> <span class="n">conv_kwoption_out</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -18,7 +18,7 @@ import autorino.common as arocmn
 import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
 def epoch_range_intrpt(epo_inp):

@@ -1,0 +1,86 @@
+# Configuration file for the Autorino project.
+# This YAML file defines the structure and settings for the environment, station, and sessions.
+
+cfgfile_version: 20.2 # Version of the configuration file format.
+
+######### DEFINITION OF THE ENVIRONMENT
+environment:
+  conv_software_paths:
+    convbin : "convbin" # Path to RTKLIB converter.
+    mdb2rinex : "mdb2rinex" # Path to Leica converter.
+    sbf2rin : "sbf2rin" # Path to Septentrio converter.
+    tps2rin : "tps2rin.exe" # Path to Topcon converter.
+    ### Trimble
+    t0xconvert : "t0xConvert" # Path to Trimble official converter (case-sensitive).
+    trm2rinex : "trm2rinex:cli-light" # Path to Trimble unofficial docker converter.
+    runpkr00 : "runpkr00" # Path to Trimble legacy converter for TEQC.
+    ### RINEX handling
+    converto : "ConvertoCPP" # Path to ConvertoCPP tool.
+    gfzrnx : "gfzrnx" # Path to GFZRNX tool.
+    teqc : "teqc" # Path to TEQC tool.
+  general:
+    log_level: "DEBUG" # Logging level for the application.
+    trimble_default_software: "trm2rinex" # Default Trimble converter key (lowercase).
+    cfg_merge_strategy: "replace" # Strategy to merge configuration files ('replace' or 'additive').
+
+######### DEFINITION OF THE STATION COMMON INFORMATION FOR THE WHOLE NETWORK
+station:
+    site:
+      operator: "MY_OPERATOR_NAME" # Name of the site operator.
+      agency: "MY_AGENCY_NAME" # Name of the agency managing the site.
+      country: "France" # Country name in ISO 3166 format.
+      sitelog_path: <$HOME>/sitelogs/ # Path to site logs (file or directory).
+    sessions:
+        session_01D30S:
+            general:
+                active: True # Indicates if the session is active.
+                session_name: "01D30S" # Free name of the session (must be the same as the 'session_XXXXX' key suffix).
+                data_frequency: "30S" # RINEX convention (XXC – 100 Hertz, XXZ – Hertz, XXS – Seconds, XXM – Minutes, XXH – Hours, XXD – Days, XXU – Unspecified)
+                tmp_dir_parent: '/<$HOME>/autorino_workflow/tmp' # Parent directory for temporary files.
+                tmp_dir_structure: '' # Structure for temporary directories.
+                log_dir_parent: '/<$HOME>/autorino_workflow/log' # Parent directory for log files.
+                log_dir_structure: '' # Structure for log directories.
+            epoch_range:
+                epoch1: '10 days ago UTC' # Start of the epoch range.
+                epoch2: 'yesterday at 23:59 UTC' # End of the epoch range.
+                period: "1D" # Time period using Pandas offset aliases.
+                round_method: "floor" # Method to round timestamps.
+                tz: 'UTC' # Timezone for the session.
+            steps:
+                download: ###### DOWNLOAD STEP DEFINITION
+                    active : True # Indicates if the download step is active.
+                    # inp_dir_parent, inp_dir_structure & inp_file_regex are defined in sites cfg.
+                    out_dir_parent: '/<$HOME>/autorino_workflow/raw' # Parent directory for output files.
+                    out_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for output directories.
+                    epoch_range:
+                        FROM_SESSION # Use the session's epoch range.
+                    options:
+                        force: False # Force re-download of files.
+                        remote_find_method: ask # Method to find remote files ('ask' or 'guess').
+                        # ask: Retrieve the actual remote file list (e.g., for FTP).
+                        # guess: Pre-generate remote file paths (e.g., for HTTP).
+                        invalidate_small_local_files: False # Invalidate small local files.
+                        timeout: 30 # Timeout for remote connections in seconds.
+                        max_try: 4 # Maximum number of retries for remote connections.
+                        sleep_time: 5 # Sleep time between retries in seconds.
+                        ping_timeout: 5 # Timeout for pinging remote servers in seconds.
+                        ping_max_try: 4 # Maximum number of ping retries.
+                convert: ###### CONVERT STEP DEFINITION
+                    active : True # Indicates if the convert step is active.
+                    inp_dir_parent: '/<$HOME>/autorino_workflow/raw' # Parent directory for input files.
+                    inp_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for input directories.
+                    inp_file_regex:  ".*<SITE_ID4>.*" # Regular expression for input file names.
+                    out_dir_parent: '/<$HOME>/autorino_workflow/rnx' # Parent directory for output files.
+                    out_dir_structure: '<SITE_ID9>/%Y/%j' # Structure for output directories.
+                    epoch_range:
+                        FROM_SESSION # Use the session's epoch range.
+                    options:
+                        force: False # Force re-conversion of files.
+                        converter: auto # Converter to use (auto-detect).
+                        rinexmod_options:
+                            compression: "gz" # Compression format for RINEX files.
+                            longname: True # Use long file names.
+                            force_rnx_load: True # Force loading of RINEX files.
+                            verbose: False # Enable verbose output.
+                            filename_style: basic # Style for file names.
+                            full_history: True # Keep full history of operations.

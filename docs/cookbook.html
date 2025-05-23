@@ -1,0 +1,445 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino’s exemple cookbook &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration files in a nutshell" href="config_files_nutshell.html" />
+    <link rel="prev" title="External GNSS converters" href="external_converters.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><em>autorino</em>’s exemple cookbook</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#receipe-1-run-an-autorino-workflow">Receipe #1: run an <em>autorino</em> workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#launching-for-specific-dates">Launching for specific dates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#launching-specific-steps">Launching specific steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#excluding-specific-steps">Excluding specific steps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#launching-for-specific-sites">Launching for specific sites</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#receipe-2-convert-raw-to-rinex-files">Receipe #2: convert RAW to RINEX files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Synopsis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#receipe-3-check-a-configuration-file">Receipe #3: Check a configuration file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Synopsis</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#receipe-4-convert-raw-file-to-rinex-in-api-mode">Receipe #4: Convert RAW file to RINEX in API mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-minimal-example">convert_rnx function minimal example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-docstring">convert_rnx function docstring</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#autorino.api.convert_rnx"><code class="docutils literal notranslate"><span class="pre">convert_rnx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><em>autorino</em>’s exemple cookbook</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cookbook.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="autorino-s-exemple-cookbook">
+<span id="cookbook"></span><h1><em>autorino</em>’s exemple cookbook<a class="headerlink" href="#autorino-s-exemple-cookbook" title="Link to this heading"></a></h1>
+<section id="receipe-1-run-an-autorino-workflow">
+<h2>Receipe #1: run an <em>autorino</em> workflow<a class="headerlink" href="#receipe-1-run-an-autorino-workflow" title="Link to this heading"></a></h2>
+<p>Call <code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> to run an <em>autorino</em> workflow i.e. a set of <em>steps</em>.<br />
+The workflow is defined in a YAML <em>site</em> configuration file.<br />
+See the next chapters <a class="reference internal" href="config_files_nutshell.html"><span class="std std-doc">configuration files in a nutshell</span></a> &amp;
+<a class="reference internal" href="config_files_details.html"><span class="std std-doc">configuration files details</span></a> for more details.</p>
+<section id="synopsis">
+<h3>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_cfgfile_run --help
+250430T23:55:24.696|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+usage: autorino_cfgfile_run [-h] -c CONFIG
+                            [-i INCLUDE_CONFIG [INCLUDE_CONFIG ...]]
+                            [-s START] [-e END] [-p PERIOD]
+                            [-l LIST_SITES [LIST_SITES ...]] [-is]
+                            [-sc STEPS_SELECT_LIST [STEPS_SELECT_LIST ...]]
+                            [-es] [-f]
+
+Assisted Unloading, Treatment and Organization of RINEX observations
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        The input site configuration file or directory of
+                        sites configuration files. If a directory is provided,
+                        all files ending with &#39;.yml&#39; will be used.
+  -i INCLUDE_CONFIG [INCLUDE_CONFIG ...], --include_config INCLUDE_CONFIG [INCLUDE_CONFIG ...]
+                        The include configuration files to be used for
+                        development or advanced purposes. If a list is
+                        provided, all files in the list will be included.
+                        These files override the `include` section of the main
+                        configuration file.
+  -s START, --start START
+                        The start date for the epoch range. Can be a date e.g.
+                        &#39;2025-01-01&#39;, &#39;2025-001&#39; or a literal e.g. &#39;2 days
+                        ago&#39;. Can also be a list; if so, each epoch is
+                        considered separately. Can also be a file path; if so,
+                        the file contains a list of start epochs. Default is
+                        None.
+  -e END, --end END     The end date for the epoch range. Can be a date e.g.
+                        &#39;2025-01-01&#39;, &#39;2025-001&#39; or a literal e.g. &#39;2 days
+                        ago&#39;. Default is None.
+  -p PERIOD, --period PERIOD
+                        The period for the epoch range i.e. the sampling of
+                        the files: daily = &#39;1D&#39;, hourly = &#39;1H&#39;, 15 minutes =
+                        &#39;15M&#39;. Default is &#39;1D&#39;.
+  -l LIST_SITES [LIST_SITES ...], --list_sites LIST_SITES [LIST_SITES ...]
+                        list of site identifiers (&#39;site_id&#39;) in the config
+                        fileto filter the configuration files. If provided,
+                        only configurations for sites in this list will be
+                        processed. Default is None.
+  -is, --ignore_sites   If True, the sites in --list_sites will be ignored.It
+                        is the opposed behavior of the regular one using
+                        list_sites.Default is False.
+  -sc STEPS_SELECT_LIST [STEPS_SELECT_LIST ...], --steps_select_list STEPS_SELECT_LIST [STEPS_SELECT_LIST ...]
+                        A list of selected steps to be executed. If not
+                        provided, all steps in &#39;steps_list&#39; will be executed.
+                        Accepted steps are: &#39;download&#39;, &#39;convert&#39;, &#39;splice&#39;,
+                        &#39;split&#39;. Default is None.
+  -es, --exclude_steps_select
+                        If True the selected steps indicated in
+                        step_select_list are excluded. It is the opposite
+                        behavior of the regular one using steps_select_list.
+                        Default is False.
+  -f, --force           If True, the steps will be executed even if the output
+                        files already exist. Overrides the &#39;force&#39; parameters
+                        in the configuration file. Default is False.
+
+Examples:
+  * run all the config files within cfgfiles_dir directory, using a main config file and per default epoch ranges:
+    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml
+  * run the config file site_cfg.yml from the 1st January 2025 for a range of 10 days:
+    autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e &#39;10 days ago&#39;
+  * run download and convert steps only for HOUZ00GLP &amp; BORG00REU sites only:
+    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -l HOUZ00GLP BORG00REU -sc download convert
+</pre></div>
+</div>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h3>
+<p>We set the configuration file path in an environment variable <code class="docutils literal notranslate"><span class="pre">$ARO_CFGFILE</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">ARO_CFGFILE</span><span class="o">=</span><span class="si">${</span><span class="nv">AUTORINO_DIR</span><span class="si">}</span>/configfiles/site/autorino_site_cfg.yml
+</pre></div>
+</div>
+<section id="launching-for-specific-dates">
+<h4>Launching for specific dates<a class="headerlink" href="#launching-for-specific-dates" title="Link to this heading"></a></h4>
+<p>Run all config files in the sites/terrestrial folder for a 10-day period in the past starting from January 1, 2025</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-s<span class="w"> </span><span class="s1">&#39;2025-01-01&#39;</span><span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;10 day ago&#39;</span><span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="launching-specific-steps">
+<h4>Launching specific steps<a class="headerlink" href="#launching-specific-steps" title="Link to this heading"></a></h4>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-ss/--select_steps</span></code>. For example, to run only the download and conversion steps:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-ss<span class="w"> </span>download<span class="w"> </span>convert<span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="excluding-specific-steps">
+<h4>Excluding specific steps<a class="headerlink" href="#excluding-specific-steps" title="Link to this heading"></a></h4>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-ss/--select_steps</span></code> to select the steps to exclude, then activate <code class="docutils literal notranslate"><span class="pre">-es/--exclude_steps_select</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-ss<span class="w"> </span>download<span class="w"> </span>-es<span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="launching-for-specific-sites">
+<h4>Launching for specific sites<a class="headerlink" href="#launching-for-specific-sites" title="Link to this heading"></a></h4>
+<p>Use <code class="docutils literal notranslate"><span class="pre">-l/--list_sites</span></code> to run a specific site. For example, to run the site <code class="docutils literal notranslate"><span class="pre">SOUF00GLP</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">BULG00GLP</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autorino_cfgfile_run<span class="w"> </span>-l<span class="w"> </span>SOUF00GLP<span class="w"> </span>BULG00GLP<span class="w"> </span>-c<span class="w"> </span><span class="si">${</span><span class="nv">ARO_CFGFILE</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="receipe-2-convert-raw-to-rinex-files">
+<h2>Receipe #2: convert RAW to RINEX files<a class="headerlink" href="#receipe-2-convert-raw-to-rinex-files" title="Link to this heading"></a></h2>
+<p>Call <code class="docutils literal notranslate"><span class="pre">autorino_convert_rnx</span></code>_ to convert RAW files to RINEX files.</p>
+<section id="id1">
+<h3>Synopsis<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_convert_rnx --help
+250501T00:22:43.465|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+usage: autorino_convert_rnx [-h] -i INP_RAWS [INP_RAWS ...] -o OUT_DIR
+                            [-t OUT_STRUCTURE] [-m METADATA] [-frnx] [-fraw]
+                            [-l] [-tmp TMP_DIR] [-log LOG_DIR]
+                            [-rimo RINEXMOD_OPTIONS] [-ro RAW_OUT_DIR]
+                            [-rt RAW_OUT_STRUCTURE]
+
+Convert RAW files to RINEX.
+
+options:
+  -h, --help            show this help message and exit
+  -i INP_RAWS [INP_RAWS ...], --inp_raws INP_RAWS [INP_RAWS ...]
+                        The input RAW files to be converted Possible inputs
+                        are: * one single RAW file path * a comma-separated
+                        (,) list of RAW paths * a text file containing a list
+                        of RAW paths (then --list_file_input must be
+                        activated) * a directory containing RAW files
+  -o OUT_DIR, --out_dir OUT_DIR
+                        The output directory where the converted files will be
+                        stored
+  -t OUT_STRUCTURE, --out_structure OUT_STRUCTURE
+                        The structure of the output directory. If provided,
+                        the converted files will be stored in a subdirectory
+                        of out_dir following this structure. See README.md for
+                        more information. Typical values are &#39;&lt;SITE_ID4&gt;/%Y/&#39;
+                        or &#39;%Y/%j/.
+  -m METADATA, --metadata METADATA
+                        The metadata to be included in the converted RINEX
+                        files. Possible inputs are: * list of string (sitelog
+                        file paths) * single string (single sitelog file path)
+                        * single string (directory containing the sitelogs)
+  -frnx, --force_rnx    Force the conversion even if the output files already
+                        exist
+  -fraw, --force_raw    Force the RAW file archiving even if the output files
+                        already exist
+  -l, --list_file_input
+                        If set to True, the input RAW files are provided as a
+                        list in a text file
+  -tmp TMP_DIR, --tmp_dir TMP_DIR
+                        The temporary directory used during the conversion
+                        process. If not provided, it defaults to
+                        &lt;$HOME&gt;/tmp_convert_rnx.
+  -log LOG_DIR, --log_dir LOG_DIR
+                        The directory where logs will be stored. If not
+                        provided, it defaults to tmp_dir
+  -rimo RINEXMOD_OPTIONS, --rinexmod_options RINEXMOD_OPTIONS
+                        The options for modifying the RINEX files during the
+                        conversion. The options must be provided in a
+                        dictionnary represented as a string e.g. &#39;{longname:
+                        False, filename_style: basic}&#39; Defaults to None
+  -ro RAW_OUT_DIR, --raw_out_dir RAW_OUT_DIR
+                        Directory where RAW files will be archived. No
+                        deletion will occur, your RAW files are sacred.
+  -rt RAW_OUT_STRUCTURE, --raw_out_structure RAW_OUT_STRUCTURE
+                        Structure for archiving RAW files. Defaults to the
+                        same structure as the output directory if not
+                        provided.
+</pre></div>
+</div>
+</section>
+</section>
+<section id="receipe-3-check-a-configuration-file">
+<h2>Receipe #3: Check a configuration file<a class="headerlink" href="#receipe-3-check-a-configuration-file" title="Link to this heading"></a></h2>
+<p>Call <code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_check</span></code> to check the import of a configuration file, especially its <em>include</em>.</p>
+<section id="id2">
+<h3>Synopsis<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_cfgfile_check --help
+250501T00:28:05.803|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+usage: autorino_cfgfile_check [-h] -c CONFIG
+                              [-i INCLUDE_CONFIG [INCLUDE_CONFIG ...]]
+                              [-o OUTPUT]
+
+Check autorino configuration file
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        The input site configuration file or directory of
+                        sites configuration files. If a directory is provided,
+                        all files ending with &#39;.yml&#39; will be used.
+  -i INCLUDE_CONFIG [INCLUDE_CONFIG ...], --include_config INCLUDE_CONFIG [INCLUDE_CONFIG ...]
+                        The main configuration file to be used.
+  -o OUTPUT, --output OUTPUT
+                        The output path where to write the checked
+                        configuration.
+</pre></div>
+</div>
+</section>
+</section>
+<section id="receipe-4-convert-raw-file-to-rinex-in-api-mode">
+<h2>Receipe #4: Convert RAW file to RINEX in API mode<a class="headerlink" href="#receipe-4-convert-raw-file-to-rinex-in-api-mode" title="Link to this heading"></a></h2>
+<p>The most basic and common operation that autorino can perform is to convert some
+RAW files to RINEX.</p>
+<section id="convert-rnx-function-minimal-example">
+<h3>convert_rnx function minimal example<a class="headerlink" href="#convert-rnx-function-minimal-example" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="c1">### Find all BINEX files in a folder</span>
+<span class="n">p</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/raw_data/are_stored/&quot;</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;*BNX&quot;</span><span class="p">)</span>
+
+<span class="c1">### Define the output folder</span>
+<span class="n">out_dir</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/rinex_data/will_be_saved/&quot;</span>
+<span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">out_dir</span>
+
+<span class="c1">### Call the conversion function</span>
+<span class="n">arocmn</span><span class="o">.</span><span class="n">convert_rnx</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">out_dir</span><span class="p">,</span><span class="n">tmp_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="convert-rnx-function-docstring">
+<h3>convert_rnx function docstring<a class="headerlink" href="#convert-rnx-function-docstring" title="Link to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.convert_rnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.</span></span><span class="sig-name descname"><span class="pre">convert_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%Y/%j'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rnx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_prev_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/convert_rnx.html#convert_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.convert_rnx" title="Link to this definition"></a></dt>
+<dd><p>Frontend function that performs RAW &gt; RINEX conversion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp_raws</strong> (<em>list</em>) – The input RAW files to be converted.
+The input can be:
+* a python list
+* a text file path containing a list of files
+* a tuple containing several text files path
+* a directory path.</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em>) – The output directory where the converted files will be stored.</p></li>
+<li><p><strong>out_structure</strong> (<em>str</em><em>, </em><em>optional</em>) – The structure of the output directory.
+If provided, the converted files will be stored in a subdirectory of out_dir following this structure.
+See README.md for more information.
+Typical values are ‘&lt;SITE_ID4&gt;/%Y/’ or ‘%Y/%j/’.
+Default value is ‘%Y/%j/’.</p></li>
+<li><p><strong>tmp_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The temporary directory used during the conversion process.
+If not provided, it defaults to &lt;out_dir&gt;/tmp_convert_rnx.
+Defaults to None.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>The directory where logs will be stored. If not provided, it defaults to tmp_dir.</dt><dd><p>Defaults to None.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – The options for modifying the RINEX files during the conversion. Defaults to None.</p></li>
+<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>The metadata to be included in the converted RINEX files.
+Possible inputs are:</p>
+<blockquote>
+<div><ul>
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object.</p></li>
+</ul>
+<p>Defaults to None.</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>force_rnx</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the conversion will be forced even if the output files already exist.
+Defaults to False.</p></li>
+<li><p><strong>force_raw</strong> (<em>bool</em><em>, </em><em>optional</em>) – If set to True, the RAW file archiving will be forced even if the output files already exist.
+Defaults to False.</p></li>
+<li><p><strong>raw_out_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory where RAW files will be archived.
+No move/delete will occur, your input RAW files are sacred.
+Defaults to None.</p></li>
+<li><p><strong>raw_out_structure</strong> (<em>str</em><em>, </em><em>optional</em>) – Structure for archiving RAW files.
+Defaults to <cite>out_structure</cite> if not provided.</p></li>
+<li><p><strong>processes</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of processes to use for parallel conversion. Default is 1.</p></li>
+<li><p><strong>filter_prev_tables</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, filters and skip previously converted files
+with tables stored in the tmp tables directory.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="external_converters.html" class="btn btn-neutral float-left" title="External GNSS converters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config_files_nutshell.html" class="btn btn-neutral float-right" title="Configuration files in a nutshell" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

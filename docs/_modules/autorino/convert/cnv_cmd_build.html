@@ -1,0 +1,1805 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.convert.cnv_cmd_build &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.convert.cnv_cmd_build</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.convert.cnv_cmd_build</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Mar 14 12:05:28 2023cd</span>
+
+<span class="sd">@author: psakic</span>
+
+<span class="sd">This module contains the functions to build the generic commands </span>
+<span class="sd">needed to run a GNSS conversion</span>
+
+<span class="sd">one function per converter, one  converter per manufacturer</span>
+
+<span class="sd">all the functions here have the same returns:</span>
+
+<span class="sd">Returns</span>
+<span class="sd">-------</span>
+<span class="sd">cmd_use : list of string</span>
+<span class="sd">    the command as a mono-string in list (singleton).</span>
+<span class="sd">    Ready to be used by subprocess.run</span>
+<span class="sd">cmd_list : list of strings</span>
+<span class="sd">    the command as a list of strings, splited for each element.</span>
+<span class="sd">cmd_str : string</span>
+<span class="sd">    the command as a concatenated string.</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Import star style</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># from pathlib3x import Path</span>
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<span class="c1"># IMPORT AUTORINO ENVIRONNEMENT VARABLES</span>
+<span class="c1">##software paths</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">aro_env_soft_path</span> <span class="o">=</span> <span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;conv_software_paths&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="_kw_options_dict2str">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build._kw_options_dict2str">[docs]</a>
+<span class="k">def</span> <span class="nf">_kw_options_dict2str</span><span class="p">(</span><span class="n">kw_options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a dictionary of keyword options into a command line string.</span>
+
+<span class="sd">    This function takes a dictionary where the keys are command line option flags (e.g., &quot;-a&quot;, &quot;-b&quot;)</span>
+<span class="sd">    and the values are the corresponding values for these flags.</span>
+<span class="sd">    It returns a string that represents these options in a format that can be used in a command line interface.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kw_options : dict</span>
+<span class="sd">        A dictionary where the keys are command line option flags and the values</span>
+<span class="sd">        are the corresponding values for these flags.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_list : list</span>
+<span class="sd">        A list where the elements are command line options and their values.</span>
+<span class="sd">    cmd_str : str</span>
+<span class="sd">        A string that represents the command line options and their values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; kw_options = {&quot;-a&quot;: &quot;valueA&quot;, &quot;-b&quot;: &quot;42&quot;}</span>
+<span class="sd">    &gt;&gt;&gt; _kw_options_dict2str(kw_options)</span>
+<span class="sd">    &#39;-a valueA -b 42&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">kw_options</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kw_options</span> <span class="o">=</span> <span class="p">[</span><span class="n">kw_options</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">kwo</span> <span class="ow">in</span> <span class="n">kw_options</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwo</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">cmd_list</span> <span class="o">=</span> <span class="n">cmd_list</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)]</span>
+
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="_options_list2str">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build._options_list2str">[docs]</a>
+<span class="k">def</span> <span class="nf">_options_list2str</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a list of options into a command line string.</span>
+
+<span class="sd">    This function takes a list where the elements are command line options</span>
+<span class="sd">    (e.g., &quot;-a&quot;, Path(valueA), &quot;-b&quot;, 42) and returns a string that represents these options</span>
+<span class="sd">    in a format that can be used in a command line interface.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    options : list</span>
+<span class="sd">        A list where the elements are command line options.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_list : list</span>
+<span class="sd">        A list where the elements are command line options and their values.</span>
+<span class="sd">    cmd_str : str</span>
+<span class="sd">        A string that represents the command line options and their values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt; options = [&quot;-a&quot;, Path(valueA), &quot;-b&quot;, 42]</span>
+<span class="sd">    &gt; _options_list2str(options)</span>
+<span class="sd">    ([&#39;-a&#39;, &#39;valueA&#39;, &#39;-b&#39;, &#39;42&#39;], &#39;-a valueA -b 42&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">cmd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cmd_list</span> <span class="o">=</span> <span class="n">cmd_list</span> <span class="o">+</span> <span class="n">opt</span>
+
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<span class="c1">###################################################################</span>
+<span class="c1">#### command builder functions</span>
+
+
+<div class="viewcode-block" id="cmd_build_generic">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_generic">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_generic</span><span class="p">(</span>
+    <span class="n">program</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span>
+    <span class="n">kw_options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">arguments</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">options_bis</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span>
+    <span class="n">kw_options_bis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds a command to launch a generic converter.</span>
+
+<span class="sd">    This function is primarily used for development purposes.</span>
+<span class="sd">    It constructs a command by concatenating the provided parameters in a specific order.</span>
+<span class="sd">    The command can then be used to launch a generic converter.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    program : str, optional</span>
+<span class="sd">        The name of the program or converter to be launched. Default is an empty string.</span>
+<span class="sd">    options : list, optional</span>
+<span class="sd">        A list of options to be passed to the program. Default is an empty list.</span>
+<span class="sd">    kw_options : dict, optional</span>
+<span class="sd">        A dictionary of keyword options to be passed to the program. Default is an empty dictionary.</span>
+<span class="sd">    arguments : str, optional</span>
+<span class="sd">        The arguments to be passed to the program. Default is an empty string.</span>
+<span class="sd">    options_bis : list, optional</span>
+<span class="sd">        A second list of options to be passed to the program. Default is an empty list.</span>
+<span class="sd">    kw_options_bis : dict, optional</span>
+<span class="sd">        A second dictionary of keyword options to be passed to the program. Default is an empty dictionary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        The constructed command as a list of strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">program</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">program</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">program</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kw_options</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kw_options_bis</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">arguments</span><span class="p">):</span>
+        <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">arguments</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">arguments</span><span class="p">)]</span>
+
+    <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">+</span> <span class="n">options</span> <span class="o">+</span> <span class="n">options_bis</span> <span class="o">+</span> <span class="n">arguments</span>
+
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_trm2rinex">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_trm2rinex">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_trm2rinex</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;trm2rinex&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a command to launch trm2rinex, the Trimble converter</span>
+
+<span class="sd">    It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : str or Path</span>
+<span class="sd">        the path of the input Raw GNSS file.</span>
+<span class="sd">    out_dir : str or Path</span>
+<span class="sd">        the path of the output directory.</span>
+<span class="sd">    bin_options_custom : list, optional</span>
+<span class="sd">        a list for custom option arguments. The default is [].</span>
+<span class="sd">    bin_kwoptions_custom : dict, optional</span>
+<span class="sd">        a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">    bin_path : str, optional</span>
+<span class="sd">        the path the executed binary.</span>
+<span class="sd">        The default is &quot;trm2rinex:cli-light&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_use : list of string</span>
+<span class="sd">        the command as a mono-string in list (singleton).</span>
+<span class="sd">        Ready to be used by subprocess.run</span>
+<span class="sd">    cmd_list : list of strings</span>
+<span class="sd">        the command as a list of strings, splited for each element.</span>
+<span class="sd">    cmd_str : string</span>
+<span class="sd">        the command as a concatenated string.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Usage of `trm2rinex`</span>
+
+<span class="sd">    docker run --rm -v ${DIR_INP}:/inp -v ${DIR_OUT}:/out trm2rinex:cli-light</span>
+<span class="sd">    inp/${FNAME_RAW} -p out/${SUBDIR_OUT} -n -d -s -v 3.04</span>
+
+<span class="sd">    data/MAGC320b.2021.rt27 defines the input file (relative to container filesystem root)</span>
+<span class="sd">    -p data/out defines the path for the conversion output (relative to container filesystem root)</span>
+<span class="sd">    -n to NOT perform height reference point corrections</span>
+<span class="sd">    -d to include doppler observables in the output observation file</span>
+<span class="sd">    -co to include clock corrections in the output observation file</span>
+<span class="sd">    -s to include signal strength values in the output observation file</span>
+<span class="sd">    -v 3.04 to choose which RINEX version is generated (cf. command line usage for details)</span>
+<span class="sd">    -h 0.1387 to include the marker to antenna ARP vertical offset into RINEX header</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#### Convert the paths as Path objects</span>
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="c1"># out_dir must be writable by root =&gt; 777</span>
+    <span class="n">out_dir_access_rights</span> <span class="o">=</span> <span class="n">out_dir</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mode</span>
+    <span class="n">out_dir</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="mo">0o777</span><span class="p">)</span>
+
+    <span class="n">cmd_docker_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;docker&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;run&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--rm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot;:/inp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&quot;:/out&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">cmd_trm2rinex_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">bin_path</span><span class="p">,</span>
+        <span class="s2">&quot;inp/&quot;</span> <span class="o">+</span> <span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+        <span class="c1"># &quot;-d&quot;, # doppler disabled, because can cause non standard values for RINEX format</span>
+        <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-v&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;3.04&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-p&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;out/&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="n">cmd_docker_list</span> <span class="o">+</span> <span class="n">cmd_trm2rinex_list</span> <span class="o">+</span> <span class="n">cmd_opt_list</span> <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_t0xconvert">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_t0xconvert">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_t0xconvert</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;t0xconvert&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a command to launch t0xConvert, the Trimble converter</span>
+
+<span class="sd">    It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : str or Path</span>
+<span class="sd">        the path of the input Raw GNSS file.</span>
+<span class="sd">    out_dir : str or Path</span>
+<span class="sd">        the path of the output directory.</span>
+<span class="sd">    bin_options_custom : list, optional</span>
+<span class="sd">        a list for custom option arguments. The default is [].</span>
+<span class="sd">    bin_kwoptions_custom : dict, optional</span>
+<span class="sd">        a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">    bin_path : str, optional</span>
+<span class="sd">        the path the executed binary.</span>
+<span class="sd">        The default is &quot;t0xConvert&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_use : list of string</span>
+<span class="sd">        the command as a mono-string in list (singleton).</span>
+<span class="sd">        Ready to be used by subprocess.run</span>
+<span class="sd">    cmd_list : list of strings</span>
+<span class="sd">        the command as a list of strings, splited for each element.</span>
+<span class="sd">    cmd_str : string</span>
+<span class="sd">        the command as a concatenated string.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    Usage of `t0xConvert`</span>
+
+<span class="sd">    t0xConvert - Utility to convert Trimble T02/T04 files to RINEX</span>
+<span class="sd">    Version 2.38.0. Copyright (c) Trimble Inc. 2008-2023.  All rights reserved</span>
+
+
+<span class="sd">    Usage: t0xConvert {file_options} [field_options] &lt;input_file&gt;</span>
+
+<span class="sd">    &lt;input_file&gt;       Trimble T02/T04 format file</span>
+
+<span class="sd">    File_options:</span>
+<span class="sd">    -o                 Specifying &quot;-o&quot; creates a RINEX observation file</span>
+<span class="sd">    -ofixed            Use fixed # of observation fields with -o</span>
+<span class="sd">    -h                 Specifying &quot;-h&quot; creates a Hatanaka compressed observation file</span>
+<span class="sd">    -nNAV              File Type</span>
+<span class="sd">                        -ngps      - GPS NAV file</span>
+<span class="sd">                        -nglonass  - GLONASS NAV file</span>
+<span class="sd">                        -ngalileo  - GALILEO NAV file</span>
+<span class="sd">                        -nqzss     - QZSS NAV file</span>
+<span class="sd">                        -ncombined - Combined NAV file</span>
+<span class="sd">    -m                 Create MET file</span>
+<span class="sd">    -vVER              RINEX Version x100 (default 211)</span>
+<span class="sd">                        Supported Formats</span>
+<span class="sd">                        211 = RINEX 2.11</span>
+<span class="sd">                        212 = RINEX 2.12 with QZSS extensions</span>
+<span class="sd">                        300 = RINEX 3.00</span>
+<span class="sd">                        302 = RINEX 3.02</span>
+<span class="sd">                        303 = RINEX 3.03</span>
+<span class="sd">                        304 = RINEX 3.04</span>
+<span class="sd">                        e.g. -v304 will generate output files in RINEX 3.04 format</span>
+<span class="sd">    -z                 Zip up all generated files into one zip file</span>
+
+<span class="sd">    Field_options:</span>
+<span class="sd">      The form for field options is &lt;specifier&gt;=&lt;value&gt;, so to override the</span>
+<span class="sd">      AGENCY field to be &quot;Trimble&quot;, you would use -ag=&quot;Trimble&quot;. Here are the</span>
+<span class="sd">      supported &lt;specifier&gt; types:</span>
+
+<span class="sd">    -ob                Observer,          e.g. -ob=&quot;BILL SMITH&quot;</span>
+<span class="sd">    -ag                Agency,            e.g. -ag=&quot;ABC INSTITUTE&quot;</span>
+<span class="sd">    -rb                Run By,            e.g. -rb=&quot;BILL SMITH&quot;</span>
+<span class="sd">    -mo                Marker Name,       e.g. -mo=&quot;A 9080&quot;</span>
+<span class="sd">    -mn                Marker Number      e.g. -mn=&quot;9080.1.34&quot;</span>
+<span class="sd">    -at                Antenna Type       e.g. -at=&quot;ROVER&quot;</span>
+<span class="sd">    -an                Antenna Number     e.g. -an=&quot;G1234&quot;</span>
+<span class="sd">    -ah                Antenna Height     e.g. -ah=&quot;0.01&quot;</span>
+<span class="sd">    -rt                Receiver Type      e.g. -rt=&quot;GEODETIC&quot;</span>
+<span class="sd">    -rn                Receiver Number    e.g. -rn=&quot;X1234A1234&quot;</span>
+<span class="sd">    -ap                Approx. XYZ Position. Use &#39;,&#39; to separate X, Y, and Z</span>
+<span class="sd">                       values as in the following example:</span>
+<span class="sd">                       -ap=-2689320.68662,-4302891.91205,3851423.71881</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the paths as Path objects</span>
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="n">inp_raw_fpath_tmp</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="c1"># Copy the input file to the output directory (this is done silentely)</span>
+    <span class="c1"># shutil.copy(inp_raw_fpath, inp_raw_fpath_tmp)</span>
+    <span class="c1"># this is actually done with a shell cp command prior to the conversion</span>
+    <span class="c1"># see the cmd_list below</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;cp&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">out_dir</span><span class="p">),</span> <span class="s2">&quot;&amp;&amp;&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;-v304&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+        <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">inp_raw_fpath_tmp</span><span class="p">)]</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="c1"># Remove the temporary file (this is done silentely)</span>
+    <span class="c1"># os.remove(inp_raw_fpath_tmp)</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_mdb2rinex">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_mdb2rinex">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_mdb2rinex</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;mdb2rinex&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a command to launch mdb2rinex, the Leica converter</span>
+
+<span class="sd">    It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : str or Path</span>
+<span class="sd">        the path of the input Raw GNSS file.</span>
+<span class="sd">    out_dir : str or Path</span>
+<span class="sd">        the path of the output directory.</span>
+<span class="sd">    bin_options_custom : list, optional</span>
+<span class="sd">        a list for custom option arguments. The default is [].</span>
+<span class="sd">    bin_kwoptions_custom : dict, optional</span>
+<span class="sd">        a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">    bin_path : str, optional</span>
+<span class="sd">        the path the executed binary.</span>
+<span class="sd">        The default is &quot;mdb2rinex&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_use : list of string</span>
+<span class="sd">        the command as a mono-string in list (singleton).</span>
+<span class="sd">        Ready to be used by subprocess.run</span>
+<span class="sd">    cmd_list : list of strings</span>
+<span class="sd">        the command as a list of strings, splited for each element.</span>
+<span class="sd">    cmd_str : string</span>
+<span class="sd">        the command as a concatenated string.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    Usage of `mdb2rinex`</span>
+
+<span class="sd">    Options:</span>
+<span class="sd">    -h [ --help ]         Print help messages</span>
+<span class="sd">    -v [ --version ]      Print program version</span>
+<span class="sd">    -s [ --summary ]      Print tracking summary at end of obs file</span>
+<span class="sd">    -o [ --out ] arg      Output directory</span>
+<span class="sd">    -f [ --files ] arg    Mdb input file list</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the paths as Path objects</span>
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;--out&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="s2">&quot;--files&quot;</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_sbf2rin">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_sbf2rin">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_sbf2rin</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;sbf2rin&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Build a command to launch sbf2rin, the Septentrio converter</span>
+
+<span class="sd">     It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">     ----------</span>
+<span class="sd">     inp_raw_fpath : str or Path</span>
+<span class="sd">         the path of the input Raw GNSS file.</span>
+<span class="sd">     out_dir : str or Path</span>
+<span class="sd">         the path of the output directory.</span>
+<span class="sd">     bin_options_custom : list, optional</span>
+<span class="sd">         a list for custom option arguments. The default is [].</span>
+<span class="sd">     bin_kwoptions_custom : dict, optional</span>
+<span class="sd">         a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">     bin_path : str, optional</span>
+<span class="sd">         the path the executed binary.</span>
+<span class="sd">         The default is &quot;sbf2rin&quot;.</span>
+
+<span class="sd">     Returns</span>
+<span class="sd">     -------</span>
+<span class="sd">     cmd_use : list of string</span>
+<span class="sd">         the command as a mono-string in list (singleton).</span>
+<span class="sd">         Ready to be used by subprocess.run</span>
+<span class="sd">     cmd_list : list of strings</span>
+<span class="sd">         the command as a list of strings, splited for each element.</span>
+<span class="sd">     cmd_str : string</span>
+<span class="sd">         the command as a concatenated string.</span>
+
+<span class="sd">     Note</span>
+<span class="sd">     ----</span>
+<span class="sd">     Usage of `sbf2rin`</span>
+
+<span class="sd">      sbf2rin -f input_file [-o output_file][-l][-O CCC][-R3][-R210][-n type]</span>
+<span class="sd">                        [-MET][-i interval][-b startepoch][-e endepoch]</span>
+<span class="sd">                        [-s][-D][-X][-c][-C commentstr][-x systems]</span>
+<span class="sd">                        [-I siglist][-E siglist][-a antenna][-ma][-mf]</span>
+<span class="sd">                        [-noevent][-S][-v][-V]</span>
+
+<span class="sd">    -f input_file   (mandatory) Name of the SBF file(s) to be converted.</span>
+<span class="sd">                    To convert multiple files, use a whitespace as</span>
+<span class="sd">                    delimiter between the different file names. Each SBF</span>
+<span class="sd">                    file is converted into a different RINEX file.</span>
+<span class="sd">    -o output_file  Name of the output RINEX file, bypassing the standard</span>
+<span class="sd">                    naming convention. See file naming convention below.</span>
+<span class="sd">                    Note: do not use a forced output file name when</span>
+<span class="sd">                    converting multiple files.</span>
+<span class="sd">    -l              Use long file naming convention (introduced in RINEX</span>
+<span class="sd">                    v3.02). Default is short file name. See below.</span>
+<span class="sd">    -O CCC          Force using the specified 3-letter country code in</span>
+<span class="sd">                    the long file name. This option is ignored if the -l</span>
+<span class="sd">                    option is not used.</span>
+<span class="sd">    -R version      By default, sbf2rin converts to RINEX v3.04.</span>
+<span class="sd">                    -R211 converts to v2.11,</span>
+<span class="sd">                    -R303 converts to v3.03,</span>
+<span class="sd">                    -R304 converts to v3.04,</span>
+<span class="sd">                    -R305 converts to v3.05,</span>
+<span class="sd">                    -R400 converts to v4.00,</span>
+<span class="sd">                    -R3 is an alias for -R304,</span>
+<span class="sd">                    -R4 is an alias for -R400.</span>
+<span class="sd">    -n type         Type of files to be generated.  type is a combination</span>
+<span class="sd">                    of the following characters:</span>
+<span class="sd">                      O for an observation file (this is the default),</span>
+<span class="sd">                      N for a GPS-only navigation file,</span>
+<span class="sd">                      G for a GLONASS-only navigation file,</span>
+<span class="sd">                      E for a Galileo-only navigation file (always RINEX</span>
+<span class="sd">                        v3.xx or above),</span>
+<span class="sd">                      H for a SBAS-only navigation file,</span>
+<span class="sd">                      I for a BeiDou-only navigation file (always RINEX</span>
+<span class="sd">                        v3.xx or above),</span>
+<span class="sd">                      P for a mixed GNSS navigation file (always RINEX</span>
+<span class="sd">                        v3.xx or above),</span>
+<span class="sd">                      B for a broadcast SBAS file (all L1 and L5 messages),</span>
+<span class="sd">                        valid only for a broadcast SBAS file (valid CRC</span>
+<span class="sd">                        only),</span>
+<span class="sd">                      M for a meteo file.</span>
+<span class="sd">                    Note that QZSS and IRNSS/NavIC navigation data is only</span>
+<span class="sd">                    available in mixed files.</span>
+<span class="sd">                    If multiple characters are combined, all the requested</span>
+<span class="sd">                    RINEX files are generated at once. For example -nPOM</span>
+<span class="sd">                    generates obs, mixed nav and meteo files.</span>
+<span class="sd">    -MET            Generate a RINEX meteo file (same as -nM).</span>
+<span class="sd">    -i interval     Interval in the RINEX obs and meteo file, in seconds</span>
+<span class="sd">                    (by default, the interval is the same as in the SBF</span>
+<span class="sd">                     file).</span>
+<span class="sd">    -b startepoch   Time of first epoch to insert in the RINEX file.</span>
+<span class="sd">                    Format: yyyy-mm-dd_hh:mm:ss or hh:mm:ss.</span>
+<span class="sd">    -e endepoch     Last epoch to insert in the RINEX file</span>
+<span class="sd">                    Format: yyyy-mm-dd_hh:mm:ss or hh:mm:ss.</span>
+<span class="sd">    -s              Include the Sx obs types in the observation file.</span>
+<span class="sd">    -D              Include the Dx obs types in the observation file.</span>
+<span class="sd">    -X              Include the X1 obs types (channel number) in the</span>
+<span class="sd">                    observation file.</span>
+<span class="sd">                    (option not available when generating RINEX v2.11</span>
+<span class="sd">                     files).</span>
+<span class="sd">    -c              Allow comments in the RINEX file (from the Comment SBF</span>
+<span class="sd">                    block)</span>
+<span class="sd">    -C commentstr   Add the specified comment string to the RINEX obs</span>
+<span class="sd">                    header. The comment string must not be longer than</span>
+<span class="sd">                    240 characters. Enclose the string between quotes if</span>
+<span class="sd">                    it contains whitespaces.</span>
+<span class="sd">    -U              Make sure a satellite number does not appear more than</span>
+<span class="sd">                    once in a given epoch, which could otherwise happen when</span>
+<span class="sd">                    the receiver is configured to track the same satellite on</span>
+<span class="sd">                    multiple channels, or in rare cases when two GLONASS</span>
+<span class="sd">                    satellites are using the same slot number.</span>
+<span class="sd">    -x systems      Exclude one or more satellite systems from the obs</span>
+<span class="sd">                    file or from the mixed navigation file.</span>
+<span class="sd">                    systems may be G (GPS), R (Glonass), E (Galileo), S</span>
+<span class="sd">                    (SBAS), C (Compass/Beidou), J (QZSS), I (IRNSS/NavIC) or</span>
+<span class="sd">                    any combination thereof. For instance, -xERSCJI produces</span>
+<span class="sd">                    a GPS-only file.</span>
+<span class="sd">    -I siglist      Include only the observables from the specified signal</span>
+<span class="sd">                    types. By default all observables in the SBF file are</span>
+<span class="sd">                    converted to RINEX. siglist is a list of signal types</span>
+<span class="sd">                    separated by &quot;+&quot; and without whitespaces.  The</span>
+<span class="sd">                    available signal types are:</span>
+<span class="sd">                    GPSL1CA, GPSL1P, GPSL2P, GPSL2C, GPSL5, GPSL1C,</span>
+<span class="sd">                    GLOL1CA, GLOL1P, GLOL2P, GLOL2CA, GLOL3,</span>
+<span class="sd">                    GALE1, GALE5a, GALE5b, GALE5, GALE6,</span>
+<span class="sd">                    BDSB1I, BDSB2I, BDSB3I, BDSB1C, BDSB2a, BDSB2b,</span>
+<span class="sd">                    QZSL1CA, QZSL2C, QZSL5, QZSL1C, QZSL1S, QZSL5S</span>
+<span class="sd">                    SBSL1, SBSL5,</span>
+<span class="sd">                    IRNL5, IRNS1.</span>
+<span class="sd">                    For example: -I GPSL1CA+GLOL1CA</span>
+<span class="sd">    -E siglist      Exclude the observables from the specified signal</span>
+<span class="sd">                    types. See the -I argument for a definition of siglist.</span>
+<span class="sd">    -a antenna      Convert data from the specified antenna (antenna is 1,</span>
+<span class="sd">                    2 or 3). The default is 1, corresponding to the main</span>
+<span class="sd">                    antenna.</span>
+<span class="sd">    -ma             Insert a &quot;start moving&quot; event right after the header</span>
+<span class="sd">                    if the RINEX file contains kinematic data.</span>
+<span class="sd">    -mf             Force inserting a &quot;start moving&quot; event right after</span>
+<span class="sd">                    the header.</span>
+<span class="sd">    -noevent        Do not report external events in RINEX.  Default is to</span>
+<span class="sd">                    report external events in comment strings.</span>
+<span class="sd">    -S              Automatically increase the file sequence character in</span>
+<span class="sd">                    the output file name when converting multiple files</span>
+<span class="sd">                    from the same marker and the same day. This option is</span>
+<span class="sd">                    ignored if the -l or the -o option is also selected.</span>
+<span class="sd">    -v              Run in verbose mode.</span>
+<span class="sd">    -V              Display the sbf2rin version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the paths as Path objects</span>
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">out_fpath</span> <span class="o">=</span> <span class="n">out_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.rnx_sbf2rin&quot;</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">out_fpath</span><span class="p">,</span> <span class="s2">&quot;-s&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_runpkr00">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_runpkr00">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_runpkr00</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;runpkr00&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a command to launch runpkr00, the Trimble &gt; teqc converter</span>
+
+<span class="sd">    It has the same behavior as all th&lt;e `cmd_build` functions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : str or Path</span>
+<span class="sd">        the path of the input Raw GNSS file.</span>
+<span class="sd">    out_dir : str or Path</span>
+<span class="sd">        the path of the output directory.</span>
+<span class="sd">    bin_options_custom : list, optional</span>
+<span class="sd">        a list for custom option arguments. The default is [].</span>
+<span class="sd">    bin_kwoptions_custom : dict, optional</span>
+<span class="sd">        a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">    bin_path : str, optional</span>
+<span class="sd">        the path the executed binary.</span>
+<span class="sd">        The default is &quot;runpkr00&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_use : list of string</span>
+<span class="sd">        the command as a mono-string in list (singleton).</span>
+<span class="sd">        Ready to be used by subprocess.run</span>
+<span class="sd">    cmd_list : list of strings</span>
+<span class="sd">        the command as a list of strings, splited for each element.</span>
+<span class="sd">    cmd_str : string</span>
+<span class="sd">        the command as a concatenated string.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Usage of `runpkr00`</span>
+
+<span class="sd">    runpkr00 - Utility to unpack Trimble R00, T00, T01, T02 files, Version 6.03 (Linux) ( t01lib 8.111 )</span>
+<span class="sd">    Copyright (c) Trimble Navigation Limited 1992-2015.  All rights reserved.</span>
+
+<span class="sd">    usage: runpkr00 [-deimacfvq] [-sfile] [-x[ehi*]] [-tfmt] [-n[!]] [-u0|1] src[+s2+s3+..+sn] [@file] [out]</span>
+<span class="sd">      @file      file with list of files to be concatenated (one per line)</span>
+<span class="sd">      -c         ignore checksum errors</span>
+<span class="sd">      -a         produce APP file (when possible)</span>
+<span class="sd">      -d         produce DAT file</span>
+<span class="sd">      -e         produce EPH file</span>
+<span class="sd">      -i         produce ION file</span>
+<span class="sd">      -m         produce MES file</span>
+<span class="sd">      -n[!]      fix NetRS serial number, [!-unconditional]</span>
+<span class="sd">      -s[file]   produce Summary file</span>
+<span class="sd">      -f         attempt fixup if possible</span>
+<span class="sd">      -u[0|1]    update file name [0-dft, 1-station]</span>
+<span class="sd">      -v         verbose</span>
+<span class="sd">      -x[ehi*]   exclude initial: e-eph, h-header, i-ionutc, *-all</span>
+<span class="sd">      -tfmt      format type of file (fmt=r00,t00,t01,t02)</span>
+<span class="sd">      -q         quick summary to std out</span>
+<span class="sd">      -g         use type 27 (if it exists) and allow extended type 17</span>
+
+<span class="sd">    examples: runpkr00 -d gs00233a</span>
+<span class="sd">              runpkr00 -dev gs00233a gnew233a</span>
+<span class="sd">              runpkr00 -deimv gs00233a c:\\new\\gs00233a</span>
+<span class="sd">              runpkr00 -de c:\\old\\gs00233a c:\new\\gs00233a</span>
+<span class="sd">              runpkr00 -demv gs00233a+gs00233b+gs00233c comb2330</span>
+<span class="sd">              runpkr00 -demv @r00.lst comb2330</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the paths as Path objects</span>
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;-d&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+        <span class="o">+</span> <span class="p">[</span><span class="n">inp_raw_fpath</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_convbin">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_convbin">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_convbin</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;convbin&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a command to launch convbin, the RTKLIB converter, for BINEX</span>
+
+<span class="sd">    It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : str or Path</span>
+<span class="sd">        the path of the input Raw GNSS file.</span>
+<span class="sd">    out_dir : str or Path</span>
+<span class="sd">        the path of the output directory.</span>
+<span class="sd">    bin_options_custom : list, optional</span>
+<span class="sd">        a list for custom option arguments. The default is [].</span>
+<span class="sd">    bin_kwoptions_custom : dict, optional</span>
+<span class="sd">        a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">    bin_path : str, optional</span>
+<span class="sd">        the path the executed binary.</span>
+<span class="sd">        The default is &quot;convbin&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_use : list of string</span>
+<span class="sd">        the command as a mono-string in list (singleton).</span>
+<span class="sd">        Ready to be used by subprocess.run</span>
+<span class="sd">    cmd_list : list of strings</span>
+<span class="sd">        the command as a list of strings, splited for each element.</span>
+<span class="sd">    cmd_str : string</span>
+<span class="sd">        the command as a concatenated string.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Usage of `convbin`</span>
+
+<span class="sd">    convbin [option ...] file</span>
+
+<span class="sd">    Description</span>
+
+<span class="sd">    Convert RTCM, receiver raw data log and RINEX file to RINEX and SBAS/LEX</span>
+<span class="sd">    message file. SBAS message file complies with RTKLIB SBAS/LEX message</span>
+<span class="sd">    format. It supports the following messages or files.</span>
+
+<span class="sd">    RTCM 2                : Type 1, 3, 9, 14, 16, 17, 18, 19, 22</span>
+<span class="sd">    RTCM 3                : Type 1002, 1004, 1005, 1006, 1010, 1012, 1019, 1020</span>
+<span class="sd">                            Type 1071-1127 (MSM except for compact msg)</span>
+<span class="sd">    NovAtel OEMV/4,OEMStar: RANGECMPB, RANGEB, RAWEPHEMB, IONUTCB, RAWWASSFRAMEB</span>
+<span class="sd">    u-blox LEA-4T/5T/6T/8/9  : RXM-RAW, RXM-RAWX, RXM-SFRB</span>
+<span class="sd">    Swift Piksi Multi     :</span>
+<span class="sd">    Hemisphere            : BIN76, BIN80, BIN94, BIN95, BIN96</span>
+<span class="sd">    SkyTraq S1315F        : msg0xDD, msg0xE0, msg0xDC</span>
+<span class="sd">    GW10                  : msg0x08, msg0x03, msg0x27, msg0x20</span>
+<span class="sd">    Javad                 : [R*],[r*],[*R],[*r],[P*],[p*],[*P],[*p],[D*],[*d],</span>
+<span class="sd">                            [E*],[*E],[F*],[TC],[GE],[NE],[EN],[QE],[UO],[IO],</span>
+<span class="sd">                            [WD]</span>
+<span class="sd">    NVS                   : BINR</span>
+<span class="sd">    BINEX                 : big-endian, regular CRC, forward record (0xE2)</span>
+<span class="sd">                            0x01-01,0x01-02,0x01-03,0x01-04,0x01-06,0x7f-05</span>
+<span class="sd">    Trimble               : RT17</span>
+<span class="sd">    Septentrio            : SBF</span>
+<span class="sd">    RINEX                 : OBS, NAV, GNAV, HNAV, LNAV, QNAV</span>
+
+<span class="sd">    Options [default]</span>
+
+<span class="sd">        file         input receiver binary log file</span>
+<span class="sd">        -ts y/m/d h:m:s  start time [all]</span>
+<span class="sd">        -te y/m/d h:m:s  end time [all]</span>
+<span class="sd">        -tr y/m/d h:m:s  approximated time for RTCM</span>
+<span class="sd">        -ti tint     observation data interval (s) [all]</span>
+<span class="sd">        -tt ttol     observation data epoch tolerance (s) [0.005]</span>
+<span class="sd">        -span span   time span (h) [all]</span>
+<span class="sd">        -r format    log format type</span>
+<span class="sd">                      rtcm2= RTCM 2</span>
+<span class="sd">                      rtcm3= RTCM 3</span>
+<span class="sd">                      nov  = NovAtel OEM/4/V/6/7,OEMStar</span>
+<span class="sd">                      ubx  = ublox LEA-4T/5T/6T/7T/M8T/F9</span>
+<span class="sd">                      sbp  = Swift Navigation SBP</span>
+<span class="sd">                      hemis= Hemisphere Eclipse/Crescent</span>
+<span class="sd">                      stq  = SkyTraq S1315F</span>
+<span class="sd">                      javad= Javad GREIS</span>
+<span class="sd">                      nvs  = NVS NV08C BINR</span>
+<span class="sd">                      binex= BINEX</span>
+<span class="sd">                      rt17 = Trimble RT17</span>
+<span class="sd">                      sbf  = Septentrio SBF</span>
+<span class="sd">                      rinex= RINEX</span>
+<span class="sd">        -ro opt      receiver options</span>
+<span class="sd">        -f freq      number of frequencies [5]</span>
+<span class="sd">        -hc comment  rinex header: comment line</span>
+<span class="sd">        -hm marker   rinex header: marker name</span>
+<span class="sd">        -hn markno   rinex header: marker number</span>
+<span class="sd">        -ht marktype rinex header: marker type</span>
+<span class="sd">        -ho observ   rinex header: oberver name and agency separated by /</span>
+<span class="sd">        -hr rec      rinex header: receiver number, type and version separated by /</span>
+<span class="sd">        -ha ant      rinex header: antenna number and type separated by /</span>
+<span class="sd">        -hp pos      rinex header: approx position x/y/z separated by /</span>
+<span class="sd">        -hd delta    rinex header: antenna delta h/e/n separated by /</span>
+<span class="sd">        -v ver       rinex version [3.04]</span>
+<span class="sd">        -od          include doppler frequency in rinex obs [on]</span>
+<span class="sd">        -os          include snr in rinex obs [on]</span>
+<span class="sd">        -oi          include iono correction in rinex nav header [off]</span>
+<span class="sd">        -ot          include time correction in rinex nav header [off]</span>
+<span class="sd">        -ol          include leap seconds in rinex nav header [off]</span>
+<span class="sd">        -halfc       half-cycle ambiguity correction [off]</span>
+<span class="sd">        -mask   [sig[,...]] signal mask(s) (sig={G|R|E|J|S|C|I}L{1C|1P|1W|...})</span>
+<span class="sd">        -nomask [sig[,...]] signal no mask (same as above)</span>
+<span class="sd">        -x sat       exclude satellite</span>
+<span class="sd">        -y sys       exclude systems (G:GPS,R:GLO,E:GAL,J:QZS,S:SBS,C:BDS,I:IRN)</span>
+<span class="sd">        -d dir       output directory [same as input file]</span>
+<span class="sd">        -c staid     use RINEX file name convention with staid [off]</span>
+<span class="sd">        -o ofile     output RINEX OBS file</span>
+<span class="sd">        -n nfile     output RINEX NAV file</span>
+<span class="sd">        -g gfile     output RINEX GNAV file</span>
+<span class="sd">        -h hfile     output RINEX HNAV file</span>
+<span class="sd">        -q qfile     output RINEX QNAV file</span>
+<span class="sd">        -l lfile     output RINEX LNAV file</span>
+<span class="sd">        -b cfile     output RINEX CNAV file</span>
+<span class="sd">        -i ifile     output RINEX INAV file</span>
+<span class="sd">        -s sfile     output SBAS message file</span>
+<span class="sd">        -trace level output trace level [off]</span>
+
+<span class="sd">    If any output file specified, default output files (&lt;file&gt;.obs,</span>
+<span class="sd">    &lt;file&gt;.nav, &lt;file&gt;.gnav, &lt;file&gt;.hnav, &lt;file&gt;.qnav, &lt;file&gt;.lnav,</span>
+<span class="sd">    &lt;file&gt;.cnav, &lt;file&gt;.inav and &lt;file&gt;.sbs) are used. To obtain week number info</span>
+<span class="sd">    for RTCM file, use -tr option to specify the approximated log start time.</span>
+<span class="sd">    Without -tr option, the program obtains the week number from the time-tag file (if it exists) or the last modified time of the log file instead.</span>
+
+<span class="sd">    If receiver type is not specified, type is recognized by the input</span>
+<span class="sd">    file extension as follows.</span>
+<span class="sd">        *.rtcm2       RTCM 2</span>
+<span class="sd">        *.rtcm3       RTCM 3</span>
+<span class="sd">        *.gps         NovAtel OEM4/V/6/7,OEMStar</span>
+<span class="sd">        *.ubx         u-blox LEA-4T/5T/6T/7T/M8T/F9</span>
+<span class="sd">        *.sbp         Swift Navigation SBP</span>
+<span class="sd">        *.bin         Hemisphere Eclipse/Crescent</span>
+<span class="sd">        *.stq         SkyTraq S1315F</span>
+<span class="sd">        *.jps         Javad GREIS</span>
+<span class="sd">        *.bnx,*binex  BINEX</span>
+<span class="sd">        *.rt17        Trimble RT17</span>
+<span class="sd">        *.sbf         Septentrio SBF</span>
+<span class="sd">        *.obs,*.*o    RINEX OBS</span>
+<span class="sd">        *.rnx         RINEX OBS     *.nav,*.*n    RINEX NAV</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#### Convert the paths as Path objects</span>
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">,</span> <span class="s2">&quot;-os&quot;</span><span class="p">,</span> <span class="s2">&quot;-od&quot;</span><span class="p">,</span> <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;binex&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+        <span class="o">+</span> <span class="p">[</span><span class="n">inp_raw_fpath</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_tps2rin">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_tps2rin">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_tps2rin</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;tps2rin&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a command to launch tps2rin, for Topcon</span>
+
+<span class="sd">    It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : str or Path</span>
+<span class="sd">        the path of the input Raw GNSS file.</span>
+<span class="sd">    out_dir : str or Path</span>
+<span class="sd">        the path of the output directory.</span>
+<span class="sd">    bin_options_custom : list, optional</span>
+<span class="sd">        a list for custom option arguments. The default is [].</span>
+<span class="sd">    bin_kwoptions_custom : dict, optional</span>
+<span class="sd">        a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">    bin_path : str, optional</span>
+<span class="sd">        the path the executed binary.</span>
+<span class="sd">        Since tps2rin is a Windows executable and executed with wine,</span>
+<span class="sd">        it must be an **absoulte** path.</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_use : list of string</span>
+<span class="sd">        the command as a mono-string in list (singleton).</span>
+<span class="sd">        Ready to be used by subprocess.run</span>
+<span class="sd">    cmd_list : list of strings</span>
+<span class="sd">        the command as a list of strings, splited for each element.</span>
+<span class="sd">    cmd_str : string</span>
+<span class="sd">        the command as a concatenated string.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+
+<span class="sd">    tps2rin requires wine to run on Linux.</span>
+
+
+<span class="sd">    Usage of `tps2rin`</span>
+<span class="sd">    ```</span>
+<span class="sd">    TPS2RIN 1.0.28.3459 Win64 build Jun 01, 2022 (c) Topcon Positioning Systems</span>
+<span class="sd">    Conversion of TPS file to RINEX.</span>
+<span class="sd">    Usage :  TPS2RIN  [&lt;sw&gt; [ &lt;sw&gt;]]  &lt;input file name&gt; [&lt;sw&gt; [ &lt;sw&gt;]]</span>
+<span class="sd">    &lt;Switches(sw)&gt;:</span>
+<span class="sd">      -h, -?, --help     Display help screen.</span>
+<span class="sd">      -v &lt;version&gt;       Set RINEX version. Valid are 2.10, 2.11, 2.12, 3.00, 3.01, 3</span>
+<span class="sd">    .02, 3.03, 3.04, 3.05, 4.00 versions.</span>
+<span class="sd">                        Default version is 3.05.</span>
+<span class="sd">      -o &lt;output dir&gt;    Output directory. Current directory used by default.</span>
+<span class="sd">      -p &lt;Profile name&gt;  For detailed help type &#39;TPS2RIN -p ?&#39;.</span>
+<span class="sd">      -i &lt;input file&gt;    Specify input file name. Required if &lt;input file&gt; starts wit</span>
+<span class="sd">    h &#39;-&#39; or &#39;+&#39;.</span>
+<span class="sd">      -s &lt;StartTime&gt;     Start date/time. For detailed help type &#39;TPS2RIN -s ?&#39;.</span>
+<span class="sd">      -f &lt;FinishTime&gt;    Finish date/time. For detailed help type &#39;TPS2RIN -f ?&#39;.</span>
+<span class="sd">      --date &lt;CurrTime&gt;  Current date/time. For detailed help type &#39;TPS2RIN --date ?&#39;</span>
+<span class="sd">    .</span>
+<span class="sd">      -G                 Exclude all GPS satellites.</span>
+<span class="sd">      -G&lt;nn&gt;,-g &lt;nn&gt;     Exclude GPS satellite G##.</span>
+<span class="sd">      +G&lt;nn&gt;,+g &lt;nn&gt;     Include GPS satellite G## (used after -G).</span>
+<span class="sd">      -R                 Exclude all GLONASS satellites.</span>
+<span class="sd">      -R&lt;nn&gt;,-r &lt;nn&gt;     Exclude GLONASS satellite R##.</span>
+<span class="sd">      +R&lt;nn&gt;,+r &lt;nn&gt;     Include GLONASS satellite R## (used after -R).</span>
+<span class="sd">      -E                 Exclude all GALILEO satellites.</span>
+<span class="sd">      -E&lt;nn&gt;             Exclude GALILEO satellite E##.</span>
+<span class="sd">      +E&lt;nn&gt;             Include GALILEO satellite E## (used after -E).</span>
+<span class="sd">      -C                 Exclude all BeiDou satellites.</span>
+<span class="sd">      -C&lt;nn&gt;             Exclude BeiDou satellite C##.</span>
+<span class="sd">      +C&lt;nn&gt;             Include BeiDou satellite C## (used after -C).</span>
+<span class="sd">      -W                 Exclude all SBAS (WAAS) satellites, including QZSS 183-192.</span>
+<span class="sd">      -W&lt;nn&gt;,-S&lt;nn&gt;,-w &lt;nn&gt; Exclude SBAS (WAAS) satellite. Use Rinex ID or PRN: S20-S</span>
+<span class="sd">    58 or S120-S158.</span>
+<span class="sd">      +W&lt;nn&gt;,+S&lt;nn&gt;,+w &lt;nn&gt; Include SBAS (WAAS) satellite (used after -W). Use Rinex</span>
+<span class="sd">    ID or PRN: S20-S58 or S120-S158.</span>
+<span class="sd">      -J                 Exclude all QZSS satellites.</span>
+<span class="sd">      -J&lt;nn&gt;             Exclude QZSS satellite J##. Use Rinex ID or PRN: J01-J10, J1</span>
+<span class="sd">    93-J202, J183-J192.</span>
+<span class="sd">      +J&lt;nn&gt;             Include QZSS satellite J## (used after -J). Use Rinex ID or</span>
+<span class="sd">    PRN: J01-J10, J193-J202, J183-J192.</span>
+<span class="sd">      -IRN               Exclude all IRNSS satellites.</span>
+<span class="sd">      -IRN7              7 IRNSS satellites support only.</span>
+<span class="sd">      -I&lt;nn&gt;             Exclude IRNSS satellite I##.</span>
+<span class="sd">      +I&lt;nn&gt;             Include IRNSS satellite I## (used after -IRN).</span>
+<span class="sd">      -1,-2,..,-5, ..,-9 Exclude all selected band measurements from output RINEX. (F</span>
+<span class="sd">    or example, -1 exludes C1, L1, P1, D1, S1).</span>
+<span class="sd">      -C2                Ignore all L2C channel measurements (GPS/GLONASS only).</span>
+<span class="sd">      --no-L1C           Ignore L1-C/A carrier phase/doppler/SNR (GPS/GLONASS only).</span>
+<span class="sd">      --no-L1P           Ignore L1-P carrier phase/doppler/SNR (GPS/GLONASS only).</span>
+<span class="sd">      --no-L2C           Ignore L2-C/A carrier phase/doppler/SNR (GPS/GLONASS only).</span>
+<span class="sd">      --no-L2P           Ignore L2-P carrier phase/doppler/SNR (GPS/GLONASS only).</span>
+<span class="sd">      --no-C1C           Ignore L1-C/A pseudorange (GPS/GLONASS only).</span>
+<span class="sd">      --no-C1P           Ignore L1-P pseudorange (GPS/GLONASS only).</span>
+<span class="sd">      --no-C2C           Ignore L2-C/A pseudorange (GPS/GLONASS only).</span>
+<span class="sd">      --no-C2P           Ignore L2-P pseudorange (GPS/GLONASS only).</span>
+<span class="sd">      --no-rM            Skip rM messages. Same as --skip rM.</span>
+<span class="sd">      --no-rD            Skip rD messages. Same as --skip rD.</span>
+<span class="sd">      --no-rL            Skip rL messages. Same as --skip rL.</span>
+<span class="sd">      --no-rS            Skip rS messages. Same as --skip rS.</span>
+<span class="sd">      --use-rM           Ignore all regular TPS messages, use rM messages.</span>
+<span class="sd">      --use-rD           Ignore all regular TPS messages, use rD messages.</span>
+<span class="sd">      --skip &lt;Id[,Id]&gt;   Skip list of TPS messages.</span>
+<span class="sd">      -I &lt;sec&gt;           Interval in seconds. Floating point value is OK.</span>
+<span class="sd">      -L &lt;n&gt;             If Leap Seconds information is missing, force Leap Seconds t</span>
+<span class="sd">    o &lt;n&gt;.</span>
+<span class="sd">      -D                 Exclude Doppler.</span>
+<span class="sd">      -O                 Include Receiver Clock Offset in epoch header lines.</span>
+<span class="sd">      --apply-clock-bias Apply Receiver Clock Offset to epoch time, carrier phases an</span>
+<span class="sd">    d pseudoranges.</span>
+<span class="sd">      --keep-epoch-time  Option --apply-clock-bias applied to carrier phases and pseu</span>
+<span class="sd">    doranges using doppler.</span>
+<span class="sd">      -S                 Include observation types S1,S2. Units: dB*Hz.</span>
+<span class="sd">      -~                 Apply Smoothing to pseudoranges.</span>
+<span class="sd">      -M &lt;Name&gt;          Override any Marker Name found in profile or input file.</span>
+<span class="sd">      -m &lt;Number&gt;        Override any Marker Number found in profile or input file.</span>
+<span class="sd">      -T &lt;Type&gt;          Override any Marker Type found in profile (GEODETIC and NON_</span>
+<span class="sd">    GEODETIC mean static survey mode).</span>
+<span class="sd">      -A &lt;Name&gt;          Override Antenna type name. For details type &#39;TPS2RIN -A ?&#39;.</span>
+<span class="sd">      -a &lt;Number&gt;        Override Antenna Serial # found in profile or input file.</span>
+<span class="sd">      --slant &lt;r&gt;,&lt;v&gt;    Convert antenna height from SLANT to VERTICAL: r - radius, m</span>
+<span class="sd">    m; v - C1-A1, mm.</span>
+<span class="sd">      --meteo-model &lt;model&gt;</span>
+<span class="sd">      -Met.Model &lt;model&gt; Override Meteo Device Model found in profile.</span>
+<span class="sd">      --meteo-type &lt;type&gt;</span>
+<span class="sd">      -Met.Type &lt;type&gt;   Override Meteo Device Type found in profile.</span>
+<span class="sd">      --sn               Prefer to output receiver serial number instead of receiver</span>
+<span class="sd">    id.</span>
+<span class="sd">      -=                 Ignore User Events. For details type .TPS2RIN -= ?&#39;.</span>
+<span class="sd">      -XYZ &lt;X&gt; &lt;Y&gt; &lt;Z&gt;   Override approximate XYZ calculated from raw position or giv</span>
+<span class="sd">    en in profile.</span>
+<span class="sd">      -c                 Use Hatanaka Compression.</span>
+<span class="sd">      -N &lt;ABCD&gt;          Short Marker Name alias for Marker Name.</span>
+<span class="sd">      --lfn &lt;R,CAN,00&gt;   Use long file name format. R is data src, CAN - country c</span>
+<span class="sd">    ode,</span>
+<span class="sd">                        00 - station code (monument 0-9 and receiver 0-9 numbers).</span>
+<span class="sd">      --file-period &lt;n&gt;  Rotation File period in seconds for file name generation.</span>
+<span class="sd">      --doi              Digital Object Identifier (DOI) for data citation.</span>
+<span class="sd">      --license          Name of the license or link to the specific version of the l</span>
+<span class="sd">    icense.</span>
+<span class="sd">      --station-info     The link to persistent URL with the station metadata.</span>
+<span class="sd">      --no-cnav          Don&#39;t use common navigational file for RINEX 3.0.</span>
+<span class="sd">      --no-obs           Don&#39;t create observation file.</span>
+<span class="sd">      --no-eph           Don&#39;t create ephemeris files.</span>
+<span class="sd">      --no-meteo         Don&#39;t create meteo file.</span>
+<span class="sd">      --no-tilt          Don&#39;t create angular file.</span>
+<span class="sd">      --no-extra         Don&#39;t create any extra files except observation and ephemeri</span>
+<span class="sd">    s.</span>
+<span class="sd">      --sort             Sort satellites in epochs.</span>
+<span class="sd">      --keep-eph         Keep all present ephemeris.</span>
+<span class="sd">      --sort-eph         Sort ephemeris by satellites and time.</span>
+<span class="sd">      --binex            Input stream contains BINEX messages.</span>
+<span class="sd">      --binex-use &lt;##&gt;   Select measurements from given subrecord ## of record 7F.</span>
+<span class="sd">                        Subrecords 00, 02, 03 and 05 are supported.</span>
+<span class="sd">      --binex-skip &lt;##&gt;  Skip record ##. May use several times.</span>
+<span class="sd">      --binex-7F05-fmt   Format for record 7F subrecord 05 RxClkOff field.</span>
+<span class="sd">                        Valid values are &quot;s+21b&quot; or &quot;2c22b&quot; (default).</span>
+<span class="sd">      --log &lt;log file&gt;   Write log file. Use &#39;-&#39; for writing to stdout.</span>
+<span class="sd">      --preview          Scan the file and print a short summary.</span>
+<span class="sd">      --print            Print all TPS messages to the log file.</span>
+<span class="sd">      --utf8             Log file has UTF-8 charset.</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the paths as Path objects</span>
+    <span class="n">inp_raw_fpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;wine&quot;</span><span class="p">,</span> <span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+        <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_teqc">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_teqc">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_teqc</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;teqc&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a command to launch teqc, for legacy conversion and RINEX Handeling</span>
+
+<span class="sd">    It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_raw_fpath : str or Path</span>
+<span class="sd">        the path of the input Raw GNSS file.</span>
+<span class="sd">        for RINEX Handeling (e.g. splice) a list of path is allowed.</span>
+<span class="sd">    out_dir : str or Path</span>
+<span class="sd">        the path of the output directory.</span>
+<span class="sd">    bin_options_custom : list, optional</span>
+<span class="sd">        a list for custom option arguments. The default is [].</span>
+<span class="sd">    bin_kwoptions_custom : dict, optional</span>
+<span class="sd">        a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">    bin_path : str, optional</span>
+<span class="sd">        the path the executed binary.</span>
+<span class="sd">        The default is &quot;teqc&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cmd_use : list of string</span>
+<span class="sd">        the command as a mono-string in list (singleton).</span>
+<span class="sd">        Ready to be used by subprocess.run</span>
+<span class="sd">    cmd_list : list of strings</span>
+<span class="sd">        the command as a list of strings, splited for each element.</span>
+<span class="sd">    cmd_str : string</span>
+<span class="sd">        the command as a concatenated string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the paths as Path objects</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+    <span class="c1"># for RINEX handeling, inp_raw_fpath can ben an iterable (list)</span>
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">inp_raw_fpath</span><span class="p">]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">raw_fpath_multi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># a single  file, most common case</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+
+    <span class="n">raw_fpath_str_lst</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">raw_fpath_multi</span><span class="p">]</span>
+    <span class="n">out_fpath</span> <span class="o">=</span> <span class="n">out_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">raw_fpath_mono</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.rnx_teqc&quot;</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;+out&quot;</span><span class="p">,</span> <span class="n">out_fpath</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+        <span class="o">+</span> <span class="n">raw_fpath_str_lst</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_converto">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_converto">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_converto</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;converto&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Build a command to launch teqc, for legacy conversion and RINEX Handeling</span>
+
+<span class="sd">     It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">     Parameters</span>
+<span class="sd">     ----------</span>
+<span class="sd">     inp_raw_fpath : str or Path</span>
+<span class="sd">         the path of the input Raw GNSS file.</span>
+<span class="sd">         for RINEX Handeling (e.g. splice) a list of path is allowed.</span>
+<span class="sd">     out_dir : str or Path</span>
+<span class="sd">         the path of the output directory.</span>
+<span class="sd">     bin_options_custom : list, optional</span>
+<span class="sd">         a list for custom option arguments. The default is [].</span>
+<span class="sd">     bin_kwoptions_custom : dict, optional</span>
+<span class="sd">         a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">     bin_path : str, optional</span>
+<span class="sd">         the path the executed binary.</span>
+<span class="sd">         The default is &quot;converto&quot;.</span>
+
+<span class="sd">     Returns</span>
+<span class="sd">     -------</span>
+<span class="sd">     cmd_use : list of string</span>
+<span class="sd">         the command as a mono-string in list (singleton).</span>
+<span class="sd">         Ready to be used by subprocess.run</span>
+<span class="sd">     cmd_list : list of strings</span>
+<span class="sd">         the command as a list of strings, splited for each element.</span>
+<span class="sd">     cmd_str : string</span>
+<span class="sd">         the command as a concatenated string.</span>
+
+<span class="sd">     Note</span>
+<span class="sd">     ----</span>
+
+<span class="sd">     Usage of `converto`</span>
+
+<span class="sd">     ##############################################################</span>
+<span class="sd">    &quot;Converto&quot; v1.0.5.2 permet d&#39;effectuer plusieurs types de traitements sur des fichiers RINEX, dont :</span>
+<span class="sd">    edition, extraction d&#39;informations, conversion et controle qualite.</span>
+
+<span class="sd">     ## Parametre obligatoire :</span>
+<span class="sd">        -i[n] fichier            Nom(s) de fichier(s) en entree (separes par une virgule si plusieurs)</span>
+<span class="sd">                                 Les caract�res regex impliquent des guillements ex : rinex.17o,&quot;*.18o&quot;)</span>
+
+<span class="sd">     ## Autres parametres :</span>
+<span class="sd">        -o[ut] fichier           Nom(s) de fichier(s) en sortie (separes par une virgule si plusieurs)</span>
+<span class="sd">        -cfgfiles fichier          Nom(s) de fichier(s) de configuration (separes par une virgule si plusieurs)</span>
+<span class="sd">        -h[elp]                  Affiche ces lignes d&#39;aide</span>
+<span class="sd">        -ver                     Affiche le numero de version de Converto</span>
+<span class="sd">        -a[lerte]                Active l&#39;affichage des alertes concernant le traitement dans la console</span>
+<span class="sd">        -v[erbose]               Active l&#39;affichage des etapes du traitement en plus des alertes dans la console</span>
+<span class="sd">        -rep[ort]                Ecrit un fichier de rapport (mode -cat, -conv et -ech seulement)</span>
+<span class="sd">        -phc                     Supprime les commentaires situes apres la fin du header</span>
+
+<span class="sd">                                 Mode edition par defaut</span>
+<span class="sd">        -cat                     Mode concatenation de fichiers</span>
+<span class="sd">        -mix                     Mode mixage de 2 fichiers RINEX OBS</span>
+<span class="sd">        -conv                    Mode conversion V3 vers V2</span>
+<span class="sd">        -info                    Mode extraction d&#39;informations</span>
+<span class="sd">        -qc                      Mode controle qualite de fichiers RINEX OBS</span>
+
+<span class="sd">        -G|gps                   Exclut le systeme GPS du traitement (inclus par defaut)</span>
+<span class="sd">        -R|glo                   Exclut le systeme GLONASS du traitement (inclus par defaut)</span>
+<span class="sd">        -E|gal                   Exclut le systeme Galileo du traitement (inclus par defaut)</span>
+<span class="sd">        -S|sba                   Exclut le systeme SBAS du traitement (inclus par defaut)</span>
+<span class="sd">        -C|bds                   Exclut le systeme BDS/Compass du traitement (inclus par defaut, sauf mode -conv : voir -v212)</span>
+<span class="sd">        -J|qzs                   Exclut le systeme QZSS du traitement (inclus par defaut, sauf mode -conv : voir -v212)</span>
+<span class="sd">        -I|irnss                 Exclut le systeme IRNSS du traitement (inclus par defaut, sauf mode -conv : voir -v212)</span>
+
+<span class="sd">     # Options d&#39;edition de RINEX OBS ou MET :</span>
+<span class="sd">        -st[art_window] str      set windowing start time to str == [[[[[[YY]YY]MM]DD]hh]mm]ss[.sssss]</span>
+<span class="sd">        -e[nd_window] str        set windowing end time to str == [[[[[[YY]YY]MM]DD]hh]mm]ss[.sssss]</span>
+<span class="sd">        -dX #                    delta X time of # from windowing start time; X == Y, M, d, h, m, s for year,...,second</span>
+<span class="sd">                                      if negative, from windowing end time.</span>
+<span class="sd">        -hole fichier            read file &#39;name&#39; to establish list of window holes</span>
+<span class="sd">        -tbin # str              time binned output with # time-delta (# = &lt;N&gt;[d|h|m|s]) and filename prefix &#39;str&#39;</span>
+<span class="sd">        -ast str                 set aligned time binned start time to str == [[[[[[YY]YY]MM]DD]hh]mm]ss[.sssss]</span>
+<span class="sd">                                      or str = _ to start alignment with the first observation epoch</span>
+
+<span class="sd">     # Options d&#39;edition de RINEX OBS :</span>
+<span class="sd">        -O.s[ystem] #            set RINEX OBS header satellite system to # (= G, R, E, S, C, J or M)</span>
+<span class="sd">        -O.r[un_by] &#39;str&#39;        set RINEX OBS header run by to &#39;str&#39;</span>
+<span class="sd">        -O.c[omment] &#39;str&#39;       append RINEX OBS header comment &#39;str&#39;</span>
+<span class="sd">        -O.mo[nument] &#39;str&#39;      set RINEX OBS header monument name to &#39;str&#39;</span>
+<span class="sd">        -O.mn &#39;str&#39;              set RINEX OBS header monument number to &#39;str&#39;</span>
+<span class="sd">        -O.o[perator] &#39;str&#39;      set RINEX OBS header operator name to &#39;str&#39;</span>
+<span class="sd">        -O.ag[ency] &#39;str&#39;        set RINEX OBS header operating agency to &#39;str&#39;</span>
+<span class="sd">        -O.rn &#39;str&#39;              set RINEX OBS header receiver number to &#39;str&#39;</span>
+<span class="sd">        -O.rt &#39;str&#39;              set RINEX OBS header receiver type to &#39;str&#39;</span>
+<span class="sd">        -O.rv &#39;str&#39;              set RINEX OBS header receiver firmware version to &#39;str&#39;</span>
+<span class="sd">        -O.an &#39;str&#39;              set RINEX OBS header antenna number to &#39;str&#39;</span>
+<span class="sd">        -O.at &#39;str&#39;              set RINEX OBS header antenna type (and radome type) to &#39;str&#39;</span>
+<span class="sd">        -O.px[WGS84xyz,m] x y z  set RINEX OBS header antenna WGS 84 position to x y z (meters)</span>
+<span class="sd">        -O.mov[ing] 1            force RINEX OBS antenna position to be in kinematic (roving) state initially</span>
+<span class="sd">        -O.def_wf i j            set RINEX OBS header default wavelength factors to i and j</span>
+<span class="sd">        -O.leap #                set RINEX OBS header leap seconds to #</span>
+<span class="sd">        -ech|O.dec[imate] #      modulo decimation of OBS epochs to # time units</span>
+<span class="sd">                                      # = 15s results in epochs at 00, 15, 30, and 45 seconds</span>
+<span class="sd">        -nbobs                   write or update  PRN / # OF OBS fields in the header</span>
+
+<span class="sd">     # Options d&#39;edition de RINEX OBS V2 :</span>
+<span class="sd">        -O.obs[_types] &#39;str&#39;     change RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">                                      &#39;str&#39; = L1+L2+C1+P2 (or L1L2C1P2) sets 4 observables to be L1 L2 C1 P2, and in that order</span>
+<span class="sd">        -O._obs[_types] &#39;str&#39;    exclude those RINEX OBS observables listed in &#39;str&#39;</span>
+
+<span class="sd">     # Options d&#39;edition de RINEX OBS V3 :</span>
+<span class="sd">        -O.obs_G &#39;str&#39;           change GPS RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">                                      &#39;str&#39; = L1C+L2W+C1C+C2W sets 4 observables to be L1C L2W C1C C2W, and in that order</span>
+<span class="sd">        -O.obs_R &#39;str&#39;           change GLONASS RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">        -O.obs_E &#39;str&#39;           change Galileo RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">        -O.obs_S &#39;str&#39;           change SBAS RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">        -O.obs_C &#39;str&#39;           change BDS/Compass RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">        -O.obs_J &#39;str&#39;           change QZSS RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">        -O.obs_I &#39;str&#39;           change IRNSS RINEX OBS header observables to &#39;str&#39;</span>
+<span class="sd">        -O._obs_G &#39;str&#39;          exclude those GPS RINEX OBS observables listed in &#39;str&#39;</span>
+<span class="sd">        -O._obs_R &#39;str&#39;          exclude those GLONASS RINEX OBS observables listed in &#39;str&#39;</span>
+<span class="sd">        -O._obs_E &#39;str&#39;          exclude those Galileo RINEX OBS observables listed in &#39;str&#39;</span>
+<span class="sd">        -O._obs_S &#39;str&#39;          exclude those SBAS RINEX OBS observables listed in &#39;str&#39;</span>
+<span class="sd">        -O._obs_C &#39;str&#39;          exclude those BDS/Compass RINEX OBS observables listed in &#39;str&#39;</span>
+<span class="sd">        -O._obs_J &#39;str&#39;          exclude those QZSS RINEX OBS observables listed in &#39;str&#39;</span>
+<span class="sd">        -O._obs_I &#39;str&#39;          exclude those IRNSS RINEX OBS observables listed in &#39;str&#39;</span>
+
+<span class="sd">     # Options d&#39;edition de RINEX MET :</span>
+<span class="sd">        -M.r[un_by] &#39;str&#39;        set RINEX MET header run by to &#39;str&#39;</span>
+<span class="sd">        -M.c[omment] &#39;str&#39;       append RINEX MET header comment &#39;str&#39;</span>
+<span class="sd">        -M.mo[nument] &#39;str&#39;      set RINEX MET header monument name to &#39;str&#39;</span>
+<span class="sd">        -M.mn &#39;str&#39;              set RINEX MET header monument number to &#39;str&#39;</span>
+<span class="sd">        -M.obs[_types] &#39;str&#39;     change RINEX MET header observables to &#39;str&#39;</span>
+<span class="sd">                                      &#39;str&#39; = TD+HR+PR sets 3 observables to be TD HR PR, and in that order</span>
+<span class="sd">        -M._obs[_types] &#39;str&#39;    exclude those RINEX MET observables listed in &#39;str&#39;</span>
+<span class="sd">        -M.mod[el/type/acc] &#39;obs&#39; &#39;model&#39; &#39;type&#39; accuracy  set &#39;obs&#39; RINEX MET header sensor mod/type/acc to &#39;model&#39; &#39;type&#39; accuracy</span>
+<span class="sd">        -M.pos[ition] &#39;obs&#39; x y z h  set &#39;obs&#39; RINEX MET header sensor XYZ/H to x y z h</span>
+<span class="sd">        -M.dec[imate] #          modulo decimation of MET epochs to # time units</span>
+<span class="sd">                                      # = 15m results in epochs at 00, 15, 30, and 45 minutes</span>
+
+<span class="sd">     # Options d&#39;edition de RINEX NAV :</span>
+<span class="sd">        -N.s[ystem] #            set RINEX NAV header satellite system to # (= G, R, E, S, C, J or M)</span>
+<span class="sd">        -N.r[un_by] &#39;str&#39;        set RINEX NAV header run by to &#39;str&#39;</span>
+<span class="sd">        -N.c[omment] &#39;str&#39;       append RINEX NAV header comment &#39;str&#39;</span>
+<span class="sd">        -N.leap #                set RINEX NAV header leap seconds to #</span>
+
+<span class="sd">     # Options en mode -conv, pour RINEX OBS V3 seulement :</span>
+<span class="sd">        -l1_p1                   Privilegie la phase issue du code P1 (si presente) en GPS a celle issue du code C/A sur L1</span>
+<span class="sd">        -l2_l2c                  Inclut et privilegie la phase issue d&#39;un code Civilian sur L2 (L2C) en GPS (RINEX v2.11)</span>
+<span class="sd">        -c2_l2c                  Inclut la pseudo-distance issue d&#39;un code Civilian sur L2 (L2C) en GPS (RINEX v2.11)</span>
+<span class="sd">        -l2c                     Joue le role de -l2_l2c et -c2_l2c (RINEX v2.11)</span>
+<span class="sd">        -l5                      Inclut les observables issus de la bande L5 en GPS (RINEX v2.11)</span>
+<span class="sd">        -std                     Joue le role de -l2c et -l5 (RINEX v2.11)</span>
+<span class="sd">        -l1c                     Inclut les observables Civilian sur L1 (L1C) en GPS (RINEX v2.12)</span>
+<span class="sd">        -v212                    Joue le role de -l1c, -std et inclut les observables BDS/Compass, QZSS et IRNSS</span>
+<span class="sd">                                 (RINEX v2.12)</span>
+<span class="sd">        -rep[ort]                Ecrit un fichier de rapport de la conversion</span>
+
+<span class="sd">     # Options en mode -qc :</span>
+<span class="sd">        -set_mask|masks #        Positionner le masque a # degres</span>
+<span class="sd">                                 (defaut : 10.00 ; separer par une virgule si plusieurs valeurs)</span>
+<span class="sd">        -sym[bol_codes]          dump symbol codes and hierarchy for short report qc ASCII timeplot</span>
+<span class="sd">        -w[idth] #               set time width of qc ASCII timeplot to # (default = 72)</span>
+<span class="sd">        -lli                     Desactiver l&#39;affichage des indicateurs de Loss Of Lock (symbole L)</span>
+<span class="sd">     ##############################################################</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#### Convert the paths as Path objects</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+    <span class="c1">## for RINEX handeling, inp_raw_fpath can ben an iterable (list)</span>
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">inp_raw_fpath</span><span class="p">]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">raw_fpath_multi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># a single  file, most common case</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+
+    <span class="n">raw_fpath_str_lst</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">raw_fpath_multi</span><span class="p">]</span>
+    <span class="n">out_fpath</span> <span class="o">=</span> <span class="n">out_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">raw_fpath_mono</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.rnx_converto&quot;</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;-i&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">raw_fpath_str_lst</span>
+        <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">out_fpath</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+    <span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+
+
+<div class="viewcode-block" id="cmd_build_gfzrnx">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_gfzrnx">[docs]</a>
+<span class="k">def</span> <span class="nf">cmd_build_gfzrnx</span><span class="p">(</span>
+    <span class="n">inp_raw_fpath</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">bin_options_custom</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">bin_kwoptions_custom</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+    <span class="n">bin_path</span><span class="o">=</span><span class="n">aro_env_soft_path</span><span class="p">[</span><span class="s2">&quot;gfzrnx&quot;</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a command to launch gfzrnx, for RINEX Handeling</span>
+
+<span class="sd">        It has the same behavior as all the `cmd_build` functions</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inp_raw_fpath : str or Path</span>
+<span class="sd">            the path of the input Raw GNSS file.</span>
+<span class="sd">            for RINEX Handeling (e.g. splice) a list of path is allowed.</span>
+<span class="sd">        out_dir : str or Path</span>
+<span class="sd">            the path of the output directory.</span>
+<span class="sd">        bin_options_custom : list, optional</span>
+<span class="sd">            a list for custom option arguments. The default is [].</span>
+<span class="sd">        bin_kwoptions_custom : dict, optional</span>
+<span class="sd">            a dictionary for custom keywords arguments. The default is dict().</span>
+<span class="sd">        bin_path : str, optional</span>
+<span class="sd">            the path the executed binary.</span>
+<span class="sd">            The default is &quot;gfzrnx&quot;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cmd_use : list of string</span>
+<span class="sd">            the command as a mono-string in list (singleton).</span>
+<span class="sd">            Ready to be used by subprocess.run</span>
+<span class="sd">        cmd_list : list of strings</span>
+<span class="sd">            the command as a list of strings, splited for each element.</span>
+<span class="sd">        cmd_str : string</span>
+<span class="sd">            the command as a concatenated string.</span>
+
+<span class="sd">        Warning</span>
+<span class="sd">        -------</span>
+<span class="sd">        `gfzrnx` requires a commercial license when used in a **routine environment**</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Usage of `gfzrnx`</span>
+
+<span class="sd">         file only or common options</span>
+<span class="sd">         -----------------------------------------------------------------------------------------</span>
+<span class="sd">         [-h]                      - show this usage message</span>
+<span class="sd">         [-help]</span>
+
+<span class="sd">         [-finp &lt;file list&gt;]       - input  rinex file(s) (std. STDIN).</span>
+<span class="sd">                                     STDIN is only valid for a single file input.</span>
+
+<span class="sd">                                     the following file name types are supported to derive the</span>
+<span class="sd">                                     nominal epoch/duration information.</span>
+
+<span class="sd">                                     RINEX-2 file naming</span>
+
+<span class="sd">                                     ssssDDD0.YYx       - daily      file</span>
+<span class="sd">                                     ssssDDD[a-x].YYx   - hourly     file</span>
+<span class="sd">                                     ssssDDD[a-x]mm.YYx - sub-hourly file</span>
+
+<span class="sd">                                     RINEX-3/4 file naming</span>
+
+<span class="sd">                                     SSSSMRCCC_S_YYYYDDDHHMM_NNN_FRQ_TT.FMT</span>
+<span class="sd">                                     SSSSMRCCC_S_YYYYDDDHHMM_NNN_TT.FMT</span>
+
+<span class="sd">                                     see Documentation for details</span>
+
+<span class="sd">                                     splice mode:</span>
+<span class="sd">                                     ------------</span>
+<span class="sd">                                     * list of input files</span>
+
+<span class="sd">         [-fout &lt;file&gt;]            - output rinex or statistics file (std. STDOUT)</span>
+<span class="sd">                                     automatic output file name if filename given is &quot;::RX2::&quot;, &quot;::RX3::&quot; or &quot;::RX4::&quot;</span>
+
+<span class="sd">         [-4to9 &lt;file&gt;]            - renaming information for rinex-3 type (re)naming</span>
+<span class="sd">                                     ( NNNN -&gt; NNNNMRCCC / POTS -&gt; POTS00DEU )</span>
+
+<span class="sd">         [-f]                      - force overwrite of output file if it already exists</span>
+<span class="sd">                                     (std. no overwrite)</span>
+
+<span class="sd">         [-sifl]                   - perform an operation on a single file if a file list is</span>
+<span class="sd">         [-single_file]              provided via &quot;-finp&quot;</span>
+
+<span class="sd">         [-ant_rename]             - rename historical antenna names to be IGS conform</span>
+
+<span class="sd">      [-nomren23 &lt;[s,][mr,][iso]&gt;] - fast nominal output file name for RINEX-2 to RINEX-3 file renaming.</span>
+<span class="sd">                                     RINEX-3 output file name is written to STDOUT.</span>
+
+<span class="sd">                                        s   - data src (S|R)        (default R)</span>
+<span class="sd">                                        mr  - marker receiver number   (default 00)</span>
+<span class="sd">                                        iso - 3 char. iso country code (default XXX)</span>
+
+<span class="sd">                                     the input parameters can be given in any order.</span>
+<span class="sd">                                     supported input file names nnnnddde.yyt[.cmp] or nnnndddedd.yyt[.cmp]</span>
+
+<span class="sd">                                     if providing a compressed file all information which is usually taken</span>
+<span class="sd">                                     from file header (sat. system(s), data frequency) has to be given via the</span>
+<span class="sd">                                     command line parameter (see documion for details).</span>
+
+<span class="sd">         [-vo &lt;2|3|4&gt;]             - output RINEX version (std. latest)</span>
+<span class="sd">         [--version_out &lt;2|3|4&gt;]</span>
+<span class="sd">         [-vosc &lt;2|3|4&gt;]           - output RINEX version (fully standard conform)</span>
+
+<span class="sd">         [-vnum m.nn]              - change header VERSION number and set output RINEX version</span>
+<span class="sd">                                     (only the version number is changed / output RINEX version is the highest supported</span>
+<span class="sd">                                     one)</span>
+
+<span class="sd">         [-pr3rx2 &lt;list&gt;]          - komma separated list of list of signal priorities used for rinex 3 -&gt; 2 conversion</span>
+<span class="sd">                                     to overwrite the standard settings, see documentation for details.</span>
+
+<span class="sd">                                     S:n[n...]:STRING</span>
+
+<span class="sd">                                     S      - satellite System [CEGJRSI]</span>
+<span class="sd">                                     n      - frequency number(s)</span>
+<span class="sd">                                     STRING - prority STRING</span>
+
+<span class="sd">                                     G:12:PWCSLXYN,G:5:QXI,R:12:CP</span>
+
+<span class="sd">         [-errlog &lt;file&gt;]          - store (append) error logs to a file (std. print to STDERR)</span>
+
+<span class="sd">         [-smp &lt;num&gt;]              - sampling rate in sec. (std. no sampling / resolution 1 ms)</span>
+
+<span class="sd">         [-smp_nom &lt;num&gt;]          - sampling rate (num) in sec to be used for automatic file naming</span>
+
+<span class="sd">         [-smp_lli_shift]          - perform LLI shifts via data sampling to sampling epoch</span>
+
+<span class="sd">         [-nav_mixed]              - create a mixed nav. filename</span>
+
+<span class="sd">         [-no_nav_stk]             - no nav. splice header statistic tables</span>
+
+<span class="sd">         [-stk_obs]                - output data statistics information (std. STDOUT)</span>
+<span class="sd">         [-stk_only]</span>
+
+<span class="sd">         [-crux &lt;file&gt;]            - rinex header manipulations definitions for input files</span>
+
+<span class="sd">         [-cx_updins &lt;string(s)&gt;]  - rinex header manipulation(s) definition for input files</span>
+<span class="sd">                                     given via command line</span>
+
+<span class="sd">         [-cx_addinthd]            - if using using a crux-file (-crux) internal/data headers are created</span>
+<span class="sd">                                     at crux-settings starting epochs.</span>
+
+<span class="sd">         [-show_crux]              - show crux structure adopted and used by the program</span>
+
+<span class="sd">         [-hded]                   - perform the header edit ONLY mode (with -crux)</span>
+
+<span class="sd">         [-stk_epo &lt;n[:list]&gt;]     - ASCII timeplot of data availability (std. STDOUT)</span>
+<span class="sd">                                     n    - time resolution in seconds</span>
+<span class="sd">                                     list - comma separated list (prn,otp) (std. prn)</span>
+
+<span class="sd">         [-ot &lt;list&gt;]              - obs. types list to be used (pattern matching). the list can be given</span>
+<span class="sd">         [--obs_types &lt;list&gt;]        globaly or sat. system dependent. the sat. system dependent record</span>
+<span class="sd">                                     replaces fully a global one.</span>
+
+<span class="sd">                                     list can be: [S:]OT1,OT2,...[+S:OT3,OT4,...][+...]</span>
+
+<span class="sd">                                     S  - satellite system [CEGJRSI]</span>
+<span class="sd">                                     OT - observation type identifier</span>
+
+<span class="sd">                                     L1,L2,C1,C2,P1,P2</span>
+<span class="sd">                                     L1,L2,C1,C2,P1,P2+C:L1,L7,C1,C7+G:L1C,L2W,C1,C2</span>
+
+<span class="sd">         [-ots &lt;string&gt;[:&lt;attr&gt;]]  - obs. types output sorting</span>
+<span class="sd">    [--obs_types_sort &lt;string&gt;[:&lt;attr&gt;]]</span>
+<span class="sd">                                     the &quot;string&quot; consists of the 1st obs. type id. characters ( e.g. CPLDS ),</span>
+<span class="sd">                                     the &quot;attr&quot; can be [frqasc|frqdsc|frqi,j,...] (frequ. numbers (i,j,...) = 1,...,n),</span>
+<span class="sd">                                     which means a preferred sorting by frequency (ascending,descending or</span>
+<span class="sd">                                     a list of distinct frequency numbers)</span>
+
+<span class="sd">         [-prn &lt;prn-list&gt;]         - komma separated list of PRNs to be used</span>
+<span class="sd">                                     range notations are possible G1-32,C01-5,R01-10,E14,E18</span>
+
+<span class="sd">         [-no_prn &lt;prn-list&gt;]      - komma separated list of PRNs to be skipped</span>
+<span class="sd">                                     range notations are possible G1-32,C01-5,R01-10,E14,E18</span>
+
+<span class="sd">         [-kaot]                   - keep all obs. types (including fully empty ones)</span>
+
+<span class="sd">         [-rsot &lt;n&gt;]               - remove sparse obs. types.</span>
+<span class="sd">    [--remove_sparse_obs_types &lt;n&gt;]  n - defines the % limit of the median number of observations</span>
+<span class="sd">                                         per observation type used to delete an observation type fully.</span>
+
+<span class="sd">         [-satsys &lt;letters&gt;]       - satellite system(s) to be used (CEGIJRS) (std. CEGIJRS)</span>
+<span class="sd">                                     C - Beidou</span>
+<span class="sd">                                     E - Galileo</span>
+<span class="sd">                                     G - GPS</span>
+<span class="sd">                                     I - IRNSS</span>
+<span class="sd">                                     J - QZSS</span>
+<span class="sd">                                     R - Glonass</span>
+<span class="sd">                                     S - SBAS</span>
+
+<span class="sd">         [-ns        &lt;type&gt;]       - output order of navigation records.   type = [time|prn] (std. prn)</span>
+<span class="sd">         [--nav_sort &lt;type&gt;]         time - sort by time,prn</span>
+<span class="sd">                                     prn  - sort by prn,time</span>
+
+<span class="sd">         [-nt       &lt;type-list&gt;]   - &#39;+&#39; separated list of nav. selection records (version &gt;= 4).</span>
+<span class="sd">         [-nav_type &lt;type-list&gt;]     record = [&lt;sat.system(s)&gt;::]&lt;nav.type(s)&gt;:[&lt;message.type(s)]</span>
+<span class="sd">                                     type(s) are separated via &#39;.&#39;</span>
+
+<span class="sd">         [-split n]                - split input file in &lt;n seconds&gt; pieces</span>
+<span class="sd">                                     - valid only with -fout ::RX2:: or ::RX3::</span>
+<span class="sd">                                     - valid if n is a multiple of 60 seconds.</span>
+<span class="sd">                                     - only supported for single input file</span>
+
+<span class="sd">         [-chk]                    - extended formal checks on input file (slower)</span>
+
+<span class="sd">         [-meta &lt;type[:format]&gt;]   - extract file meta data. the type can be (basic|full).</span>
+<span class="sd">                                     supported formats are json|xml|txt|dump</span>
+
+<span class="sd">         [-fdiff]                  - compare two rinex files of the same format (major version id.)</span>
+<span class="sd">                                     the two input files have to be given via -finp</span>
+
+<span class="sd">         [-met_nwm]                - edit a rinex meteo file(1) by the means of a reference NWM file(2).</span>
+<span class="sd">                                     the two input files have to be given via -finp.</span>
+<span class="sd">                                     the second file contains reference NWM data and check limits</span>
+<span class="sd">                                     (can be used in conjunction with -obs_types, -ot)</span>
+
+<span class="sd">         [-site &lt;sitename&gt;]        - use the 4- or 9-char sitename for output filename via automatic file naming</span>
+<span class="sd">                                     or for header editing settings extractions (crux)</span>
+<span class="sd">                                     or for &quot;MARKER NAME&quot; in case it is missing.</span>
+
+<span class="sd">         [-kv]                     - keep major output version number same as in input</span>
+
+<span class="sd">         [-q]                      - quiet mode</span>
+
+<span class="sd">         [-d &lt;sec&gt;]                - file duration (seconds) (std. ignored on input</span>
+<span class="sd">         [--duration &lt;sec&gt;]                                   std. 86400   on output )</span>
+
+<span class="sd">         [-epo_beg &lt;EPOCH&gt;]        - first output epoch (&lt;EPOCH&gt; see below)</span>
+
+<span class="sd">         [-sei &lt;in|out&gt;]</span>
+<span class="sd">    [--strict_epoch_interval &lt;in|out&gt;] - output epoch interval according to in/output file name</span>
+<span class="sd">                                         (only valid in case of RINEX conform file names)</span>
+
+<span class="sd">         [-enb &lt;n&gt;]                - extend the nav. epoch interval by +- n seconds</span>
+<span class="sd">                                     (when using strict epoch interval)</span>
+
+<span class="sd">         [-nav_epo_filter]         - only standard epochs are passed to the output</span>
+<span class="sd">         [-nav_epo_strict]         - only nominal  epochs are passed to the output</span>
+<span class="sd">         [-nav_latest]             - only latest nav. record per PRN are passed to the output</span>
+
+<span class="sd">         [splice_direct]           - use no RAM to store observations via splice operations</span>
+<span class="sd">                                     (no header data statistics)</span>
+
+<span class="sd">         [try_append &lt;sec&gt;]        - try append mode to fasten the splice process with</span>
+<span class="sd">                                     smallest nominal file duration (seconds) of part files</span>
+
+<span class="sd">         [-use_obs_map &lt;file&gt;]     - use modified obs. types mapping</span>
+<span class="sd">         [-out_obs_map]            - output std.  obs. types mapping</span>
+
+<span class="sd">         [-tab]                    - create a tabular data representation output</span>
+
+<span class="sd">         [-tab_date]               - use other date (pattern) for tabular observation output</span>
+<span class="sd">                                     (yyyy-mm-dd|yy-mm-dd|yyyy-ddd|wwww-d|yyyymmdd|yymmdd|yyyyddd|wwwwd|mjd|ddd)</span>
+
+<span class="sd">         [-tab_time]               - use other time pattern for tabular observation output</span>
+<span class="sd">                                     (hh:mm:ss|hhmmss|sod|fod)</span>
+
+<span class="sd">         [-tab_sep &lt;string&gt;]       - column separator string (default: BLANK)</span>
+
+<span class="sd">         epoch &lt;EPOCH&gt; parameter</span>
+<span class="sd">         -----------------------------------------------------------------------------------------</span>
+<span class="sd">         mjd             56753   or        56753_123000</span>
+<span class="sd">         wwwwd           17870   or        17870_12:30:00</span>
+<span class="sd">         yyyyddd       2014096   or      2014096_123000</span>
+<span class="sd">         yyyymmdd     20140406   or     20140406_12:30:00</span>
+<span class="sd">         yyyy-mm-dd 2014-04-06   or   2014-04-06_123000</span>
+
+<span class="sd">         all these date types can be combined via &#39;_&#39; with a time string of type:</span>
+<span class="sd">         hhmmss</span>
+<span class="sd">         hh:mm:ss</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#### Convert the paths as Path objects</span>
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+    <span class="c1">## for RINEX handeling, inp_raw_fpath can ben an iterable (list)</span>
+    <span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_iterable</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">inp_raw_fpath</span><span class="p">]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">raw_fpath_multi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># a single  file, most common case</span>
+        <span class="n">raw_fpath_multi</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)]</span>
+        <span class="n">raw_fpath_mono</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">)</span>
+
+    <span class="n">raw_fpath_str_lst</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">raw_fpath_multi</span><span class="p">]</span>
+    <span class="n">out_fpath</span> <span class="o">=</span> <span class="n">out_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">raw_fpath_mono</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.rnx_gfzrnx&quot;</span><span class="p">)</span>
+
+    <span class="n">cmd_opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_options_list2str</span><span class="p">(</span><span class="n">bin_options_custom</span><span class="p">)</span>
+    <span class="n">cmd_kwopt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">bin_kwoptions_custom</span><span class="p">)</span>
+
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">bin_path</span><span class="p">,</span> <span class="s2">&quot;-finp&quot;</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">raw_fpath_str_lst</span>
+        <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;-fout&quot;</span><span class="p">,</span> <span class="n">out_fpath</span><span class="p">]</span>
+        <span class="o">+</span> <span class="n">cmd_opt_list</span>
+        <span class="o">+</span> <span class="n">cmd_kwopt_list</span>
+    <span class="p">)</span>
+    <span class="n">cmd_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cmd_list</span><span class="p">]</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_list</span><span class="p">)</span>
+    <span class="n">cmd_use</span> <span class="o">=</span> <span class="p">[</span><span class="n">cmd_str</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cmd_use</span><span class="p">,</span> <span class="n">cmd_list</span><span class="p">,</span> <span class="n">cmd_str</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

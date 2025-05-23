@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.common.eporng_fcts &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.common.eporng_fcts</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.common.eporng_fcts</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Jan  8 15:47:58 2024</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">dateparser</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas.tseries.frequencies</span> <span class="kn">import</span> <span class="n">to_offset</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="epoch_range_intrpt">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.epoch_range_intrpt">[docs]</a>
+<span class="k">def</span> <span class="nf">epoch_range_intrpt</span><span class="p">(</span><span class="n">epo_inp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function interprets an input to get an output EpochRange object. The input can either be a tuple,</span>
+<span class="sd">    typically in the form of (epo1, epo2, period), or an instance of the EpochRange class. If the input is</span>
+<span class="sd">    an EpochRange object, it is returned as is. If the input is a tuple, a new EpochRange object is created</span>
+<span class="sd">    using the elements of the tuple.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    epo_inp : tuple or EpochRange</span>
+<span class="sd">        The input to be interpreted. If it&#39;s a tuple, it should be in the form of (epo1, epo2, period).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    epo_range_out : EpochRange</span>
+<span class="sd">        The interpreted EpochRange object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">epo_inp</span><span class="p">)</span> <span class="ow">is</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">:</span>
+        <span class="n">epo_range_out</span> <span class="o">=</span> <span class="n">epo_inp</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">epo_inp</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">epo_inp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">epo_range_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="o">*</span><span class="n">epo_inp</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">epo_inp</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">epo_inp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">epo_range_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="n">epo_inp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">epo_inp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;epoch range input not understood&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span>
+
+    <span class="k">return</span> <span class="n">epo_range_out</span></div>
+
+
+
+<div class="viewcode-block" id="datepars_intrpt">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.datepars_intrpt">[docs]</a>
+<span class="k">def</span> <span class="nf">datepars_intrpt</span><span class="p">(</span><span class="n">date_inp</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tz_if_naive</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function interprets a string or datetime-like object to a Pandas Timestamp.</span>
+<span class="sd">    It also applies a timezone (UTC by default). Note that rounding does not take place here</span>
+<span class="sd">    as rounding is not a parsing operation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    date_inp : str or datetime-like</span>
+<span class="sd">        The input date to be interpreted.</span>
+<span class="sd">    tz : str, optional</span>
+<span class="sd">        The timezone to be applied.</span>
+<span class="sd">        The default is None.</span>
+<span class="sd">    tz_if_naive : str, optional</span>
+<span class="sd">        The timezone to be applied if the input date is timezone-naive.</span>
+<span class="sd">        The default is &quot;UTC&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    date_out : datetime</span>
+<span class="sd">        The interpreted date as a python native datetime.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    If the input date is a string, it is parsed using the dateparser library.</span>
+<span class="sd">    If the input date is a datetime-like object, it is converted first to a Pandas Timestamp.</span>
+<span class="sd">    If the resulting date is a NaT (Not a Time) type, it is returned as is.</span>
+<span class="sd">    If the resulting date does not have a timezone, the specified timezone is applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">### INTERPRET THE INPUT</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_inp</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">date_out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">date_inp</span><span class="p">)</span>
+    <span class="c1">## date_inp is a str</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">### Must handle the case of day of year separately</span>
+        <span class="n">doy_pattern_1</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^\d</span><span class="si">{4}</span><span class="s2">-\d{1,3}$&quot;</span>
+        <span class="n">doy_pattern_2</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^\d</span><span class="si">{4}</span><span class="s2">/\d</span><span class="si">{1.3}</span><span class="s2">$&quot;</span>
+        <span class="c1"># YYYY-DDD</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">doy_pattern_1</span><span class="p">,</span> <span class="n">date_inp</span><span class="p">):</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_inp</span><span class="p">,</span> <span class="s2">&quot;%Y-%j&quot;</span><span class="p">))</span>
+        <span class="c1"># YYYY/DDD</span>
+        <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">doy_pattern_2</span><span class="p">,</span> <span class="n">date_inp</span><span class="p">):</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_inp</span><span class="p">,</span> <span class="s2">&quot;%Y/%j&quot;</span><span class="p">))</span>
+        <span class="c1">### regular case</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">dateparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">date_inp</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+            <span class="c1"># .isoformat() is to correctly handle the time zone,</span>
+            <span class="c1"># without weird pytz&#39;s objects used by dateparser</span>
+            <span class="c1"># like &lt;StaticTzInfo &#39;UTC\+00:00&#39;&gt;</span>
+
+    <span class="c1">### MANAGE THE TIMEZONE</span>
+    <span class="c1">### NaT case. can not support tz</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_out</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">_libs</span><span class="o">.</span><span class="n">tslibs</span><span class="o">.</span><span class="n">nattype</span><span class="o">.</span><span class="n">NaTType</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">date_out</span>
+    <span class="c1">### if the date is timezone-naive, apply the tz_if_naive</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">date_out</span><span class="o">.</span><span class="n">tz</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;date </span><span class="si">%s</span><span class="s2"> is timezone-naive. Applying tz </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">date_out</span><span class="p">,</span> <span class="n">tz_if_naive</span><span class="p">)</span>
+        <span class="n">date_out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">date_out</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">tz_if_naive</span><span class="p">)</span>
+    <span class="c1">### apply the tz</span>
+    <span class="k">if</span> <span class="n">tz</span><span class="p">:</span>
+        <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_out</span><span class="o">.</span><span class="n">tz_convert</span><span class="p">(</span><span class="n">tz</span><span class="p">)</span>
+
+    <span class="c1">### OUTPUT A NATIVE DATETIME</span>
+    <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_out</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">date_out</span></div>
+
+
+
+<div class="viewcode-block" id="dates_list2epoch_range">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.dates_list2epoch_range">[docs]</a>
+<span class="k">def</span> <span class="nf">dates_list2epoch_range</span><span class="p">(</span><span class="n">dates_list_inp</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a list of dates to an EpochRange.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dates_list_inp : iterable</span>
+<span class="sd">        The input list of dates.</span>
+<span class="sd">    period : str, optional</span>
+<span class="sd">        The rounding period. If not provided, the period is determined as the unique difference</span>
+<span class="sd">         between consecutive dates in the input list. The default is None.</span>
+<span class="sd">    round_method : str, optional</span>
+<span class="sd">        The method used for rounding the epochs. The default is &#39;floor&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    EpochRange</span>
+<span class="sd">        The converted EpochRange.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The current method for determining the period when not provided is a simple calculation of</span>
+<span class="sd">    the unique difference between consecutive dates.</span>
+<span class="sd">    This may not be the most accurate or desired method and should be improved in future iterations of this function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">epoch1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dates_list_inp</span><span class="p">)</span>
+    <span class="n">epoch2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dates_list_inp</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">period</span><span class="p">:</span>
+        <span class="n">period_use</span> <span class="o">=</span> <span class="n">period</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">period_use</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">dates_list_inp</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># poor, must be improved</span>
+
+    <span class="n">epo_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span>
+        <span class="n">epoch1</span><span class="p">,</span> <span class="n">epoch2</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period_use</span><span class="p">,</span> <span class="n">round_method</span><span class="o">=</span><span class="n">round_method</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">epo_out</span></div>
+
+
+
+<div class="viewcode-block" id="round_date_legacy">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.round_date_legacy">[docs]</a>
+<span class="k">def</span> <span class="nf">round_date_legacy</span><span class="p">(</span><span class="n">date_in</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    low-level function to round a Pandas Serie or a datetime-like object</span>
+<span class="sd">    according to the &quot;ceil&quot;, &quot;floor&quot;, &quot;round&quot;, &quot;none&quot; approach</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    date_in : Pandas Serie or a datetime-like object</span>
+<span class="sd">        Input date .</span>
+<span class="sd">    period : str, optional</span>
+<span class="sd">        the rounding period.</span>
+<span class="sd">        Use the pandas&#39; frequency aliases convention (see bellow for details).</span>
+<span class="sd">    round_method : str, optional</span>
+<span class="sd">        round method: &#39;ceil&#39;, &#39;floor&#39;, &#39;round&#39;, &#39;none&#39;. The default is &quot;floor&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    date_out : Pandas Serie or datetime-like object (same as input)</span>
+<span class="sd">        rounded date.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Pandas&#39; frequency aliases memo</span>
+<span class="sd">    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># we separate the Series case of the simple datetime-like</span>
+    <span class="c1"># both for ease and performance reason</span>
+
+    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">date_in</span><span class="p">):</span>  <span class="c1">### NaT case</span>
+        <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_in</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_in</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">date_use</span> <span class="o">=</span> <span class="n">date_in</span>
+
+        <span class="k">if</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;ceil&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;floor&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;round&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;round_method not understood&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">date_typ</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">date_in</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">date_typ</span> <span class="ow">in</span> <span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">,):</span>
+            <span class="n">date_use</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">date_in</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_use</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">date_in</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;ceil&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;floor&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;round&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">round_method</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_use</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;round_method not understood&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+
+        <span class="c1">#++++ back to the original type</span>
+        <span class="k">if</span> <span class="n">date_typ</span> <span class="ow">in</span> <span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">,):</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_out</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_typ</span><span class="p">(</span><span class="n">date_out</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">date_out</span></div>
+
+
+
+<div class="viewcode-block" id="round_date">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.round_date">[docs]</a>
+<span class="k">def</span> <span class="nf">round_date</span><span class="p">(</span><span class="n">date_in</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    low-level function to round a Pandas Serie or a datetime-like object</span>
+<span class="sd">    according to the &quot;ceil&quot;, &quot;floor&quot;, &quot;round&quot;, &quot;none&quot; approach</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    date_in : Pandas Serie or a datetime-like object</span>
+<span class="sd">        Input date .</span>
+<span class="sd">    period : str, optional</span>
+<span class="sd">        the rounding period.</span>
+<span class="sd">        Use the pandas&#39; frequency aliases convention (see bellow for details).</span>
+<span class="sd">    round_method : str, optional</span>
+<span class="sd">        round method: &#39;ceil&#39;, &#39;floor&#39;, &#39;round&#39;, &#39;none&#39;. The default is &quot;floor&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    date_out : Pandas Serie or datetime-like object (same as input)</span>
+<span class="sd">        rounded date.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Pandas&#39; frequency aliases memo</span>
+<span class="sd">    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># ++++ NaT case</span>
+    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">date_in</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">date_in</span>
+
+    <span class="c1"># ++++ Series case</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_in</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">date_in</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">round_method</span><span class="p">)(</span><span class="n">period</span><span class="p">)</span>
+
+    <span class="c1"># ++++ Singleton case</span>
+    <span class="n">date_use</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">date_in</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_in</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">)</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">date_in</span><span class="p">)</span>
+    <span class="n">date_out</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">date_use</span><span class="p">,</span> <span class="n">round_method</span><span class="p">)(</span><span class="n">period</span><span class="p">)</span> <span class="k">if</span> <span class="n">round_method</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span> <span class="k">else</span> <span class="n">date_use</span>
+
+    <span class="c1"># ++++ back to the original type</span>
+    <span class="n">date_out</span> <span class="o">=</span> <span class="n">date_out</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">date_in</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="k">else</span> <span class="nb">type</span><span class="p">(</span><span class="n">date_in</span><span class="p">)(</span><span class="n">date_out</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">date_out</span></div>
+
+
+
+<div class="viewcode-block" id="round_epochs">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.round_epochs">[docs]</a>
+<span class="k">def</span> <span class="nf">round_epochs</span><span class="p">(</span>
+    <span class="n">epochs_inp</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1d&quot;</span><span class="p">,</span> <span class="n">rolling_period</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rolling_ref</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    High-level function to round several epochs to a common one.</span>
+<span class="sd">    Useful to group and then splice RINEX</span>
+
+<span class="sd">    Use it with pandas .groupby in a further step</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    epochs_inp : iterable</span>
+<span class="sd">        The input epochs expected to be rounded.</span>
+<span class="sd">    period : str, optional</span>
+<span class="sd">        the rounding period.</span>
+<span class="sd">        Use the pandas&#39; frequency aliases convention (see bellow for details).</span>
+<span class="sd">        The default is &#39;1d&#39;.</span>
+<span class="sd">    rolling_period : bool, optional</span>
+<span class="sd">        Whether to use a rolling period for splicing the RINEX files.</span>
+<span class="sd">        If False, the spliced files will be based only on the &quot;full&quot; period provided,</span>
+<span class="sd">        i.e. Day1 00h-24h, Day2 00h-24h, etc.</span>
+<span class="sd">        If True, the spliced files will be based on the rolling period.</span>
+<span class="sd">        i.e. Day1 00h-Day2 00h, Day1 01h-Day2 01h, Day1 02h-Day2 02h etc.</span>
+<span class="sd">        Defaults to False.</span>
+<span class="sd">    rolling_ref :  datetime-like or int, optional</span>
+<span class="sd">        The reference for the rolling period.</span>
+<span class="sd">        If datetime-like object, use this epoch as reference.</span>
+<span class="sd">        If integer, use the epoch of the corresponding index</span>
+<span class="sd">        Use -1 for the last epoch for instance.</span>
+<span class="sd">        The default is -1.</span>
+<span class="sd">    round_method : str, optional</span>
+<span class="sd">        round method: &#39;ceil&#39;, &#39;floor&#39;, &#39;round&#39;. The default is &quot;floor&quot;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    epochs_rnd :</span>
+<span class="sd">        Pandas Series of Timestamp or Timedelta</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Pandas&#39; frequency aliases memo</span>
+<span class="sd">    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">epochs_use</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">epochs_inp</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rolling_period</span><span class="p">:</span>
+        <span class="n">epochs_rnd</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">round_date</span><span class="p">(</span><span class="n">epochs_use</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">round_method</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">rolling_ref</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">rolling_ref_use</span> <span class="o">=</span> <span class="n">epochs_use</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">rolling_ref</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rolling_ref_use</span> <span class="o">=</span> <span class="n">rolling_ref</span>
+
+        <span class="c1">### add one second to be sure that the rolling_ref is included in a group</span>
+        <span class="n">rolling_ref_use</span> <span class="o">=</span> <span class="n">rolling_ref_use</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span>
+
+        <span class="n">roll_diff</span> <span class="o">=</span> <span class="n">epochs_use</span> <span class="o">-</span> <span class="n">rolling_ref_use</span>
+
+        <span class="n">epochs_rnd</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">arocmn</span><span class="o">.</span><span class="n">round_date</span><span class="p">(</span><span class="n">roll_diff</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">round_method</span><span class="p">)</span> <span class="o">+</span> <span class="n">rolling_ref_use</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">epochs_rnd</span></div>
+
+
+
+<div class="viewcode-block" id="timedelta2freq_alias">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.timedelta2freq_alias">[docs]</a>
+<span class="k">def</span> <span class="nf">timedelta2freq_alias</span><span class="p">(</span><span class="n">timedelta_in</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Time representation conversion</span>
+
+<span class="sd">    Timedelta (from datetime, numpy or pandas) =&gt; Pandas&#39; Frequency alias</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    timedelta_in : timedelta-like</span>
+<span class="sd">        POSIX Time.  Can *NOT YET* handle several timedelta in a list.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    offset : string</span>
+<span class="sd">        Converted pandas&#39; frequency alias</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    Pandas&#39; frequency aliases memo</span>
+<span class="sd">    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">to_offset</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">timedelta_in</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">offset</span><span class="o">.</span><span class="n">freqstr</span></div>
+
+
+
+<div class="viewcode-block" id="create_dummy_epochrange">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.create_dummy_epochrange">[docs]</a>
+<span class="k">def</span> <span class="nf">create_dummy_epochrange</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a fake/dummy EpochRange object</span>
+<span class="sd">    for test/development purpose</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ses : EpochRange object</span>
+<span class="sd">        dummy EpochRange object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">epo</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="n">epoch1</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">NaT</span><span class="p">,</span> <span class="n">epoch2</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">NaT</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;15min&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">epo</span></div>
+
+
+
+<div class="viewcode-block" id="iso_zulu_epoch">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.eporng_fcts.iso_zulu_epoch">[docs]</a>
+<span class="k">def</span> <span class="nf">iso_zulu_epoch</span><span class="p">(</span><span class="n">epo_in</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert an input epoch to ISO 8601 format with Zulu time (UTC).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    epo_in : datetime-like</span>
+<span class="sd">        The input epoch to be converted.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The epoch in ISO 8601 format with Zulu time (UTC).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">epo_in</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;+00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

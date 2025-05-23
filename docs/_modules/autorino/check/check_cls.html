@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.check.check_cls &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.check.check_cls</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.check.check_cls</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 27/01/2025 09:35:53</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">autorino.handle</span> <span class="k">as</span> <span class="nn">arohdl</span>
+<span class="kn">import</span> <span class="nn">autorino.check</span> <span class="k">as</span> <span class="nn">arochk</span>
+<span class="kn">import</span> <span class="nn">rinexmod</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+
+
+<div class="viewcode-block" id="CheckGnss">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_cls.CheckGnss">[docs]</a>
+<span class="k">class</span> <span class="nc">CheckGnss</span><span class="p">(</span><span class="n">arohdl</span><span class="o">.</span><span class="n">HandleGnss</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inp_file_regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir</span><span class="p">,</span>
+            <span class="n">inp_file_regex</span><span class="o">=</span><span class="n">inp_file_regex</span><span class="p">,</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_stats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="CheckGnss.analyze_rnxs">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_cls.CheckGnss.analyze_rnxs">[docs]</a>
+    <span class="k">def</span> <span class="nf">analyze_rnxs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this function do the basic analysis of the table of RINEXs</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Flags meaning</span>
+
+<span class="sd">        * 0 = OK</span>
+<span class="sd">        * 1 = missing RINEX or critical content</span>
+<span class="sd">        * 2 = incomplete RINEX</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_stats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="n">ds_stk</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">(),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">),</span>
+                                   <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Analyzing RINEX files for &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_id</span><span class="p">):</span>
+
+            <span class="n">ds</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;fpath&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span>
+            <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;site&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">irow</span><span class="p">),</span> <span class="s1">&#39;check&#39;</span><span class="p">):</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">### get RINEX as an rinexMod&#39;s Object</span>
+                <span class="n">rnxobj</span> <span class="o">=</span> <span class="n">rinexmod</span><span class="o">.</span><span class="n">rinexfile</span><span class="o">.</span><span class="n">RinexFile</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;fpath&quot;</span><span class="p">])</span>
+                <span class="c1">### get RINEX site code</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rnxobj</span><span class="o">.</span><span class="n">get_site</span><span class="p">(</span><span class="n">lower_case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">only_4char</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="c1">### theoretical epochs</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span>
+
+                <span class="c1">### get RINEX start/end in the data</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;epoch_srt_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">rnxobj</span><span class="o">.</span><span class="n">start_date</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">)</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;epoch_end_data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">rnxobj</span><span class="o">.</span><span class="n">end_date</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%H:%M:%S&#39;</span><span class="p">)</span>
+                <span class="c1">### get RINEX nominal interval</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;itrvl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rnxobj</span><span class="o">.</span><span class="n">sample_rate_numeric</span>
+                <span class="c1">### get RINEX number of epochs</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;nepochs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rnxobj</span><span class="o">.</span><span class="n">get_dates_all</span><span class="p">())</span>
+                <span class="c1">### get completness</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;td_str&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rnxobj</span><span class="o">.</span><span class="n">get_file_period_from_filename</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="c1"># improve with right fct !!!!</span>
+                <span class="k">if</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;td_str&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;01H&quot;</span><span class="p">:</span>
+                    <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;td_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3600</span>
+                <span class="k">elif</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;td_str&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;01D&quot;</span><span class="p">:</span>
+                    <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;td_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">86400</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;td_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;itrvl&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;nepochs&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;td_int&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">100</span>
+                <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">ds_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+
+        <span class="n">dfts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ds_stk</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_stats</span> <span class="o">=</span> <span class="n">dfts</span>
+
+        <span class="k">return</span> <span class="n">dfts</span></div>
+
+
+
+<div class="viewcode-block" id="CheckGnss.check">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_cls.CheckGnss.check">[docs]</a>
+    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_rnx</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="s2">&quot;inp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="s2">&quot;inp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analyze_rnxs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_stats</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span></div>
+</div>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

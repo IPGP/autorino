@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.handle.split_cls &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.handle.split_cls</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.handle.split_cls</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 20/05/2025 20:26:44</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="c1"># Create a logger object.</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
+
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">autorino.convert</span> <span class="k">as</span> <span class="nn">arocnv</span>
+<span class="kn">import</span> <span class="nn">autorino.handle.handle_cls</span> <span class="k">as</span> <span class="nn">arohdlcls</span>
+
+<span class="c1"># +++ Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+<span class="n">BOLD_SRT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
+<span class="n">BOLD_END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+
+<span class="c1">#   _____       _ _ _</span>
+<span class="c1">#  / ____|     | (_) |</span>
+<span class="c1"># | (___  _ __ | |_| |_</span>
+<span class="c1">#  \___ \| &#39;_ \| | | __|</span>
+<span class="c1">#  ____) | |_) | | | |_</span>
+<span class="c1"># |_____/| .__/|_|_|\__|</span>
+<span class="c1">#        | |</span>
+<span class="c1">#        |_|</span>
+
+
+<div class="viewcode-block" id="SplitGnss">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.split_cls.SplitGnss">[docs]</a>
+<span class="k">class</span> <span class="nc">SplitGnss</span><span class="p">(</span><span class="n">arohdlcls</span><span class="o">.</span><span class="n">HandleGnss</span><span class="p">):</span>
+<div class="viewcode-block" id="SplitGnss.__init__">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.split_cls.SplitGnss.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">out_dir</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="p">,</span>
+        <span class="n">inp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inp_file_regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a SplitGnss object.</span>
+
+<span class="sd">        This constructor initializes a SplitGnss object, which is used for handling</span>
+<span class="sd">        the splitting of RINEX files. It inherits from the HandleGnss class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        out_dir : str</span>
+<span class="sd">            The output directory for the split RINEX files.</span>
+<span class="sd">        tmp_dir : str</span>
+<span class="sd">            The temporary directory for intermediate files.</span>
+<span class="sd">        log_dir : str</span>
+<span class="sd">            The directory for log files.</span>
+<span class="sd">        inp_dir : str, optional</span>
+<span class="sd">            The input directory for raw files. Default is None.</span>
+<span class="sd">        inp_file_regex : str, optional</span>
+<span class="sd">            The regular expression for filtering input files. Default is None.</span>
+<span class="sd">        epoch_range : EpochRange, optional</span>
+<span class="sd">            The range of epochs to be processed. Default is None.</span>
+<span class="sd">        site : dict, optional</span>
+<span class="sd">            Information about the site. Default is None.</span>
+<span class="sd">        session : dict, optional</span>
+<span class="sd">            Information about the session. Default is None.</span>
+<span class="sd">        options : dict, optional</span>
+<span class="sd">            Additional options for the splitting operation. Default is None.</span>
+<span class="sd">        metadata : dict, optional</span>
+<span class="sd">            Metadata for the splitting operation. Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir</span><span class="p">,</span>
+            <span class="n">inp_file_regex</span><span class="o">=</span><span class="n">inp_file_regex</span><span class="p">,</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SplitGnss.split">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.split_cls.SplitGnss.split">[docs]</a>
+    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_mode</span><span class="o">=</span><span class="s2">&quot;given&quot;</span><span class="p">,</span>
+        <span class="n">input_rinexs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">handle_software</span><span class="o">=</span><span class="s2">&quot;converto&quot;</span><span class="p">,</span>
+        <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Split RINEX files.</span>
+
+<span class="sd">        This method splits RINEX files based on the provided input. It can find local input files,</span>
+<span class="sd">        convert a list of RINEX files to a StepGnss object, or use an existing StepGnss object.</span>
+<span class="sd">        The splitting operation is performed using the specified software and options.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_mode : str, optional</span>
+<span class="sd">            The mode for finding input RINEX files. It can be:</span>
+<span class="sd">            - &quot;find&quot;: to find local input files.</span>
+<span class="sd">            - &quot;given&quot;: to use provided input RINEX files.</span>
+<span class="sd">            Default is &quot;given&quot;.</span>
+<span class="sd">        input_rinexs : str or list or StepGnss, optional</span>
+<span class="sd">            The input RINEX files. It can be:</span>
+<span class="sd">            - A list of RINEX file paths.</span>
+<span class="sd">            - An existing StepGnss object.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        handle_software : str, optional</span>
+<span class="sd">            The software to use for handling the RINEX files. Default is &quot;converto&quot;.</span>
+<span class="sd">        rinexmod_options : dict, optional</span>
+<span class="sd">            Additional options for the RINEX modification. Default is None.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, prints the table for debugging purposes. Default is False.</span>
+<span class="sd">        force : bool, optional</span>
+<span class="sd">            If True, forces the splitting operation. Default is False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set the log file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_logfile</span><span class="p">()</span>
+
+        <span class="c1"># Log the start of the splitting operation</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">BOLD_SRT</span> <span class="o">+</span> <span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt; Splitting RINEX files&quot;</span> <span class="o">+</span> <span class="n">BOLD_END</span><span class="p">)</span>
+
+        <span class="c1"># set the ok_inp to True per default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># generate the potential local files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_rnx</span><span class="p">()</span>
+        <span class="c1"># tests if the output local files are already there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
+        <span class="c1"># switch ok_inp to False if the output files are already there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filter_ok_out</span><span class="p">()</span>
+        <span class="c1"># if force is True, force the splicing operation</span>
+        <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="s2">&quot;split&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Find the input RINEX files</span>
+        <span class="n">stp_obj_rnxs_inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_input_rnxs</span><span class="p">(</span><span class="n">input_mode</span><span class="p">,</span> <span class="n">input_rinexs</span><span class="p">)</span>
+
+        <span class="c1"># Feed the epochs for splitting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feed_by_epochs</span><span class="p">(</span><span class="n">stp_obj_rnxs_inp</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;split&quot;</span><span class="p">,</span> <span class="n">print_table</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># Perform the core splitting operation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">split_core</span><span class="p">(</span>
+            <span class="n">handle_software</span><span class="o">=</span><span class="n">handle_software</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="n">rinexmod_options</span>
+        <span class="p">)</span>
+
+        <span class="c1"># close the log file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_logfile</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SplitGnss.split_core">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.split_cls.SplitGnss.split_core">[docs]</a>
+    <span class="k">def</span> <span class="nf">split_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handle_software</span><span class="o">=</span><span class="s2">&quot;converto&quot;</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform the core splitting operation.</span>
+
+<span class="sd">        This method handles the core splitting operation for RINEX files. It iterates over each row</span>
+<span class="sd">        in the table, performs the splitting operation using the specified software, and applies</span>
+<span class="sd">        RINEX modifications if necessary. Temporary files are removed after the operation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        handle_software : str, optional</span>
+<span class="sd">            The software to use for handling the RINEX files. Default is &quot;converto&quot;.</span>
+<span class="sd">        rinexmod_options : dict, optional</span>
+<span class="sd">            Additional options for the RINEX modification. Default is None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tmp_dirs</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span>
+                <span class="n">irow</span><span class="p">,</span>
+                <span class="s2">&quot;split&quot;</span><span class="p">,</span>
+                <span class="n">fname_custom</span><span class="o">=</span><span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]),</span>
+            <span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">fdecmptmp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_decompress</span><span class="p">(</span><span class="n">irow</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_decmp_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fdecmptmp</span><span class="p">)</span>
+
+            <span class="n">frnx_splited</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_split</span><span class="p">(</span>
+                <span class="n">irow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_converted</span><span class="p">,</span> <span class="n">handle_software</span><span class="o">=</span><span class="n">handle_software</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;unable to split </span><span class="si">%s</span><span class="s2">, skip&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">])</span>
+                <span class="k">continue</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">tmp_rnx_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frnx_splited</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">mono_rinexmod</span><span class="p">(</span>
+                <span class="n">irow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_rinexmoded</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="n">rinexmod_options</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_rinexmoded</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mono_mv_final</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remov_tmp_files</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SplitGnss.mono_split">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.split_cls.SplitGnss.mono_split">[docs]</a>
+    <span class="k">def</span> <span class="nf">mono_split</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span> <span class="n">handle_software</span><span class="o">=</span><span class="s2">&quot;converto&quot;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;on row&quot; method</span>
+
+<span class="sd">        for each row of the table, split the &#39;table_col&#39; entry,</span>
+<span class="sd">        typically &#39;fpath_inp&#39; file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span>
+            <span class="n">irow</span><span class="p">,</span>
+            <span class="s2">&quot;split (mono)&quot;</span><span class="p">,</span>
+            <span class="n">fname_custom</span><span class="o">=</span><span class="n">arocmn</span><span class="o">.</span><span class="n">iso_zulu_epoch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]),</span>
+            <span class="n">switch_ok_out_false</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># definition of the output directory</span>
+        <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
+            <span class="n">out_dir_main_use</span> <span class="o">=</span> <span class="n">out_dir</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;tmp_dir_converted&quot;</span><span class="p">):</span>
+            <span class="n">out_dir_main_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_converted</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out_dir_main_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span>
+
+        <span class="n">out_dir_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span>
+            <span class="n">out_dir_main_use</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">frnx_inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">table_col</span><span class="p">]</span>
+
+        <span class="n">conv_options</span><span class="p">,</span> <span class="n">conv_kwoptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_softs_opts</span><span class="p">(</span>
+            <span class="n">irow</span><span class="p">,</span> <span class="n">handle_software</span><span class="o">=</span><span class="n">handle_software</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">frnxtmp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">converter_run</span><span class="p">(</span>
+                <span class="n">frnx_inp</span><span class="p">,</span>
+                <span class="n">out_dir_use</span><span class="p">,</span>
+                <span class="n">converter</span><span class="o">=</span><span class="n">handle_software</span><span class="p">,</span>
+                <span class="n">bin_options</span><span class="o">=</span><span class="n">conv_options</span><span class="p">,</span>
+                <span class="n">bin_kwoptions</span><span class="o">=</span><span class="n">conv_kwoptions</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">frnx_inp</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Exception raised: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">frnxtmp</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">frnxtmp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frnxtmp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># raise e</span>
+
+        <span class="k">return</span> <span class="n">frnxtmp</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

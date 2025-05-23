@@ -18,7 +18,7 @@ import logging
 import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 # pd.options.mode.chained_assignment = "warn"
 warnings.simplefilter("ignore", category=RuntimeWarning)
@@ -154,7 +154,11 @@ class DownloadGnss(arocmn.StepGnss):
 
         rmot_paths_list = []
 
-        for epoch in self.epoch_range.eporng_list():  ### go for irow !
+        #for epoch in self.epoch_range.eporng_list():  ### go for irow ! ### IMPROVE ME !!!
+
+        for irow, row in self.table.iterrows():
+            #epoch = row["epoch_srt"]
+
             ### guess the potential remote files
             rmot_dir_use = str(self.inp_dir)
             rmot_fname_use = str(self.inp_file_regex)
@@ -163,16 +167,16 @@ class DownloadGnss(arocmn.StepGnss):
                 self.access["protocol"], hostname_use, rmot_dir_use, rmot_fname_use
             )
 
-            rmot_path_use = self.translate_path(rmot_path_use, epoch, make_dir=False)
+            rmot_path_use = self.translate_path(rmot_path_use, row["epoch_srt"], make_dir=False)
 
             rmot_fname_use = os.path.basename(rmot_path_use)
 
             rmot_paths_list.append(rmot_path_use)
 
-            iepoch = self.table[self.table["epoch_srt"] == epoch].index[0]
+            #iepoch = self.table[self.table["epoch_srt"] == epoch].index[0]
 
-            self.table.loc[iepoch, "fname"] = rmot_fname_use
-            self.table.loc[iepoch, "fpath_inp"] = rmot_path_use
+            self.table.loc[irow, "fname"] = rmot_fname_use
+            self.table.loc[irow, "fpath_inp"] = rmot_path_use
             logger.debug("remote file guessed: %s", rmot_path_use)
 
         # for guess, all input files are considered as ok a priori
@@ -194,22 +198,26 @@ class DownloadGnss(arocmn.StepGnss):
 
         local_paths_list = []
 
-        for epoch in self.epoch_range.eporng_list():  # go for irow !
+        # for epoch in self.epoch_range.eporng_list():  # go for irow ! ### IMPROVE ME !!!
+
+        for irow, row in self.table.iterrows():
+            #epoch = row["epoch_srt"]
+
             # guess the potential local files
             local_dir_use = str(self.out_dir)
             local_fname_use = str(self.inp_file_regex)
             local_path_use = os.path.join(local_dir_use, local_fname_use)
 
-            local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
+            local_path_use = self.translate_path(local_path_use, row["epoch_srt"], make_dir=False)
 
             local_fname_use = os.path.basename(local_path_use)
 
             local_paths_list.append(local_path_use)
 
-            iepoch = self.table[self.table["epoch_srt"] == epoch].index
+            # iepoch = self.table[self.table["epoch_srt"] == epoch].index
 
-            self.table.loc[iepoch, "fname"] = local_fname_use
-            self.table.loc[iepoch, "fpath_out"] = local_path_use
+            self.table.loc[irow, "fname"] = local_fname_use
+            self.table.loc[irow, "fpath_out"] = local_path_use
             logger.debug("local file guessed: %s", local_path_use)
 
         logger.info("nbr local raw files guessed: %s", len(local_paths_list))
@@ -259,9 +267,7 @@ class DownloadGnss(arocmn.StepGnss):
         epo_lis = []
 
         if self.inp_file_regex:
-            logger.debug(
-                "remote files will be filtered with regex: %s", self.inp_file_regex
-            )
+            logger.debug(f"remote files will be filtered with regex: {self.inp_file_regex} (aliases not translated yet)")
         else:
             logger.debug("no regex filtering will be applied to remote files")
 
@@ -403,9 +409,9 @@ class DownloadGnss(arocmn.StepGnss):
             logger.error("Remote server %s is not reachable.", self.access["hostname"])
         else:
             logger.info(
-                "Remote server %s is reachable. (%f ms)",
+                "Remote server %s is reachable. (%d ms)",
                 self.access["hostname"],
-                ping_out * 10**3,
+                int(ping_out * 10**3),
             )
 
         return ping_out

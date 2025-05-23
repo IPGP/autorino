@@ -1,0 +1,581 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.convert.cnv_regex &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.convert.cnv_regex</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.convert.cnv_regex</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Mar 14 12:03:40 2023</span>
+
+<span class="sd">@author: psakic</span>
+
+<span class="sd">#### converted files regular expressions functions</span>
+<span class="sd">#### main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">#### annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">#### the main with be processed before the annex,</span>
+<span class="sd">#### thus annex regex will finally not include the main</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+
+<span class="c1">###################################################################</span>
+
+
+<div class="viewcode-block" id="conv_regex_void">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_void">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_void</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the main and annex converted files</span>
+<span class="sd">    equivalent to the input filename</span>
+
+<span class="sd">    ** Must be used for test purposes only !**</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_runpkr00">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_runpkr00">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_runpkr00</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
+<span class="sd">    outputed by runpkr00 (Trimble)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># PSA1______202110270000A.tgd (option -d -g)</span>
+    <span class="c1"># PSA1______202110270000A.tg! (opened/working file)</span>
+    <span class="c1"># ABD0______202110270000A.dat (when not option -g in runpkr)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.tgd&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_teqc">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_teqc">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_teqc</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the main and annex converted files</span>
+<span class="sd">    outputed by teqc (polyvalent)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="c1"># conv_regex_main = re.compile(f.with_suffix(&quot;.rnx_teqc&quot;).name)</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.rnx_teqc&quot;</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">conv_regex_main</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_converto">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_converto">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_converto</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the main and annex converted files</span>
+<span class="sd">    outputed by converto (polyvalent)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="c1"># conv_regex_main = re.compile(f.with_suffix(&quot;.rnx_teqc&quot;).name)</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.rnx_converto&quot;</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">conv_regex_main</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_gfzrnx">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_gfzrnx">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_gfzrnx</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the main and annex converted files</span>
+<span class="sd">    outputed by GFZRNX (polyvalent)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="c1"># conv_regex_main = re.compile(f.with_suffix(&quot;.rnx_teqc&quot;).name)</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.rnx_gfzrnx&quot;</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">conv_regex_main</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_trm2rinex">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_trm2rinex">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_trm2rinex</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
+<span class="sd">    outputed by trm2rinex (Trimble)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># &quot;/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21o&quot;,</span>
+    <span class="c1"># &quot;/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21l&quot;,</span>
+    <span class="c1"># &quot;/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21g&quot;,</span>
+    <span class="c1"># &quot;/home/psakicki/aaa_FOURBI/convertertest/AGAL______202110270000A.21n&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="c1"># date_full = re.search(&quot;[0-9]{12}[a-zA-Z]&quot;,f.name).group() ##too restrictive, sometime there is no final letter</span>
+    <span class="n">date_full</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;20[0-9]</span><span class="si">{10}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+    <span class="n">yyyy</span> <span class="o">=</span> <span class="n">date_full</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">yyyy</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">+</span> <span class="s2">&quot;o&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">yyyy</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_t0xconvert">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_t0xconvert">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_t0xconvert</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
+<span class="sd">    outputed by t0xconvert (Trimble)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="c1"># date_full = re.search(&quot;[0-9]{12}[a-zA-Z]&quot;,f.name).group() ##too restrictive, sometime there is no final letter</span>
+    <span class="n">date_full</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;20[0-9]</span><span class="si">{10}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
+    <span class="n">yyyy</span> <span class="o">=</span> <span class="n">date_full</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">yyyy</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">+</span> <span class="s2">&quot;o&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">yyyy</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_mdb2rnx">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_mdb2rnx">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_mdb2rnx</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
+<span class="sd">    outputed by mdb2rnx (Leica)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># souf3000.21o</span>
+    <span class="c1"># souf3000.21n</span>
+    <span class="c1"># souf3000.21l</span>
+    <span class="c1"># souf3000.21g</span>
+    <span class="c1">### met also for OVSM</span>
+    <span class="c1"># fsdc176p11.18o</span>
+    <span class="c1"># mlm0236a00.18n</span>
+    <span class="c1"># mlm0236a00.18l</span>
+    <span class="c1"># mlm0236a00.18g</span>
+    <span class="c1"># fsdc176p11.18o</span>
+    <span class="c1"># fsdc176p11.18n</span>
+    <span class="c1"># fsdc176p11.18g</span>
+    <span class="c1"># and even for OVSG</span>
+    <span class="c1"># souf226n 8.24l</span>
+    <span class="c1"># souf226n 8.24n</span>
+    <span class="c1"># souf226n 8.24o</span>
+
+    <span class="n">finp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="k">if</span> <span class="n">finp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;mdb&quot;</span><span class="p">):</span>
+        <span class="c1"># used in OVSM e.g.</span>
+        <span class="c1"># LAJB0a18002.MDB</span>
+        <span class="c1"># LMLM0-Leicaa18233.MDB</span>
+        <span class="n">regex_doy_site</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;.(\w</span><span class="si">{4}</span><span class="s2">)(-Leica)?.([0-9]</span><span class="si">{2}</span><span class="s2">)([0-9]</span><span class="si">{3}</span><span class="s2">)&quot;</span>
+        <span class="n">doygroup</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="c1"># alternativelywe can exclude the group &#39;Leica-&#39; with ?:</span>
+        <span class="c1"># regex_doy_site=r&quot;.(\w{4})(?:-Leica)?.([0-9]{2})([0-9]{3})&quot;</span>
+        <span class="c1"># doygroup = 3</span>
+    <span class="k">elif</span> <span class="n">finp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;m00&quot;</span><span class="p">):</span>
+        <span class="c1"># used in OVSG e.g.</span>
+        <span class="c1"># PAR1323a.m00</span>
+        <span class="n">regex_doy_site</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\w</span><span class="si">{4}</span><span class="s2">)([0-9]</span><span class="si">{3}</span><span class="s2">)&quot;</span>
+        <span class="n">doygroup</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">regex_doy_site</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\w</span><span class="si">{4}</span><span class="s2">)([0-9]</span><span class="si">{3}</span><span class="s2">)&quot;</span>
+        <span class="n">doygroup</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">site</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex_doy_site</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">doy</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex_doy_site</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">doygroup</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">site</span> <span class="o">+</span> <span class="n">doy</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;.(.</span><span class="si">{2}</span><span class="s2">)?\.[0-9]</span><span class="si">{2}</span><span class="s2">o&quot;</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">site</span> <span class="o">+</span> <span class="n">doy</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;.(.</span><span class="si">{2}</span><span class="s2">)?\.[0-9]</span><span class="si">{2}</span><span class="s2">\w&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_convbin">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_convbin">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_convbin</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
+<span class="sd">    outputed by RTKLIB&#39;s convbin (polyvalent)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Input</span>
+    <span class="c1"># NBIM0a20221226.BNX</span>
+    <span class="c1"># Output</span>
+    <span class="c1"># NBIM0a20221226.obs</span>
+    <span class="c1"># NBIM0a20221226.nav</span>
+    <span class="c1"># NBIM0a20221226.sbs</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.obs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
+<div class="viewcode-block" id="conv_regex_tps2rin">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_tps2rin">[docs]</a>
+<span class="k">def</span> <span class="nf">conv_regex_tps2rin</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
+<span class="sd">    outputed by tp2rin (Topcon)</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    f : str or Path</span>
+<span class="sd">        the input Raw filename or path</span>
+<span class="sd">        (the filename will be extracted in the function).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Input</span>
+    <span class="c1"># DHS030011.TPS</span>
+    <span class="c1"># Output</span>
+    <span class="c1"># an extra character is added if there is already an existing file</span>
+    <span class="c1"># dhs030002.11p</span>
+    <span class="c1"># dhs030002.11p</span>
+    <span class="c1"># dhs030002.11o</span>
+    <span class="c1"># dhs030001.11p</span>
+    <span class="c1"># dhs030001.11o</span>
+    <span class="c1"># dhs030000.11p</span>
+    <span class="c1"># dhs030000.11o</span>
+    <span class="c1"># dhs03000.11p</span>
+    <span class="c1"># dhs03000.11o</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
+    <span class="n">regex_doy_site</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\w</span><span class="si">{4}</span><span class="s2">)([0-9]</span><span class="si">{3}</span><span class="s2">)&quot;</span>
+    <span class="n">site</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex_doy_site</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="c1"># doy=re.match(regex_doy_site,f.name).group(2).lower()</span>
+    <span class="c1"># conv_regex_main = re.compile(site+doy+&quot;.(.|)\.[0-9]{2}o&quot;)</span>
+    <span class="c1"># conv_regex_annex  = re.compile(site+doy+&quot;.(.|)\.[0-9]{2}\w&quot;)</span>
+    <span class="c1">## the date of the raw file can be actually anything...</span>
+    <span class="c1">## doy/month-day/etc..</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">site</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;[0-9]</span><span class="si">{3}</span><span class="s2">.(.|)\.[0-9]</span><span class="si">{2}</span><span class="s2">o&quot;</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">site</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;[0-9]</span><span class="si">{3}</span><span class="s2">.(.|)\.[0-9]</span><span class="si">{2}</span><span class="s2">\w&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

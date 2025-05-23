@@ -1,0 +1,235 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.check.check_fcts &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.check.check_fcts</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.check.check_fcts</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 27/01/2025 18:53:22</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">termcolor</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">tabulate</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="color">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_fcts.color">[docs]</a>
+<span class="k">def</span> <span class="nf">color</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a color according to the value of the input.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    val: float</span>
+<span class="sd">        The value to be colored.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str: color</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mf">96.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;cyan&quot;</span>
+    <span class="k">elif</span> <span class="n">val</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;magenta&quot;</span>
+    <span class="k">elif</span> <span class="mf">50.</span> <span class="o">&gt;=</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;red&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;yellow&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="colorize_list">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_fcts.colorize_list">[docs]</a>
+<span class="k">def</span> <span class="nf">colorize_list</span><span class="p">(</span><span class="n">list_inp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function colorizes a list of values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    list_inp : list</span>
+<span class="sd">        The list of values to be colorized.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list: list of colorized values</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;TERM&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TERM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;xterm-256color&#39;</span>  <span class="c1"># Set terminal type to xterm-256color if not set</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">termcolor</span><span class="o">.</span><span class="n">colored</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">color</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">list_inp</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_tabult_raw">
+<a class="viewcode-back" href="../../../autorino.check.html#autorino.check.check_fcts.get_tabult_raw">[docs]</a>
+<span class="k">def</span> <span class="nf">get_tabult_raw</span><span class="p">(</span><span class="n">chk_tab</span><span class="p">,</span> <span class="n">short_label</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function returns a tabulated string of the check table.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chk_tab : pd.DataFrame</span>
+<span class="sd">        The check table.</span>
+
+<span class="sd">    short_label : bool, optional</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tabu_chk_col: str</span>
+<span class="sd">        The tabulated string of the check table with colored values.</span>
+<span class="sd">    tabu_chk_bnw: str</span>
+<span class="sd">        The tabulated string of the check table with black and white values.</span>
+<span class="sd">    df_chk_sum: pd.DataFrame</span>
+<span class="sd">        The values of the check table summarized in a dataframe.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chk_tab</span> <span class="o">=</span> <span class="n">chk_tab</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="s2">&quot;site&quot;</span><span class="p">])</span>
+    <span class="n">sites</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chk_tab</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">short_label</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">sites</span><span class="p">)</span>
+        <span class="n">sites</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sites</span><span class="p">]</span>
+        <span class="n">fmt_time</span> <span class="o">=</span> <span class="s2">&quot;%Y-%j&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fmt_time</span> <span class="o">=</span> <span class="s2">&quot;%Y-%j %H:%M&quot;</span>
+
+    <span class="n">tab_chk_raw_col</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sites</span><span class="p">]</span>
+    <span class="n">tab_chk_raw_bnw</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">sites</span><span class="p">]</span>
+    <span class="n">flt_data_stk</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">epo</span><span class="p">,</span> <span class="n">chk_epo</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">chk_tab</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">))):</span>
+        <span class="n">epo</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">epo</span><span class="p">)</span>
+        <span class="n">l_flt</span> <span class="o">=</span> <span class="p">[</span><span class="n">epo</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">chk_epo</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">l_str_col</span> <span class="o">=</span> <span class="p">[</span><span class="n">epo</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt_time</span><span class="p">)]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">colorize_list</span><span class="p">(</span><span class="n">chk_epo</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span>
+        <span class="n">l_str_bnw</span> <span class="o">=</span> <span class="p">[</span><span class="n">epo</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt_time</span><span class="p">)]</span> <span class="o">+</span> <span class="n">chk_epo</span><span class="p">[</span><span class="s2">&quot;%&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">flt_data_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l_flt</span><span class="p">)</span>
+        <span class="n">tab_chk_raw_col</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l_str_col</span><span class="p">)</span>
+        <span class="n">tab_chk_raw_bnw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l_str_bnw</span><span class="p">)</span>
+
+
+    <span class="n">tabu_chk_col</span> <span class="o">=</span> <span class="n">tabulate</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">tab_chk_raw_col</span><span class="p">,</span>
+                                     <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;firstrow&quot;</span><span class="p">,</span>
+                                     <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;grid&quot;</span><span class="p">)</span>
+    <span class="n">tabu_chk_bnw</span> <span class="o">=</span> <span class="n">tabulate</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">tab_chk_raw_bnw</span><span class="p">,</span>
+                                    <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;firstrow&quot;</span><span class="p">,</span>
+                                    <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;grid&quot;</span><span class="p">)</span>
+
+    <span class="n">df_chk_sum</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">flt_data_stk</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">tab_chk_raw_col</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">df_chk_sum</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tabu_chk_col</span><span class="p">,</span> <span class="n">tabu_chk_bnw</span><span class="p">,</span> <span class="n">df_chk_sum</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

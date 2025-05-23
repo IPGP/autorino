@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.api.check_rnx &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.api.check_rnx</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.api.check_rnx</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 27/01/2025 09:50:23</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">autorino.cfgenv</span> <span class="k">as</span> <span class="nn">aroenv</span>
+<span class="kn">import</span> <span class="nn">autorino.check</span> <span class="k">as</span> <span class="nn">arochk</span>
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="check_rnx">
+<a class="viewcode-back" href="../../../autorino.api.html#autorino.api.check_rnx.check_rnx">[docs]</a>
+<span class="k">def</span> <span class="nf">check_rnx</span><span class="p">(</span>
+    <span class="n">inp_dir_parent</span><span class="p">,</span>
+    <span class="n">inp_dir_structure</span><span class="p">,</span>
+    <span class="n">epoch_start</span><span class="p">,</span>
+    <span class="n">epoch_end</span><span class="p">,</span>
+    <span class="n">sites_list</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function checks the RINEX files in the input directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    inp_dir_parent : str</span>
+<span class="sd">        The parent input directory.</span>
+<span class="sd">    inp_dir_structure : str</span>
+<span class="sd">        The input directory structure.</span>
+<span class="sd">    epoch_start : str</span>
+<span class="sd">        The start epoch.</span>
+<span class="sd">    epoch_end : str</span>
+<span class="sd">        The end epoch.</span>
+<span class="sd">    sites_list : list, optional</span>
+<span class="sd">        A list of site identifiers to filter the check.</span>
+<span class="sd">    output_dir : str, optional</span>
+<span class="sd">        The output directory.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tabu_chk_col : str</span>
+<span class="sd">        The tabulated string of the check table with colored values.</span>
+<span class="sd">    tabu_chk_bnw : str</span>
+<span class="sd">        The tabulated string of the check table with black and white values.</span>
+<span class="sd">    df_chk_sum  : pd.DataFrame</span>
+<span class="sd">        The values of the check table summarized in a dataframe.</span>
+<span class="sd">    df_chk_full_stats : pd.DataFrame</span>
+<span class="sd">        The full statistics of the check table.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">inp_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inp_dir_parent</span><span class="p">,</span> <span class="n">inp_dir_structure</span><span class="p">)</span>
+    <span class="n">eporng</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="n">epoch_start</span><span class="p">,</span> <span class="n">epoch_end</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sites_list</span><span class="p">:</span>
+        <span class="n">sites_use</span> <span class="o">=</span> <span class="n">sites_list</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sites_use</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">guess_sites_list</span><span class="p">(</span><span class="n">inp_dir_parent</span><span class="p">)</span>
+
+    <span class="n">chk_tab_stk</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">chk_tab_stats_stk</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">site</span> <span class="ow">in</span> <span class="n">sites_use</span><span class="p">:</span>
+        <span class="n">chk</span> <span class="o">=</span> <span class="n">arochk</span><span class="o">.</span><span class="n">CheckGnss</span><span class="p">(</span>
+            <span class="n">inp_dir</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">inp_dir</span><span class="p">),</span>
+            <span class="n">site</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;site_id&quot;</span><span class="p">:</span> <span class="n">site</span><span class="p">},</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">eporng</span>
+        <span class="p">)</span>
+        <span class="n">chk</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+        <span class="n">chk_tab_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chk</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+        <span class="n">chk_tab_stats_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chk</span><span class="o">.</span><span class="n">table_stats</span><span class="p">)</span>
+
+    <span class="n">df_chk_table_cat</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">chk_tab_stk</span><span class="p">)</span>
+    <span class="n">df_chk_full_stats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">chk_tab_stats_stk</span><span class="p">)</span>
+
+    <span class="n">tabu_chk_col</span><span class="p">,</span> <span class="n">tabu_chk_bnw</span><span class="p">,</span> <span class="n">df_chk_sum</span> <span class="o">=</span> <span class="n">arochk</span><span class="o">.</span><span class="n">get_tabult_raw</span><span class="p">(</span>
+        <span class="n">df_chk_table_cat</span><span class="p">,</span> <span class="n">short_label</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Check: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">tabu_chk_col</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output_dir</span><span class="p">:</span>
+        <span class="n">checkrnx_output</span><span class="p">(</span>
+            <span class="n">output_dir</span><span class="p">,</span>
+            <span class="n">eporng</span><span class="p">,</span>
+            <span class="n">tabu_chk_col</span><span class="p">,</span>
+            <span class="n">tabu_chk_bnw</span><span class="p">,</span>
+            <span class="n">df_chk_sum</span><span class="p">,</span>
+            <span class="n">df_chk_full_stats</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tabu_chk_col</span><span class="p">,</span> <span class="n">tabu_chk_bnw</span><span class="p">,</span> <span class="n">df_chk_sum</span><span class="p">,</span> <span class="n">df_chk_full_stats</span></div>
+
+
+
+<span class="c1"># defcheckrnx_analyz</span>
+<span class="c1"># checkrnx_format</span>
+<div class="viewcode-block" id="checkrnx_output">
+<a class="viewcode-back" href="../../../autorino.api.html#autorino.api.check_rnx.checkrnx_output">[docs]</a>
+<span class="k">def</span> <span class="nf">checkrnx_output</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="p">,</span> <span class="n">eporng</span><span class="p">,</span> <span class="n">tabu_chk_col</span><span class="p">,</span> <span class="n">tabu_chk_bnw</span><span class="p">,</span> <span class="n">df_chk_sum</span><span class="p">,</span> <span class="n">df_chk_full_stats</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function saves the check_rnx results in the output directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output_dir : str</span>
+<span class="sd">        The output directory.</span>
+<span class="sd">    eporng : EpochRange</span>
+<span class="sd">        The epoch range.</span>
+<span class="sd">    tabu_chk_col : str</span>
+<span class="sd">        The tabulated string of the check table with colored values.</span>
+<span class="sd">    tabu_chk_bnw : str</span>
+<span class="sd">        The tabulated string of the check table with black and white values.</span>
+<span class="sd">    df_chk_sum  : pd.DataFrame</span>
+<span class="sd">        The values of the check table summarized in a dataframe.</span>
+<span class="sd">    df_chk_full_stats : pd.DataFrame</span>
+<span class="sd">        The full statistics of the check table.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">get_timestamp</span><span class="p">(),</span>
+            <span class="n">eporng</span><span class="o">.</span><span class="n">epoch_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%j&quot;</span><span class="p">),</span>
+            <span class="n">eporng</span><span class="o">.</span><span class="n">epoch_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%j&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">output_dir_use</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">create_dir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">prefix</span><span class="p">))</span>
+    <span class="c1">### csv</span>
+    <span class="n">summ_csv</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir_use</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_check_rnx_summ.csv&quot;</span><span class="p">)</span>
+    <span class="n">full_csv</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir_use</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_check_rnx_full.csv&quot;</span><span class="p">)</span>
+    <span class="n">df_chk_sum</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">summ_csv</span><span class="p">)</span>
+    <span class="n">df_chk_full_stats</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">full_csv</span><span class="p">)</span>
+
+    <span class="c1">### plot</span>
+    <span class="n">df_chk_sum</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">figure_saver</span><span class="p">(</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">output_dir_use</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_check_rnx_plot&quot;</span><span class="p">,</span> <span class="n">outtype</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.pdf&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1">### pretty print tabulate</span>
+    <span class="n">tabu_col_txt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir_use</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_check_rnx_tabu_col.txt&quot;</span><span class="p">)</span>
+    <span class="n">tabu_bnw_txt</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir_use</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_check_rnx_tabu_bnw.txt&quot;</span><span class="p">)</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">write_in_file</span><span class="p">(</span><span class="n">tabu_chk_col</span><span class="p">,</span> <span class="n">tabu_col_txt</span><span class="p">)</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">write_in_file</span><span class="p">(</span><span class="n">tabu_chk_bnw</span><span class="p">,</span> <span class="n">tabu_bnw_txt</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

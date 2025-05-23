@@ -30,7 +30,7 @@ import logging
 import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 import warnings
 
 warnings.simplefilter("always", UserWarning)
@@ -516,7 +516,12 @@ class StepGnss:
         # Add each attribute from the site and session dictionaries to the translation dictionary
         for dic in (self.site, self.session):
             for k, v in dic.items():
-                trsltdict[k] = v
+                if isinstance(v, str):
+                    trsltdict[k.lower()] = v.lower()
+                    trsltdict[k.upper()] = v.upper()
+                else:
+                    trsltdict[k.lower()] = v
+                    trsltdict[k.upper()] = v
 
         # Add each variation of the site id to the translation dictionary
         for s in ("site_id", "site_id4", "site_id9"):
@@ -1169,47 +1174,13 @@ class StepGnss:
             The formatted table as a string if 'no_return' is False. Otherwise, None.
         """
 
-        def _shrink_str(str_inp, maxlen=max_colwidth):
-            """
-            Shrinks a string to a specified maximum length.
-
-            This function shrinks a string to a specified maximum length by keeping the first and last parts
-            of the string and replacing the middle part with '..'.
-            The length of the first and last parts is half of the maximum length.
-
-            Parameters
-            ----------
-            str_inp : str
-                The input string to be shrunk.
-            maxlen : int, optional
-                The maximum length of the output string.
-                Default is the value of the 'max_colwidth' parameter of the
-                'verbose' method.
-
-            Returns
-            -------
-            str
-                The shrunk string.
-            """
-            if len(str_inp) <= maxlen:
-                return str_inp
-            else:
-                halflen = int((maxlen / 2) - 1)
-                str_out_shrink = str_inp[:halflen] + ".." + str_inp[-halflen:]
-                return str_out_shrink
-
         self.table_ok_cols_bool()
 
-        form = dict()
-        form["fraw"] = _shrink_str
-        form["fpath_inp"] = _shrink_str
-        form["fpath_out"] = _shrink_str
+        str_out = arocmn.print_tab_core(
+            self.table,
+            max_colwidth=max_colwidth,
+        )
 
-        form["epoch_srt"] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
-        form["epoch_end"] = lambda t: t.strftime("%y-%m-%d %H:%M:%S")
-
-        str_out = self.table.to_string(max_colwidth=max_colwidth + 1, formatters=form)
-        # add +1 in max_colwidth for safety
         if not no_print:
             # print it in the logger (if silent , just return it)
             name = self.get_step_type(True)
@@ -1301,7 +1272,7 @@ class StepGnss:
 
         return flist
 
-    def load_tab_prev_tab(self, input_table, reset_table=True):
+    def load_tab_prev_tab(self, prev_table, reset_table=True, new_inp_is_prev="out"):
         """
         Loads the table from the previous step's table.
 
@@ -1313,11 +1284,15 @@ class StepGnss:
 
         Parameters
         ----------
-        input_table : pandas.DataFrame
+        prev_table : pandas.DataFrame
             The table from the previous step in the processing chain. It should contain 'fpath_out', 'size_out',
             'fname', 'site', 'epoch_srt', 'epoch_end', and 'ok_inp' columns.
         reset_table : bool, optional
             If True, the current table is reset before loading the new data. Default is True.
+        new_inp_is_prev : str, optional
+            Specifies whether the new input files are the previous
+            output files ('out') or the previous input files ('inp').
+            Default is 'out'.
 
         Returns
         -------
@@ -1326,14 +1301,25 @@ class StepGnss:
         if reset_table:
             self._init_table(init_epoch=False)
 
-        self.table["fpath_inp"] = input_table["fpath_out"].values
-        self.table["size_inp"] = input_table["size_out"].values
-        self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
-        self.table["site"] = input_table["site"].values
+        if new_inp_is_prev == "out":
+            self.table["fpath_inp"] = prev_table["fpath_out"].values
+            self.table["size_inp"] = prev_table["size_out"].values
+        elif new_inp_is_prev == "inp":
+            self.table["fpath_inp"] = prev_table["fpath_inp"].values
+            self.table["size_inp"] = prev_table["size_inp"].values
+        else:
+            raise ValueError("new_inp_is_prev must be 'out' or 'inp'")
+
+        isfile_lbd = lambda x: os.path.isfile(x) if isinstance(x, str) else "none"
+        basnam_lbd = lambda x: os.path.basename(x) if isinstance(x, str) else "none"
+
+        self.table["ok_inp"] = self.table["fpath_inp"].apply(isfile_lbd)
+        self.table["fname"] = self.table["fpath_inp"].apply(basnam_lbd)
+
+        self.table["site"] = prev_table["site"].values
         # epoch_srt and epoch_end are supposed to be timezone aware
-        self.table["epoch_srt"] = input_table["epoch_srt"].values
-        self.table["epoch_end"] = input_table["epoch_end"].values
-        self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
+        self.table["epoch_srt"] = prev_table["epoch_srt"].values
+        self.table["epoch_end"] = prev_table["epoch_end"].values
 
         return None
 
@@ -1399,6 +1385,60 @@ class StepGnss:
 
         return None
 
+    def get_vals_prev_tab(
+        self,
+        df_prev_tab,
+        col_ref="fpath_inp",
+        get_cols=["site", "epoch_srt", "epoch_end"],
+    ):
+        """
+        Updates columns in self.table with values from df_prev_tab for matching col_ref entries.
+
+        Parameters
+        ----------
+        df_prev_tab : pandas.DataFrame
+            The previous table to update from.
+        col_ref : str, optional
+            The column to match on. Default is 'fpath_inp'.
+        get_cols : list, optional
+            The columns to update. Default is ['site', 'epoch_srt', 'epoch_end'].
+
+        Returns
+        -------
+        None
+        """
+
+        ### too pythonic, less intuitive (and does not work well)
+        # self.table.reset_index(inplace=True)
+        # df_prev_tab.reset_index(inplace=True)
+        #
+        # # Merge to get updated values for matching rows
+        # df_merged = self.table.merge(
+        #     df_prev_tab[[col_ref] + get_cols],
+        #     on=col_ref,
+        #     how="left",
+        #     suffixes=("", "_prev")
+        # )
+        # # Update only the specified columns
+        # for col in get_cols:
+        #     prev_col = f"{col}_prev"
+        #     if prev_col in df_merged:
+        #         self.table[col] = df_merged[prev_col].combine_first(self.table[col])
+
+        ## less pythonic, more intuitive
+        for col in get_cols:
+            if col in df_prev_tab.columns:
+                mask1 = self.table[col_ref].isin(df_prev_tab[col_ref])
+                matched = self.table.loc[mask1, col_ref]
+                for idx in matched.index:
+                    mask2 = self.table.at[idx, col_ref] == df_prev_tab[col_ref]
+                    prev_value = df_prev_tab.loc[mask2, col].values[0]
+                    self.table.at[idx, col] = prev_value
+
+        for epocol in ["epoch_srt", "epoch_end"]:
+            if epocol in get_cols:
+                self.table[epocol] = pd.to_datetime(self.table[epocol])
+
     def force(self, step_name=""):
         """
         Enables the force mode for the current step.
@@ -1420,102 +1460,70 @@ class StepGnss:
         self.table["note"] = "force_" + step_name
         return None
 
-    def guess_local_rnx(self, io="out"):
+    def guess_local_rnx(self, io="out", shortname=False):
         """
         For a given site name and date in a table, guess the potential local RINEX files
         and write it as 'fpath_out' value in the table
         """
 
-        #### to do: split it as a mono fct & go for irow iteration
-        #### IMPROVE_ME!!!!
+        loc_paths_list = []
 
-        local_paths_list = []
-
+        warnmsg = "unable to get the epochs to generate local RINEX paths"
         ### no epoch at all, you are surely in convert mode
         if pd.isna(self.table["epoch_srt"]).all():
-            logger.debug(
-                "unable to get the epochs to generate local RINEX paths (normal in epoch-blind convert mode)"
-            )
+            logger.warning(f"{warnmsg} (normal in epoch-blind convert mode)")
             return []
 
         ### some epochs are here, this is weirder and should not happen, we raise a warning
         if pd.isna(self.table["epoch_srt"]).any():
-            logger.debug(
-                "unable to get the epochs to generate local RINEX paths (something went wrong)"
-            )
+            logger.error(f"{warnmsg} (something went wrong)")
             return []
 
-        for iepoch, epoch in self.table["epoch_srt"].items():
-            # guess the potential local files
-            if io == "out":
-                local_dir_use = str(self.out_dir)
-            elif io == "inp":
-                local_dir_use = str(self.inp_dir)
-            else:
-                logging.error("io must be 'inp' or 'out'")
-                raise Exception
+        loc_paths_list = []
+        for irow, row in self.table.iterrows():
+            loc_path = self.mono_guess_rnx(irow, io=io, shortname=shortname)
+            loc_paths_list.append(loc_path)
 
-            # local_fname_use = str(self.inp_basename)
+        logger.info("nbr local RINEX files guessed: %s", len(loc_paths_list))
 
-            epo_dt_srt = epoch.to_pydatetime()
-            epo_dt_end = self.table.loc[iepoch, "epoch_end"].to_pydatetime()
-
-            # force the timezone to avoid nasty effects: rinexmod is not TZ aware... but autorino is!
-            # prefer to force the timezone elsewere in autorino
-            epo_dt_srt = epo_dt_srt.replace(tzinfo=None)
-            epo_dt_end = epo_dt_end.replace(tzinfo=None)
-
-            prd_str = rinexmod.rinexfile.file_period_from_timedelta(
-                epo_dt_srt, epo_dt_end
-            )[0]
-
-            local_fname_use = conv.statname_dt2rinexname_long(
-                self.site_id9,
-                epoch,
-                country="XXX",  ### site_id9 has the country
-                data_source="R",  ### always will be with autorino
-                file_period=prd_str,
-                data_freq=self.session["data_frequency"],
-                data_type="MO",
-                format_compression="crx.gz",
-                preset_type=None,
-            )
-
-            local_path_use0 = os.path.join(local_dir_use, local_fname_use)
-
-            local_path_use = self.translate_path(local_path_use0, epoch_inp=epoch)
-
-            local_fname_use = os.path.basename(local_path_use)
-
-            local_paths_list.append(local_path_use)
-
-            # iepoch = self.table[self.table['epoch_srt'] == epoch].index
-            # self.table.loc[iepoch, 'fname'] = local_fname_use
-            self.table.loc[iepoch, "fpath_" + io] = local_path_use
-            logger.debug("local RINEX file guessed: %s", local_path_use)
-
-        logger.info("nbr local RINEX files guessed: %s", len(local_paths_list))
-
-        return local_paths_list
+        return loc_paths_list
 
     def guess_out_files(self):
+        """
+        Generates output file paths for each row in the table and updates the table.
 
+        This method iterates over the rows of the table, constructs the output file path
+        for each input file, and updates the `fpath_out` column in the table. It also
+        ensures that the output directory exists and checks the validity of the output files.
+
+        Returns
+        -------
+        list
+            A list of output file paths generated for the table rows.
+
+        Notes
+        -----
+        - The output directory is created if it does not exist.
+        - The `check_local_files` method is called to validate the output files.
+        """
         out_paths_list = []
 
         for irow, row in self.table.iterrows():
-            ## dirty update of the site_id
-            ## a new translate_path should accept table row
-            ### IMPORVE_ME !!!
-            # self.site_id = self.table.loc[irow, "site"]
-            # self.set_translate_dict()
-
+            # Translate the output directory path for the current row and create it if necessary
             outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
 
+            # Construct the output file path using the input file's base name
             bnam_inp = os.path.basename(row["fpath_inp"])
             fpath_out = os.path.join(outdir_use, bnam_inp)
-            self.table.loc[irow, "fpath_out"] = fpath_out
-            self.check_local_files(io="out")
+
+            # Append the output file path to the list
             out_paths_list.append(fpath_out)
+
+        # Update the table with the generated output file path
+        self.table["fpath_out"] = out_paths_list
+
+        # Check the validity of the output files
+        self.check_local_files(io="out")
 
         return out_paths_list
 
@@ -1549,23 +1557,13 @@ class StepGnss:
         local_files_list = []
 
         if io not in ["inp", "out"]:
-            logger.error("io must be 'inp' or 'out'")
-            return local_files_list
+            logging.error("io must be 'inp' or 'out'")
+            raise Exception
 
         for irow, row in self.table.iterrows():
-            loc_file = row["fpath_" + io]
-            if type(loc_file) is float:
-                ### if not initialized, value is NaN (and then a float)
-                self.table.loc[irow, "ok_" + io] = False
-            else:
-                loc_file_abs = os.path.abspath(loc_file)
-                if os.path.exists(loc_file_abs) and os.path.getsize(loc_file_abs) > 0:
-                    self.table.loc[irow, "ok_" + io] = True
-                    self.table.loc[irow, "size_" + io] = os.path.getsize(loc_file_abs)
-                    local_files_list.append(loc_file_abs)
-                else:
-                    self.table.loc[irow, "ok_" + io] = False
-                    self.table.loc[irow, "size_" + io] = np.nan
+            loc_file_out = self.mono_chk_local(irow, io=io)
+            if loc_file_out:
+                local_files_list.append(loc_file_out)
 
         return local_files_list
 
@@ -1646,9 +1644,8 @@ class StepGnss:
 
             files_uncmp_list.append(file_decmp)  ### all files are stored in this list
             if bool_decmp:
-                files_decmp_list.append(
-                    file_decmp
-                )  ### only the DEcompressed files are stored in this list (to be rm later)
+                files_decmp_list.append(file_decmp)
+                ### only the DEcompressed files are stored in this list (to be rm later)
 
         return files_decmp_list, files_uncmp_list
 
@@ -1713,8 +1710,10 @@ class StepGnss:
         Parameters
         ----------
         mode : str, optional
-            The mode of operation. Can be 'inpout' to move/copy files from input to output path,
-            or 'final' to move/copy files to the final destination. Default is 'inpout'.
+            The mode of operation. Can be:
+            'inpout' to move/copy files from input to output path,
+            'final' to move/copy files to the final destination.
+            Default is 'inpout'.
         copy_only : bool, optional
             If True, the files are copied instead of moved. Default is False.
         force : bool, optional
@@ -1732,10 +1731,10 @@ class StepGnss:
         file_mv_lis = []
         for irow, row in self.table.iterrows():
             if mode == "inpout":
-                file_mv = self.mono_mv_inpout(irow, copy_only=copy_only)
+                file_mv = self.mono_mv_inpout(irow, copy_only=copy_only, force=force)
             elif mode == "final":
                 file_mv = self.mono_mv_final(
-                    irow, table_col="fpath_out", copy_only=copy_only
+                    irow, table_col="fpath_out", copy_only=copy_only, force=force
                 )
             else:
                 logger.error("mode must be 'inpout' or 'final'")
@@ -1836,7 +1835,7 @@ class StepGnss:
             f = row["fname"]
             boolbad = utils.patterns_in_string_checker(f, *keywords_path_excl)
             if boolbad:
-                self.table.iloc[irow, "ok_inp"] = False
+                self.table.loc[irow, "ok_inp"] = False
                 logger.debug("file filtered, contains an excluded keyword: %s", f)
                 nfil += 1
             else:
@@ -2060,7 +2059,7 @@ class StepGnss:
         Parameters
         ----------
         df_prev_tab : pandas.DataFrame
-            The previous conversion tables stored as a DataFrame.
+            The previous conversion tables concatenated and stored as a DataFrame.
 
         Returns
         -------
@@ -2131,97 +2130,38 @@ class StepGnss:
             out = self.table[self.table[col]]
         return out
 
-    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
+    def filter_na(self, cols=None):
         """
-        Updates the rinexmod options dictionnary.
-
-        This method updates the rinexmod options based on the provided input options and the current
-        state of the StepGnss object. It handles default options, merges them with input options, and sets
-        specific options like metadata and site name/marker.
+        Filters the table to remove rows with NaN values in the specified columns,
+        and prints the dropped rows.
 
         Parameters
         ----------
-        rinexmod_options_inp : dict, optional
-            Input options for RINEX modification. Default is None.
-        irow : int, optional
-            Row index for setting the site name/marker from the table. Default is None.
-        debug_print : bool, optional
-            If True, prints the RINEX modification options for debugging purposes. Default is False.
+        cols : list, optional
+            The list of columns to check for NaN values.
+            If None, all columns are checked.
 
         Returns
         -------
-        dict
-            Updated RINEX modification options.
+        pandas.DataFrame
+            The dropped rows.
         """
 
-        if not rinexmod_options_inp:
-            rinexmod_options_inp = dict()
+        if cols is None:
+            cols = self.table.columns.tolist()
 
-        # just a shorter alias
-        rimopts_inp = rinexmod_options_inp
+        # Identify rows to be dropped
+        isna_bool = self.table[cols].isna().any(axis=1)
+        dropped_rows = self.table[isna_bool]
+        if not dropped_rows.empty:
+            logger.warning("row(s) filtered bc. NaN/NaT values in: %s", cols)
+            logger.warning("\n" + arocmn.print_tab_core(dropped_rows))
 
-        # default options/arguments for rinexmod
-        rimopts_def = {
-            # 'marker': 'XXXX', # forced below
-            # 'sitelog': metadata, # forced below
-            "compression": "gz",
-            # "longname": True, # managed below
-            "force_rnx_load": True,
-            "verbose": False,
-            "filename_style": "basic",
-            "full_history": True,
-        }
+        # Return filtered table
+        self.table = self.table[~isna_bool]
+        self.table.reset_index(drop=True, inplace=True)
 
-        # handle the specific case of a station.info input
-        # necessary for users using the station.info input (like EK@ENS)
-        update_sitelog = True
-        if not rimopts_inp.get("sitelog") and rimopts_inp.get("station_info"):
-            rimopts_def.pop("sitelog", None)
-            update_sitelog = False
-
-        # create the working copy of the default options
-        rimopts_out = rimopts_def.copy()
-        rimopts_wrk = rimopts_inp.copy()
-
-        # print the initial state
-        if debug_print:
-            logger.debug("default options for rinexmod: %s", rimopts_def)
-            logger.debug("input options for rinexmod: %s", rimopts_inp)
-
-        # +++ set #1: the metadata/sitelog
-        if update_sitelog:
-            rimopts_wrk["sitelog"] = self.metadata
-
-        # +++ set #2: site name/marker
-        if "marker" in rimopts_inp.keys():
-            rimopts_wrk["marker"] = rimopts_inp["marker"]
-        elif irow is not None:
-            rimopts_wrk["marker"] = self.table.loc[irow, "site"]
-        elif self.site_id9:
-            rimopts_wrk["marker"] = self.site_id9
-        else:
-            logger.warning(
-                "unable to set the marker (irow is %s, self.site_id9 is %s)",
-                irow,
-                self.site_id9,
-            )
-        # better give nothing rather than XXXX00XXX (nasty side effects)
-        if rimopts_wrk["marker"] == "XXXX00XXX":
-            rimopts_wrk.pop("marker", None)
-
-        # +++ set #3: the short/longname
-        # if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
-        if not any(k in rimopts_wrk for k in ("shortname", "longname")):
-            rimopts_wrk["shortname"] = False
-            rimopts_wrk["longname"] = True
-
-        # DO THE UPDATE HERE
-        rimopts_out.update(rimopts_wrk)
-
-        if debug_print:
-            logger.debug("final options for rinexmod: %s", rimopts_wrk)
-
-        return rimopts_out
+        return dropped_rows
 
     #               _   _                   _ _                           _ _    __                                 __
     #     /\       | | (_)                 ( | )                         ( | )  / /                                 \ \
@@ -2321,6 +2261,98 @@ class StepGnss:
 
         return bool_ok
 
+    def updt_rnxmodopts(self, rinexmod_options_inp=None, irow=None, debug_print=False):
+        """
+        Updates the rinexmod options dictionnary.
+
+        This method updates the rinexmod options based on the provided input options and the current
+        state of the StepGnss object. It handles default options, merges them with input options, and sets
+        specific options like metadata and site name/marker.
+
+        Parameters
+        ----------
+        rinexmod_options_inp : dict, optional
+            Input options for RINEX modification. Default is None.
+        irow : int, optional
+            Row index for setting the site name/marker from the table. Default is None.
+        debug_print : bool, optional
+            If True, prints the RINEX modification options for debugging purposes. Default is False.
+
+        Returns
+        -------
+        dict
+            Updated RINEX modification options.
+        """
+
+        if not rinexmod_options_inp:
+            rinexmod_options_inp = dict()
+
+        # just a shorter alias
+        rimopts_inp = rinexmod_options_inp
+
+        # default options/arguments for rinexmod
+        rimopts_def = {
+            # 'marker': 'XXXX', # forced below
+            # 'sitelog': metadata, # forced below
+            "compression": "gz",
+            # "longname": True, # managed below
+            "force_rnx_load": True,
+            "verbose": False,
+            "filename_style": "basic",
+            "full_history": True,
+        }
+
+        # handle the specific case of a station.info input
+        # necessary for users using the station.info input (like EK@ENS)
+        update_sitelog = True
+        if not rimopts_inp.get("sitelog") and rimopts_inp.get("station_info"):
+            rimopts_def.pop("sitelog", None)
+            update_sitelog = False
+
+        # create the working copy of the default options
+        rimopts_out = rimopts_def.copy()
+        rimopts_wrk = rimopts_inp.copy()
+
+        # print the initial state
+        if debug_print:
+            logger.debug("default options for rinexmod: %s", rimopts_def)
+            logger.debug("input options for rinexmod: %s", rimopts_inp)
+
+        # +++ set #1: the metadata/sitelog
+        if update_sitelog:
+            rimopts_wrk["sitelog"] = self.metadata
+
+        # +++ set #2: site name/marker
+        if "marker" in rimopts_inp.keys():
+            rimopts_wrk["marker"] = rimopts_inp["marker"]
+        elif irow is not None:
+            rimopts_wrk["marker"] = self.table.loc[irow, "site"]
+        elif self.site_id9:
+            rimopts_wrk["marker"] = self.site_id9
+        else:
+            logger.warning(
+                "unable to set the marker (irow is %s, self.site_id9 is %s)",
+                irow,
+                self.site_id9,
+            )
+        # better give nothing rather than XXXX00XXX (nasty side effects)
+        if rimopts_wrk["marker"] == "XXXX00XXX":
+            rimopts_wrk.pop("marker", None)
+
+        # +++ set #3: the short/longname
+        # if not ("shortname" in rimopts_wrk.keys() and "longname" in rimopts_wrk.keys()):
+        if not any(k in rimopts_wrk for k in ("shortname", "longname")):
+            rimopts_wrk["shortname"] = False
+            rimopts_wrk["longname"] = True
+
+        # DO THE UPDATE HERE
+        rimopts_out.update(rimopts_wrk)
+
+        if debug_print:
+            logger.debug("final options for rinexmod: %s", rimopts_wrk)
+
+        return rimopts_out
+
     def mono_rinexmod(
         self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
     ):
@@ -2402,7 +2434,9 @@ class StepGnss:
 
         return frnxmod
 
-    def mono_mv_final(self, irow, out_dir=None, table_col="fpath_out", copy_only=False):
+    def mono_mv_final(
+        self, irow, out_dir=None, table_col="fpath_out", copy_only=False, force=False
+    ):
         """
         "on row" method
 
@@ -2430,6 +2464,9 @@ class StepGnss:
             If True, the file is copied to the final destination
             instead of being moved.
             Default is False.
+        force : bool, optional
+            Force the move/copy if the file already exists
+            Default is False
 
         See also mono_mv_inpout
 
@@ -2466,13 +2503,15 @@ class StepGnss:
 
         file_to_mv = self.table.loc[irow, table_col]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(file_to_mv, outdir_trsl, copy_only=copy_only)
+        file_moved = arocmn.move_copy_core(
+            file_to_mv, outdir_trsl, copy_only=copy_only, force=force
+        )
         ### ^^^^^ HERE IS THE MOVE
         self.mono_mv_validat(irow, file_moved=file_moved, table_col=table_col)
 
         return file_moved
 
-    def mono_mv_inpout(self, irow, copy_only=False):
+    def mono_mv_inpout(self, irow, copy_only=False, force=False):
         """
         Moves or copies the input file to the output file.
 
@@ -2488,6 +2527,9 @@ class StepGnss:
             The index of the row in the table to process.
         copy_only : bool, optional
             If True, the file is copied instead of moved. Default is False.
+        force : bool, optional
+            Force the move/copy if the file already exists
+            Default is False
 
         Returns
         -------
@@ -2501,7 +2543,9 @@ class StepGnss:
         file_src = self.table.loc[irow, "fpath_inp"]
         file_des = self.table.loc[irow, "fpath_out"]
         ### vvvvv HERE IS THE MOVE
-        file_moved = arocmn.move_core(file_src, file_des, copy_only=copy_only)
+        file_moved = arocmn.move_copy_core(
+            file_src, file_des, copy_only=copy_only, force=force
+        )
         ### ^^^^^ HERE IS THE MOVE
         self.mono_mv_validat(irow, file_moved=file_moved, table_col="fpath_out")
         return file_moved
@@ -2622,3 +2666,129 @@ class StepGnss:
             bool_decomp_out = False
 
         return file_decomp_out, bool_decomp_out
+
+    def mono_guess_rnx(self, irow, io="out", shortname=False):
+        """
+        Guesses the local RINEX file path for a given row in the table.
+
+        This method determines the local RINEX file path based on the epoch range
+        and site information for a specific row in the table. It supports both
+        input (`inp`) and output (`out`) modes.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table for which the RINEX file path is to be guessed.
+        io : str, optional
+            Specifies whether to guess the input (`inp`) or output (`out`) file path.
+            Default is `out`.
+        shortname : bool, optional
+            guess RINEX's shortname if True
+            Default is False.
+
+        Returns
+        -------
+        str
+            The guessed local RINEX file path.
+
+        Raises
+        ------
+        Exception
+            If the `io` parameter is not `inp` or `out`.
+
+        Notes
+        -----
+        - The method ensures that the timezone information is removed from the
+          epoch start and end times to avoid compatibility issues with `rinexmod`.
+        - The guessed file path is stored in the `fpath_<io>` column of the table.
+        """
+
+        # Determine the directory based on the `io` parameter
+        if io not in ["inp", "out"]:
+            logging.error("io must be 'inp' or 'out'")
+            raise Exception
+
+        loc_dir = str(self.out_dir if io == "out" else self.inp_dir)
+
+        # Retrieve the start and end epochs for the specified row
+        epo_srt = self.table.loc[irow, "epoch_srt"].to_pydatetime()
+        epo_end = self.table.loc[irow, "epoch_end"].to_pydatetime()
+
+        # Remove timezone information to ensure compatibility with `rinexmod`
+        epo_srt = epo_srt.replace(tzinfo=None)
+        epo_end = epo_end.replace(tzinfo=None)
+
+        # Determine the file period string based on the epoch range
+        prd_str = rinexmod.rinexfile.file_period_from_timedelta(epo_srt, epo_end)[0]
+
+        # Generate the RINEX file name using site and session information
+        if not shortname:
+            loc_fname = conv.statname_dt2rinexname_long(
+                self.site_id9,
+                epo_srt,
+                country="XXX",  # `site_id9` includes the country
+                data_source="R",  # Always "R" for autorino
+                file_period=prd_str,
+                data_freq=self.session["data_frequency"],
+                data_type="MO",
+                format_compression="crx.gz",
+                preset_type=None,
+            )
+        else:
+            loc_fname = conv.statname_dt2rinexname(self.site_id9[:4], epo_srt, "d.gz")
+
+        # Construct the full file path and translate it
+        loc_path0 = os.path.join(loc_dir, loc_fname)
+        loc_path = self.translate_path(loc_path0, epoch_inp=epo_srt)
+        loc_fname = os.path.basename(loc_path)
+
+        # Update the table with the guessed file path
+        self.table.loc[irow, "fpath_" + io] = loc_path
+        logger.debug("local RINEX file guessed: %s", loc_path)
+
+        return loc_path
+
+    def mono_chk_local(self, irow, io="out"):
+        """
+        Checks the existence and validity of a local file for a specific row in the table.
+
+        This method verifies if the file specified in the `fpath_<io>` column of the table exists
+        and is non-empty. It updates the corresponding `ok_<io>` and `size_<io>` columns in the table
+        based on the file's existence and size.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table to check.
+        io : str, optional
+            Specifies whether to check the input (`inp`) or output (`out`) file path.
+            Default is `out`.
+
+        Returns
+        -------
+        str or None
+            The absolute path of the file if it exists and is valid, otherwise None.
+
+        Notes
+        -----
+        - If the file path is not initialized (NaN), the method sets `ok_<io>` to False.
+        - If the file exists and is non-empty, the method sets `ok_<io>` to True and updates `size_<io>`
+          with the file size.
+        - If the file does not exist or is empty, the method sets `ok_<io>` to False and `size_<io>` to NaN.
+        """
+        loc_file = self.table.loc[irow, "fpath_" + io]
+        if isinstance(loc_file, float) and np.isnan(loc_file):
+            ### if not initialized, value is NaN (and then a float)
+            self.table.loc[irow, "ok_" + io] = False
+            loc_file_out = None
+        else:
+            loc_file_abs = os.path.abspath(loc_file)
+            if os.path.exists(loc_file_abs) and os.path.getsize(loc_file_abs) > 0:
+                self.table.loc[irow, "ok_" + io] = True
+                self.table.loc[irow, "size_" + io] = os.path.getsize(loc_file_abs)
+                loc_file_out = loc_file_abs
+            else:
+                self.table.loc[irow, "ok_" + io] = False
+                self.table.loc[irow, "size_" + io] = np.nan
+                loc_file_out = None
+        return loc_file_out

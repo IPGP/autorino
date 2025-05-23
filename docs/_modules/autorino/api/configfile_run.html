@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.api.configfile_run &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.api.configfile_run</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.api.configfile_run</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 18/09/2024 18:23:30</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgfiles</span> <span class="k">as</span> <span class="nn">arocfg</span>
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+
+<span class="c1">#### Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;autorino&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="cfgfile_run">
+<a class="viewcode-back" href="../../../autorino.api.html#autorino.api.configfile_run.cfgfile_run">[docs]</a>
+<span class="k">def</span> <span class="nf">cfgfile_run</span><span class="p">(</span>
+    <span class="n">cfg_in</span><span class="p">,</span>
+    <span class="n">incl_cfg_in</span><span class="p">,</span>
+    <span class="n">sites_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_sites</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">epo_srt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">epo_end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span>
+    <span class="n">steps_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_steps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run the Autorino configuration files.</span>
+
+<span class="sd">    This function takes in a configuration file or a directory of configuration files,</span>
+<span class="sd">    reads the configuration, and runs the steps specified in the configuration.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cfg_in : str</span>
+<span class="sd">        The input configuration file or directory of configuration files.</span>
+<span class="sd">        If a directory is provided, all files ending with &#39;.yml&#39; will be used.</span>
+<span class="sd">    incl_cfg_in : str or list of str</span>
+<span class="sd">        The include configuration files to be used for development/advanced purposes.</span>
+<span class="sd">        If a list is provided, all files in the list will be included.</span>
+<span class="sd">        It will override the `include` section of the `cfg_in` configuration file.</span>
+<span class="sd">    sites_list : list, optional</span>
+<span class="sd">        A list of site identifiers to filter the configuration files.</span>
+<span class="sd">         If provided, only configurations for sites in this list will be processed.</span>
+<span class="sd">         Default is None.</span>
+<span class="sd">    exclude_sites : bool, optional</span>
+<span class="sd">        If True, the site in sites_list will be ignored.</span>
+<span class="sd">        It is the opposed behavior of the regular one using sites_list.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    epo_srt : str, list, optional</span>
+<span class="sd">        The start date for the epoch range.</span>
+<span class="sd">        Can be a list; if so, each epoch is considered separately.</span>
+<span class="sd">        Can be a file path; if so, the file contains a list of start epochs</span>
+<span class="sd">        The epoch can be formatted as:</span>
+<span class="sd">        * a litteral, e.g. &#39;yesterday&#39;, &#39;10 days ago&#39;</span>
+<span class="sd">        * YYYY-DDD, year-day of year, e.g. 2025-140</span>
+<span class="sd">        * YYYY-MM-DD, classic calendar date, e.g. 2025-05-20</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    epo_end : str, optional</span>
+<span class="sd">        The end date for the epoch range. Default is None.</span>
+<span class="sd">    period : str, optional</span>
+<span class="sd">        The period for the epoch range. Default is &quot;1D&quot;.</span>
+<span class="sd">    steps_list : list, optional</span>
+<span class="sd">        A list of selected steps to be executed.</span>
+<span class="sd">        If not provided, all steps in &#39;steps_lis&#39; will be executed.</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    exclude_steps : bool, optional</span>
+<span class="sd">        If True the selected steps indicated in step_select_list are excluded.</span>
+<span class="sd">        It is the opposite behavior of the regular one using steps_select_list</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    force : bool, optional</span>
+<span class="sd">        If True, the steps will be executed even if the output files already exist.</span>
+<span class="sd">        overrides the &#39;force&#39; parameters in the configuration file.</span>
+<span class="sd">        Default is False.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    Exception</span>
+<span class="sd">        If the provided cfg_in does not exist as a file or directory, an exception is raised.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Check if cfg_in is a directory or a file and get the list of configuration files</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">cfg_in</span><span class="p">):</span>
+        <span class="n">cfg_use_lis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;/*yml&quot;</span><span class="p">,</span> <span class="s2">&quot;/*yaml&quot;</span><span class="p">):</span>
+            <span class="n">cfg_use_lis</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">cfg_in</span> <span class="o">+</span> <span class="n">ext</span><span class="p">))))</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cfg_in</span><span class="p">):</span>
+        <span class="n">cfg_use_lis</span> <span class="o">=</span> <span class="p">[</span><span class="n">cfg_in</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> does not exist, check input cfgfiles file/dir&quot;</span><span class="p">,</span> <span class="n">cfg_in</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Determine the epoch range based on the provided start and end dates</span>
+    <span class="k">if</span> <span class="n">epo_srt</span> <span class="ow">and</span> <span class="n">epo_end</span><span class="p">:</span>
+        <span class="n">epoch_range</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">,</span> <span class="n">epo_end</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">epo_srt</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">epo_end</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">start_use</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">start_use</span> <span class="o">=</span> <span class="n">epo_srt</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;start must be a list or a file path&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">epoch_range</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="n">start_use</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">epoch_range</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Process each configuration file</span>
+    <span class="k">for</span> <span class="n">cfg_use</span> <span class="ow">in</span> <span class="n">cfg_use_lis</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sites_list</span><span class="p">:</span>
+            <span class="c1"># Quick load to check if the site is in the list or not</span>
+            <span class="n">y_quick</span> <span class="o">=</span> <span class="n">arocfg</span><span class="o">.</span><span class="n">load_cfg</span><span class="p">(</span><span class="n">cfg_path</span><span class="o">=</span><span class="n">cfg_use</span><span class="p">)</span>
+            <span class="n">site_quick</span> <span class="o">=</span> <span class="n">y_quick</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">][</span><span class="s2">&quot;site&quot;</span><span class="p">][</span><span class="s2">&quot;site_id&quot;</span><span class="p">]</span>
+            <span class="c1">### case 1: sites_list are the sites we want</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">exclude_sites</span> <span class="ow">and</span> <span class="p">(</span><span class="n">site_quick</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sites_list</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping site </span><span class="si">%s</span><span class="s2"> (not in sites list)&quot;</span><span class="p">,</span> <span class="n">site_quick</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1">### case 2: sites_list are the sites we ignore</span>
+            <span class="k">elif</span> <span class="n">exclude_sites</span> <span class="ow">and</span> <span class="p">(</span><span class="n">site_quick</span> <span class="ow">in</span> <span class="n">sites_list</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping site </span><span class="si">%s</span><span class="s2"> (in ignored sites list)&quot;</span><span class="p">,</span> <span class="n">site_quick</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1">### case 3: regular case</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+
+        <span class="c1"># Read the configuration and run the steps</span>
+        <span class="c1"># step_lis_lis is a list of list because you can have several sessions in the same configuration file</span>
+        <span class="n">steps_lis_lis</span><span class="p">,</span> <span class="n">steps_dic_dic</span><span class="p">,</span> <span class="n">y_use</span> <span class="o">=</span> <span class="n">arocfg</span><span class="o">.</span><span class="n">read_cfg</span><span class="p">(</span>
+            <span class="n">site_cfg_path</span><span class="o">=</span><span class="n">cfg_use</span><span class="p">,</span> <span class="n">include_cfg_paths_xtra</span><span class="o">=</span><span class="n">incl_cfg_in</span><span class="p">,</span> <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">steps_lis</span> <span class="ow">in</span> <span class="n">steps_lis_lis</span><span class="p">:</span>
+            <span class="n">arocfg</span><span class="o">.</span><span class="n">run_steps</span><span class="p">(</span>
+                <span class="n">steps_lis</span><span class="p">,</span>
+                <span class="n">steps_select_list</span><span class="o">=</span><span class="n">steps_list</span><span class="p">,</span>
+                <span class="n">exclude_steps_select</span><span class="o">=</span><span class="n">exclude_steps</span><span class="p">,</span>
+                <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

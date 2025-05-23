@@ -31,7 +31,7 @@ name = "autorino"  # REQUIRED, is the only field that cannot be marked as dynami
 #
 # For a discussion on single-sourcing the version, see
 # https://packaging.python.org/guides/single-sourcing-package-version/
-version = "1.3.1"  # REQUIRED, although can be dynamic
+version = "2.0.0-beta1"  # REQUIRED, although can be dynamic
 
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
@@ -171,6 +171,7 @@ dependencies = {file = ["requirements.txt"]}
 # which executes the function `main` from this package when invoked.
 [project.scripts]
 autorino_cfgfile_run = "autorino.bin.autorino_cfgfile_run:main"
+autorino_cfgfile_check = "autorino.bin.autorino_cfgfile_check:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
@@ -181,7 +182,7 @@ autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 # package-data = {"sample" = ["*.dat"]}
-#packages = ['autorino']
+# packages = ['autorino']
 
 [tool.setuptools.packages.find]
 where = ["."]  # list of folders that contain the packages (["."] by default)
@@ -189,39 +190,30 @@ include = ["autorino*"] # package names should match these glob patterns (["*"] 
 #exclude = []  # exclude packages matching these glob patterns (empty by default)
 #namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
-
-
-
-#[tool.versioningit.vcs]
-## The method key:
-#method = "git"  # <- The method name
-#
-## Parameters to pass to the method:
-#match = ["v*"]
-#default-tag = "1.0.0"
-#
-#
-#[tool.versioningit.format]
-## Format used when there have been commits since the most recent tag:
-#distance = "{base_version}.post{distance}+{vcs}{rev}"
-## Example formatted version: 1.2.3.post42+ge174a1f
-#
-## Format used when there are uncommitted changes:
-#dirty = "{base_version}+d{build_date:%Y%m%d}"
-## Example formatted version: 1.2.3+d20230922
-#
-## Format used when there are both commits and uncommitted changes:
-#distance-dirty = "{base_version}.post{distance}+{vcs}{rev}.d{build_date:%Y%m%d}"
-## Example formatted version: 1.2.3.post42+ge174a1f.d20230922
-
-## Parameters to pass to the method:
-#match = ["v*"]
-#default-tag = "1.0.0"
-
 [tool.bumpversion]
-current_version = "1.3.1"  # REQUIRED, although can be dynamic
-parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
-serialize = ["{major}.{minor}.{patch}"]
+current_version = "2.0.0"  # REQUIRED, although can be dynamic
+
+
+##### SIMPLE CYCLE - MAJOR.MINOR.PATCH #####
+#parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+#serialize = ["{major}.{minor}.{patch}"]
+
+##### MORE COMPLEX CYCLE - MAJOR.MINOR.PATCH-PRERELEASE #####
+parse = """(?x)
+    (?P<major>0|[1-9]\\d*)\\.
+    (?P<minor>0|[1-9]\\d*)\\.
+    (?P<patch>0|[1-9]\\d*)
+    (?:
+        -                             # dash separator for pre-release section
+        (?P<pre_l>[a-zA-Z-]+)         # pre-release label
+        (?P<pre_n>0|[1-9]\\d*)        # pre-release version number
+    )?                                # pre-release section is optional
+"""
+serialize = [
+    "{major}.{minor}.{patch}-{pre_l}{pre_n}",
+    "{major}.{minor}.{patch}",
+]
+
 search = "{current_version}"
 replace = "{new_version}"
 regex = false
@@ -239,10 +231,12 @@ setup_hooks = []
 pre_commit_hooks = []
 post_commit_hooks = []
 
+[tool.bumpversion.parts.pre_l]
+values = ["beta",  "final"]
+optional_value = "final" # optional value for pre-release label ('final' wont appear in the version string)
+
 [[tool.bumpversion.files]]
 filename = "README.md"
-parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
-serialize = ["{major}.{minor}.{patch}"]
 search = "Version: {current_version}"
 replace = "Version: {new_version}"
 
@@ -254,14 +248,10 @@ regex = true
 
 [[tool.bumpversion.files]]
 filename = "autorino/__init__.py"
-parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
-serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
 replace = "{new_version}"
 
 [[tool.bumpversion.files]]
 filename = "pyproject.toml"
-parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
-serialize = ["{major}.{minor}.{patch}"]
 search = 'version = "{current_version}"'
 replace = 'version = "{new_version}"'

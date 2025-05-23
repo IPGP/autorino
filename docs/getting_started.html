@@ -1,0 +1,194 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="geodezyx’s Cookbook" href="cookbook.html" />
+    <link rel="prev" title="Welcome to autorino’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            autorino
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#standard-installation-for-non-admin-users">Standard installation (for non-admin users)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#full-installation-for-sudoers-advanced-users">Full installation (for sudoers/advanced users)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clone-and-manually-install-from-github-for-devloppers">Clone and manually install from GitHub (for devloppers)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-exemple">Minimal exemple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#description-of-the-modules">Description of the Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><cite>geodezyx</cite>’s Cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<span id="id1"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="installation">
+<span id="install"></span><h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>We recommend you to use Python’s virtual environnements to have a clean and isolated environment for the <cite>geodezyx</cite> toolbox.
+If you are not familiar with Python’s virtual environnements, you can follow the <a class="reference external" href="https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/">official documentation</a>.</p>
+<section id="standard-installation-for-non-admin-users">
+<h3>Standard installation (for non-admin users)<a class="headerlink" href="#standard-installation-for-non-admin-users" title="Link to this heading"></a></h3>
+<p>We recommend to use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install the last stable <a class="reference external" href="https://pypi.org/project/geodezyx/">PyPi-hosted</a> version:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">geodezyx</span></code></p>
+<p>To get the <strong>latest developpement version</strong> you can install directly the <a class="reference external" href="https://github.com/IPGP/geodezyx">GitHub-hosted</a> version:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/IPGP/geodezyx</span></code></p>
+<p>If you <strong>reinstall</strong> a new version the package, you should uninstall the existing one and/or use the <code class="docutils literal notranslate"><span class="pre">--upgrade</span></code> option:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">geodezyx</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">geodezyx</span></code></p>
+</section>
+<section id="full-installation-for-sudoers-advanced-users">
+<h3>Full installation (for sudoers/advanced users)<a class="headerlink" href="#full-installation-for-sudoers-advanced-users" title="Link to this heading"></a></h3>
+<p>This version installs facultative external modules, which require system libraries only installable when you have the sudo/admin rights, namely <code class="docutils literal notranslate"><span class="pre">netCDF4</span></code>, <code class="docutils literal notranslate"><span class="pre">kepler.py</span></code>, <code class="docutils literal notranslate"><span class="pre">ncompress</span></code>, <code class="docutils literal notranslate"><span class="pre">seawater</span></code>, <code class="docutils literal notranslate"><span class="pre">gsw</span></code>.</p>
+<p>We recommend to use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install the last stable <a class="reference external" href="https://pypi.org/project/geodezyx/">PyPi-hosted</a> version:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">geodezyx[full]</span></code></p>
+<p>To get the <strong>latest developpement version</strong> you can install directly the <a class="reference external" href="https://github.com/IPGP/geodezyx">GitHub-hosted</a> version:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;geodezyx[full]</span> <span class="pre">&#64;</span> <span class="pre">git+https://github.com/IPGP/geodezyx&quot;</span></code></p>
+</section>
+<section id="clone-and-manually-install-from-github-for-devloppers">
+<h3>Clone and manually install from GitHub (for devloppers)<a class="headerlink" href="#clone-and-manually-install-from-github-for-devloppers" title="Link to this heading"></a></h3>
+<p>Manually fork and/or clone the GitHub repository (<a class="reference external" href="https://github.com/IPGP/geodezyx">https://github.com/IPGP/geodezyx</a>) using your favorite flavor:</p>
+<ul class="simple">
+<li><p>https: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/IPGP/geodezyx.git</span></code> (recommended)</p></li>
+<li><p>SSH: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:IPGP/geodezyx.git</span></code></p></li>
+</ul>
+<p>Go to the folder where you cloned the repository:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">geodezyx</span></code></p></li>
+</ul>
+<p>And then install the toolbox you downloaded. Three solutions are possible:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> (<a class="reference external" href="https://setuptools.pypa.io/en/latest/userguide/development_mode.html">editable mode</a>, recommended if you want to edit the source code)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> (standard mode)</p></li>
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">geodezyx</span></code> folder in your <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>, for experimented (and old-fashoned) users</p></li>
+</ol>
+<p>To push your changes to the repository, don’t forget to set your <a class="reference external" href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">GitHub token first</a>.</p>
+</section>
+</section>
+<section id="minimal-exemple">
+<h2>Minimal exemple<a class="headerlink" href="#minimal-exemple" title="Link to this heading"></a></h2>
+<p>To test if the <cite>geodezyx</cite> toolbox is well installed, import:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#### Import</span>
+<span class="kn">import</span> <span class="nn">geodezyx</span>           <span class="c1"># Import the geodezyx modules</span>
+</pre></div>
+</div>
+<p>If the module are well imported (without errors in the console), fine! you have installed the <cite>geodezyx</cite> toolbox!
+If not, check again the potential errors during the installation.</p>
+<p>It might be better to import the modules separatelly, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geodezyx.conv</span> <span class="k">as</span> <span class="nn">conv</span>                  <span class="c1"># Import the conversion module</span>
+</pre></div>
+</div>
+<p>See the description of each module in the following section</p>
+</section>
+<section id="description-of-the-modules">
+<h2>Description of the Modules<a class="headerlink" href="#description-of-the-modules" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.athmo</span></code>: functions implementing troposhere/ionosphere models</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.conv</span></code>: time and coordinates conversion</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.files_rw</span></code>: read, import &amp; write geodetic files</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.geodyn</span></code>: Euler pole calculator and plot velocity field maps</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.marine</span></code>: contains a GEBCO bathymetry extrapolator</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.operational</span></code>: Download GNSS data/products from various servers / Read and Import sitelogs</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.reffram</span></code>: Reference Frame &amp; high-level coordinates conversion</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.stats</span></code>: Low-level statistics functions &amp; outlier detection functions / Low-level least-square functions</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.time_series</span></code>: module to handle Geodetic time-series</p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">geodezyx.utils</span></code>: Shell-like functions (grep, find in folder …) and functions to optimize list management</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to autorino’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cookbook.html" class="btn btn-neutral float-right" title="geodezyx’s Cookbook" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

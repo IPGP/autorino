@@ -19,3 +19,4 @@ matplotlib
 jinja2
 colorama
 logging-tree
+mergedeep

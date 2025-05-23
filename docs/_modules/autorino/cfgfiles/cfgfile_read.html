@@ -1,0 +1,995 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.cfgfiles.cfgfile_read &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.cfgfiles.cfgfile_read</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.cfgfiles.cfgfile_read</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Dec  1 15:47:05 2022</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">collections.abc</span>
+
+<span class="c1"># Create a logger object.</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">mergedeep</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">autorino.convert</span> <span class="k">as</span> <span class="nn">arocnv</span>
+<span class="kn">import</span> <span class="nn">autorino.download</span> <span class="k">as</span> <span class="nn">arodwl</span>
+<span class="kn">import</span> <span class="nn">autorino.handle</span> <span class="k">as</span> <span class="nn">arohdl</span>
+
+<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span>
+<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">metadata</span> <span class="k">as</span> <span class="n">rimo_mda</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+
+<span class="c1">#### Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+<span class="n">BOLD_SRT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m&quot;</span>
+<span class="n">BOLD_END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
+
+
+<div class="viewcode-block" id="load_cfg">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.load_cfg">[docs]</a>
+<span class="k">def</span> <span class="nf">load_cfg</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads quickly one or several configuration files (YAML format) **without interpretation**.</span>
+
+<span class="sd">    This function reads a YAML configuration file from the specified path and returns the parsed content.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cfg_path : str or list of str</span>
+<span class="sd">        The path(s) to the configuration file.</span>
+<span class="sd">        If a list is provided, the config files are merged</span>
+<span class="sd">    verbose : bool</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The parsed/merged content of the configuration files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">recursive</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">recursive</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">BOLD_SRT</span> <span class="o">+</span> <span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; Read configfile: &quot;</span> <span class="o">+</span> <span class="n">BOLD_END</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cfg_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+        <span class="n">ys_raw</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="p">[</span><span class="n">load_cfg</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cfg_path</span><span class="p">]</span> <span class="k">if</span> <span class="n">y</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mergedeep</span><span class="o">.</span><span class="n">merge</span><span class="p">({},</span> <span class="o">*</span><span class="n">ys_raw</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;config file doesn&#39;t exists!: </span><span class="si">{</span><span class="n">cfg_path</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_out</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">y_out</span></div>
+
+
+
+<div class="viewcode-block" id="read_cfg">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg">[docs]</a>
+<span class="k">def</span> <span class="nf">read_cfg</span><span class="p">(</span>
+    <span class="n">site_cfg_path</span><span class="p">,</span> <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_cfg_paths_xtra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read and interpret a configuration file (YAML format) and</span>
+<span class="sd">    return a list of StepGnss objects to be launched sequentially.</span>
+
+<span class="sd">    This function takes in a path to a configuration file,</span>
+<span class="sd">    an optional EpochRange object, and an optional path</span>
+<span class="sd">    to a main configuration file.</span>
+<span class="sd">    It reads the configuration file, updates it with the main configuration file if provided,</span>
+<span class="sd">    and creates a list of StepGnss objects based on the configuration.</span>
+<span class="sd">    The EpochRange object, if provided, will override the epoch ranges given in the configuration file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    site_cfg_path : str</span>
+<span class="sd">        The path to the configuration file.</span>
+<span class="sd">        Should be a single file here (no list).</span>
+<span class="sd">    epoch_range : EpochRange, optional</span>
+<span class="sd">        An EpochRange object which will override the epoch ranges</span>
+<span class="sd">        given in the configuration file. Default is None.</span>
+<span class="sd">    include_cfg_paths_xtra : str or list of str, optional</span>
+<span class="sd">        The path to the include configuration file.</span>
+<span class="sd">        If a list is provided, the include config files are merged.</span>
+<span class="sd">        It overrides the files given with the &#39;include&#39; keyword</span>
+<span class="sd">        in the site configuration file.</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        A flag indicating whether to print the configuration</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    steps_lis_lis : list</span>
+<span class="sd">        A list of lists of StepGnss objects to be launched sequentially.</span>
+<span class="sd">    steps_dic_dic : dict</span>
+<span class="sd">        A dictionary of dictionaries of StepGnss.</span>
+<span class="sd">    y_use : dict</span>
+<span class="sd">        The parsed/merged content of the configuration file as dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">y_site</span> <span class="o">=</span> <span class="n">load_cfg</span><span class="p">(</span><span class="n">site_cfg_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;include&quot;</span> <span class="ow">in</span> <span class="n">y_site</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">include_cfg_paths</span> <span class="o">=</span> <span class="n">get_incl_cfg_paths</span><span class="p">(</span><span class="n">y_site</span><span class="p">,</span> <span class="n">site_cfg_path</span><span class="p">)</span>
+        <span class="n">y_incl</span> <span class="o">=</span> <span class="n">load_cfg</span><span class="p">(</span><span class="n">include_cfg_paths</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_incl</span> <span class="o">=</span> <span class="n">load_cfg</span><span class="p">(</span><span class="n">include_cfg_paths_xtra</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># before config files v20 (2025-04-10), the keyword FROM_MAIN was used in the sites cfgfiles</span>
+    <span class="c1"># after v20, the main cfgfile is the basis, and is automatically overloaded with site cfgfile values</span>
+    <span class="n">legacy_main_updt</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">y_site</span><span class="p">[</span><span class="s2">&quot;cfgfile_version&quot;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">20.0</span> <span class="k">else</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">legacy_main_updt</span><span class="p">:</span>  <span class="c1"># cfgfile_version &lt; 20.</span>
+        <span class="n">y_use</span> <span class="o">=</span> <span class="n">read_cfg_legacy</span><span class="p">(</span><span class="n">y_site</span><span class="p">,</span> <span class="n">y_incl</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># cfgfile_version &gt;= 20.</span>
+        <span class="n">y_use</span> <span class="o">=</span> <span class="n">mergedeep</span><span class="o">.</span><span class="n">merge</span><span class="p">({},</span> <span class="n">y_incl</span><span class="p">,</span> <span class="n">y_site</span><span class="p">)</span> <span class="k">if</span> <span class="n">y_incl</span> <span class="k">else</span> <span class="n">y_site</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Used configuration (updated with include):</span><span class="se">\n</span><span class="si">{</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">y_use</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">steps_lis_lis</span><span class="p">,</span> <span class="n">steps_dic_dic</span> <span class="o">=</span> <span class="n">read_cfg_core</span><span class="p">(</span><span class="n">y_use</span><span class="p">,</span> <span class="n">epoch_range_inp</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">steps_lis_lis</span><span class="p">,</span> <span class="n">steps_dic_dic</span><span class="p">,</span> <span class="n">y_use</span></div>
+
+
+
+<div class="viewcode-block" id="read_cfg_core">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_core">[docs]</a>
+<span class="k">def</span> <span class="nf">read_cfg_core</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">epoch_range_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads and interprets session configurations from a dictionary</span>
+<span class="sd">    and returns lists and dictionaries of StepGnss objects.</span>
+
+<span class="sd">    This function processes session configurations,</span>
+<span class="sd">    loads metadata if available, and constructs lists and dictionaries</span>
+<span class="sd">    of StepGnss objects based on the provided session configurations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_inp : dict</span>
+<span class="sd">        A dictionary a site configuration.</span>
+<span class="sd">    epoch_range_inp : EpochRange, optional</span>
+<span class="sd">        An EpochRange object which will override the epoch ranges given</span>
+<span class="sd">        in the session configurations. Default is None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    steps_lis_lis : list</span>
+<span class="sd">        A list of lists of StepGnss objects to be launched sequentially.</span>
+<span class="sd">    steps_dic_dic : dict</span>
+<span class="sd">        A dictionary of dictionaries of StepGnss objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># ++++ METADATA</span>
+    <span class="n">y_station</span> <span class="o">=</span> <span class="n">y_inp</span><span class="p">[</span><span class="s2">&quot;station&quot;</span><span class="p">]</span>
+    <span class="n">y_sessions</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;sessions&quot;</span><span class="p">]</span>
+    <span class="c1"># Load metadata as external sitelog(s)</span>
+    <span class="k">if</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">][</span><span class="s2">&quot;attributes_from_sitelog&quot;</span><span class="p">]:</span>
+        <span class="n">slpath</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">][</span><span class="s2">&quot;sitelog_path&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">slpath</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">slpath</span><span class="p">):</span>
+            <span class="c1"># Load the metadata if the path is a directory or a file</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">rinexmod_api</span><span class="o">.</span><span class="n">metadata_input_manage</span><span class="p">(</span><span class="n">slpath</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If not, keep the path it as a string</span>
+            <span class="c1"># (because it might contain aliases and be translated later in the object)</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">slpath</span>
+    <span class="c1"># Load metadata as device block</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">_device2mda</span><span class="p">(</span><span class="n">y_station</span><span class="p">)</span>
+
+    <span class="n">steps_lis_lis</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">steps_dic_dic</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k_ses</span><span class="p">,</span> <span class="n">y_ses</span> <span class="ow">in</span> <span class="n">y_sessions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="n">steps_lis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">steps_dic</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">y_gen</span> <span class="o">=</span> <span class="n">y_ses</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_cfg_bloc_active</span><span class="p">(</span><span class="n">y_gen</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># y_gen_main = y_ses_main[&#39;general&#39;]</span>
+        <span class="c1"># y_gen = update_w_main_dic(y_gen, y_gen_main)</span>
+
+        <span class="c1"># ++++ TMP DIRECTORY</span>
+        <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_dir_path</span><span class="p">(</span><span class="n">y_gen</span><span class="p">,</span> <span class="s2">&quot;tmp&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ++++ LOG DIRECTORY</span>
+        <span class="n">log_dir</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_dir_path</span><span class="p">(</span><span class="n">y_gen</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ++++ EPOCH RANGE AT THE SESSION LEVEL</span>
+        <span class="k">if</span> <span class="n">epoch_range_inp</span><span class="p">:</span>
+            <span class="n">epo_obj_ses</span> <span class="o">=</span> <span class="n">epoch_range_inp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">epo_obj_ses</span> <span class="o">=</span> <span class="n">_epoch_range_from_cfg_bloc</span><span class="p">(</span><span class="n">y_ses</span><span class="p">[</span><span class="s2">&quot;epoch_range&quot;</span><span class="p">])</span>
+
+        <span class="c1"># ++++ manage steps</span>
+        <span class="n">y_steps</span> <span class="o">=</span> <span class="n">y_ses</span><span class="p">[</span><span class="s2">&quot;steps&quot;</span><span class="p">]</span>
+        <span class="c1"># y_workflow_main = y_ses_main[&#39;workflow&#39;]</span>
+
+        <span class="k">for</span> <span class="n">k_stp</span><span class="p">,</span> <span class="n">y_stp</span> <span class="ow">in</span> <span class="n">y_steps</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># y_step_main = y_workflow_main[k_stp]</span>
+            <span class="c1"># y_step = update_w_main_dic(y_step, y_step_main)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_cfg_bloc_active</span><span class="p">(</span><span class="n">y_stp</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># ++++ EPOCH RANGE AT THE STEP LEVEL</span>
+            <span class="n">step_cls</span> <span class="o">=</span> <span class="n">step_cls_select</span><span class="p">(</span><span class="n">k_stp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">step_cls</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;unknown step </span><span class="si">%s</span><span class="s2">, skip&quot;</span><span class="p">,</span> <span class="n">k_stp</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">y_stp</span><span class="p">[</span><span class="s2">&quot;epoch_range&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;FROM_SESSION&quot;</span>
+                <span class="ow">or</span> <span class="ow">not</span> <span class="s2">&quot;epoch_range&quot;</span> <span class="ow">in</span> <span class="n">y_stp</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">epo_obj_stp</span> <span class="o">=</span> <span class="n">epo_obj_ses</span>
+                <span class="n">y_stp</span><span class="p">[</span><span class="s2">&quot;epoch_range&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_ses</span><span class="p">[</span><span class="s2">&quot;epoch_range&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">epo_obj_stp</span> <span class="o">=</span> <span class="n">_epoch_range_from_cfg_bloc</span><span class="p">(</span><span class="n">y_stp</span><span class="p">[</span><span class="s2">&quot;epoch_range&quot;</span><span class="p">])</span>
+
+            <span class="c1">## concatenate the dir_parent and the structure</span>
+            <span class="c1"># (but not the file_regex, it is just about the directory)</span>
+            <span class="n">out_dir</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_dir_path</span><span class="p">(</span><span class="n">y_stp</span><span class="p">,</span> <span class="s2">&quot;out&quot;</span><span class="p">)</span>
+            <span class="n">inp_dir</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_dir_path</span><span class="p">(</span><span class="n">y_stp</span><span class="p">,</span> <span class="s2">&quot;inp&quot;</span><span class="p">,</span> <span class="n">check_parent_dir_exist</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;inp_file_regex&quot;</span> <span class="ow">in</span> <span class="n">y_stp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">inp_file_regex</span> <span class="o">=</span> <span class="n">y_stp</span><span class="p">[</span><span class="s2">&quot;inp_file_regex&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Compatibility! inp_file_regex not defined in cfg files&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;upgrade your config file to &gt;v15, set to .* for now&quot;</span><span class="p">)</span>
+                <span class="n">inp_file_regex</span> <span class="o">=</span> <span class="s2">&quot;.*&quot;</span>
+
+            <span class="n">kwargs_for_step</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;out_dir&quot;</span><span class="p">:</span> <span class="n">out_dir</span><span class="p">,</span>
+                <span class="s2">&quot;tmp_dir&quot;</span><span class="p">:</span> <span class="n">tmp_dir</span><span class="p">,</span>
+                <span class="s2">&quot;log_dir&quot;</span><span class="p">:</span> <span class="n">log_dir</span><span class="p">,</span>
+                <span class="s2">&quot;inp_dir&quot;</span><span class="p">:</span> <span class="n">inp_dir</span><span class="p">,</span>
+                <span class="s2">&quot;inp_file_regex&quot;</span><span class="p">:</span> <span class="n">inp_file_regex</span><span class="p">,</span>
+                <span class="s2">&quot;epoch_range&quot;</span><span class="p">:</span> <span class="n">epo_obj_stp</span><span class="p">,</span>
+                <span class="s2">&quot;site&quot;</span><span class="p">:</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;session&quot;</span><span class="p">:</span> <span class="n">y_ses</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="n">y_stp</span><span class="p">[</span><span class="s2">&quot;options&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">metadata</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">k_stp</span> <span class="o">==</span> <span class="s2">&quot;download&quot;</span><span class="p">:</span>
+                <span class="n">kwargs_for_step</span><span class="p">[</span><span class="s2">&quot;access&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;access&quot;</span><span class="p">]</span>
+
+            <span class="c1">### +++ CREATION OF THE OBJECT ###########</span>
+            <span class="n">step_obj</span> <span class="o">=</span> <span class="n">step_cls</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs_for_step</span><span class="p">)</span>
+            <span class="c1">##########################################</span>
+            <span class="c1"># appended in lis and dic at the end of the k_stp tests</span>
+            <span class="n">steps_lis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step_obj</span><span class="p">)</span>
+            <span class="n">steps_dic</span><span class="p">[</span><span class="n">k_stp</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_obj</span>
+
+        <span class="n">steps_lis_lis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">steps_lis</span><span class="p">)</span>
+        <span class="n">steps_dic_dic</span><span class="p">[</span><span class="n">k_ses</span><span class="p">]</span> <span class="o">=</span> <span class="n">steps_dic</span>
+
+    <span class="k">return</span> <span class="n">steps_lis_lis</span><span class="p">,</span> <span class="n">steps_dic_dic</span></div>
+
+
+
+<div class="viewcode-block" id="step_cls_select">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.step_cls_select">[docs]</a>
+<span class="k">def</span> <span class="nf">step_cls_select</span><span class="p">(</span><span class="n">step_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Selects the appropriate class for a given step name.</span>
+
+<span class="sd">    This function maps a step name to its corresponding class, which is used</span>
+<span class="sd">    to handle specific GNSS processing steps such as &#39;download&#39;, &#39;convert&#39;,</span>
+<span class="sd">    &#39;split&#39;, or &#39;splice&#39;. If the step name is unknown, a warning is logged,</span>
+<span class="sd">    and None is returned.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    step_name : str</span>
+<span class="sd">        The name of the step for which the corresponding class is to be selected.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    class or None</span>
+<span class="sd">        The class corresponding to the given step name, or None if the step name is unknown.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Supported step names and their corresponding classes:</span>
+<span class="sd">        - &#39;download&#39;: arodwl.DownloadGnss</span>
+<span class="sd">        - &#39;convert&#39;: arocnv.ConvertGnss</span>
+<span class="sd">        - &#39;split&#39;: arohdl.SplitGnss</span>
+<span class="sd">        - &#39;splice&#39;: arohdl.SpliceGnss</span>
+<span class="sd">    - Logs a warning if the step name is not recognized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;download&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arodwl</span><span class="o">.</span><span class="n">DownloadGnss</span>
+    <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;convert&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">ConvertGnss</span>
+    <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;split&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SplitGnss</span>
+    <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;splice&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SpliceGnss</span>
+    <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">RinexmodGnss</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;unknown step </span><span class="si">%s</span><span class="s2"> in cfgfiles file, skip&quot;</span><span class="p">,</span> <span class="n">step_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="run_steps">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.run_steps">[docs]</a>
+<span class="k">def</span> <span class="nf">run_steps</span><span class="p">(</span>
+    <span class="n">steps_lis</span><span class="p">,</span>
+    <span class="n">steps_select_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude_steps_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes the steps in the provided list.</span>
+
+<span class="sd">    This function takes a list of StepGnss objects,</span>
+<span class="sd">    an optional list of selected steps,</span>
+<span class="sd">    and an optional boolean flag for printing tables.</span>
+<span class="sd">    It iterates over the list of StepGnss objects and executes</span>
+<span class="sd">    the &#39;download&#39; or &#39;convert&#39; method depending on the type of the step.</span>
+<span class="sd">    If a list of selected steps is provided,</span>
+<span class="sd">    only the steps in the list will be executed.</span>
+<span class="sd">    If the &#39;verbose&#39; flag is set to True,</span>
+<span class="sd">    the tables will be printed during the execution of the steps.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    steps_lis : Iterable</span>
+<span class="sd">        A list of StepGnss objects to be executed.</span>
+<span class="sd">    steps_select_list : list, optional</span>
+<span class="sd">        A list of selected steps to be executed.</span>
+<span class="sd">        If not provided, all steps in &#39;steps_lis&#39; will be executed.</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    exclude_steps_select : bool, optional</span>
+<span class="sd">        If True the selected steps indicated in step_select_list are excluded.</span>
+<span class="sd">        It is the opposite behavior of the regular one using steps_list</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        A flag indicating whether to print the tables during the execution of the steps.</span>
+<span class="sd">         Default is True.</span>
+<span class="sd">    force : bool, optional</span>
+<span class="sd">        A flag indicating whether to force the execution of the steps.</span>
+<span class="sd">        overrides the &#39;force&#39; parameters in the configuration file.</span>
+<span class="sd">        Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># If no steps are selected, initialize an empty list</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">steps_select_list</span><span class="p">:</span>
+        <span class="n">steps_select_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">wkf_prev</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Log the number of steps to be run</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%i</span><span class="s2"> steps will be run </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps_lis</span><span class="p">),</span> <span class="n">steps_lis</span><span class="p">)</span>
+
+    <span class="c1"># Iterate over the list of steps</span>
+    <span class="k">for</span> <span class="n">istp</span><span class="p">,</span> <span class="n">stp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">steps_lis</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">istp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">wkf_prev</span> <span class="o">=</span> <span class="n">steps_lis</span><span class="p">[</span><span class="n">istp</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Check if there are selected steps to be run</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">steps_select_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Forced case: steps_list contains the steps to be run only</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="n">exclude_steps_select</span>
+                <span class="ow">and</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">steps_select_list</span>
+            <span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;step </span><span class="si">%s</span><span class="s2"> skipped, not selected in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">(),</span>
+                    <span class="n">steps_select_list</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1"># Exclusion case: steps_list contains steps to be excluded</span>
+            <span class="k">elif</span> <span class="n">exclude_steps_select</span> <span class="ow">and</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="ow">in</span> <span class="n">steps_select_list</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;step </span><span class="si">%s</span><span class="s2"> skipped, selected in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">(),</span>
+                    <span class="n">steps_select_list</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Set the verbose option if verbose is True</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;verbose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s2">&quot;force&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">load_table_msg_str</span> <span class="o">=</span> <span class="n">BOLD_SRT</span> <span class="o">+</span> <span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; Load table for step </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">BOLD_END</span>
+        <span class="c1"># Execute the step based on its type</span>
+        <span class="k">if</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;download&quot;</span><span class="p">:</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;convert&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">load_table_msg_str</span><span class="p">,</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">())</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">()</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;splice&quot;</span><span class="p">:</span>
+            <span class="n">stp_rnx_inp</span> <span class="o">=</span> <span class="n">stp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">load_table_msg_str</span><span class="p">,</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">())</span>
+            <span class="n">stp_rnx_inp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">splice</span><span class="p">(</span><span class="n">input_mode</span><span class="o">=</span><span class="s2">&quot;given&quot;</span><span class="p">,</span> <span class="n">input_rinexs</span><span class="o">=</span><span class="n">stp_rnx_inp</span><span class="p">,</span> <span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;split&quot;</span><span class="p">:</span>
+            <span class="n">stp_rnx_inp</span> <span class="o">=</span> <span class="n">stp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">load_table_msg_str</span><span class="p">,</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">())</span>
+            <span class="n">stp_rnx_inp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_mode</span><span class="o">=</span><span class="s2">&quot;given&quot;</span><span class="p">,</span> <span class="n">input_rinexs</span><span class="o">=</span><span class="n">stp_rnx_inp</span><span class="p">,</span> <span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">rinexmod</span><span class="p">(</span><span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="c1">##### close the step</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="_check_parent_dir_exist">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._check_parent_dir_exist">[docs]</a>
+<span class="k">def</span> <span class="nf">_check_parent_dir_exist</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a parent directory exists and translates it with the environment variable first.</span>
+
+<span class="sd">    This function takes a string representing a directory path.</span>
+<span class="sd">    It first translates the directory path with the environment variable.</span>
+<span class="sd">    Then, it checks if the translated directory exists.</span>
+<span class="sd">    If it does not exist, it raises a FileNotFoundError with a custom error message.</span>
+<span class="sd">    If it does exist, it returns None.</span>
+
+<span class="sd">    This function is an internal function for the read_cfg function.</span>
+
+<span class="sd">    Will translate it with the environment variable first.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    parent_dir : str</span>
+<span class="sd">        A string representing a directory path.</span>
+<span class="sd">    parent_dir_key : str, optional</span>
+<span class="sd">        The dictionnary key representing the parent directory.</span>
+<span class="sd">        Default is None.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If the translated directory does not exist.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        If the translated directory exists.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parent_dir_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">translator</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">)</span>
+
+    <span class="n">mkdir_err_msg</span> <span class="o">=</span> <span class="s2">&quot; does not exists, create it manually first (mkdir -p ...)&quot;</span>
+
+    <span class="c1">### FROM_MAIN is obsolete, this if test too</span>
+    <span class="c1"># if parent_dir_out == &quot;FROM_MAIN&quot;:</span>
+    <span class="c1">#     # case when the parent directory is not defined in the main cfgfiles file</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if not parent_dir_key:</span>
+    <span class="c1">#         parent_dir_key = &quot;a directory&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1">#     logger.error(</span>
+    <span class="c1">#         &quot;%s is not correctly defined in the main cfgfiles file &quot;</span>
+    <span class="c1">#         &quot;(FROM_MAIN can not be replaced)&quot;,</span>
+    <span class="c1">#         parent_dir_key,</span>
+    <span class="c1">#     )</span>
+    <span class="c1">#     raise FileNotFoundError(None, parent_dir_key + mkdir_err_msg)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">parent_dir_out</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">parent_dir_out</span> <span class="o">+</span> <span class="n">mkdir_err_msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent_dir_out</span> <span class="o">+</span> <span class="n">mkdir_err_msg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="_is_cfg_bloc_active">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._is_cfg_bloc_active">[docs]</a>
+<span class="k">def</span> <span class="nf">_is_cfg_bloc_active</span><span class="p">(</span><span class="n">ywkf</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if a configuration block is active.</span>
+
+<span class="sd">    This function takes a dictionary representing a configuration block.</span>
+<span class="sd">    It checks if the &#39;active&#39; key is present in the dictionary.</span>
+<span class="sd">    If it is, it returns the value of the &#39;active&#39; key.</span>
+<span class="sd">    If the &#39;active&#39; key is not present,</span>
+<span class="sd">    it assumes the block is active and returns True.</span>
+
+<span class="sd">    Internal function for read_cfg</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ywkf : dict</span>
+<span class="sd">        A dictionary representing a configuration block.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the &#39;active&#39; key is present and its value is True,</span>
+<span class="sd">        or if the &#39;active&#39; key is not present.</span>
+<span class="sd">        False if the &#39;active&#39; key is present and its value is False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;active&quot;</span> <span class="ow">in</span> <span class="n">ywkf</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">ywkf</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># ++++ if no &#39;active&#39; key, we assume the bloc active</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="_epoch_range_from_cfg_bloc">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._epoch_range_from_cfg_bloc">[docs]</a>
+<span class="k">def</span> <span class="nf">_epoch_range_from_cfg_bloc</span><span class="p">(</span><span class="n">epoch_range_dic</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get an EpochRange object from epoch_range dictionary bloc</span>
+<span class="sd">    internal function for read_cfg</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span>
+        <span class="n">epoch_range_dic</span><span class="p">[</span><span class="s2">&quot;epoch1&quot;</span><span class="p">],</span>
+        <span class="n">epoch_range_dic</span><span class="p">[</span><span class="s2">&quot;epoch2&quot;</span><span class="p">],</span>
+        <span class="n">epoch_range_dic</span><span class="p">[</span><span class="s2">&quot;period&quot;</span><span class="p">],</span>
+        <span class="n">epoch_range_dic</span><span class="p">[</span><span class="s2">&quot;round_method&quot;</span><span class="p">],</span>
+        <span class="n">epoch_range_dic</span><span class="p">[</span><span class="s2">&quot;tz&quot;</span><span class="p">],</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_get_dir_path">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._get_dir_path">[docs]</a>
+<span class="k">def</span> <span class="nf">_get_dir_path</span><span class="p">(</span><span class="n">y_step</span><span class="p">,</span> <span class="n">dir_type</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">check_parent_dir_exist</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs a directory path based on the provided parameters.</span>
+
+<span class="sd">    This function takes a dictionary containing step information,</span>
+<span class="sd">     a directory type, and a flag indicating whether to check if</span>
+<span class="sd">     the parent directory exists. It constructs a directory</span>
+<span class="sd">     path by joining the parent directory and the structure.</span>
+<span class="sd">     If the flag to check the existence of the parent directory</span>
+<span class="sd">     is set to True, it checks if the parent directory exists.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_step : dict</span>
+<span class="sd">        A dictionary containing step information.</span>
+<span class="sd">    dir_type : str, optional</span>
+<span class="sd">        The type of directory to be constructed. Default is &#39;out&#39;.</span>
+<span class="sd">    check_parent_dir_exist : bool, optional</span>
+<span class="sd">        A flag indicating whether to check if the parent directory exists.</span>
+<span class="sd">        Default is True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing the constructed directory path,</span>
+<span class="sd">        the parent directory, and the structure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_key_check</span><span class="p">(</span><span class="n">key_inp</span><span class="p">,</span> <span class="n">y_step_inp</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key_inp</span> <span class="ow">in</span> <span class="n">y_step_inp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no </span><span class="si">{</span><span class="n">key_parent</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">y_step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">key_parent</span> <span class="o">=</span> <span class="n">dir_type</span> <span class="o">+</span> <span class="s2">&quot;_dir_parent&quot;</span>
+    <span class="n">key_structure</span> <span class="o">=</span> <span class="n">dir_type</span> <span class="o">+</span> <span class="s2">&quot;_dir_structure&quot;</span>
+
+    <span class="n">_key_check</span><span class="p">(</span><span class="n">key_parent</span><span class="p">,</span> <span class="n">y_step</span><span class="p">)</span>
+    <span class="n">dir_parent</span> <span class="o">=</span> <span class="n">y_step</span><span class="p">[</span><span class="n">key_parent</span><span class="p">]</span>
+
+    <span class="n">_key_check</span><span class="p">(</span><span class="n">key_structure</span><span class="p">,</span> <span class="n">y_step</span><span class="p">)</span>
+    <span class="n">structure</span> <span class="o">=</span> <span class="n">y_step</span><span class="p">[</span><span class="n">key_structure</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">check_parent_dir_exist</span><span class="p">:</span>
+        <span class="n">_check_parent_dir_exist</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="n">dir_type</span> <span class="o">+</span> <span class="s2">&quot;_dir_parent&quot;</span><span class="p">)</span>
+
+    <span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span> <span class="o">=</span> <span class="n">format_dir_path</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span><span class="p">)</span>
+
+    <span class="n">dir_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span></div>
+
+
+
+<div class="viewcode-block" id="_device2mda">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._device2mda">[docs]</a>
+<span class="k">def</span> <span class="nf">_device2mda</span><span class="p">(</span><span class="n">y_station</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a device block from a configuration file to a MetaData object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y_dev</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;device&quot;</span><span class="p">]</span>
+    <span class="n">y_sit</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">attkw</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;rec_type&quot;</span><span class="p">,</span> <span class="s2">&quot;rec_sn&quot;</span><span class="p">,</span> <span class="s2">&quot;rec_fw&quot;</span><span class="p">,</span> <span class="s2">&quot;ant_type&quot;</span><span class="p">,</span> <span class="s2">&quot;ant_sn&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attkw</span> <span class="ow">in</span> <span class="n">y_dev</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;device attribute </span><span class="si">%s</span><span class="s2"> not found in cfg file, set to &#39;unknown&#39;&quot;</span><span class="p">,</span> <span class="n">attkw</span>
+            <span class="p">)</span>
+            <span class="n">y_dev</span><span class="p">[</span><span class="n">attkw</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">rimo_mda</span><span class="o">.</span><span class="n">MetaData</span><span class="p">()</span>
+    <span class="n">rec_dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Receiver Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_type&quot;</span><span class="p">]</span>
+    <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Serial Number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_sn&quot;</span><span class="p">]</span>
+    <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Firmware Version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_fw&quot;</span><span class="p">]</span>
+
+    <span class="n">ant_dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">ant_dic</span><span class="p">[</span><span class="s2">&quot;Antenna Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;ant_type&quot;</span><span class="p">]</span>
+    <span class="n">ant_dic</span><span class="p">[</span><span class="s2">&quot;Antenna Radome Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;ant_type&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span>
+
+    <span class="n">ant_dic</span><span class="p">[</span><span class="s2">&quot;Serial Number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;ant_sn&quot;</span><span class="p">]</span>
+
+    <span class="n">ant_dic</span><span class="p">[</span><span class="s2">&quot;Marker-&gt;ARP Up Ecc. (m)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;ecc_une&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ant_dic</span><span class="p">[</span><span class="s2">&quot;Marker-&gt;ARP North Ecc(m)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;ecc_une&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ant_dic</span><span class="p">[</span><span class="s2">&quot;Marker-&gt;ARP East Ecc(m)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;ecc_une&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">metadata</span><span class="o">.</span><span class="n">add_instru</span><span class="p">(</span><span class="n">rec_dic</span><span class="p">,</span> <span class="n">ant_dic</span><span class="p">)</span>
+
+    <span class="n">metadata</span><span class="o">.</span><span class="n">set_meta</span><span class="p">(</span>
+        <span class="n">site_id</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;site_id&quot;</span><span class="p">],</span>
+        <span class="n">domes</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;domes&quot;</span><span class="p">],</span>
+        <span class="n">operator</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;operator&quot;</span><span class="p">],</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;position_xyz&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;position_xyz&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">z</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;position_xyz&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+        <span class="n">country</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">],</span>
+        <span class="n">date_prepared</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+        <span class="n">agency</span><span class="o">=</span><span class="n">y_sit</span><span class="p">[</span><span class="s2">&quot;agency&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+
+<div class="viewcode-block" id="format_dir_path">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.format_dir_path">[docs]</a>
+<span class="k">def</span> <span class="nf">format_dir_path</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats a directory path by adding or removing a leading slash.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dir_parent</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;/&quot;</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;dir_parent </span><span class="si">%s</span><span class="s2"> should start with slash (/), we add it automatically&quot;</span><span class="p">,</span>
+            <span class="n">dir_parent</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">dir_parent</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">dir_parent</span>
+
+    <span class="k">if</span> <span class="n">structure</span> <span class="ow">and</span> <span class="n">structure</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/&quot;</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;structure </span><span class="si">%s</span><span class="s2"> should not start with slash (/), we remove it automatically&quot;</span><span class="p">,</span>
+            <span class="n">structure</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span></div>
+
+
+
+<div class="viewcode-block" id="get_incl_cfg_paths">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_cfg_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">get_incl_cfg_paths</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">site_cfg_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a list of absolute paths for included configuration files.</span>
+
+<span class="sd">    This function processes the &#39;include&#39; section of a configuration dictionary,</span>
+<span class="sd">    translates the paths using a translator function, and converts them to</span>
+<span class="sd">    absolute paths relative to the provided site configuration file path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_inp : dict</span>
+<span class="sd">        A dictionary containing the configuration data, including an &#39;include&#39; key</span>
+<span class="sd">        with paths to additional configuration files.</span>
+<span class="sd">    site_cfg_path : str</span>
+<span class="sd">        The absolute path to the site configuration file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of absolute paths for the included configuration files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">incl_cfg_paths_out</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">y_inp</span><span class="p">[</span><span class="s2">&quot;include&quot;</span><span class="p">]:</span>
+        <span class="c1"># Translate the path using a custom translator function</span>
+        <span class="n">pmod</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">translator</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="c1"># Convert the path to be relative to the site configuration file&#39;s directory</span>
+        <span class="n">pmod</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">site_cfg_path</span><span class="p">),</span> <span class="n">pmod</span><span class="p">)</span>
+        <span class="c1"># Ensure the path is absolute with respect to the site configuration file</span>
+        <span class="n">pmod</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">abs_path_wrt</span><span class="p">(</span><span class="n">pmod</span><span class="p">,</span> <span class="n">site_cfg_path</span><span class="p">)</span>
+        <span class="n">incl_cfg_paths_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pmod</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">incl_cfg_paths_out</span></div>
+
+
+
+<div class="viewcode-block" id="get_incl_strategy">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_strategy">[docs]</a>
+<span class="k">def</span> <span class="nf">get_incl_strategy</span><span class="p">(</span><span class="n">strat_str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieves the merging strategy for configuration files.</span>
+
+<span class="sd">    This function maps a string representing a merging strategy to the corresponding</span>
+<span class="sd">    `mergedeep.Strategy` enum value. Supported strategies are &#39;append&#39; and &#39;replace&#39;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    strat_str : str</span>
+<span class="sd">        The merging strategy as a string. Valid values are &#39;append&#39; or &#39;replace&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mergedeep.Strategy</span>
+<span class="sd">        The corresponding merging strategy.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the provided strategy string is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">strat_str</span> <span class="o">==</span> <span class="s2">&quot;append&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mergedeep</span><span class="o">.</span><span class="n">Strategy</span><span class="o">.</span><span class="n">APPEND</span>
+    <span class="k">elif</span> <span class="n">strat_str</span> <span class="o">==</span> <span class="s2">&quot;replace&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mergedeep</span><span class="o">.</span><span class="n">Strategy</span><span class="o">.</span><span class="n">REPLACE</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid strategy &#39;</span><span class="si">{</span><span class="n">strat_str</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+            <span class="s2">&quot;Valid strategies are &#39;append&#39; or &#39;replace&#39;.&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="c1">#  _                                    __                  _   _</span>
+<span class="c1"># | |                                  / _|                | | (_)</span>
+<span class="c1"># | |     ___  __ _  __ _  ___ _   _  | |_ _   _ _ __   ___| |_ _  ___  _ __  ___</span>
+<span class="c1"># | |    / _ \/ _` |/ _` |/ __| | | | |  _| | | | &#39;_ \ / __| __| |/ _ \| &#39;_ \/ __|</span>
+<span class="c1"># | |___|  __/ (_| | (_| | (__| |_| | | | | |_| | | | | (__| |_| | (_) | | | \__ \</span>
+<span class="c1"># |______\___|\__, |\__,_|\___|\__, | |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/</span>
+<span class="c1">#              __/ |            __/ |</span>
+<span class="c1">#             |___/            |___/</span>
+
+
+<div class="viewcode-block" id="check_from_main">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.check_from_main">[docs]</a>
+<span class="k">def</span> <span class="nf">check_from_main</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the FROM_MAIN keyword is used in the configuration file.</span>
+
+<span class="sd">    This function takes a dictionary representing the configuration file.</span>
+<span class="sd">    It checks if the &#39;FROM_MAIN&#39; keyword is used in the configuration file.</span>
+<span class="sd">    If it is, it returns True. Otherwise, it returns False.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : dict</span>
+<span class="sd">        A dictionary representing the configuration file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the &#39;FROM_MAIN&#39; keyword is used in the configuration file.</span>
+<span class="sd">        False otherwise.</span>
+
+<span class="sd">    Warning</span>
+<span class="sd">    -------</span>
+<span class="sd">    Obsolete since 2025-04 and cfgfile v &gt;= 20.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;FROM_MAIN&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="update_w_main_dic">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.update_w_main_dic">[docs]</a>
+<span class="k">def</span> <span class="nf">update_w_main_dic</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">specific_value</span><span class="o">=</span><span class="s2">&quot;FROM_MAIN&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates a dictionary with another dictionary.</span>
+
+<span class="sd">    Warning</span>
+<span class="sd">    -------</span>
+<span class="sd">    Obsolete since 2025-04 and cfgfile v &gt;= 20.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">d</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">u</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">specific_value</span><span class="p">:</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">update_w_main_dic</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">specific_value</span><span class="p">:</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+
+<div class="viewcode-block" id="read_cfg_legacy">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_legacy">[docs]</a>
+<span class="k">def</span> <span class="nf">read_cfg_legacy</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">y_main</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles legacy configuration files with the &#39;FROM_MAIN&#39; keyword.</span>
+
+<span class="sd">    This function processes configuration files with a version less than 20.0,</span>
+<span class="sd">    where the &#39;FROM_MAIN&#39; keyword is used to indicate that values should be</span>
+<span class="sd">    inherited from a main configuration file. If the main configuration file</span>
+<span class="sd">    is not provided or cannot be found, an error is raised.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_inp : dict</span>
+<span class="sd">        The input configuration dictionary (site-specific configuration).</span>
+<span class="sd">    y_main : dict or None</span>
+<span class="sd">        The main configuration dictionary. If None, the function will check</span>
+<span class="sd">        for the presence of the &#39;FROM_MAIN&#39; keyword in the input configuration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The updated configuration dictionary, where values from the main</span>
+<span class="sd">        configuration file have been merged into the input configuration.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If the &#39;FROM_MAIN&#39; keyword is used in the input configuration but</span>
+<span class="sd">        no main configuration file is provided.</span>
+
+<span class="sd">    Warning</span>
+<span class="sd">    -------</span>
+<span class="sd">    Obsolete since 2025-04 and cfgfile v &gt;= 20.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Log a warning indicating that a legacy configuration file is being used</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Use legacy cfgfile w/ FROM_MAIN keyword (cfgfile_version &lt; 20.)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Check if the main configuration file is missing and the &#39;FROM_MAIN&#39; keyword is used</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">y_main</span> <span class="ow">and</span> <span class="n">check_from_main</span><span class="p">(</span><span class="n">y_inp</span><span class="p">):</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;FROM_MAIN keyword used in cfg file, but no main cfg file provided (-m option)&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>  <span class="c1"># Log an error message</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+            <span class="kc">None</span><span class="p">,</span> <span class="n">errmsg</span>
+        <span class="p">)</span>  <span class="c1"># Raise an exception with the error message</span>
+
+    <span class="c1"># Merge the input configuration with the main configuration</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">update_w_main_dic</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">y_main</span><span class="p">)</span>
+
+    <span class="c1"># Return the updated configuration dictionary</span>
+    <span class="k">return</span> <span class="n">y</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

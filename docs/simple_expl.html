@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started: some simple examples &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration files in a nutshell" href="config_files_nutshell.html" />
+    <link rel="prev" title="External GNSS converters" href="external_converters.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started: some simple examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#convert-raw-file-to-rinex-in-cli-mode">Convert RAW file to RINEX in CLI mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autorino-convert-rnx-minimal-example"><code class="docutils literal notranslate"><span class="pre">autorino_convert_rnx</span></code> minimal example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autorino-convert-rnx-help"><code class="docutils literal notranslate"><span class="pre">autorino_convert_rnx</span></code> help</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#call-a-step-workflow-in-cli-mode">Call a Step workflow in CLI mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autorino-cfgfile-run-minimal-example"><code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> minimal example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#autorino-cfgfile-run-help"><code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> help</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#convert-raw-file-to-rinex-in-api-mode">Convert RAW file to RINEX in API mode</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-minimal-example">convert_rnx function minimal example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-rnx-function-definition"><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started: some simple examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simple_expl.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started-some-simple-examples">
+<span id="simple-expl"></span><h1>Getting started: some simple examples<a class="headerlink" href="#getting-started-some-simple-examples" title="Link to this heading"></a></h1>
+<section id="convert-raw-file-to-rinex-in-cli-mode">
+<h2>Convert RAW file to RINEX in CLI mode<a class="headerlink" href="#convert-raw-file-to-rinex-in-cli-mode" title="Link to this heading"></a></h2>
+<section id="autorino-convert-rnx-minimal-example">
+<h3><code class="docutils literal notranslate"><span class="pre">autorino_convert_rnx</span></code> minimal example<a class="headerlink" href="#autorino-convert-rnx-minimal-example" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>autorino_convert_rnx.py<span class="w">  </span>--force<span class="w">  </span>--metadata<span class="w"> </span>/home/user/path/of/your/sitelogs<span class="w">  </span>--out_dir_structure<span class="w"> </span><span class="s1">&#39;&lt;SITE_ID4&gt;/%Y&#39;</span><span class="w"> </span>--list_file_input<span class="w">  </span>/home/user/where_your/raw_data/are_stored/raw_data_list.txt<span class="w"> </span>/home/user/where_your/rinex_data/will_be_saved/<span class="sb">```</span>
+</pre></div>
+</div>
+</section>
+<section id="autorino-convert-rnx-help">
+<h3><code class="docutils literal notranslate"><span class="pre">autorino_convert_rnx</span></code> help<a class="headerlink" href="#autorino-convert-rnx-help" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">autorino_convert_rnx</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">OUT_DIR_STRUCTURE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">tmp</span> <span class="n">TMP_DIR</span><span class="p">]</span>
+                               <span class="p">[</span><span class="o">-</span><span class="n">log</span> <span class="n">LOG_DIR</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">rnmo</span> <span class="n">RINEXMOD_OPTIONS</span><span class="p">]</span>
+                               <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">METADATA</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span>
+                               <span class="n">raws_inp</span> <span class="p">[</span><span class="n">raws_inp</span> <span class="o">...</span><span class="p">]</span> <span class="n">out_dir</span>
+
+<span class="n">Convert</span> <span class="n">RAW</span> <span class="n">files</span> <span class="n">to</span> <span class="n">RINEX</span><span class="o">.</span>
+
+<span class="n">positional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="n">raws_inp</span>              <span class="n">The</span> <span class="nb">input</span> <span class="n">RAW</span> <span class="n">files</span> <span class="n">to</span> <span class="n">be</span> <span class="n">convertedPossible</span> <span class="n">inputs</span>
+                        <span class="n">are</span><span class="p">:</span> <span class="o">*</span> <span class="n">one</span> <span class="n">single</span> <span class="n">RAW</span> <span class="n">file</span> <span class="n">path</span> <span class="o">*</span> <span class="n">a</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">RAW</span> <span class="n">path</span> <span class="o">*</span>
+                        <span class="n">a</span> <span class="n">text</span> <span class="n">file</span> <span class="n">containing</span> <span class="n">a</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">RAW</span> <span class="n">paths</span> <span class="p">(</span><span class="n">then</span>
+                        <span class="o">--</span><span class="n">list_file_input</span> <span class="n">must</span> <span class="n">be</span> <span class="n">activated</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span> <span class="n">directory</span>
+                        <span class="n">containing</span> <span class="n">RAW</span> <span class="n">files</span>
+  <span class="n">out_dir</span>               <span class="n">The</span> <span class="n">output</span> <span class="n">directory</span> <span class="n">where</span> <span class="n">the</span> <span class="n">converted</span> <span class="n">files</span> <span class="n">will</span> <span class="n">be</span>
+                        <span class="n">stored</span>
+
+<span class="n">options</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="o">--</span><span class="n">list_file_input</span>
+                        <span class="n">If</span> <span class="nb">set</span> <span class="n">to</span> <span class="kc">True</span><span class="p">,</span> <span class="n">the</span> <span class="nb">input</span> <span class="n">RAW</span> <span class="n">files</span> <span class="n">are</span> <span class="n">provided</span> <span class="k">as</span> <span class="n">a</span>
+                        <span class="nb">list</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">text</span> <span class="n">file</span>
+  <span class="o">-</span><span class="n">s</span> <span class="n">OUT_DIR_STRUCTURE</span><span class="p">,</span> <span class="o">--</span><span class="n">out_dir_structure</span> <span class="n">OUT_DIR_STRUCTURE</span>
+                        <span class="n">The</span> <span class="n">structure</span> <span class="n">of</span> <span class="n">the</span> <span class="n">output</span> <span class="n">directory</span><span class="o">.</span><span class="n">If</span> <span class="n">provided</span><span class="p">,</span> <span class="n">the</span>
+                        <span class="n">converted</span> <span class="n">files</span> <span class="n">will</span> <span class="n">be</span> <span class="n">stored</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">subdirectory</span> <span class="n">of</span>
+                        <span class="n">out_dir</span> <span class="n">following</span> <span class="n">this</span> <span class="n">structure</span><span class="o">.</span><span class="n">See</span> <span class="n">README</span><span class="o">.</span><span class="n">md</span> <span class="k">for</span>
+                        <span class="n">more</span> <span class="n">information</span><span class="o">.</span><span class="n">Typical</span> <span class="n">values</span> <span class="n">are</span> <span class="s1">&#39;&lt;SITE_ID4&gt;/%Y/&#39;</span>
+                        <span class="ow">or</span> <span class="s1">&#39;%Y/%j/</span>
+  <span class="o">-</span><span class="n">tmp</span> <span class="n">TMP_DIR</span><span class="p">,</span> <span class="o">--</span><span class="n">tmp_dir</span> <span class="n">TMP_DIR</span>
+                        <span class="n">The</span> <span class="n">temporary</span> <span class="n">directory</span> <span class="n">used</span> <span class="n">during</span> <span class="n">the</span> <span class="n">conversion</span>
+                        <span class="n">process</span>
+  <span class="o">-</span><span class="n">log</span> <span class="n">LOG_DIR</span><span class="p">,</span> <span class="o">--</span><span class="n">log_dir</span> <span class="n">LOG_DIR</span>
+                        <span class="n">The</span> <span class="n">directory</span> <span class="n">where</span> <span class="n">logs</span> <span class="n">will</span> <span class="n">be</span> <span class="n">stored</span><span class="o">.</span> <span class="n">If</span> <span class="ow">not</span>
+                        <span class="n">provided</span><span class="p">,</span> <span class="n">it</span> <span class="n">defaults</span> <span class="n">to</span> <span class="n">tmp_dir</span>
+  <span class="o">-</span><span class="n">rnmo</span> <span class="n">RINEXMOD_OPTIONS</span><span class="p">,</span> <span class="o">--</span><span class="n">rinexmod_options</span> <span class="n">RINEXMOD_OPTIONS</span>
+                        <span class="n">The</span> <span class="n">options</span> <span class="k">for</span> <span class="n">modifying</span> <span class="n">the</span> <span class="n">RINEX</span> <span class="n">files</span> <span class="n">during</span> <span class="n">the</span>
+                        <span class="n">conversion</span>
+  <span class="o">-</span><span class="n">m</span> <span class="n">METADATA</span><span class="p">,</span> <span class="o">--</span><span class="n">metadata</span> <span class="n">METADATA</span>
+                        <span class="n">The</span> <span class="n">metadata</span> <span class="n">to</span> <span class="n">be</span> <span class="n">included</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">converted</span> <span class="n">RINEX</span>
+                        <span class="n">files</span><span class="o">.</span> <span class="n">Possible</span> <span class="n">inputs</span> <span class="n">are</span><span class="p">:</span> <span class="o">*</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">string</span> <span class="p">(</span><span class="n">sitelog</span>
+                        <span class="n">file</span> <span class="n">paths</span><span class="p">),</span> <span class="o">*</span> <span class="n">single</span> <span class="n">string</span> <span class="p">(</span><span class="n">single</span> <span class="n">sitelog</span> <span class="n">file</span>
+                        <span class="n">path</span><span class="p">),</span> <span class="o">*</span> <span class="n">single</span> <span class="n">string</span> <span class="p">(</span><span class="n">directory</span> <span class="n">containing</span> <span class="n">the</span>
+                        <span class="n">sitelogs</span><span class="p">),</span> <span class="o">*</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">MetaData</span> <span class="n">objects</span><span class="p">,</span> <span class="o">*</span> <span class="n">single</span>
+                        <span class="n">MetaData</span> <span class="nb">object</span>
+  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">--</span><span class="n">force</span>           <span class="n">Force</span> <span class="n">the</span> <span class="n">conversion</span> <span class="n">even</span> <span class="k">if</span> <span class="n">the</span> <span class="n">output</span> <span class="n">files</span> <span class="n">already</span>
+                        <span class="n">exist</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="call-a-step-workflow-in-cli-mode">
+<h2>Call a Step workflow in CLI mode<a class="headerlink" href="#call-a-step-workflow-in-cli-mode" title="Link to this heading"></a></h2>
+<section id="autorino-cfgfile-run-minimal-example">
+<h3><code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> minimal example<a class="headerlink" href="#autorino-cfgfile-run-minimal-example" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>autorino_cfgfile_run.py<span class="w">  </span>-c<span class="w"> </span>/path/to/your/configfile.yml<span class="w"> </span>-m<span class="w"> </span>/path/to/your/main_configfile.yml<span class="w"> </span>-s<span class="w"> </span><span class="s1">&#39;2024-05-01 00:00:00&#39;</span><span class="w"> </span>-e<span class="w"> </span><span class="s1">&#39;2024-05-05 23:59:59&#39;</span><span class="w"> </span>-p<span class="w"> </span><span class="s1">&#39;01D&#39;</span><span class="w"> </span>-ls<span class="w"> </span><span class="s1">&#39;SITE&#39;</span><span class="w"> </span>-ss<span class="w"> </span><span class="s1">&#39;download,convert,splice&#39;</span><span class="w"> </span>-f<span class="sb">```</span>
+</pre></div>
+</div>
+</section>
+<section id="autorino-cfgfile-run-help">
+<h3><code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> help<a class="headerlink" href="#autorino-cfgfile-run-help" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">autorino_cfgfile_run</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">CONFIG</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MAIN_CONFIG</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">START</span><span class="p">]</span>
+                               <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">END</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">PERIOD</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">ls</span> <span class="n">LIST_SITES</span><span class="p">]</span>
+                               <span class="p">[</span><span class="o">-</span><span class="n">ss</span> <span class="n">STEPS_SELECT_LIST</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">es</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span>
+
+<span class="n">Assisted</span> <span class="n">Unloading</span><span class="p">,</span> <span class="n">Treatment</span> <span class="ow">and</span> <span class="n">Organization</span> <span class="n">of</span> <span class="n">RINEX</span> <span class="n">observations</span>
+
+<span class="n">options</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">c</span> <span class="n">CONFIG</span><span class="p">,</span> <span class="o">--</span><span class="n">config</span> <span class="n">CONFIG</span>
+                        <span class="n">cfgfiles</span> <span class="n">file</span> <span class="n">path</span> <span class="ow">or</span> <span class="n">directory</span> <span class="n">path</span> <span class="n">containing</span> <span class="n">the</span>
+                        <span class="n">cfgfiles</span> <span class="n">file</span>
+  <span class="o">-</span><span class="n">m</span> <span class="n">MAIN_CONFIG</span><span class="p">,</span> <span class="o">--</span><span class="n">main_config</span> <span class="n">MAIN_CONFIG</span>
+                        <span class="n">main</span> <span class="n">cfgfiles</span> <span class="n">file</span> <span class="n">path</span>
+  <span class="o">-</span><span class="n">s</span> <span class="n">START</span><span class="p">,</span> <span class="o">--</span><span class="n">start</span> <span class="n">START</span>
+  <span class="o">-</span><span class="n">e</span> <span class="n">END</span><span class="p">,</span> <span class="o">--</span><span class="n">end</span> <span class="n">END</span>
+  <span class="o">-</span><span class="n">p</span> <span class="n">PERIOD</span><span class="p">,</span> <span class="o">--</span><span class="n">period</span> <span class="n">PERIOD</span>
+  <span class="o">-</span><span class="n">ls</span> <span class="n">LIST_SITES</span><span class="p">,</span> <span class="o">--</span><span class="n">list_sites</span> <span class="n">LIST_SITES</span>
+                        <span class="n">Comma</span><span class="o">-</span><span class="n">separated</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">site</span> <span class="n">identifiers</span>
+  <span class="o">-</span><span class="n">ss</span> <span class="n">STEPS_SELECT_LIST</span><span class="p">,</span> <span class="o">--</span><span class="n">steps_select_list</span> <span class="n">STEPS_SELECT_LIST</span>
+                        <span class="n">Comma</span><span class="o">-</span><span class="n">separated</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">selected</span> <span class="n">steps</span> <span class="n">to</span> <span class="n">be</span> <span class="n">executed</span><span class="o">.</span>
+                        <span class="n">The</span> <span class="n">step</span><span class="s1">&#39;s names are the ones in the config file</span>
+                        <span class="p">(</span><span class="n">download</span><span class="p">,</span> <span class="n">convert</span><span class="o">...</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">es</span><span class="p">,</span> <span class="o">--</span><span class="n">exclude_steps_select</span>
+                        <span class="n">Flag</span> <span class="n">to</span> <span class="n">exclude</span> <span class="n">the</span> <span class="n">selected</span> <span class="n">steps</span><span class="o">.</span> <span class="n">The</span> <span class="n">step</span><span class="s1">&#39;s names</span>
+                        <span class="n">are</span> <span class="n">the</span> <span class="n">ones</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span> <span class="p">(</span><span class="n">download</span><span class="p">,</span> <span class="n">convert</span><span class="o">...</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">--</span><span class="n">force</span>           <span class="n">force</span> <span class="n">the</span> <span class="n">execution</span> <span class="n">of</span> <span class="n">the</span> <span class="n">steps</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="convert-raw-file-to-rinex-in-api-mode">
+<h2>Convert RAW file to RINEX in API mode<a class="headerlink" href="#convert-raw-file-to-rinex-in-api-mode" title="Link to this heading"></a></h2>
+<p>The most basic and common operation that autorino can perform is to convert some
+RAW files to RINEX.</p>
+<section id="convert-rnx-function-minimal-example">
+<h3>convert_rnx function minimal example<a class="headerlink" href="#convert-rnx-function-minimal-example" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<span class="c1">### Find all BINEX files in a folder</span>
+<span class="n">p</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/raw_data/are_stored/&quot;</span>
+<span class="n">l</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="s2">&quot;*BNX&quot;</span><span class="p">)</span>
+
+<span class="c1">### Define the output folder</span>
+<span class="n">out_dir</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/rinex_data/will_be_saved/&quot;</span>
+<span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">out_dir</span>
+
+<span class="c1">### Call the conversion function</span>
+<span class="n">arocmn</span><span class="o">.</span><span class="n">convert_rnx</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">out_dir</span><span class="p">,</span><span class="n">tmp_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="convert-rnx-function-definition">
+<h3><code class="docutils literal notranslate"><span class="pre">convert_rnx</span></code> function definition<a class="headerlink" href="#convert-rnx-function-definition" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://github.com/IPGP/autorino/blob/main/autorino/common/frontend_fcts.py#:~:text=convert_rnx">go to source code</a></p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="external_converters.html" class="btn btn-neutral float-left" title="External GNSS converters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config_files_nutshell.html" class="btn btn-neutral float-right" title="Configuration files in a nutshell" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

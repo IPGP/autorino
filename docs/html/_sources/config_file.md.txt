@@ -1,0 +1,72 @@
+```{eval-rst}
+.. _config_file:
+```
+
+## The configuration files
+
+_autorino_ relies on YAML configuration files to perform its _workflow_ 
+(i.e. set of _steps_) operations.
+
+### The _env_ configuration file
+
+Described in the _Setting up the environment_ and _Setting up external utilities_ 
+sections above.
+
+### The _sites_ configuration files
+
+It contains the site-specific information and configuration under the main `station` block. 
+Then, it is organized in different sub-blocks:
+* `site`: site's name, its coordinates, and metadata
+* `device`: manually define the device's (receiver and antenna) characteristics if metadata are not provided in 
+`site` block 
+* `access` : connexion protocols, login and password etc...
+* `sessions` : define the record sessions characteristics.
+Each session is in a sub-block with its own parameters.
+  * `session_<sessionname>` : define one record session characteristics.
+  The session block name is, by convention, `session_<sessionname>`, where `<sessionname>` is also the first
+  session's `general` sub-block attribute's `name`.
+    * `general` : name, data freqency, temporary and log directories of the session
+    * `epoch_range` : See the dedicated section below.
+    * `steps` : list of the steps constituting the workflow. 
+       Each step is a sub-block with its own parameters.
+
+The different possible steps are:
+* `download` : download the data
+* `convert` : convert the data
+* `splice` : splice (concatenate) the data
+* `split` : split the data
+
+A step has the following generic structure:
+* `active`: a boolean (`True` or `False`) to activate or deactivate the step
+* `inp_dir_parent`: the parent directory of the input files
+* `inp_structure`: the filename structure of the input files
+* `out_dir_parent`: the parent directory of the output files
+* `out_structure`: the filename structure of the output files
+* `epoch_range`: the epoch range of the step. (see above) 
+* `options`: a dictionary of options specific to the step 
+
+### The _main_ configuration file
+
+It contains the "standard" configuration for an _autorino_ workflow,
+i.e. all the parameters, paths, options ... which are the same for all stations.
+_main_ values can be called and used in the _sites_ configuration files using the alias `FROM_MAIN`
+(see below).
+
+### Aliases in the configuration files
+
+To use generic or variables values in the configuration files, you can use aliases.
+Aliases take the form of `<aliasname>` or `<ALIASNAME>` with `< >`. Alias are case-sensitive: 
+the first version is lower-case and the latter is upper-case.
+The following aliases are managed:
+* `<site_id4>` or `<SITE_ID4>`: the 4-characters site name
+* `<site_id9>` or `<SITE_ID9>`: the 9-characters site name
+
+Time aliases can also be used. They follow the `date` format convention, 
+e.g. `%Y` for the year, `%H` for the hour, `%j` for the day of year, etc...
+
+The environment variables can also be used as aliases. They follow the `<$ENVVAR>` convention,
+using `$` and between `<` & `>`, e.g. `<$HOME>` for the home directory.
+
+Per default values can be called and used in the configuration files using the alias:
+* `FROM_MAIN`. Then, the value is taken from the _main_ configuration file, see above
+* `FROM_SESSION`. Then, the value is taken from the `session` block

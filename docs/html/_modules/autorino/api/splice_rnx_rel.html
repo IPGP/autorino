@@ -1,0 +1,217 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.api.splice_rnx_rel &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            autorino
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.api.splice_rnx_rel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.api.splice_rnx_rel</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 18/09/2024 18:26:37</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<span class="kn">import</span> <span class="nn">autorino.handle</span> <span class="k">as</span> <span class="nn">arohdl</span>
+
+
+<span class="c1">#### Import the logger</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;autorino&#39;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">aro_env_dict</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+
+
+<div class="viewcode-block" id="splice_rnx_rel">
+<a class="viewcode-back" href="../../../autorino.api.html#autorino.api.splice_rnx_rel.splice_rnx_rel">[docs]</a>
+<span class="k">def</span> <span class="nf">splice_rnx_rel</span><span class="p">(</span>
+    <span class="n">rnxs_inp</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">tmp_dir</span><span class="p">,</span>
+    <span class="n">log_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">handle_software</span><span class="o">=</span><span class="s2">&quot;converto&quot;</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1d&quot;</span><span class="p">,</span>
+    <span class="n">rolling_period</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">rolling_ref</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">,</span>
+    <span class="n">drop_epoch_rnd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splices RINEX files together in a relative way, based on certain criteria.</span>
+
+<span class="sd">    This function takes in a list of RINEX files and splices them together based on the provided criteria.</span>
+<span class="sd">    The spliced files are stored in the specified output directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rnxs_inp : list</span>
+<span class="sd">        The input RINEX files to be spliced.</span>
+<span class="sd">        The input can be:</span>
+<span class="sd">        * a python list</span>
+<span class="sd">        * a text file path containing a list of files</span>
+<span class="sd">        * a tuple containing several text files path</span>
+<span class="sd">        * a directory path.</span>
+<span class="sd">    out_dir : str</span>
+<span class="sd">        The output directory where the spliced files will be stored.</span>
+<span class="sd">    tmp_dir : str</span>
+<span class="sd">        The temporary directory used during the splicing process.</span>
+<span class="sd">    log_dir : str, optional</span>
+<span class="sd">        The directory where logs will be stored. If not provided, it defaults to tmp_dir.</span>
+<span class="sd">    handle_software : str, optional</span>
+<span class="sd">        The software to be used for handling the RINEX files during the splice operation.</span>
+<span class="sd">        Defaults to &quot;converto&quot;.</span>
+<span class="sd">    period : str, optional</span>
+<span class="sd">        The period for splicing the RINEX files. Defaults to &quot;1d&quot;.</span>
+<span class="sd">    rolling_period : bool, optional</span>
+<span class="sd">        Whether to use a rolling period for splicing the RINEX files.</span>
+<span class="sd">        If False, the spliced files will be based only on the &quot;full&quot; period provided,</span>
+<span class="sd">        i.e. Day1 00h-24h, Day2 00h-24h, etc.</span>
+<span class="sd">        If True, the spliced files will be based on the rolling period.</span>
+<span class="sd">        i.e. Day1 00h-Day2 00h, Day1 01h-Day2 01h, Day1 02h-Day2 02h etc.</span>
+<span class="sd">        Defaults to False.</span>
+<span class="sd">        see also eporng_fcts.round_epochs function</span>
+<span class="sd">    rolling_ref :  datetime-like or int, optional</span>
+<span class="sd">        The reference for the rolling period.</span>
+<span class="sd">        If datetime-like object, use this epoch as reference.</span>
+<span class="sd">        If integer, use the epoch of the corresponding index</span>
+<span class="sd">        Use -1 for the last epoch for instance.</span>
+<span class="sd">        The default is -1.</span>
+<span class="sd">        see also eporng_fcts.round_epochs function</span>
+<span class="sd">    round_method : str, optional</span>
+<span class="sd">        The method for rounding the epochs during the splice operation. Defaults to &quot;floor&quot;.</span>
+<span class="sd">    drop_epoch_rnd : bool, optional</span>
+<span class="sd">        Whether to drop the rounded epochs during the splice operation. Defaults to False.</span>
+<span class="sd">    rinexmod_options : dict, optional</span>
+<span class="sd">        The options for modifying the RINEX files during the splice operation. Defaults to None.</span>
+<span class="sd">    metadata : str or list, optional</span>
+<span class="sd">        The metadata to be included in the spliced RINEX files. Possible inputs are:</span>
+<span class="sd">         * list of string (sitelog file paths),</span>
+<span class="sd">         * single string (single sitelog file path)</span>
+<span class="sd">         * single string (directory containing the sitelogs)</span>
+<span class="sd">         * list of MetaData objects</span>
+<span class="sd">         * single MetaData object. Defaults to None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spc_main_obj : object</span>
+<span class="sd">        The main SpliceGnss object after the splice operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">log_dir</span><span class="p">:</span>
+        <span class="n">log_dir</span> <span class="o">=</span> <span class="n">tmp_dir</span>
+
+    <span class="n">spc_inp</span> <span class="o">=</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SpliceGnss</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">log_dir</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">spc_inp</span><span class="o">.</span><span class="n">load_tab_filelist</span><span class="p">(</span><span class="n">rnxs_inp</span><span class="p">)</span>
+    <span class="n">spc_inp</span><span class="o">.</span><span class="n">updt_epotab_rnx</span><span class="p">(</span><span class="n">use_rnx_filename_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">spc_main_obj</span><span class="p">,</span> <span class="n">spc_objs_lis</span> <span class="o">=</span> <span class="n">spc_inp</span><span class="o">.</span><span class="n">group_by_epochs</span><span class="p">(</span>
+        <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span>
+        <span class="n">rolling_period</span><span class="o">=</span><span class="n">rolling_period</span><span class="p">,</span>
+        <span class="n">rolling_ref</span><span class="o">=</span><span class="n">rolling_ref</span><span class="p">,</span>
+        <span class="n">round_method</span><span class="o">=</span><span class="n">round_method</span><span class="p">,</span>
+        <span class="n">drop_epoch_rnd</span><span class="o">=</span><span class="n">drop_epoch_rnd</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">spc_main_obj</span><span class="o">.</span><span class="n">splice_core</span><span class="p">(</span>
+        <span class="n">handle_software</span><span class="o">=</span><span class="n">handle_software</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="n">rinexmod_options</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spc_main_obj</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

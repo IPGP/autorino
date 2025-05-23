@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.bin.autorino_convert_rnx &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            autorino
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.bin.autorino_convert_rnx</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.bin.autorino_convert_rnx</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 30/05/2024 16:22:55</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">autorino.api</span> <span class="k">as</span> <span class="nn">aroapi</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../autorino.bin.html#autorino.bin.autorino_convert_rnx.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Convert RAW files to RINEX.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--inp_raws&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The input RAW files to be converted &quot;</span>
+        <span class="s2">&quot;Possible inputs are: </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;* one single RAW file path </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;* a comma-separated (,) list of RAW paths </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;* a text file containing a list of RAW paths </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;(then --list_file_input must be activated) </span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;* a directory containing RAW files </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--out_dir&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The output directory where the converted files will be stored&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--out_structure&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The structure of the output directory. &quot;</span>
+             <span class="s2">&quot;If provided, the converted files will be &quot;</span>
+             <span class="s2">&quot;stored in a subdirectory of out_dir following this structure. &quot;</span>
+             <span class="s2">&quot;See README.md for more information. &quot;</span>
+             <span class="s2">&quot;Typical values are &#39;&lt;SITE_ID4&gt;/</span><span class="si">%%</span><span class="s2">Y/&#39; or &#39;</span><span class="si">%%</span><span class="s2">Y/</span><span class="si">%%</span><span class="s2">j/.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&lt;SITE_ID4&gt;/%Y/&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--metadata&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        The metadata to be included in the converted RINEX files. </span><span class="se">\n</span><span class="s2"> </span>
+<span class="s2">        Possible inputs are: </span><span class="se">\n</span><span class="s2"> </span>
+<span class="s2">        * list of string (sitelog file paths)  </span>
+<span class="s2">        * single string (single sitelog file path) </span>
+<span class="s2">        * single string (directory containing the sitelogs)</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--force&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Force the conversion even if the output files already exist&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-l&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--list_file_input&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If set to True, the input RAW files are provided as a list in a text file&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-tmp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--tmp_dir&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The temporary directory used during the conversion process. &quot;</span>
+             <span class="s2">&quot;If not provided, it defaults to &lt;$HOME&gt;/tmp_convert_rnx. &quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&lt;$HOME&gt;/tmp_convert_rnx&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--log_dir&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The directory where logs will be stored. &quot;</span>
+             <span class="s2">&quot;If not provided, it defaults to tmp_dir &quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-rimo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--rinexmod_options&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The options for modifying the RINEX files during the conversion. &quot;</span>
+             <span class="s2">&quot;The options must be provided in a dictionnary represented as a string &quot;</span>
+             <span class="s2">&quot;e.g. &#39;{longname: False, filename_style: basic}&#39; &quot;</span>
+             <span class="s2">&quot;Defaults to None&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-ro&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--raw_out_dir&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Directory where RAW files will be archived. &quot;</span>
+             <span class="s2">&quot;No deletion will occur, your RAW files are sacred.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-rt&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--raw_out_structure&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Structure for archiving RAW files. &quot;</span>
+             <span class="s2">&quot;Defaults to the same structure as the output directory if not provided.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># parser.add_argument(</span>
+    <span class="c1">#     &quot;-s&quot;,</span>
+    <span class="c1">#     &quot;--site&quot;,</span>
+    <span class="c1">#     help=&quot;Force a site identifier (9-character) for the conversion if the input RAW files are not correctly named&quot;,</span>
+    <span class="c1">#     default=None,</span>
+    <span class="c1"># )</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">aroapi</span><span class="o">.</span><span class="n">convert_rnx</span><span class="p">(</span>
+        <span class="n">inp_raws</span><span class="o">=</span><span class="n">_prep_raws_inp</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
+        <span class="n">out_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out_dir</span><span class="p">,</span>
+        <span class="n">out_structure</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">out_structure</span><span class="p">,</span>
+        <span class="n">tmp_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">,</span>
+        <span class="n">log_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">log_dir</span><span class="p">,</span>
+        <span class="n">rinexmod_options</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">rinexmod_options</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">force</span><span class="p">,</span>
+        <span class="n">raw_out_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">raw_out_dir</span><span class="p">,</span>
+        <span class="n">raw_out_structure</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">raw_out_structure</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_prep_raws_inp">
+<a class="viewcode-back" href="../../../autorino.bin.html#autorino.bin.autorino_convert_rnx._prep_raws_inp">[docs]</a>
+<span class="k">def</span> <span class="nf">_prep_raws_inp</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    see also step_fcts.import_files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">list_file_input</span><span class="p">:</span>
+        <span class="c1">### input is a filelist of RINEXs =&gt; output is a list</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">inp_raws</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">inp_raws</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">inp_raws</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="c1">### input is a directory =&gt; output is the directory str</span>
+        <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">inp_raws</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">### input is a single or several RINEXs =&gt; output is a list</span>
+        <span class="c1"># (if one single RINEX file, then it is a singleton list)</span>
+        <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">inp_raws</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

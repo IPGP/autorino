@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuration files in a nutshell &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration file details" href="config_files_details.html" />
+    <link rel="prev" title="autorino’s exemple cookbook" href="cookbook.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration files in a nutshell</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#location-of-the-configuration-files">Location of the configuration files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-include-section">The include section</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-of-the-include-section">Example of the include section</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-configuration-file-s-main-sections">The configuration file’s main sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#aliases-in-the-configuration-files">Aliases in the configuration files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reserved-keywords">Reserved keywords</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configuration files in a nutshell</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/config_files_nutshell.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration-files-in-a-nutshell">
+<span id="config-files-nutshell"></span><h1>Configuration files in a nutshell<a class="headerlink" href="#configuration-files-in-a-nutshell" title="Link to this heading"></a></h1>
+<p><em>autorino</em> relies on YAML configuration files to perform its <em>workflow</em>
+(i.e. set of <em>steps</em>) operations.</p>
+<section id="location-of-the-configuration-files">
+<h2>Location of the configuration files<a class="headerlink" href="#location-of-the-configuration-files" title="Link to this heading"></a></h2>
+<p>The exemple configuration files are located in the <code class="docutils literal notranslate"><span class="pre">configfiles</span></code> directory of the <em>autorino</em> package.
+They are organized in subdirectories according to their purpose.
+But you can also create your own configuration files in a different location with a different folder structure.</p>
+<p>The exemple folder structure is as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">configfiles/main/</span></code> for <em>main</em> configuration: general settings regarding autorino’s environnement (converters paths
+etc.) and GNSS network
+(GNSS network name, GNSS network’s site log path, etc.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">configfiles/site/</span></code> for <em>site</em>-specific configuration: IP addresses, site names, login &amp; password, etc.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">configfiles/profile/</span></code> for <em>profile</em> configuration: profiles are common settings for a group of sites (same
+manufacturer, same
+data structure, same data transfer protocol, etc.). A site can be part of several profiles.</p></li>
+</ul>
+<p>autorino keeps a philosophy of <em>one site configuration file per GNSS station</em>.</p>
+</section>
+<section id="the-include-section">
+<h2>The include section<a class="headerlink" href="#the-include-section" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">include</span></code> section allows you to include other configuration files in the current configuration file,
+typically a site configuration file.
+This is useful for modularizing your configuration and reusing common settings across different files.<br />
+The <code class="docutils literal notranslate"><span class="pre">include</span></code> section is a list of the configuration files paths you want to include.<br />
+The included files are processed in the order they are listed, and their contents are merged into the current
+configuration file, but <strong>prior</strong> to its content.<br />
+In other words, the values of the first included file is loaded before the next one, and then the next one
+complete/overrides the
+values of the previous. The current configuration file is processed after all the included files have been processed.<br />
+This means that if there are any overlapping keys or sections, the values of the last file processed will take
+precedence.
+The included files can be either absolute or relative paths.</p>
+<section id="example-of-the-include-section">
+<h3>Example of the include section<a class="headerlink" href="#example-of-the-include-section" title="Link to this heading"></a></h3>
+<p>In the site configuration file <code class="docutils literal notranslate"><span class="pre">autorino_site_trimble_cfg.yml</span></code>, we include with the <code class="docutils literal notranslate"><span class="pre">include</span></code> section:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">include</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../main/autorino_main_cfg.yml</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../profile/autorino_profile_session24h30s_trimble_cfg.yml</span>
+</pre></div>
+</div>
+<p>The above example includes in the current configuration file:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">autorino_main_cfg.yml</span></code> for the general configuration regarding autorino’s environnement and GNSS network</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">autorino_profile_session24h30s_trimble_cfg.yml</span></code> configuration file is a common profile for all Trimble stations (with
+the same <code class="docutils literal notranslate"><span class="pre">inp_file_regex</span></code>, <code class="docutils literal notranslate"><span class="pre">inp_dir_structure</span></code>…)</p></li>
+</ul>
+<p>You can control the good inclusion of the configuration files with the <code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_check</span></code>_ command.
+See the <a class="reference internal" href="cookbook.html"><span class="std std-doc">cookbook</span></a> for more details.</p>
+</section>
+</section>
+<section id="the-configuration-file-s-main-sections">
+<h2>The configuration file’s main sections<a class="headerlink" href="#the-configuration-file-s-main-sections" title="Link to this heading"></a></h2>
+<p>It contains the site-specific information and configuration under the main <code class="docutils literal notranslate"><span class="pre">station</span></code> block.
+Then, it is organized in different sub-blocks.</p>
+<p>Next chapter <a class="reference internal" href="#config_file_details.md"><span class="xref myst">configuration file details</span></a> all the options.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">environment</span></code>: global settings for the GNSS data processing environment, including paths to software tools and general
+application settings.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">conv_software_paths</span></code>: paths to GNSS raw data converters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">general</span></code>: general settings for the configuration file</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">include</span></code>: list of the configuration files to include in the current configuration file, see next section.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">site</span></code>: site’s name, its coordinates, and metadata</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">device</span></code>: manually define the device’s (receiver and antenna) characteristics if metadata are not provided in
+<code class="docutils literal notranslate"><span class="pre">site</span></code> block</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">access</span></code> : connexion protocols, login and password etc…</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sessions</span></code> : define the record sessions characteristics.
+Each session is in a sub-block with its own parameters.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">session_&lt;sessionname&gt;</span></code> : define one record session characteristics.
+The session block name is, by convention, <code class="docutils literal notranslate"><span class="pre">session_&lt;sessionname&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;sessionname&gt;</span></code> is also the first
+session’s <code class="docutils literal notranslate"><span class="pre">general</span></code> sub-block attribute’s <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">general</span></code> : name, data freqency, temporary and log directories of the session</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epoch_range</span></code> : See the dedicated section below.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">steps</span></code> : list of the steps constituting the workflow.
+Each step is a sub-block with its own parameters.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>The different possible steps are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">download</span></code> : download the data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">convert</span></code> : convert the data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">splice</span></code> : splice (concatenate) the data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">split</span></code> : split the data</p></li>
+</ul>
+<p>A step has the following generic structure:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">active</span></code>: a boolean (<code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>) to activate or deactivate the step</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inp_dir_parent</span></code>: the parent directory of the input files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inp_structure</span></code>: the filename structure of the input files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">out_dir_parent</span></code>: the parent directory of the output files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">out_structure</span></code>: the filename structure of the output files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epoch_range</span></code>: the epoch range of the step. (see above)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">options</span></code>: a dictionary of options specific to the step</p></li>
+</ul>
+</section>
+<section id="aliases-in-the-configuration-files">
+<h2>Aliases in the configuration files<a class="headerlink" href="#aliases-in-the-configuration-files" title="Link to this heading"></a></h2>
+<p>To use generic or variables values in the configuration files, you can use aliases.
+Aliases take the form of <code class="docutils literal notranslate"><span class="pre">&lt;aliasname&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;ALIASNAME&gt;</span></code> with <code class="docutils literal notranslate"><span class="pre">&lt;</span> <span class="pre">&gt;</span></code>. Alias are case-sensitive:
+the first version is lower-case and the latter is upper-case.
+The following aliases are managed:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;site_id4&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;SITE_ID4&gt;</span></code>: the 4-characters site name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;site_id9&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;SITE_ID9&gt;</span></code>: the 9-characters site name</p></li>
+</ul>
+<p>Time aliases can also be used. They follow the <code class="docutils literal notranslate"><span class="pre">date</span></code> format convention,
+e.g. <code class="docutils literal notranslate"><span class="pre">%Y</span></code> for the year, <code class="docutils literal notranslate"><span class="pre">%H</span></code> for the hour, <code class="docutils literal notranslate"><span class="pre">%j</span></code> for the day of year, etc…</p>
+<p>The environment variables can also be used as aliases. They follow the <code class="docutils literal notranslate"><span class="pre">&lt;$ENVVAR&gt;</span></code> convention,
+using <code class="docutils literal notranslate"><span class="pre">$</span></code> and between <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">&lt;$HOME&gt;</span></code> for the home directory.</p>
+</section>
+<section id="reserved-keywords">
+<h2>Reserved keywords<a class="headerlink" href="#reserved-keywords" title="Link to this heading"></a></h2>
+<p>Per default values can be called and used in the configuration files using reserved keywords:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">FROM_SESSION</span></code>: Then, the value is taken from the <code class="docutils literal notranslate"><span class="pre">session</span></code> block</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FROM_MAIN</span></code>: Now obsolete and deprecated since introduction of <code class="docutils literal notranslate"><span class="pre">include</span></code> in version 2.0.0.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cookbook.html" class="btn btn-neutral float-left" title="autorino’s exemple cookbook" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config_files_details.html" class="btn btn-neutral float-right" title="Configuration file details" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

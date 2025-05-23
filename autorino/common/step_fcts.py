@@ -22,7 +22,7 @@ import autorino.cfgenv.env_read as aroenv
 import autorino.common as arocmn
 
 logger = logging.getLogger("autorino")
-logger.setLevel(aroenv.aro_env_dict["general"]["log_level"])
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
 def make_site_id9(site_id_inp):
@@ -194,15 +194,80 @@ def load_previous_tables(log_dir):
     if not tables_files:
         logger.warning("No previous tables found in the log directory.")
         return pd.DataFrame([])
-    else:
-        # If files are found, read each file into a DataFrame and concatenate them into a single DataFrame
-        tab_df_stk = []
-        for t in tables_files:
-            tab_df = pd.read_csv(t)
-            # if not len(tab_df) == 0:
-            tab_df_stk.append(tab_df)
 
-        return pd.concat(tab_df_stk)
+    # Read and concatenate non-empty DataFrames from the found files
+    tab_df_stk = [pd.read_csv(t) for t in tables_files if not pd.read_csv(t).empty]
+
+    return pd.concat(tab_df_stk, ignore_index=True) if tab_df_stk else pd.DataFrame([])
+
+def print_tab_core(table_inp, max_colwidth=33):
+    """
+    Prints the table of the StepGnss object with specified formatting.
+
+    This method formats and prints the table of the StepGnss object. It shrinks the strings in the 'fraw',
+    'fpath_inp', and 'fpath_out' columns to a specified maximum length and formats the 'epoch_srt' and 'epoch_end'
+    columns as strings
+    with a specific date-time format. The method then prints the formatted table to the logger.
+
+    Parameters
+    ----------
+    table_inp : pd.DataFrame
+        The input table to be formatted and printed.
+
+    max_colwidth : int, optional
+        The maximum column width for the output table. Default is 33.
+
+    Returns
+    -------
+    str
+        The formatted table as a string.
+    """
+
+    def _shrink_str(str_inp, maxlen=max_colwidth):
+        """
+        Shrinks a string to a specified maximum length.
+
+        This function shrinks a string to a specified maximum length by keeping the first and last parts
+        of the string and replacing the middle part with '..'.
+        The length of the first and last parts is half of the maximum length.
+
+        Parameters
+        ----------
+        str_inp : str
+            The input string to be shrunk.
+        maxlen : int, optional
+            The maximum length of the output string.
+            Default is the value of the 'max_colwidth' parameter of the
+            'verbose' method.
+
+        Returns
+        -------
+        str
+            The shrunk string.
+        """
+        if len(str_inp) <= maxlen:
+            return str_inp
+        else:
+            halflen = int((maxlen / 2) - 1)
+            str_out_shrink = str_inp[:halflen] + ".." + str_inp[-halflen:]
+            return str_out_shrink
+
+    # we define the FORMATTERS (i.e. functions) for each column
+    form = dict()
+    form["fraw"] = _shrink_str
+    form["fpath_inp"] = _shrink_str
+    form["fpath_out"] = _shrink_str
+
+    print_time = lambda t: (
+        t.strftime("%y-%m-%d %H:%M:%S") if not pd.isna(t) else "NaT"
+    )
+    form["epoch_srt"] = print_time
+    form["epoch_end"] = print_time
+
+    str_out = table_inp.to_string(max_colwidth=max_colwidth + 1, formatters=form)
+    # add +1 in max_colwidth for safety
+
+    return str_out
 
 
 def is_ok(val_inp):
@@ -331,7 +396,7 @@ def guess_sites_list(inp_fil):
     return sites_list
 
 
-def move_core(src, dest, copy_only=False):
+def move_copy_core(src, dest, copy_only=False, force=False):
     """
     Moves or copies a file from the source to the destination.
 
@@ -347,6 +412,9 @@ def move_core(src, dest, copy_only=False):
         The destination file path.
     copy_only : bool, optional
         If True, the file is copied instead of moved. Default is False.
+    force : bool, optional
+        Force the move/copy if the file already exists
+        Default is False
 
     Returns
     -------
@@ -354,6 +422,11 @@ def move_core(src, dest, copy_only=False):
         The path of the moved/copied file if the operation is successful, None otherwise.
     """
     mvcp = "copied" if copy_only else "moved"
+
+    if os.path.isfile(dest) and not force:
+        logger.info(f"{dest} exists and kept (force={force})")
+        return dest
+
     try:
         # we prefer a copy rather than a move, mv can lead to some error
         file_moved = shutil.copy2(src, dest)
@@ -367,6 +440,7 @@ def move_core(src, dest, copy_only=False):
 
     if file_moved and (not copy_only) and os.path.isfile(src):
         os.remove(src)
+
     return file_moved
 
 
@@ -392,5 +466,3 @@ def log_tester():
     logger.critical("level critical")
 
     return None
-
-
