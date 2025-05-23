@@ -191,7 +191,7 @@ include = ["autorino*"] # package names should match these glob patterns (["*"] 
 #namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.bumpversion]
-current_version = "2.0.0-beta0"  # REQUIRED, although can be dynamic
+current_version = "2.0.0"  # REQUIRED, although can be dynamic
 
 
 ##### SIMPLE CYCLE - MAJOR.MINOR.PATCH #####
