@@ -210,8 +210,15 @@
 
         <span class="n">guess_local_rnx</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="n">guess_local_rnx</span><span class="p">:</span>
+
+            <span class="c1"># special case if we downgrade the name</span>
+            <span class="k">if</span> <span class="n">rinexmod_options</span> <span class="ow">and</span> <span class="s2">&quot;shortname&quot;</span> <span class="ow">in</span> <span class="n">rinexmod_options</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">shortname</span> <span class="o">=</span> <span class="n">rinexmod_options</span><span class="p">[</span><span class="s2">&quot;shortname&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">shortname</span> <span class="o">=</span> <span class="kc">False</span>
+
             <span class="c1"># generate the potential local files</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_rnx</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_rnx</span><span class="p">(</span><span class="n">shortname</span><span class="o">=</span><span class="n">shortname</span><span class="p">)</span>
             <span class="c1"># tests if the output local files are already there</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
             <span class="c1"># switch ok_inp to False if the output files are already there</span>

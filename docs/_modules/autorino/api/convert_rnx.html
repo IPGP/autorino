@@ -242,7 +242,7 @@
 
         <span class="c1"># the table from the ConvertGnss object</span>
         <span class="c1"># is necessary to get the epoch</span>
-        <span class="n">cpy_raw</span><span class="o">.</span><span class="n">load_tab_prev_tab</span><span class="p">(</span><span class="n">cnv_table_cat</span><span class="p">,</span> <span class="n">drop_na</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">new_inp_is_prev</span><span class="o">=</span><span class="s2">&quot;inp&quot;</span><span class="p">)</span>
+        <span class="n">cpy_raw</span><span class="o">.</span><span class="n">load_tab_prev_tab</span><span class="p">(</span><span class="n">cnv_table_cat</span><span class="p">,</span> <span class="n">new_inp_is_prev</span><span class="o">=</span><span class="s2">&quot;inp&quot;</span><span class="p">)</span>
         <span class="n">cpy_raw</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span> <span class="k">if</span> <span class="n">debug_print</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="n">cpy_raw</span><span class="o">.</span><span class="n">filter_na</span><span class="p">([</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">])</span>
         <span class="n">cpy_raw</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span> <span class="k">if</span> <span class="n">debug_print</span> <span class="k">else</span> <span class="kc">None</span>

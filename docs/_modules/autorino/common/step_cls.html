@@ -1345,8 +1345,6 @@
 
         <span class="n">str_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">print_tab_core</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span>
-            <span class="n">no_print</span><span class="o">=</span><span class="n">no_print</span><span class="p">,</span>
-            <span class="n">no_return</span><span class="o">=</span><span class="n">no_return</span><span class="p">,</span>
             <span class="n">max_colwidth</span><span class="o">=</span><span class="n">max_colwidth</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -1453,9 +1451,7 @@
 
 <div class="viewcode-block" id="StepGnss.load_tab_prev_tab">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.load_tab_prev_tab">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_tab_prev_tab</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">prev_table</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_na</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">new_inp_is_prev</span><span class="o">=</span><span class="s2">&quot;out&quot;</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_tab_prev_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prev_table</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_inp_is_prev</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the table from the previous step&#39;s table.</span>
 
@@ -1472,6 +1468,10 @@
 <span class="sd">            &#39;fname&#39;, &#39;site&#39;, &#39;epoch_srt&#39;, &#39;epoch_end&#39;, and &#39;ok_inp&#39; columns.</span>
 <span class="sd">        reset_table : bool, optional</span>
 <span class="sd">            If True, the current table is reset before loading the new data. Default is True.</span>
+<span class="sd">        new_inp_is_prev : str, optional</span>
+<span class="sd">            Specifies whether the new input files are the previous</span>
+<span class="sd">            output files (&#39;out&#39;) or the previous input files (&#39;inp&#39;).</span>
+<span class="sd">            Default is &#39;out&#39;.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1479,11 +1479,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">reset_table</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_init_table</span><span class="p">(</span><span class="n">init_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="n">prev_table</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">drop_na</span><span class="p">:</span>
-            <span class="n">prev_table</span> <span class="o">=</span> <span class="n">prev_table</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">,</span> <span class="s2">&quot;size_out&quot;</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">prev_table</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">new_inp_is_prev</span> <span class="o">==</span> <span class="s2">&quot;out&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prev_table</span><span class="p">[</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
@@ -1575,8 +1570,12 @@
 
 <div class="viewcode-block" id="StepGnss.get_vals_prev_tab">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.get_vals_prev_tab">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_vals_prev_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_prev_tab</span><span class="p">,</span> <span class="n">col_ref</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span>
-                            <span class="n">get_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">get_vals_prev_tab</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">df_prev_tab</span><span class="p">,</span>
+        <span class="n">col_ref</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span>
+        <span class="n">get_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">],</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates columns in self.table with values from df_prev_tab for matching col_ref entries.</span>
 
@@ -1614,12 +1613,11 @@
         <span class="c1">## less pythonic, more intuitive</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">get_cols</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_prev_tab</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">col_ref</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">df_prev_tab</span><span class="p">[</span><span class="n">col_ref</span><span class="p">])</span>
-                <span class="n">matched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">col_ref</span><span class="p">]</span>
+                <span class="n">mask1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">col_ref</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">df_prev_tab</span><span class="p">[</span><span class="n">col_ref</span><span class="p">])</span>
+                <span class="n">matched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask1</span><span class="p">,</span> <span class="n">col_ref</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">matched</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-                    <span class="n">prev_value</span> <span class="o">=</span> <span class="n">df_prev_tab</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-                        <span class="n">df_prev_tab</span><span class="p">[</span><span class="n">col_ref</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">col_ref</span><span class="p">],</span> <span class="n">col</span>
-                    <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">mask2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">col_ref</span><span class="p">]</span> <span class="o">==</span> <span class="n">df_prev_tab</span><span class="p">[</span><span class="n">col_ref</span><span class="p">]</span>
+                    <span class="n">prev_value</span> <span class="o">=</span> <span class="n">df_prev_tab</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask2</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">prev_value</span>
 
         <span class="k">for</span> <span class="n">epocol</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch_end&quot;</span><span class="p">]:</span>
@@ -1653,7 +1651,7 @@
 
 <div class="viewcode-block" id="StepGnss.guess_local_rnx">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.guess_local_rnx">[docs]</a>
-    <span class="k">def</span> <span class="nf">guess_local_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">guess_local_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">shortname</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a given site name and date in a table, guess the potential local RINEX files</span>
 <span class="sd">        and write it as &#39;fpath_out&#39; value in the table</span>
@@ -1674,7 +1672,7 @@
 
         <span class="n">loc_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="n">loc_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_guess_rnx</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="n">io</span><span class="p">)</span>
+            <span class="n">loc_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_guess_rnx</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="n">io</span><span class="p">,</span> <span class="n">shortname</span><span class="o">=</span><span class="n">shortname</span><span class="p">)</span>
             <span class="n">loc_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loc_path</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;nbr local RINEX files guessed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">loc_paths_list</span><span class="p">))</span>
@@ -1712,14 +1710,14 @@
             <span class="n">bnam_inp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">])</span>
             <span class="n">fpath_out</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outdir_use</span><span class="p">,</span> <span class="n">bnam_inp</span><span class="p">)</span>
 
-            <span class="c1"># Update the table with the generated output file path</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fpath_out</span>
-
-            <span class="c1"># Check the validity of the output files</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
-
             <span class="c1"># Append the output file path to the list</span>
             <span class="n">out_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fpath_out</span><span class="p">)</span>
+
+        <span class="c1"># Update the table with the generated output file path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_paths_list</span>
+
+        <span class="c1"># Check the validity of the output files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">out_paths_list</span></div>
 
@@ -2926,7 +2924,7 @@
 
 <div class="viewcode-block" id="StepGnss.mono_guess_rnx">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_guess_rnx">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_guess_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">mono_guess_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">shortname</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Guesses the local RINEX file path for a given row in the table.</span>
 
@@ -2941,6 +2939,9 @@
 <span class="sd">        io : str, optional</span>
 <span class="sd">            Specifies whether to guess the input (`inp`) or output (`out`) file path.</span>
 <span class="sd">            Default is `out`.</span>
+<span class="sd">        shortname : bool, optional</span>
+<span class="sd">            guess RINEX&#39;s shortname if True</span>
+<span class="sd">            Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2978,17 +2979,20 @@
         <span class="n">prd_str</span> <span class="o">=</span> <span class="n">rinexmod</span><span class="o">.</span><span class="n">rinexfile</span><span class="o">.</span><span class="n">file_period_from_timedelta</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">,</span> <span class="n">epo_end</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Generate the RINEX file name using site and session information</span>
-        <span class="n">loc_fname</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">statname_dt2rinexname_long</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">site_id9</span><span class="p">,</span>
-            <span class="n">epo_srt</span><span class="p">,</span>
-            <span class="n">country</span><span class="o">=</span><span class="s2">&quot;XXX&quot;</span><span class="p">,</span>  <span class="c1"># `site_id9` includes the country</span>
-            <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;R&quot;</span><span class="p">,</span>  <span class="c1"># Always &quot;R&quot; for autorino</span>
-            <span class="n">file_period</span><span class="o">=</span><span class="n">prd_str</span><span class="p">,</span>
-            <span class="n">data_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s2">&quot;data_frequency&quot;</span><span class="p">],</span>
-            <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;MO&quot;</span><span class="p">,</span>
-            <span class="n">format_compression</span><span class="o">=</span><span class="s2">&quot;crx.gz&quot;</span><span class="p">,</span>
-            <span class="n">preset_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">shortname</span><span class="p">:</span>
+            <span class="n">loc_fname</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">statname_dt2rinexname_long</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">site_id9</span><span class="p">,</span>
+                <span class="n">epo_srt</span><span class="p">,</span>
+                <span class="n">country</span><span class="o">=</span><span class="s2">&quot;XXX&quot;</span><span class="p">,</span>  <span class="c1"># `site_id9` includes the country</span>
+                <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;R&quot;</span><span class="p">,</span>  <span class="c1"># Always &quot;R&quot; for autorino</span>
+                <span class="n">file_period</span><span class="o">=</span><span class="n">prd_str</span><span class="p">,</span>
+                <span class="n">data_freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s2">&quot;data_frequency&quot;</span><span class="p">],</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="s2">&quot;MO&quot;</span><span class="p">,</span>
+                <span class="n">format_compression</span><span class="o">=</span><span class="s2">&quot;crx.gz&quot;</span><span class="p">,</span>
+                <span class="n">preset_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loc_fname</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">statname_dt2rinexname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_id9</span><span class="p">[:</span><span class="mi">4</span><span class="p">],</span> <span class="n">epo_srt</span><span class="p">,</span> <span class="s2">&quot;d.gz&quot;</span><span class="p">)</span>
 
         <span class="c1"># Construct the full file path and translate it</span>
         <span class="n">loc_path0</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">loc_dir</span><span class="p">,</span> <span class="n">loc_fname</span><span class="p">)</span>

@@ -1316,7 +1316,7 @@ the last 4 characters are removed from the class name.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.guess_local_rnx">
-<span class="sig-name descname"><span class="pre">guess_local_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.guess_local_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.guess_local_rnx" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">guess_local_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.guess_local_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.guess_local_rnx" title="Link to this definition"></a></dt>
 <dd><p>For a given site name and date in a table, guess the potential local RINEX files
 and write it as ‘fpath_out’ value in the table</p>
 </dd></dl>
@@ -1450,7 +1450,7 @@ Default is False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.load_tab_prev_tab">
-<span class="sig-name descname"><span class="pre">load_tab_prev_tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prev_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_na</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_inp_is_prev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.load_tab_prev_tab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.load_tab_prev_tab" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load_tab_prev_tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prev_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reset_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_inp_is_prev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.load_tab_prev_tab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.load_tab_prev_tab" title="Link to this definition"></a></dt>
 <dd><p>Loads the table from the previous step’s table.</p>
 <p>This method takes the table from the previous step in the processing chain and uses it to update the current
 step’s table.
@@ -1463,6 +1463,9 @@ If ‘reset_table’ is True, it resets the current table before loading the new
 <li><p><strong>prev_table</strong> (<em>pandas.DataFrame</em>) – The table from the previous step in the processing chain. It should contain ‘fpath_out’, ‘size_out’,
 ‘fname’, ‘site’, ‘epoch_srt’, ‘epoch_end’, and ‘ok_inp’ columns.</p></li>
 <li><p><strong>reset_table</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the current table is reset before loading the new data. Default is True.</p></li>
+<li><p><strong>new_inp_is_prev</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies whether the new input files are the previous
+output files (‘out’) or the previous input files (‘inp’).
+Default is ‘out’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1543,7 +1546,7 @@ Default is ‘ok_inp’.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_guess_rnx">
-<span class="sig-name descname"><span class="pre">mono_guess_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_guess_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_guess_rnx" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">mono_guess_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_guess_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_guess_rnx" title="Link to this definition"></a></dt>
 <dd><p>Guesses the local RINEX file path for a given row in the table.</p>
 <p>This method determines the local RINEX file path based on the epoch range
 and site information for a specific row in the table. It supports both
@@ -1554,6 +1557,8 @@ input (<cite>inp</cite>) and output (<cite>out</cite>) modes.</p>
 <li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table for which the RINEX file path is to be guessed.</p></li>
 <li><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies whether to guess the input (<cite>inp</cite>) or output (<cite>out</cite>) file path.
 Default is <cite>out</cite>.</p></li>
+<li><p><strong>shortname</strong> (<em>bool</em><em>, </em><em>optional</em>) – guess RINEX’s shortname if True
+Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

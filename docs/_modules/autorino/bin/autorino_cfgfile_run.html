@@ -125,7 +125,9 @@
         <span class="s2">&quot;--start&quot;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The start date for the epoch range. &quot;</span>
-        <span class="s2">&quot;Can be a date e.g. &#39;2025-01-01&#39;, &#39;2025-001&#39; or a literal e.g. &#39;2 days ago&#39;. &quot;</span>
+        <span class="s2">&quot;* a litteral, e.g. &#39;yesterday&#39;, &#39;10 days ago&#39; &quot;</span>
+        <span class="s2">&quot;* YYYY-DDD, year-day of year, e.g. 2025-140 &quot;</span>
+        <span class="s2">&quot;* YYYY-MM-DD, classic calendar date, e.g. 2025-05-20 &quot;</span>
         <span class="s2">&quot;Can also be a list; if so, each epoch is considered separately. &quot;</span>
         <span class="s2">&quot;Can also be a file path; if so, the file contains a list of start epochs. &quot;</span>
         <span class="s2">&quot;Default is None.&quot;</span><span class="p">,</span>
@@ -136,7 +138,10 @@
         <span class="s2">&quot;--end&quot;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The end date for the epoch range. &quot;</span>
-        <span class="s2">&quot;Can be a date e.g. &#39;2025-01-01&#39;, &#39;2025-001&#39; or a literal e.g. &#39;2 days ago&#39;. &quot;</span>
+        <span class="s2">&quot;The epoch can be formatted as: &quot;</span>
+        <span class="s2">&quot;* a litteral, e.g. &#39;yesterday&#39;, &#39;10 days ago&#39; &quot;</span>
+        <span class="s2">&quot;* YYYY-DDD, year-day of year, e.g. 2025-140 &quot;</span>
+        <span class="s2">&quot;* YYYY-MM-DD, classic calendar date, e.g. 2025-05-20 &quot;</span>
         <span class="s2">&quot;Default is None.&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span>
