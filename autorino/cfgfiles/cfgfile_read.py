@@ -431,7 +431,7 @@ def run_steps(
     return None
 
 
-def _check_parent_dir_exist(parent_dir, parent_dir_key=None):
+def _chk_parent_dir(parent_dir, parent_dir_key=None):
     """
     Checks if a parent directory exists and translates it with the environment variable first.
 
@@ -578,7 +578,7 @@ def _get_dir_path(y_step, dir_type="out", check_parent_dir_exist=True):
     structure = y_step[key_structure]
 
     if check_parent_dir_exist:
-        _check_parent_dir_exist(dir_parent, parent_dir_key=dir_type + "_dir_parent")
+        _chk_parent_dir(dir_parent, parent_dir_key=dir_type + "_dir_parent")
 
     dir_parent, structure = format_dir_path(dir_parent, structure)
 
