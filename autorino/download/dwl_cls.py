@@ -489,10 +489,10 @@ class DownloadGnss(arocmn.StepGnss):
             ping_max_try=ping_max_try, ping_timeout=ping_timeout
         )
 
-        if not ping_out:
-            # local raw are guessed anyway, to resume the next steps if download is not possible
-            self.guess_local_raw()
-            return None
+        #if not ping_out:
+        #    # local raw are guessed anyway, to resume the next steps if download is not possible
+        #    self.guess_local_raw()
+        #    return None
 
         # Set up the DownloadGnss's FTP object if the protocol is FTP
         if self.access["protocol"] == "ftp":
