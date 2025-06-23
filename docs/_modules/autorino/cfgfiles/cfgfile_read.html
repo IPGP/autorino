@@ -528,9 +528,9 @@
 
 
 
-<div class="viewcode-block" id="_check_parent_dir_exist">
-<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._check_parent_dir_exist">[docs]</a>
-<span class="k">def</span> <span class="nf">_check_parent_dir_exist</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="_chk_parent_dir">
+<a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._chk_parent_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">_chk_parent_dir</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks if a parent directory exists and translates it with the environment variable first.</span>
 
@@ -686,7 +686,7 @@
     <span class="n">structure</span> <span class="o">=</span> <span class="n">y_step</span><span class="p">[</span><span class="n">key_structure</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">check_parent_dir_exist</span><span class="p">:</span>
-        <span class="n">_check_parent_dir_exist</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="n">dir_type</span> <span class="o">+</span> <span class="s2">&quot;_dir_parent&quot;</span><span class="p">)</span>
+        <span class="n">_chk_parent_dir</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="n">dir_type</span> <span class="o">+</span> <span class="s2">&quot;_dir_parent&quot;</span><span class="p">)</span>
 
     <span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span> <span class="o">=</span> <span class="n">format_dir_path</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span><span class="p">)</span>
 
