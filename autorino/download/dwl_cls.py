@@ -440,7 +440,7 @@ class DownloadGnss(arocmn.StepGnss):
         sleep_time=5,
         ping_max_try=4,
         ping_timeout=20,
-        ping_off=False,
+        ping_disable=False,
     ):
         """
         Frontend method to download files from a GNSS receiver
@@ -467,7 +467,7 @@ class DownloadGnss(arocmn.StepGnss):
             Maximum number of retry attempts for pinging the remote server. Default is 4.
         ping_timeout : int, optional
             Timeout in seconds for pinging the remote server. Default is 20.
-        ping_off : bool, optional
+        ping_disable : bool, optional
             If True, skips the pinging of the remote server. Default is False.
 
         Returns
@@ -487,8 +487,8 @@ class DownloadGnss(arocmn.StepGnss):
             logger.warning("Switching to 'guess' remote find method.")
             remote_find_method = "guess"
 
-        # Ping the remote server to check if it is reachable (unless ping_off is True)
-        ping_out = True if ping_off else self.ping_remote(ping_max_try, ping_timeout)
+        # Ping the remote server to check if it is reachable (unless ping_disable is True)
+        ping_out = True if ping_disable else self.ping_remote(ping_max_try, ping_timeout)
 
         if not ping_out:
            # local raw are guessed anyway, to resume the next steps if download is not possible
