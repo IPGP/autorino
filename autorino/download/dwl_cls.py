@@ -267,9 +267,9 @@ class DownloadGnss(arocmn.StepGnss):
         epo_lis = []
 
         if self.inp_file_regex:
-            logger.debug(f"remote files will be filtered with regex: {self.inp_file_regex} (aliases not translated yet)")
+            logger.debug(f"regex to filter remote files (aliases not translated yet): {self.inp_file_regex}")
         else:
-            logger.debug("no regex filtering will be applied to remote files")
+            logger.debug("no filter regex will be applied to remote files")
 
         # step 1: iterate over the input table and list the remote files (table is updated in step 2)
         for irow, row in self.table.iterrows():
