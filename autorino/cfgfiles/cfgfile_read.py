@@ -20,7 +20,7 @@ import autorino.download as arodwl
 import autorino.handle as arohdl
 
 import rinexmod.api as rimo_api
-from rinexmod.classes import metadata as rimo_mda
+import rinexmod.classes.metadata as rimo_mda
 
 import datetime as dt
 
