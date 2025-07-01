@@ -61,7 +61,7 @@ def load_cfg(cfg_path, verbose=True):
     if recursive:
         ys_raw = [y for y in [load_cfg(c, verbose=verbose) for c in cfg_path] if y]
         return mergedeep.merge({}, *ys_raw)
-    elif not os.path.isfile(cfg_path):
+    elif not cfg_path or not os.path.isfile(cfg_path):
         msg = f"config file doesn't exists!: {cfg_path}"
         logger.error(msg)
         raise FileNotFoundError(None, msg)
