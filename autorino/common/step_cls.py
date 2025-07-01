@@ -20,8 +20,13 @@ import pandas as pd
 
 import autorino.common as arocmn
 import autorino.cfglog as arologcfg
+
 import rinexmod
-import rinexmod.api as rimo_api
+# new rinexmod v4 import
+#import rinexmod.api as rimo_api
+# old rinexmod import
+from rinexmod import rinexmod_api as rimo_api
+
 from geodezyx import utils, conv
 
 #### Import the logger

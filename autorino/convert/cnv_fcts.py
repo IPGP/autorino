@@ -15,7 +15,10 @@ import docker
 import pwd
 import grp
 
-import rinexmod.api as rimo_api
+### new rinexmod v4 import
+# import rinexmod.api as rimo_api
+### old rinexmod import
+from rinexmod import rinexmod_api as rimo_api
 
 #### Import the logger
 import logging

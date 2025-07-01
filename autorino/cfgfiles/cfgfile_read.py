@@ -19,8 +19,12 @@ import autorino.convert as arocnv
 import autorino.download as arodwl
 import autorino.handle as arohdl
 
-import rinexmod.api as rimo_api
-import rinexmod.classes.metadata as rimo_mda
+#### new rinexmod v4 import
+#import rinexmod.api as rimo_api
+#import rinexmod.classes.metadata as rimo_mda
+#### old rinexmod import (for compatibility with older versions)
+from rinexmod import rinexmod_api as rimo_api
+from rinexmod import metadata as rimo_mda
 
 import datetime as dt
 
