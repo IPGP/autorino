@@ -5,19 +5,20 @@
 ## Installation
 
 ### Automatic installation (recommended)
+You can install _autorino_ using the `pip` package manager.
+```bash
+pip install git+https://github.com/IPGP/autorino.git
+```
+
+### Developper installation 
 
 Clone the _autorino_ repository. 
 ```bash
 git clone https://github.com/IPGP/autorino.git
 ```
-And then install _autorino_ using the `pip` package manager. 
+And then install _autorino_ using the `pip` package manager in [developement mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html). 
 ```bash
 cd autorino
-pip install .
-```
-
-For developpers, you can install _autorino_ in [developement mode](https://setuptools.pypa.io/en/latest/userguide/development_mode.html).
-```bash
 pip install -e .
 ```
 
