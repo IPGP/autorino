@@ -2406,7 +2406,7 @@ class StepGnss:
         frnx = self.table.loc[irow, table_col]
 
         try:
-            frnxmod = rinexmod.api.rinexmod(
+            frnxmod = rimo_api.rinexmod(
                 frnx, out_dir_use, **rinexmod_options_use
             )
         except Exception as e:
