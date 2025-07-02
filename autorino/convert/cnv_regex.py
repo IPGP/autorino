@@ -385,8 +385,8 @@ def conv_regex_convbin(f):
 
 def conv_regex_tps2rin(f):
     """
-    Generate the regular expressions of the mainand annex converted files
-    outputed by tp2rin (Topcon)
+    Generate the regular expressions of the main and annex converted files
+    outputed by tps2rin (Topcon)
 
     It has the same behavior as all the `conv_regex` functions
     See note below
@@ -425,8 +425,13 @@ def conv_regex_tps2rin(f):
     # dhs03000.11o
 
     f = Path(Path(f).name)  ### keep the filename only
-    regex_doy_site = r"(\w{4})([0-9]{3})"
-    site = re.match(regex_doy_site, f.name).group(1).lower()
+    ### this regey_doy_site is too restricitive, it does not work for all tps files
+    #regex_doy_site = r"(\w{4})([0-9]{3})"
+    #site = re.match(regex_doy_site, f.name).group(1).lower()
+    # a less restricitive regex_site
+    regex_site = r"^(\w{4})"
+    site = re.match(regex_site, f.name).group(1).lower()
+
     # doy=re.match(regex_doy_site,f.name).group(2).lower()
     # conv_regex_main = re.compile(site+doy+".(.|)\.[0-9]{2}o")
     # conv_regex_annex  = re.compile(site+doy+".(.|)\.[0-9]{2}\w")
@@ -436,3 +441,4 @@ def conv_regex_tps2rin(f):
     conv_regex_annex = re.compile(site + r"[0-9]{3}.(.|)\.[0-9]{2}\w")
 
     return conv_regex_main, conv_regex_annex
+
