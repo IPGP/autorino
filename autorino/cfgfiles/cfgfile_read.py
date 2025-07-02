@@ -19,7 +19,11 @@ import autorino.convert as arocnv
 import autorino.download as arodwl
 import autorino.handle as arohdl
 
-from rinexmod import rinexmod_api
+#### new rinexmod v4 import
+#import rinexmod.api as rimo_api
+#import rinexmod.classes.metadata as rimo_mda
+#### old rinexmod import (for compatibility with older versions)
+from rinexmod import rinexmod_api as rimo_api
 from rinexmod import metadata as rimo_mda
 
 import datetime as dt
@@ -61,7 +65,7 @@ def load_cfg(cfg_path, verbose=True):
     if recursive:
         ys_raw = [y for y in [load_cfg(c, verbose=verbose) for c in cfg_path] if y]
         return mergedeep.merge({}, *ys_raw)
-    elif not os.path.isfile(cfg_path):
+    elif not cfg_path or not os.path.isfile(cfg_path):
         msg = f"config file doesn't exists!: {cfg_path}"
         logger.error(msg)
         raise FileNotFoundError(None, msg)
@@ -168,7 +172,7 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
             # Load the metadata if the path is a directory or a file
-            metadata = rinexmod_api.metadata_input_manage(slpath, force=False)
+            metadata = rimo_api.metadata_input_manage(slpath, force=False)
         else:
             # If not, keep the path it as a string
             # (because it might contain aliases and be translated later in the object)

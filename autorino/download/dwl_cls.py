@@ -267,9 +267,9 @@ class DownloadGnss(arocmn.StepGnss):
         epo_lis = []
 
         if self.inp_file_regex:
-            logger.debug(f"remote files will be filtered with regex: {self.inp_file_regex} (aliases not translated yet)")
+            logger.debug(f"regex to filter remote files (aliases not translated yet): {self.inp_file_regex}")
         else:
-            logger.debug("no regex filtering will be applied to remote files")
+            logger.debug("no filter regex will be applied to remote files")
 
         # step 1: iterate over the input table and list the remote files (table is updated in step 2)
         for irow, row in self.table.iterrows():
@@ -491,9 +491,9 @@ class DownloadGnss(arocmn.StepGnss):
         ping_out = True if ping_disable else self.ping_remote(ping_max_try, ping_timeout)
 
         if not ping_out:
-           # local raw are guessed anyway, to resume the next steps if download is not possible
-           self.guess_local_raw()
-           return None
+            # local raw are guessed anyway, to resume the next steps if download is not possible
+            self.guess_local_raw()
+            return None
 
         # Set up the DownloadGnss's FTP object if the protocol is FTP
         if self.access["protocol"] == "ftp":

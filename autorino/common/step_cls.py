@@ -20,10 +20,14 @@ import pandas as pd
 
 import autorino.common as arocmn
 import autorino.cfglog as arologcfg
+
 import rinexmod
+# new rinexmod v4 import
+#import rinexmod.api as rimo_api
+# old rinexmod import
+from rinexmod import rinexmod_api as rimo_api
 
 from geodezyx import utils, conv
-from rinexmod import rinexmod_api
 
 #### Import the logger
 import logging
@@ -489,7 +493,7 @@ class StepGnss:
             else:  # all the other cases, i.e. already some MetaData objects
                 metadata_set = metadata
 
-            self.metadata = rinexmod_api.metadata_input_manage(
+            self.metadata = rimo_api.metadata_input_manage(
                 metadata_set, force=False
             )
         else:
@@ -2402,7 +2406,7 @@ class StepGnss:
         frnx = self.table.loc[irow, table_col]
 
         try:
-            frnxmod = rinexmod.rinexmod_api.rinexmod(
+            frnxmod = rimo_api.rinexmod(
                 frnx, out_dir_use, **rinexmod_options_use
             )
         except Exception as e:

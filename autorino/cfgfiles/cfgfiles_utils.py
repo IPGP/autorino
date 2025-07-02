@@ -34,13 +34,19 @@ def feed_template(template_full_path, df_values, outdir, out_fname_prefix):
     template_dir = os.path.dirname(template_full_path)
     template_fname = os.path.basename(template_full_path)
 
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=template_dir))
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=template_dir),
+                             trim_blocks=True,
+                             lstrip_blocks=True)
     template = env.get_template(template_fname)
 
     for irow, row in df_values.iterrows():
         print(irow, "#########################################")
         print(row)
-        result = template.render(row.to_dict(), current_time=datetime.datetime.utcnow())
+        result = template.render(row.to_dict(),
+                                 current_time=datetime.datetime.utcnow(),
+                                 #trim_blocks=True,
+                                 #lstrip_blocks=True
+                                 )
 
         if "outdirsub" in df_values.columns:
             outdirsub = os.path.join(outdir, row["outdirsub"])

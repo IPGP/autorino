@@ -15,7 +15,10 @@ import docker
 import pwd
 import grp
 
-from rinexmod import rinexmod_api
+### new rinexmod v4 import
+# import rinexmod.api as rimo_api
+### old rinexmod import
+from rinexmod import rinexmod_api as rimo_api
 
 #### Import the logger
 import logging
@@ -56,7 +59,7 @@ def site_list_from_metadata(metadata_inp):
     ###############################################
     ### read metadata
     if not type(metadata_inp) is list and os.path.isdir(metadata_inp):
-        metadata = rinexmod_api.metadata_input_manage(metadata_inp, force=False)
+        metadata = rimo_api.metadata_input_manage(metadata_inp, force=False)
     else:
         metadata = metadata_inp
 
