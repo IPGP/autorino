@@ -2411,7 +2411,7 @@ class StepGnss:
             )
         except Exception as e:
             logger.error("Error for: %s", frnx)
-            logger.error("Exception raised: %s", e)
+            logger.exception("Exception raised: %s", e)
             frnxmod = None
 
         if frnxmod:
