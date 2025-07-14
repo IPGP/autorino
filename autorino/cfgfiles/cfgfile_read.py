@@ -608,8 +608,13 @@ def _device2mda(y_station):
     metadata = rimo_mda.MetaData()
     rec_dic = dict()
     rec_dic["Receiver Type"] = y_dev["rec_type"]
-    rec_dic["Serial Number"] = y_dev["rec_sn"]
-    rec_dic["Firmware Version"] = y_dev["rec_fw"]
+    rec_dic["Serial Number"] = str(y_dev["rec_sn"])
+    rec_dic["Firmware Version"] = str(y_dev["rec_fw"])
+
+    if not "rec_sat_sys" in y_dev.keys():
+        rec_dic["Satellite System"] = "GPS+GLO+GAL+BDS+QZSS+SBAS"
+    else:
+        rec_dic["Satellite System"] = y_dev["rec_sat_sys"]
 
     ant_dic = dict()
     ant_dic["Antenna Type"] = y_dev["ant_type"]
