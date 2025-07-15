@@ -1,5 +1,5 @@
-geodezyx @ git+https://github.com/IPGP/geodezyx
-rinexmod @ git+https://github.com/IPGP/rinexmod
+geodezyx
+rinexmod
 dateparser
 docker
 filelock
