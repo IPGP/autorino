@@ -31,7 +31,7 @@ name = "autorino"  # REQUIRED, is the only field that cannot be marked as dynami
 #
 # For a discussion on single-sourcing the version, see
 # https://packaging.python.org/guides/single-sourcing-package-version/
-version = "2.0.0-beta1"  # REQUIRED, although can be dynamic
+version = "2.2.0"  # REQUIRED, although can be dynamic
 
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
@@ -57,7 +57,10 @@ requires-python = ">=3.8"
 # This is either text indicating the license for the distribution, or a file
 # that contains the license.
 # https://packaging.python.org/en/latest/specifications/core-metadata/#license
-license = {file = "LICENSE"}
+license-files = ["LICENSE"]
+license = " GPL-3.0-or-later"
+
+
 
 # This field adds keywords for your project which will appear on the
 # project page. What does your project relate to?
@@ -94,9 +97,6 @@ classifiers = [
   # Indicate who your project is intended for
   "Intended Audience :: Developers",
   "Topic :: Software Development :: Build Tools",
-
-  # Pick your license as you wish
-  'License :: OSI Approved ::  GNU General Public License v3 (GPLv3)',
 
   # Specify the Python versions you support here. In particular, ensure
   # that you indicate you support Python 3. These classifiers are *not*
