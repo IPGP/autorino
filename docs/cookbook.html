@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="external_converters.html">External GNSS converters</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><em>autorino</em>’s exemple cookbook</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#metadata-disclaimer">Metadata disclaimer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#receipe-1-run-an-autorino-workflow">Receipe #1: run an <em>autorino</em> workflow</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#synopsis">Synopsis</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a><ul>
@@ -113,6 +114,14 @@
              
   <section id="autorino-s-exemple-cookbook">
 <span id="cookbook"></span><h1><em>autorino</em>’s exemple cookbook<a class="headerlink" href="#autorino-s-exemple-cookbook" title="Link to this heading"></a></h1>
+<section id="metadata-disclaimer">
+<h2>Metadata disclaimer<a class="headerlink" href="#metadata-disclaimer" title="Link to this heading"></a></h2>
+<p>autorino assumes that <strong>the metadata in your RINEX’s header are always wrong</strong>.<br />
+Thus, it will always <strong>update the metadata based on an external source</strong>, such as sitelogs or receiver/antenna details given in the site configuration file.</p>
+<p><em>NB:</em> after the conversion step, for receiver’s serial number and firmware version, a comparison is made between the exteral metadata source and the newly converted RINEX’s header.<br />
+If a difference is detected, a warning is raised, because the RINEX values must be the correct ones.<br />
+Nevertheless, the RINEX header will be updated with the external metadata (the warning is simply an encouragement to change you external metadata source).</p>
+</section>
 <section id="receipe-1-run-an-autorino-workflow">
 <h2>Receipe #1: run an <em>autorino</em> workflow<a class="headerlink" href="#receipe-1-run-an-autorino-workflow" title="Link to this heading"></a></h2>
 <p>Call <code class="docutils literal notranslate"><span class="pre">autorino_cfgfile_run</span></code> to run an <em>autorino</em> workflow i.e. a set of <em>steps</em>.<br />

@@ -101,7 +101,11 @@
 <span class="kn">import</span> <span class="nn">autorino.download</span> <span class="k">as</span> <span class="nn">arodwl</span>
 <span class="kn">import</span> <span class="nn">autorino.handle</span> <span class="k">as</span> <span class="nn">arohdl</span>
 
-<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span>
+<span class="c1">#### new rinexmod v4 import</span>
+<span class="c1">#import rinexmod.api as rimo_api</span>
+<span class="c1">#import rinexmod.classes.metadata as rimo_mda</span>
+<span class="c1">#### old rinexmod import (for compatibility with older versions)</span>
+<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
 <span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">metadata</span> <span class="k">as</span> <span class="n">rimo_mda</span>
 
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
@@ -145,7 +149,7 @@
     <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
         <span class="n">ys_raw</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="p">[</span><span class="n">load_cfg</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cfg_path</span><span class="p">]</span> <span class="k">if</span> <span class="n">y</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">mergedeep</span><span class="o">.</span><span class="n">merge</span><span class="p">({},</span> <span class="o">*</span><span class="n">ys_raw</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">cfg_path</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;config file doesn&#39;t exists!: </span><span class="si">{</span><span class="n">cfg_path</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
@@ -258,7 +262,7 @@
         <span class="n">slpath</span> <span class="o">=</span> <span class="n">y_station</span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">][</span><span class="s2">&quot;sitelog_path&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">slpath</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">slpath</span><span class="p">):</span>
             <span class="c1"># Load the metadata if the path is a directory or a file</span>
-            <span class="n">metadata</span> <span class="o">=</span> <span class="n">rinexmod_api</span><span class="o">.</span><span class="n">metadata_input_manage</span><span class="p">(</span><span class="n">slpath</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">rimo_api</span><span class="o">.</span><span class="n">metadata_input_manage</span><span class="p">(</span><span class="n">slpath</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If not, keep the path it as a string</span>
             <span class="c1"># (because it might contain aliases and be translated later in the object)</span>
@@ -715,8 +719,13 @@
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">rimo_mda</span><span class="o">.</span><span class="n">MetaData</span><span class="p">()</span>
     <span class="n">rec_dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Receiver Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_type&quot;</span><span class="p">]</span>
-    <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Serial Number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_sn&quot;</span><span class="p">]</span>
-    <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Firmware Version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_fw&quot;</span><span class="p">]</span>
+    <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Serial Number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_sn&quot;</span><span class="p">])</span>
+    <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Firmware Version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_fw&quot;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;rec_sat_sys&quot;</span> <span class="ow">in</span> <span class="n">y_dev</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Satellite System&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GPS+GLO+GAL+BDS+QZSS+SBAS&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rec_dic</span><span class="p">[</span><span class="s2">&quot;Satellite System&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;rec_sat_sys&quot;</span><span class="p">]</span>
 
     <span class="n">ant_dic</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">ant_dic</span><span class="p">[</span><span class="s2">&quot;Antenna Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_dev</span><span class="p">[</span><span class="s2">&quot;ant_type&quot;</span><span class="p">]</span>

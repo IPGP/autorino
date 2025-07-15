@@ -243,10 +243,10 @@
 
         <span class="n">rmot_paths_list</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1">#for epoch in self.epoch_range.eporng_list():  ### go for irow ! ### IMPROVE ME !!!</span>
+        <span class="c1"># for epoch in self.epoch_range.eporng_list():  ### go for irow ! ### IMPROVE ME !!!</span>
 
         <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="c1">#epoch = row[&quot;epoch_srt&quot;]</span>
+            <span class="c1"># epoch = row[&quot;epoch_srt&quot;]</span>
 
             <span class="c1">### guess the potential remote files</span>
             <span class="n">rmot_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_dir</span><span class="p">)</span>
@@ -262,7 +262,7 @@
 
             <span class="n">rmot_paths_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmot_path_use</span><span class="p">)</span>
 
-            <span class="c1">#iepoch = self.table[self.table[&quot;epoch_srt&quot;] == epoch].index[0]</span>
+            <span class="c1"># iepoch = self.table[self.table[&quot;epoch_srt&quot;] == epoch].index[0]</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_fname_use</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmot_path_use</span>
@@ -293,7 +293,7 @@
         <span class="c1"># for epoch in self.epoch_range.eporng_list():  # go for irow ! ### IMPROVE ME !!!</span>
 
         <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="c1">#epoch = row[&quot;epoch_srt&quot;]</span>
+            <span class="c1"># epoch = row[&quot;epoch_srt&quot;]</span>
 
             <span class="c1"># guess the potential local files</span>
             <span class="n">local_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_dir</span><span class="p">)</span>
@@ -365,9 +365,9 @@
         <span class="n">epo_lis</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;remote files will be filtered with regex: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="si">}</span><span class="s2"> (aliases not translated yet)&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;regex to filter remote files (aliases not translated yet): </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">inp_file_regex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;no regex filtering will be applied to remote files&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;no filter regex will be applied to remote files&quot;</span><span class="p">)</span>
 
         <span class="c1"># step 1: iterate over the input table and list the remote files (table is updated in step 2)</span>
         <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
@@ -550,6 +550,7 @@
         <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">ping_max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="n">ping_timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">ping_disable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Frontend method to download files from a GNSS receiver</span>
@@ -576,6 +577,8 @@
 <span class="sd">            Maximum number of retry attempts for pinging the remote server. Default is 4.</span>
 <span class="sd">        ping_timeout : int, optional</span>
 <span class="sd">            Timeout in seconds for pinging the remote server. Default is 20.</span>
+<span class="sd">        ping_disable : bool, optional</span>
+<span class="sd">            If True, skips the pinging of the remote server. Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -594,10 +597,8 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Switching to &#39;guess&#39; remote find method.&quot;</span><span class="p">)</span>
             <span class="n">remote_find_method</span> <span class="o">=</span> <span class="s2">&quot;guess&quot;</span>
 
-        <span class="c1"># Ping the remote server to check if it is reachable</span>
-        <span class="n">ping_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ping_remote</span><span class="p">(</span>
-            <span class="n">ping_max_try</span><span class="o">=</span><span class="n">ping_max_try</span><span class="p">,</span> <span class="n">ping_timeout</span><span class="o">=</span><span class="n">ping_timeout</span>
-        <span class="p">)</span>
+        <span class="c1"># Ping the remote server to check if it is reachable (unless ping_disable is True)</span>
+        <span class="n">ping_out</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">ping_disable</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">ping_remote</span><span class="p">(</span><span class="n">ping_max_try</span><span class="p">,</span> <span class="n">ping_timeout</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ping_out</span><span class="p">:</span>
             <span class="c1"># local raw are guessed anyway, to resume the next steps if download is not possible</span>

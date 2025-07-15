@@ -4,6 +4,14 @@
 
 ## _autorino_'s exemple cookbook
 
+### Metadata disclaimer
+autorino assumes that __the metadata in your RINEX's header are always wrong__.  
+Thus, it will always __update the metadata based on an external source__, such as sitelogs or receiver/antenna details given in the site configuration file.
+
+_NB:_ after the conversion step, for receiver's serial number and firmware version, a comparison is made between the exteral metadata source and the newly converted RINEX's header.   
+If a difference is detected, a warning is raised, because the RINEX values must be the correct ones.  
+Nevertheless, the RINEX header will be updated with the external metadata (the warning is simply an encouragement to change you external metadata source).
+
 ### Receipe #1: run an _autorino_ workflow
 
 Call `autorino_cfgfile_run` to run an _autorino_ workflow i.e. a set of _steps_.  

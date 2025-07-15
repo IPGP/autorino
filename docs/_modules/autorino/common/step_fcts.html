@@ -290,15 +290,11 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">tables_files</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No previous tables found in the log directory.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># If files are found, read each file into a DataFrame and concatenate them into a single DataFrame</span>
-        <span class="n">tab_df_stk</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables_files</span><span class="p">:</span>
-            <span class="n">tab_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-            <span class="c1"># if not len(tab_df) == 0:</span>
-            <span class="n">tab_df_stk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab_df</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">tab_df_stk</span><span class="p">)</span></div>
+    <span class="c1"># Read and concatenate non-empty DataFrames from the found files</span>
+    <span class="n">tab_df_stk</span> <span class="o">=</span> <span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables_files</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">tab_df_stk</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">tab_df_stk</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span></div>
 
 
 <div class="viewcode-block" id="print_tab_core">
@@ -354,8 +350,6 @@
             <span class="n">halflen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">maxlen</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">str_out_shrink</span> <span class="o">=</span> <span class="n">str_inp</span><span class="p">[:</span><span class="n">halflen</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;..&quot;</span> <span class="o">+</span> <span class="n">str_inp</span><span class="p">[</span><span class="o">-</span><span class="n">halflen</span><span class="p">:]</span>
             <span class="k">return</span> <span class="n">str_out_shrink</span>
-
-    <span class="n">table_inp</span><span class="o">.</span><span class="n">table_ok_cols_bool</span><span class="p">()</span>
 
     <span class="c1"># we define the FORMATTERS (i.e. functions) for each column</span>
     <span class="n">form</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
