@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#automatic-installation-recommended">Automatic installation (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#developper-installation">Developper installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#setting-up-the-environment">Setting up the environment</a></li>
 </ul>
 </li>
@@ -90,17 +91,20 @@
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="automatic-installation-recommended">
 <h2>Automatic installation (recommended)<a class="headerlink" href="#automatic-installation-recommended" title="Link to this heading"></a></h2>
+<p>You can install <em>autorino</em> using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package manager.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/IPGP/autorino.git
+</pre></div>
+</div>
+</section>
+<section id="developper-installation">
+<h2>Developper installation<a class="headerlink" href="#developper-installation" title="Link to this heading"></a></h2>
 <p>Clone the <em>autorino</em> repository.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/IPGP/autorino.git
 </pre></div>
 </div>
-<p>And then install <em>autorino</em> using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package manager.</p>
+<p>And then install <em>autorino</em> using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package manager in <a class="reference external" href="https://setuptools.pypa.io/en/latest/userguide/development_mode.html">developement mode</a>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>autorino
-pip<span class="w"> </span>install<span class="w"> </span>.
-</pre></div>
-</div>
-<p>For developpers, you can install <em>autorino</em> in <a class="reference external" href="https://setuptools.pypa.io/en/latest/userguide/development_mode.html">developement mode</a>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
 </section>

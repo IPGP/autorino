@@ -59,7 +59,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="autorino.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.api package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#autorino-api-check-rnx-module">autorino.api.check_rnx module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.check_rnx">autorino.api.check_rnx module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.configfile_run">autorino.api.configfile_run module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.convert_rnx">autorino.api.convert_rnx module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.api.download_raw">autorino.api.download_raw module</a></li>
@@ -115,8 +115,58 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="autorino-api-check-rnx-module">
-<h2>autorino.api.check_rnx module<a class="headerlink" href="#autorino-api-check-rnx-module" title="Link to this heading"></a></h2>
+<section id="module-autorino.api.check_rnx">
+<span id="autorino-api-check-rnx-module"></span><h2>autorino.api.check_rnx module<a class="headerlink" href="#module-autorino.api.check_rnx" title="Link to this heading"></a></h2>
+<p>Created on 27/01/2025 09:50:23</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.check_rnx.check_rnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.check_rnx.</span></span><span class="sig-name descname"><span class="pre">check_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_dir_parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir_structure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sites_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/check_rnx.html#check_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.check_rnx.check_rnx" title="Link to this definition"></a></dt>
+<dd><p>This function checks the RINEX files in the input directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp_dir_parent</strong> (<em>str</em>) – The parent input directory.</p></li>
+<li><p><strong>inp_dir_structure</strong> (<em>str</em>) – The input directory structure.</p></li>
+<li><p><strong>epoch_start</strong> (<em>str</em>) – The start epoch.</p></li>
+<li><p><strong>epoch_end</strong> (<em>str</em>) – The end epoch.</p></li>
+<li><p><strong>sites_list</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of site identifiers to filter the check.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The output directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>tabu_chk_col</strong> (<em>str</em>) – The tabulated string of the check table with colored values.</p></li>
+<li><p><strong>tabu_chk_bnw</strong> (<em>str</em>) – The tabulated string of the check table with black and white values.</p></li>
+<li><p><strong>df_chk_sum</strong> (<em>pd.DataFrame</em>) – The values of the check table summarized in a dataframe.</p></li>
+<li><p><strong>df_chk_full_stats</strong> (<em>pd.DataFrame</em>) – The full statistics of the check table.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.api.check_rnx.checkrnx_output">
+<span class="sig-prename descclassname"><span class="pre">autorino.api.check_rnx.</span></span><span class="sig-name descname"><span class="pre">checkrnx_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eporng</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabu_chk_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tabu_chk_bnw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_chk_sum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_chk_full_stats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/check_rnx.html#checkrnx_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.check_rnx.checkrnx_output" title="Link to this definition"></a></dt>
+<dd><p>This function saves the check_rnx results in the output directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_dir</strong> (<em>str</em>) – The output directory.</p></li>
+<li><p><strong>eporng</strong> (<a class="reference internal" href="autorino.common.html#autorino.common.eporng_cls.EpochRange" title="autorino.common.eporng_cls.EpochRange"><em>EpochRange</em></a>) – The epoch range.</p></li>
+<li><p><strong>tabu_chk_col</strong> (<em>str</em>) – The tabulated string of the check table with colored values.</p></li>
+<li><p><strong>tabu_chk_bnw</strong> (<em>str</em>) – The tabulated string of the check table with black and white values.</p></li>
+<li><p><strong>df_chk_sum</strong> (<em>pd.DataFrame</em>) – The values of the check table summarized in a dataframe.</p></li>
+<li><p><strong>df_chk_full_stats</strong> (<em>pd.DataFrame</em>) – The full statistics of the check table.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-autorino.api.configfile_run">
 <span id="autorino-api-configfile-run-module"></span><h2>autorino.api.configfile_run module<a class="headerlink" href="#module-autorino.api.configfile_run" title="Link to this heading"></a></h2>

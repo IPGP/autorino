@@ -102,10 +102,14 @@
 
 <span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
 <span class="kn">import</span> <span class="nn">autorino.cfglog</span> <span class="k">as</span> <span class="nn">arologcfg</span>
+
 <span class="kn">import</span> <span class="nn">rinexmod</span>
+<span class="c1"># new rinexmod v4 import</span>
+<span class="c1">#import rinexmod.api as rimo_api</span>
+<span class="c1"># old rinexmod import</span>
+<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
 
 <span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
-<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span>
 
 <span class="c1">#### Import the logger</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -599,7 +603,7 @@
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># all the other cases, i.e. already some MetaData objects</span>
                 <span class="n">metadata_set</span> <span class="o">=</span> <span class="n">metadata</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">rinexmod_api</span><span class="o">.</span><span class="n">metadata_input_manage</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">rimo_api</span><span class="o">.</span><span class="n">metadata_input_manage</span><span class="p">(</span>
                 <span class="n">metadata_set</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2644,12 +2648,12 @@
         <span class="n">frnx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">table_col</span><span class="p">]</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">frnxmod</span> <span class="o">=</span> <span class="n">rinexmod</span><span class="o">.</span><span class="n">rinexmod_api</span><span class="o">.</span><span class="n">rinexmod</span><span class="p">(</span>
+            <span class="n">frnxmod</span> <span class="o">=</span> <span class="n">rimo_api</span><span class="o">.</span><span class="n">rinexmod</span><span class="p">(</span>
                 <span class="n">frnx</span><span class="p">,</span> <span class="n">out_dir_use</span><span class="p">,</span> <span class="o">**</span><span class="n">rinexmod_options_use</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error for: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">frnx</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Exception raised: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Exception raised: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
             <span class="n">frnxmod</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">frnxmod</span><span class="p">:</span>

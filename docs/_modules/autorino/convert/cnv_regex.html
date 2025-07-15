@@ -48,10 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../simple_expl.html">Getting started: some simple examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s cookbook</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
@@ -497,8 +496,8 @@
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_tps2rin">[docs]</a>
 <span class="k">def</span> <span class="nf">conv_regex_tps2rin</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
-<span class="sd">    outputed by tp2rin (Topcon)</span>
+<span class="sd">    Generate the regular expressions of the main and annex converted files</span>
+<span class="sd">    outputed by tps2rin (Topcon)</span>
 
 <span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
 <span class="sd">    See note below</span>
@@ -537,8 +536,13 @@
     <span class="c1"># dhs03000.11o</span>
 
     <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1">### keep the filename only</span>
-    <span class="n">regex_doy_site</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;(\w</span><span class="si">{4}</span><span class="s2">)([0-9]</span><span class="si">{3}</span><span class="s2">)&quot;</span>
-    <span class="n">site</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex_doy_site</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="c1">### this regey_doy_site is too restricitive, it does not work for all tps files</span>
+    <span class="c1">#regex_doy_site = r&quot;(\w{4})([0-9]{3})&quot;</span>
+    <span class="c1">#site = re.match(regex_doy_site, f.name).group(1).lower()</span>
+    <span class="c1"># a less restricitive regex_site</span>
+    <span class="n">regex_site</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(\w</span><span class="si">{4}</span><span class="s2">)&quot;</span>
+    <span class="n">site</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex_site</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
     <span class="c1"># doy=re.match(regex_doy_site,f.name).group(2).lower()</span>
     <span class="c1"># conv_regex_main = re.compile(site+doy+&quot;.(.|)\.[0-9]{2}o&quot;)</span>
     <span class="c1"># conv_regex_annex  = re.compile(site+doy+&quot;.(.|)\.[0-9]{2}\w&quot;)</span>
@@ -548,6 +552,7 @@
     <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">site</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;[0-9]</span><span class="si">{3}</span><span class="s2">.(.|)\.[0-9]</span><span class="si">{2}</span><span class="s2">\w&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
 
 </pre></div>
 
