@@ -11,6 +11,8 @@ import os
 import collections.abc
 import yaml
 import mergedeep
+import autorino
+import rinexmod
 
 ### we need to clear the root logger to avoid duplicate logs
 root_logger = logging.getLogger()
@@ -29,6 +31,11 @@ def read_env(envfile_path=None):
     2. Environment variable `AUTORINO_ENV`
     3. Default file in the current directory
     """
+
+    varo = autorino.__version__
+    vrimo = rinexmod.__version__
+    logger.info("autorino & rinexmod version: %s & %s", varo, vrimo)
+
     # Default environment file path
     default_env_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "autorino_env_default.yml"
