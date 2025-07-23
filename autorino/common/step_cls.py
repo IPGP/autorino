@@ -18,6 +18,7 @@ from filelock import FileLock, Timeout
 import numpy as np
 import pandas as pd
 
+import autorino
 import autorino.common as arocmn
 import autorino.cfglog as arologcfg
 
@@ -653,6 +654,15 @@ class StepGnss:
         out_copy.table = self.table.copy()
 
         return out_copy
+
+    @staticmethod
+    def autorino_vers(self):
+        """
+        Returns the version of the autorino package.
+        """
+        v = autorino.__version__
+        logger.info("autorino version: %s", v)
+        return v
 
     def get_step_type(self, full_object_name=False):
         """
@@ -2182,7 +2192,7 @@ class StepGnss:
         fname_custom="",
         force=False,
         switch_ok_out_false=False,
-        mv_final_mode=False,
+        ok_out_mode=False,
     ):
         """
         Checks the status of the input and output files for a specific row in the table.
@@ -2206,9 +2216,10 @@ class StepGnss:
         switch_ok_out_false : bool, optional
             If True, the 'ok_out' column of the table is set to False if the step should be skipped.
             Default is False.
-        mv_final_mode : bool, optional
-            If True, the step is skipped if the output file does not exists.
-            Designed for final move (mv_final) steps.
+        ok_out_mode : bool, optional
+            If True, the step is skipped if 'ok_out' column is False
+            (i.e. the output file does not exist).
+            Designed for final move (mv_final) & rinexmod steps.
             Default is False.
 
         Returns
@@ -2237,9 +2248,9 @@ class StepGnss:
         if force:
             logger.info("%s forced: %s", step_name, finp_use)
             bool_ok = True
-        elif mv_final_mode and self.table.loc[irow, "ok_out"]:
+        elif ok_out_mode and self.table.loc[irow, "ok_out"]:
             bool_ok = True
-        elif mv_final_mode and not self.table.loc[irow, "ok_out"]:
+        elif ok_out_mode and not self.table.loc[irow, "ok_out"]:
             logger.warning("%s skipped (output not found): %s", step_name, fout_use)
             bool_ok = False
         # NB: we disable this option since it is not used (2025-01-14)
@@ -2358,7 +2369,7 @@ class StepGnss:
         return rimopts_out
 
     def mono_rinexmod(
-        self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None
+        self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None, check_ok_out=True
     ):
         """
         "on row" method
@@ -2383,6 +2394,9 @@ class StepGnss:
             The column in the table which contains the file path to be modified. Defaults to 'fpath_out'.
         rinexmod_options : dict, optional
             The options to be used by the rinexmod function. If not provided, default options are used.
+        check_ok_out : bool, optional
+            If True, mono_rinexmod checks the 'ok_out' table's column (defaut behavior).
+            If False, it checks the 'ok_inp' column (necessary for the stand-alone rinexmod step).
 
         Returns
         -------
@@ -2390,7 +2404,7 @@ class StepGnss:
             The path of the modified file if the operation is successful, None otherwise.
         """
 
-        if not self.mono_ok_check(irow, step_name="rinexmod"):
+        if not self.mono_ok_check(irow, step_name="rinexmod", ok_out_mode=check_ok_out):
             return None
 
         # definition of the output directory (after the action)
@@ -2490,8 +2504,8 @@ class StepGnss:
         # #NB: for mv it's ok_out column the one to check
 
         mvcp = "copy" if copy_only else "move"
-        # NB: for a final move it's ok_out column the one to check => mv_final_mode=True
-        if not self.mono_ok_check(irow, step_name="final " + mvcp, mv_final_mode=True):
+        # NB: for a final move it's ok_out column the one to check => ok_out_mode=True
+        if not self.mono_ok_check(irow, step_name="final " + mvcp, ok_out_mode=True):
             return None
 
         # definition of the output directory (after the action)

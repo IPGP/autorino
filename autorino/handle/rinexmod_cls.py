@@ -6,18 +6,6 @@ Created on 20/05/2025 20:27:15
 @author: psakic
 """
 
-# Create a logger object.
-import os
-import time
-
-import numpy as np
-import pandas as pd
-from pathlib import Path
-
-from geodezyx import utils, conv
-
-import autorino.common as arocmn
-import autorino.convert as arocnv
 import autorino.handle.handle_cls as arohdlcls
 
 # +++ Import the logger
@@ -99,9 +87,14 @@ class RinexmodGnss(arohdlcls.HandleGnss):
 
         Parameters
         ----------
-        **kwargs : dict
-            Additional options for the RINEX modification. These options are updated
-            for each row using the `updt_rnxmodopts` method.
+        verbose : bool, optional
+            If True, prints the table of operations. Default is False.
+        force : bool, optional
+            If True, forces the rinexmod operation even if the output files already exist.
+            Default is False.
+        rinexmod_options : dict, optional
+            The options to be used by the rinexmod function.
+            If not provided, default options are used.
 
         Returns
         -------
@@ -165,4 +158,7 @@ class RinexmodGnss(arohdlcls.HandleGnss):
                 out_dir=out_dir_use,
                 table_col="fpath_inp",
                 rinexmod_options=rinexmod_options_use,
+                check_ok_out=False
             )
+
+        return None
