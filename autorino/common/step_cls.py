@@ -24,7 +24,7 @@ import autorino.cfglog as arologcfg
 
 import rinexmod
 # new rinexmod v4 import
-#import rinexmod.api as rimo_api
+# import rinexmod.api as rimo_api
 # old rinexmod import
 from rinexmod import rinexmod_api as rimo_api
 
@@ -1284,6 +1284,9 @@ class StepGnss:
         self.table["fname"] = self.table["fpath_inp"].apply(os.path.basename)
         self.table["ok_inp"] = self.table["fpath_inp"].apply(os.path.isfile)
 
+        # log a warning if some files are not ok
+        self.not_ok_warn()
+
         return flist
 
     def load_tab_prev_tab(self, prev_table, reset_table=True, new_inp_is_prev="out"):
@@ -1334,6 +1337,9 @@ class StepGnss:
         # epoch_srt and epoch_end are supposed to be timezone aware
         self.table["epoch_srt"] = prev_table["epoch_srt"].values
         self.table["epoch_end"] = prev_table["epoch_end"].values
+
+        # log a warning if some files are not ok
+        self.not_ok_warn()
 
         return None
 
@@ -1813,6 +1819,17 @@ class StepGnss:
                 pass
 
         self.tmp_decmp_files = tmp_decmp_files_new
+
+    def not_ok_warn(self, io="inp"):
+        """
+        Logs a warning for each row in the table where the specified column is not OK.
+        """
+        for irow, row in self.table.iterrows():
+            if not self.table[irow, "ok_" + io]:
+                logger.warning(
+                    "file not ok, (missing?): ",
+                    self.table.loc[irow, "fpath_" + io],
+                )
 
     #  ______ _ _ _              _        _     _
     # |  ____(_) | |            | |      | |   | |
