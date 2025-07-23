@@ -10,7 +10,6 @@ import copy
 
 import os
 import re
-import shutil
 import time
 from pathlib import Path
 from filelock import FileLock, Timeout
