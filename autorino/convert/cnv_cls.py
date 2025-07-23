@@ -13,7 +13,7 @@ import pandas as pd
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
-from geodezyx import operational
+from geodezyx import operational as gzyx_opera
 
 #### Import the logger
 import logging
@@ -380,7 +380,7 @@ class ConvertGnss(arocmn.StepGnss):
             ### update table if things go well
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, "fpath_out"] = frnxtmp
-            epo_srt_ok, epo_end_ok = operational.rinex_start_end(frnxtmp)
+            epo_srt_ok, epo_end_ok = gzyx_opera.rinex_start_end(frnxtmp)
             self.table.loc[irow, "epoch_srt"] = pd.to_datetime(epo_srt_ok, utc=True)
             self.table.loc[irow, "epoch_end"] = pd.to_datetime(epo_end_ok, utc=True)
         else:
