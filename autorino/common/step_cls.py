@@ -1824,7 +1824,7 @@ class StepGnss:
         Logs a warning for each row in the table where the specified column is not OK.
         """
         for irow, row in self.table.iterrows():
-            if not self.table[irow, "ok_" + io]:
+            if not self.table.loc[irow, "ok_" + io]:
                 logger.warning(
                     "file not ok, (missing?): ",
                     self.table.loc[irow, "fpath_" + io],
