@@ -20,6 +20,7 @@ import geodezyx.utils
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
+
 def convert_rnx(
     inp_raws,
     out_dir,
@@ -33,7 +34,7 @@ def convert_rnx(
     raw_out_dir=None,
     raw_out_structure=None,
     processes=1,
-    filter_prev_tables=False
+    filter_prev_tables=False,
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -102,16 +103,18 @@ def convert_rnx(
         logger.warning("No metadata (sitelogs...) provided while highly recommended.")
         logger.warning("Be sure of what you are doing! (check -m option)")
 
-
     tmp_dir = tmp_dir or os.path.join(out_dir, "tmp_convert_rnx")
     log_dir = log_dir or tmp_dir
     out_dir_use = os.path.join(out_dir, out_structure) if out_structure else out_dir
 
+    # get the raw files as a list depending on the input type
+    inp_raws_lis = arocmn.import_files(inp_raws)
+
     ###### Convert RAW > RINEX files
-    inp_raws_chunked = geodezyx.utils.chunkIt(inp_raws, processes)
+    inp_raws_lis_cnk = geodezyx.utils.chunkIt(inp_raws_lis, processes)
 
     args_wrap = []
-    for raws in inp_raws_chunked:
+    for raws in inp_raws_lis_cnk:
         args = (
             raws,
             out_dir_use,
@@ -120,7 +123,7 @@ def convert_rnx(
             metadata,
             force_rnx,
             rinexmod_options,
-            filter_prev_tables
+            filter_prev_tables,
         )
         args_wrap.append(args)
 
@@ -151,7 +154,7 @@ def convert_rnx(
             raw_out_structure = out_structure
         raw_out_dir_use = str(os.path.join(raw_out_dir, raw_out_structure))
 
-        cnv_table_cat = pd.concat([cnv.table for cnv in cnv_out_lis],ignore_index=True)
+        cnv_table_cat = pd.concat([cnv.table for cnv in cnv_out_lis], ignore_index=True)
 
         cpy_raw = arocmn.StepGnss(raw_out_dir_use, tmp_dir, log_dir, metadata=metadata)
         debug_print = False
@@ -160,7 +163,7 @@ def convert_rnx(
         # is necessary to get the epoch
         cpy_raw.load_tab_prev_tab(cnv_table_cat, new_inp_is_prev="inp")
         cpy_raw.print_table() if debug_print else None
-        cpy_raw.filter_na(["epoch_srt","epoch_end"])
+        cpy_raw.filter_na(["epoch_srt", "epoch_end"])
         cpy_raw.print_table() if debug_print else None
         cpy_raw.guess_out_files()
         cpy_raw.print_table() if debug_print else None
@@ -203,13 +206,25 @@ def convert_raw_wrap(args):
     arocnv.ConvertGnss
         An instance of the `ConvertGnss` class containing the results of the conversion.
     """
-    raws, out_dir_use, tmp_dir, log_dir, metadata, force_rnx, rinexmod_options, filter_prev_tables = args
+    (
+        raws,
+        out_dir_use,
+        tmp_dir,
+        log_dir,
+        metadata,
+        force_rnx,
+        rinexmod_options,
+        filter_prev_tables,
+    ) = args
     # Initialize the ConvertGnss object with the provided directories and metadata
     cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
     # Load the list of RAW files to be converted
     cnv.load_tab_filelist(raws)
     # Perform the conversion with the specified options
-    cnv.convert(force=force_rnx, rinexmod_options=rinexmod_options,
-                filter_prev_tables=filter_prev_tables)
+    cnv.convert(
+        force=force_rnx,
+        rinexmod_options=rinexmod_options,
+        filter_prev_tables=filter_prev_tables,
+    )
     # Return the ConvertGnss object containing the conversion results
     return cnv

@@ -439,7 +439,7 @@ def converter_run(
 ### Low level functions
 
 
-def find_conv_files(directory, pattern_main, pattern_annex, n_sec=10):
+def find_conv_files(directory, pattern_main, pattern_annex, n_sec=20):
     """
     Searches for the files in a directory that were recently created (within the last n_sec seconds)
     and match the main and annex patterns.
@@ -458,7 +458,8 @@ def find_conv_files(directory, pattern_main, pattern_annex, n_sec=10):
     pattern_annex : str
         The regular expression pattern that the annex files should match.
     n_sec : int, optional
-        The number of seconds in the past to consider for file creation. Default is 10.
+        The number of seconds in the past to consider for file creation.
+         Default is 20.
 
     Returns
     -------
