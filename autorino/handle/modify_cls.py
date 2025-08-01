@@ -18,8 +18,7 @@ logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 BOLD_SRT = "\033[1m"
 BOLD_END = "\033[0m"
 
-
-class RinexmodGnss(arohdlcls.HandleGnss):
+class ModifyGnss(arohdlcls.HandleGnss):
     def __init__(
         self,
         out_dir,
@@ -34,9 +33,9 @@ class RinexmodGnss(arohdlcls.HandleGnss):
         metadata=None,
     ):
         """
-        Initialize a RinexmodGnss object.
+        Initialize a ModifyGnss object.
 
-        This constructor initializes a RinexmodGnss object,
+        This constructor initializes a ModifyGnss object,
         which is used for a stand-alone application of RinexMod
         actions on RINEX files.
         It inherits from the HandleGnss class.
@@ -77,7 +76,7 @@ class RinexmodGnss(arohdlcls.HandleGnss):
             metadata=metadata,
         )
 
-    def rinexmod(self, verbose=False, force=False, rinexmod_options=None):
+    def modify(self, verbose=False, force=False, rinexmod_options=None):
         """
         Apply RINEX modifications to the data.
 
@@ -106,7 +105,7 @@ class RinexmodGnss(arohdlcls.HandleGnss):
 
         # Log the start of the splitting operation
         logger.info(
-            BOLD_SRT + ">>>>>> Modding RINEX files (stand-alone rinexmod)" + BOLD_END
+            BOLD_SRT + ">>>>>> Modify RINEX files (stand-alone rinexmod)" + BOLD_END
         )
 
         # set the ok_inp to True per default
