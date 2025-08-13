@@ -113,11 +113,11 @@
 <span class="n">BOLD_END</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[0m&quot;</span>
 
 
-<div class="viewcode-block" id="RinexmodGnss">
-<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.rinexmod_cls.RinexmodGnss">[docs]</a>
-<span class="k">class</span> <span class="nc">RinexmodGnss</span><span class="p">(</span><span class="n">arohdlcls</span><span class="o">.</span><span class="n">HandleGnss</span><span class="p">):</span>
-<div class="viewcode-block" id="RinexmodGnss.__init__">
-<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.rinexmod_cls.RinexmodGnss.__init__">[docs]</a>
+<div class="viewcode-block" id="ModifyGnss">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.rinexmod_cls.ModifyGnss">[docs]</a>
+<span class="k">class</span> <span class="nc">ModifyGnss</span><span class="p">(</span><span class="n">arohdlcls</span><span class="o">.</span><span class="n">HandleGnss</span><span class="p">):</span>
+<div class="viewcode-block" id="ModifyGnss.__init__">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.rinexmod_cls.ModifyGnss.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">out_dir</span><span class="p">,</span>
@@ -132,9 +132,9 @@
         <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize a RinexmodGnss object.</span>
+<span class="sd">        Initialize a ModifyGnss object.</span>
 
-<span class="sd">        This constructor initializes a RinexmodGnss object,</span>
+<span class="sd">        This constructor initializes a ModifyGnss object,</span>
 <span class="sd">        which is used for a stand-alone application of RinexMod</span>
 <span class="sd">        actions on RINEX files.</span>
 <span class="sd">        It inherits from the HandleGnss class.</span>
@@ -176,8 +176,8 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="RinexmodGnss.rinexmod">
-<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.rinexmod_cls.RinexmodGnss.rinexmod">[docs]</a>
+<div class="viewcode-block" id="ModifyGnss.rinexmod">
+<a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.rinexmod_cls.ModifyGnss.rinexmod">[docs]</a>
     <span class="k">def</span> <span class="nf">rinexmod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply RINEX modifications to the data.</span>

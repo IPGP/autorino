@@ -405,7 +405,7 @@
     <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;splice&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SpliceGnss</span>
     <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">RinexmodGnss</span>
+        <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">ModifyGnss</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;unknown step </span><span class="si">%s</span><span class="s2"> in cfgfiles file, skip&quot;</span><span class="p">,</span> <span class="n">step_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span></div>
