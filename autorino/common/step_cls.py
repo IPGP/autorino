@@ -166,6 +166,9 @@ class StepGnss:
         self.tmp_rnx_files = []
         self.tmp_decmp_files = []
 
+        # exit code
+        self._exit_code = 0  # initialized to 0, meaning no error
+
     # getter and setter
     # site_id
 
@@ -251,6 +254,47 @@ class StepGnss:
     def table(self, value):
         self._table = value
         # designed for future safety tests
+
+    @property
+    def exit_code(self):
+        """
+        Returns the exit code of the StepGnss object.
+
+        exit code is defined as follows:
+        * 0: everything ok OR no input and no output (the step was skipped)
+        * 1: no input but all output ok (everything was already ok)
+        * 2: some input ok, some output ok
+        * 3: all input ok, some output ok
+        * 8: some input ok, but no output
+        * 9: all input ok, but no output
+        """
+
+        n_inp_ok = self.table["ok_inp"].sum()
+        n_out_ok = self.table["ok_out"].sum()
+        n_total = len(self.table)
+
+        if n_inp_ok == 0:
+            if n_out_ok == n_total and n_total > 0:
+                exco_out = 1  # no input but all output ok
+            else:
+                exco_out = 0  # no input and no output, the whole step was skipped
+        elif n_out_ok == 0:
+            if n_inp_ok == n_total:
+                exco_out = 9  # all input ok, but no output
+            else:
+                exco_out = 8  # some input ok, but no output
+        else:
+            if n_inp_ok == n_total and n_out_ok == n_total:
+                exco_out = 0  # everything ok
+            elif n_inp_ok == n_total:
+                exco_out = 3  # all input ok, some output ok
+            else:
+                exco_out = 2  # some input ok, some output ok
+
+        logger.debug("Exit code: %s, %s", exco_out, self)
+        return exco_out
+
+
 
     def _init_table(self, table_cols: list = None, init_epoch: bool = True):
         """

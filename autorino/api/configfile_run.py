@@ -15,7 +15,7 @@ import autorino.common as arocmn
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
@@ -87,7 +87,9 @@ def cfgfile_run(
 
     Returns
     -------
-    None
+    exit_code_max : int
+        The maximum exit code from all steps executed in the configuration files.
+        If no steps were executed, returns 0.
     """
 
     # Check if cfg_in is a directory or a file and get the list of configuration files
@@ -135,11 +137,12 @@ def cfgfile_run(
             else:
                 pass
 
-
         # Read the configuration and run the steps
         # step_lis_lis is a list of list because you can have several sessions in the same configuration file
         steps_lis_lis, steps_dic_dic, y_use = arocfg.read_cfg(
-            site_cfg_path=cfg_use, include_cfg_paths_xtra=incl_cfg_in, epoch_range=epoch_range
+            site_cfg_path=cfg_use,
+            include_cfg_paths_xtra=incl_cfg_in,
+            epoch_range=epoch_range,
         )
 
         for steps_lis in steps_lis_lis:
@@ -150,4 +153,9 @@ def cfgfile_run(
                 force=force,
             )
 
-    return None
+    # Get the maximum exit code from all steps
+    exit_code_max = max(
+        [max([stp.exit_code for stp in steps_lis]) for steps_lis in steps_lis_lis]
+    )
+
+    return exit_code_max

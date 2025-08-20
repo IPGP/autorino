@@ -1,5 +1,6 @@
 import argparse
 import autorino.api as aroapi
+import sys
 
 
 def main():
@@ -130,7 +131,7 @@ def main():
     exclude_steps = args.exclude_steps
     force = args.force
 
-    aroapi.cfgfile_run(
+    exit_code = aroapi.cfgfile_run(
         cfg_in=config,
         incl_cfg_in=include_config,
         sites_list=sites_list,
@@ -142,6 +143,8 @@ def main():
         exclude_steps=exclude_steps,
         force=force,
     )
+
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

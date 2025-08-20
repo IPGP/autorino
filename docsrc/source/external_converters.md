@@ -64,8 +64,15 @@ Ask Trimble support for the official Linux converter _t0xConverter_.
 
 converter here: [trm2rinex-docker-ovs](https://github.com/IPGP/trm2rinex-docker-ovs)    
 This docker image is a wrapper around Trimble's official converter _trm2rinex_ which is not available for Linux.  
-It relies on Trimble's official converter for Windows `ConvertToRinex` available
-[here](https://geospatial.trimble.com/en/support) & [there](https://trl.trimble.com/docushare/dsweb/Get/Document-1051259/).
+It relies on Trimble's official converter for Windows `ConvertToRinex` provided by Trimble.
+
+The necessary software will be downloaded automatically when building the Docker image. But here are the links for information:
+
+* [Main download page on Trimble support website](https://geospatial.trimble.com/en/support)
+* [Trimble RINEX Converter](https://trl.trimble.com/docushare/dsweb/Get/Document-1080499/Trimble%20Convert%20to%20Rinex%20-%204.0.1.9%20release%20notes.pdf)
+    * [Version 3.14](https://trl.trimble.com/dscgi/ds.py/Get/File-942121/convertToRinex314.msi) (the one used by the Docker)
+* [Trimble Office Configuration Utility](https://trl.trimble.com/docushare/dsweb/Get/Document-1052638/022516-694%20GEO-Trimble-Office-Configuration-Utility_USL_0523.pdf) (companion software)
+    * [Direct download link](https://dl.tbcrelease.net/update/config/25.4.16/TrimbleCFGUpdate.exe)
 
 #### Trimble's runpkr00
 
@@ -85,7 +92,8 @@ You might also need RINEX handeling software:
 * [GFZRNX](https://www.gfz-potsdam.de/en/section/global-geodetic-observation-and-modelling/software/gfzrinex/)
 * IGN's _converto_
 
-NB: GFZRNX usage is **not allowed** in _routine mode_ without a proper commercial license. Be sure to comply with it.
+NB: GFZRNX usage is **not allowed** in _routine mode_ without a **proper commercial license**. Be sure to comply with it.
+**The authors of _autorino_ are not responsible for any misuse of GFZRNX without license**.
 
 ### A recommended receipe for setting up the external utilities
 
