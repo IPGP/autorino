@@ -260,10 +260,13 @@ class StepGnss:
         """
         Returns the exit code of the StepGnss object.
 
-        * 0: everything ok OR no input and no output (the step was skipped)
-        * 1-5: various exit codes based on table's inp/out booleans (see exicod_from_tab).
-        * 6-: the exit code has been set manually.
-        * 7 : ping timout error
+        * 0:
+          * everything ok
+          * no input and no output (the step was skipped)
+          * no input but all output ok (everything was already ok)
+        * 1-6: various exit codes based on table's inp/out booleans (see exicod_from_tab).
+        * 7-: the exit code has been set manually.
+          * 7: ping timout error
         """
         if self._exit_code is None:
             self.exicod_from_tab(inplace=True)
