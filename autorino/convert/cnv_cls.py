@@ -294,7 +294,8 @@ class ConvertGnss(arocmn.StepGnss):
                 logger.info("custom regex for main & annex converted file provided: %s,%s",
                             conv_regex_custom_main, conv_regex_custom_annex)
                 conv_regex_custom_tup = (conv_regex_custom_main, conv_regex_custom_annex)
-                conv_regex_fct_use = arocnv.conv_regex_custom(conv_regex_custom_tup)
+                # here, conv_regex_fct_use, is the *function* itself (not the fonction return), then a lambda
+                conv_regex_fct_use = lambda x: arocnv.conv_regex_custom(conv_regex_custom_tup)
             elif not conv_regex_custom_main and not conv_regex_custom_annex:
                 logger.warning("Error: both custom regex for main & annex converted file must be provided: %s,%s",
                              conv_regex_custom_main, conv_regex_custom_annex)
