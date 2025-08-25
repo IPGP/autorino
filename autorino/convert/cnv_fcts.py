@@ -23,6 +23,7 @@ from rinexmod import rinexmod_api as rimo_api
 #### Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+import autorino.convert as arocnv
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
@@ -308,3 +309,48 @@ def change_owner(file_inp, user, group):
                 f"Unable to change owner {user_ini}:{group_ini} > {user}:{group}: {e}"
             )
     return None
+
+
+def prep_rgx_custom(conv_regex_custom_main_inp=None, conv_regex_custom_annex_inp=None):
+    """
+    Prepares a custom regex function to catch converted files based on provided main and annex regex patterns.
+    This function checks if both main and annex custom regex patterns are provided.
+    If both are provided, it returns a function that always returns the tuple of these patterns.
+    If only one or neither is
+    provided, it logs a warning and returns None.
+
+    Parameters
+    ----------
+    conv_regex_custom_main_inp : str or None
+        Custom regex pattern for the main converted file.
+    conv_regex_custom_annex_inp : str or None
+        Custom regex pattern for the annex converted file.
+
+    Returns
+    -------
+    function or None
+        A function that returns a tuple of the provided regex patterns if both are provided,
+        otherwise None.
+
+    """
+    if conv_regex_custom_main_inp and conv_regex_custom_annex_inp:
+        logger.info(
+            "main&annex custom regex for converted file provided: %s / %s",
+            conv_regex_custom_main_inp,
+            conv_regex_custom_annex_inp,
+        )
+        conv_regex_custom_tup = (conv_regex_custom_main_inp, conv_regex_custom_annex_inp)
+        # here, conv_regex_fct_use, is the *function* itself (not the fonction return), then a lambda
+        conv_regex_fct_out = lambda x: arocnv.conv_regex_custom(conv_regex_custom_tup)
+    elif not conv_regex_custom_main_inp and not conv_regex_custom_annex_inp:
+        logger.warning(
+            "Error: both main&annex custom regex for converted file must be provided: %s & %s",
+            conv_regex_custom_main_inp,
+            conv_regex_custom_annex_inp,
+        )
+        logger.warning("No custom regex will be used.")
+        conv_regex_fct_out = None
+    else:
+        conv_regex_fct_out = None
+
+    return conv_regex_fct_out

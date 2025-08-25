@@ -290,19 +290,10 @@ class ConvertGnss(arocmn.StepGnss):
                 self.table.loc[irow, "ok_inp"] = False
                 self.write_in_table_log(self.table.loc[irow])
 
-            if conv_regex_custom_main and conv_regex_custom_annex:
-                logger.info("custom regex for main & annex converted file provided: %s,%s",
-                            conv_regex_custom_main, conv_regex_custom_annex)
-                conv_regex_custom_tup = (conv_regex_custom_main, conv_regex_custom_annex)
-                # here, conv_regex_fct_use, is the *function* itself (not the fonction return), then a lambda
-                conv_regex_fct_use = lambda x: arocnv.conv_regex_custom(conv_regex_custom_tup)
-            elif not conv_regex_custom_main and not conv_regex_custom_annex:
-                logger.warning("Error: both custom regex for main & annex converted file must be provided: %s,%s",
-                             conv_regex_custom_main, conv_regex_custom_annex)
-                logger.warning("No custom regex will be used.")
-                conv_regex_fct_use = None
-            else:
-                conv_regex_fct_use = None
+            ## prepare the custom regex function if any
+            # if not, conv_regex_fct_use is None and the default regexs
+            # from autorino.convert.converter_run are set later
+            conv_regex_fct_use = arocnv.prep_rgx_custom(conv_regex_custom_main, conv_regex_custom_annex)
 
             # ++ a function to stop the docker containers running for too long
             # (for trimble conversion)
