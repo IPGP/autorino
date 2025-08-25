@@ -328,8 +328,9 @@ def converter_run(
     # then could handle both raw_fpath_mono or raw_fpath_multi
     # thus alias variable raw_fpath will work in both cases
     # *. but we thus we just keep the 1st list elt as the representent
-    # of the full list (we assue it homogene)
-    out_conv_sel = _convert_select(converter, raw_fpath)
+    # of the full list (we assue it homogeneous)
+
+    out_conv_sel = _convert_select(converter, raw_fpath, conv_regex_custom_tup)
     (
         converter_name,
         brand,

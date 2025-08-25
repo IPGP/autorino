@@ -55,6 +55,40 @@ def conv_regex_void(f):
     return conv_regex_main, conv_regex_annex
 
 
+def conv_regex_custom(regex_tup):
+    """
+    Generate the regular expressions of the main and annex converted files
+    equivalent to the input regex tuple
+
+    It has the same behavior as all the `conv_regex` functions
+    See note below
+    **but** the input is a tuple of regex strings
+    not the input raw filename
+
+    Parameters
+    ----------
+    regex_tup
+
+    Returns
+    -------
+    conv_regex_main & conv_regex_annex : Complied Regex Objects
+        The regular expressions.
+
+    Note
+    ----
+    general behavior of the `conv_regex` functions:
+    main = the regex for the main file i.e. the Observation RINEX
+    annex = the regex for the ALL outputed files (Observation RINEX included)
+    the main with be processed before the annex,
+    thus annex regex will finally not include the main one
+
+    """
+    regex_main, regex_annex = regex_tup
+    conv_regex_main = re.compile(regex_main)
+    conv_regex_annex = re.compile(regex_annex)
+    return conv_regex_main, conv_regex_annex
+
+
 def conv_regex_runpkr00(f):
     """
     Generate the regular expressions of the mainand annex converted files

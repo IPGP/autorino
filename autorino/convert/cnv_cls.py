@@ -127,6 +127,8 @@ class ConvertGnss(arocmn.StepGnss):
         rinexmod_options=None,
         converter="auto",
         filter_prev_tables=False,
+        conv_regex_custom_main=None,
+        conv_regex_custom_annex=None,
     ):
         """
         "total action" method
@@ -156,6 +158,14 @@ class ConvertGnss(arocmn.StepGnss):
             If True, filters and skip previously converted files
             with tables stored in the tmp tables directory.
             Default is False.
+        conv_regex_custom_main : str, optional
+            A custom regular expression to catch the main converted file.
+            If not specified, no custom regex is used.
+            Default is None.
+        conv_regex_custom_annex : str, optional
+            A custom regular expression to catch naming the annex converted file.
+            If not specified, no custom regex is used.
+            Default is None.
 
         Returns
         -------
@@ -280,6 +290,17 @@ class ConvertGnss(arocmn.StepGnss):
                 self.table.loc[irow, "ok_inp"] = False
                 self.write_in_table_log(self.table.loc[irow])
 
+            if conv_regex_custom_main and conv_regex_custom_annex:
+                conv_regex_custom_tup = (conv_regex_custom_main, conv_regex_custom_annex)
+                conv_regex_fct_use = arocnv.conv_regex_custom(conv_regex_custom_tup)
+            elif not conv_regex_custom_main and not conv_regex_custom_annex:
+                logger.warning("Error: both custom regex for main & annex converted file must be provided: %s,%s",
+                             conv_regex_custom_main, conv_regex_custom_annex)
+                logger.warning("No custom regex will be used.")
+                conv_regex_fct_use = None
+            else:
+                conv_regex_fct_use = None
+
             # ++ a function to stop the docker containers running for too long
             # (for trimble conversion)
             arocnv.stop_old_docker()
@@ -287,7 +308,9 @@ class ConvertGnss(arocmn.StepGnss):
             #############################################################
             # +++++ CONVERSION
             frnxtmp = self.mono_convert(
-                irow, self.tmp_dir_converted, converter_inp=converter_name_use
+                irow, self.tmp_dir_converted,
+                converter_inp=converter_name_use,
+                conv_regex_fct_inp=conv_regex_fct_use
             )
             self.tmp_rnx_files.append(frnxtmp)  # list for final remove
 
@@ -298,7 +321,8 @@ class ConvertGnss(arocmn.StepGnss):
             )
 
             self.mono_rinexmod(
-                irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options_use
+                irow, self.tmp_dir_rinexmoded,
+                rinexmod_options=rinexmod_options_use
             )
             #############################################################
 
@@ -322,7 +346,7 @@ class ConvertGnss(arocmn.StepGnss):
     #
 
     def mono_convert(
-        self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp"
+        self, irow, out_dir=None, converter_inp="auto", table_col="fpath_inp", conv_regex_fct_inp=None
     ):
         """
         "on row" method
@@ -369,7 +393,10 @@ class ConvertGnss(arocmn.StepGnss):
 
         try:
             frnxtmp, _ = arocnv.converter_run(
-                self.table.loc[irow, table_col], out_dir_use, converter=converter_inp
+                self.table.loc[irow, table_col],
+                out_dir_use,
+                converter=converter_inp,
+                conv_regex_fct= conv_regex_fct_inp
             )
         except Exception as e:
             logger.error("Error for: %s", self.table.loc[irow, table_col])
