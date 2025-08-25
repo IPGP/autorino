@@ -373,6 +373,9 @@ class ConvertGnss(arocmn.StepGnss):
         table_col : str, optional
             The column in the table that should be converted.
             Typically, this is a file. Default is 'fpath_inp'.
+        conv_regex_fct_inp : function, optional
+            A custom function returning regexs to catch
+            the main and annex converted file names.
 
         Returns
         -------

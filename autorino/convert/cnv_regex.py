@@ -55,7 +55,7 @@ def conv_regex_void(f):
     return conv_regex_main, conv_regex_annex
 
 
-def conv_regex_custom(regex_tup):
+def conv_regex_custom(regex_tup_inp):
     """
     Generate the regular expressions of the main and annex converted files
     equivalent to the input regex tuple
@@ -67,7 +67,8 @@ def conv_regex_custom(regex_tup):
 
     Parameters
     ----------
-    regex_tup
+    regex_tup_inp : 2-tuple of str
+        the input tuple of 2 regex strings for main and annex files
 
     Returns
     -------
@@ -83,7 +84,7 @@ def conv_regex_custom(regex_tup):
     thus annex regex will finally not include the main one
 
     """
-    regex_main, regex_annex = regex_tup
+    regex_main, regex_annex = regex_tup_inp
     conv_regex_main = re.compile(regex_main)
     conv_regex_annex = re.compile(regex_annex)
     return conv_regex_main, conv_regex_annex
