@@ -330,7 +330,7 @@ def converter_run(
     # *. but we thus we just keep the 1st list elt as the representent
     # of the full list (we assue it homogeneous)
 
-    out_conv_sel = _convert_select(converter, raw_fpath, conv_regex_custom_tup)
+    out_conv_sel = _convert_select(converter, raw_fpath)
     (
         converter_name,
         brand,
