@@ -79,7 +79,7 @@ station:
                         converter: auto # Converter to use (auto-detect).
                         # Custom regex to catch converted temporary files, default (empty) is regular most-common patterns.
                         conv_regex_custom_main: "" # Custom regex to catch converted temporary main file.
-                        conv_regex_custom_aux: "" # Custom regex to catch converted temporary auxiliary files.
+                        conv_regex_custom_annex: "" # Custom regex to catch converted temporary annex files.
                         rinexmod_options:
                             compression: "gz" # Compression format for RINEX files.
                             longname: True # Use long file names.
