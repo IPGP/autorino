@@ -94,3 +94,8 @@ You will get the following results:
 25-01-19 00:00:00 25-01-19 23:59:59
 25-01-20 00:00:00 25-01-20 23:59:59
 ```
+### Exit codes  
+
+_autorino_ (more specifically its CLI interface `autorino_run_cfgfile`) uses exit codes to indicate the outcome of its operations. 
+These codes help users and scripts understand whether a command executed successfully or encountered issues.
+See the `StepGnss.exit_code` and `StepGnss.exicod_from_tab` docstrings for more details.
