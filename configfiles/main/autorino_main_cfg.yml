@@ -63,6 +63,7 @@ station:
                         timeout: 30 # Timeout for remote connections in seconds.
                         max_try: 4 # Maximum number of retries for remote connections.
                         sleep_time: 5 # Sleep time between retries in seconds.
+                        ping_disable: False # Disable preliminary ping on remote servers.
                         ping_timeout: 5 # Timeout for pinging remote servers in seconds.
                         ping_max_try: 4 # Maximum number of ping retries.
                 convert: ###### CONVERT STEP DEFINITION
