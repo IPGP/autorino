@@ -296,12 +296,12 @@ class StepGnss:
         n_out_ok = self.table["ok_out"].sum()
         n_total = len(self.table)
 
-        if n_inp_ok == 0:  # no input cases
+        if n_out_ok == n_total:  # everything ok
+            exicod_out = 0
+        elif n_inp_ok == 0:  # no input cases, step is skipped or disabled
             exicod_out = 0
         elif n_out_ok == 0: # no output cases
             exicod_out = 6 if n_inp_ok == n_total else 5
-        elif n_out_ok == n_total:  # everything ok
-            exicod_out = 0
         else: # partial output cases
             exicod_out = 4 if n_inp_ok == n_total else 3
 
