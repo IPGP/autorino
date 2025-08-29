@@ -166,6 +166,9 @@ class StepGnss:
         self.tmp_rnx_files = []
         self.tmp_decmp_files = []
 
+        # exit code
+        self._exit_code = None # initialized to None
+
     # getter and setter
     # site_id
 
@@ -251,6 +254,74 @@ class StepGnss:
     def table(self, value):
         self._table = value
         # designed for future safety tests
+
+    @property
+    def exit_code(self):
+        """
+        Returns the exit code of the StepGnss object.
+
+        * 0:
+          * everything ok
+          * no input and no output (the step was skipped)
+          * no input but all output ok (everything was already ok)
+        * 1-6: various exit codes based on table's inp/out booleans (see exicod_from_tab).
+        * 7-: the exit code has been set manually.
+          * 7: ping timout error
+        """
+        if self._exit_code is None:
+            self.exicod_from_tab(inplace=True)
+        ## else it has been set manually
+        logger.debug("Exit code returned: %s, %s", self._exit_code, self)
+        return self._exit_code
+
+    @exit_code.setter
+    def exit_code(self, value):
+        self._exit_code = value
+
+    def exicod_from_tab(self, inplace=False):
+        """
+        Returns the exit code of the StepGnss object based on table's inp/out booleans.
+
+        exit code is defined as follows:
+        * 0:
+          * everything ok
+          * no input and no output (the step was skipped)
+          * no input but all output ok (everything was already ok)
+        * 3: some input ok, some output ok
+        * 4: all input ok, some output ok
+        * 5: some input ok, but no output
+        * 6: all input ok, but no output
+        """
+        n_inp_ok = self.table["ok_inp"].sum()
+        n_out_ok = self.table["ok_out"].sum()
+        n_total = len(self.table)
+
+        if n_inp_ok == 0:
+            exicod_out = 0  # no input and no output OR no input but all output ok
+        elif n_out_ok == 0:
+            if n_inp_ok == n_total:
+                exicod_out = 6  # all input ok, but no output
+            else:
+                exicod_out = 5  # some input ok, but no output
+        else:
+            if n_inp_ok == n_total and n_out_ok == n_total:
+                exicod_out = 0  # everything ok
+            elif n_inp_ok == n_total:
+                exicod_out = 4  # all input ok, some output ok
+            else:
+                exicod_out = 3  # some input ok, some output ok
+
+        if inplace:
+            self.exit_code = exicod_out
+
+        return exicod_out
+
+        #logger.debug("Exit code from table: %s, %s", exicod_out, self)
+
+        if inplace:
+            self.exit_code = exicod_out
+
+        return exicod_out
 
     def _init_table(self, table_cols: list = None, init_epoch: bool = True):
         """

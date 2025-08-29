@@ -9,4 +9,4 @@
 from .handle_cls import *
 from .split_cls import *
 from .splice_cls import *
-from .rinexmod_cls import *
+from .modify_cls import *

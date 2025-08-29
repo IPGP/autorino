@@ -407,6 +407,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         if not ping_out:
             logger.error("Remote server %s is not reachable.", self.access["hostname"])
+            self.exit_code = 7
         else:
             logger.info(
                 "Remote server %s is reachable. (%d ms)",

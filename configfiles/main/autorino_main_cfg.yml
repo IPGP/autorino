@@ -63,6 +63,7 @@ station:
                         timeout: 30 # Timeout for remote connections in seconds.
                         max_try: 4 # Maximum number of retries for remote connections.
                         sleep_time: 5 # Sleep time between retries in seconds.
+                        ping_disable: False # Disable preliminary ping on remote servers.
                         ping_timeout: 5 # Timeout for pinging remote servers in seconds.
                         ping_max_try: 4 # Maximum number of ping retries.
                 convert: ###### CONVERT STEP DEFINITION
@@ -77,6 +78,9 @@ station:
                     options:
                         force: False # Force re-conversion of files.
                         converter: auto # Converter to use (auto-detect).
+                        # Custom regex to catch converted temporary files, default (empty) is regular most-common patterns.
+                        conv_regex_custom_main: "" # Custom regex to catch converted temporary main file.
+                        conv_regex_custom_annex: "" # Custom regex to catch converted temporary annex files.
                         rinexmod_options:
                             compression: "gz" # Compression format for RINEX files.
                             longname: True # Use long file names.

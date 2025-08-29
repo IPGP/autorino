@@ -41,6 +41,26 @@ Contains station-specific information and configuration.
     - `agency`: Name of the managing agency.
     - `country`: Country name in ISO 3166 format.
     - `sitelog_path`: Path to site logs (file or directory).
+    - `name`: 'Your Site Full Free Name' # Your Site Full Free Name
+    - `site_id`: Your Site 9-char. code
+    - `domes`: Your Site DOMES number
+    - `position_xyz`: Your Site approximate coordinates in ECEF (X, Y, Z) in meters
+- **`access`**: Connection protocols, login credentials, etc.
+  - **Keys**:
+    - `protocol`: The protocol to access the data (`ftp` or `http`).
+    - `hostname`: IP address or URL to access the remote receiver/server
+    - `login`: login username
+    - `password`: login password
+    - `datalink`: a free keyword to prevent download of several stations with the same datalink at the same time
+- **`device`**: Manually defines the device's (receiver and antenna) characteristics
+  - **Keys**: 
+    - `attributes_from_sitelog`: Choose if the device attribute will come from a sitelog given with `sitelog_path` or the values below
+    - `ant_type`: Antenna type from code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+    - `ant_sn`:  Antenna Serial Number
+    - `ecc_une`:  Eccentricity Up North East of the antenna reference point in meters
+    - `rec_type`: Receiver type from code IGS code files https://files.igs.org/pub/station/general/rcvr_ant.tab
+    - `rec_sn`: Receiver Serial Number
+    - `rec_fw`: Receiver firmware version
 - **`sessions`**: Defines the characteristics of recording sessions.
 
 ### 4. `sessions`
@@ -92,6 +112,8 @@ Each step represents a specific operation in the workflow (e.g., `download`, `co
   - **Options**:
     - `force`: Force re-conversion of files.
     - `converter`: Converter to use (e.g., `auto`).
+    - `conv_regex_custom_main`: custom regex to catch converted temporary main file.
+    - `conv_regex_custom_annex`: Custom regex to catch converted temporary annex files.
     - `rinexmod_options`: 
       - `compression`: Compression format for RINEX files (e.g., `gz`).
       - `longname`: Use long file names.

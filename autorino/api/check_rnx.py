@@ -28,7 +28,8 @@ def check_rnx(
     output_dir=None,
 ):
     """
-    This function checks the RINEX files in the input directory.
+    Checks the presence of RINEX files in the input directory over a specified time range,
+    and computes their completeness ratio.
 
     Parameters
     ----------

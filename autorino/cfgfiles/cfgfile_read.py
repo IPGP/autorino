@@ -20,8 +20,8 @@ import autorino.download as arodwl
 import autorino.handle as arohdl
 
 #### new rinexmod v4 import
-#import rinexmod.api as rimo_api
-#import rinexmod.classes.metadata as rimo_mda
+# import rinexmod.api as rimo_api
+# import rinexmod.classes.metadata as rimo_mda
 #### old rinexmod import (for compatibility with older versions)
 from rinexmod import rinexmod_api as rimo_api
 from rinexmod import metadata as rimo_mda
@@ -311,8 +311,12 @@ def step_cls_select(step_name):
         return arohdl.SplitGnss
     elif step_name == "splice":
         return arohdl.SpliceGnss
-    elif step_name == "rinexmod":
-        return arohdl.RinexmodGnss
+    elif step_name in ("modify", "rinexmod"):
+        if step_name == "rinexmod":
+            warnmsg = "step 'rinexmod' is deprecated, use 'modify' instead"
+            logger.warning(warnmsg)
+            DeprecationWarning(warnmsg)
+        return arohdl.ModifyGnss
     else:
         logger.warning("unknown step %s in cfgfiles file, skip", step_name)
         return None
@@ -426,9 +430,13 @@ def run_steps(
             logger.info(load_table_msg_str, stp.get_step_type())
             stp_rnx_inp.load_tab_inpdir(update_epochs=True)
             stp.split(input_mode="given", input_rinexs=stp_rnx_inp, **stp.options)
-        elif stp.get_step_type() == "rinexmod":
+        elif stp.get_step_type() in ("modify", "rinexmod"):
+            if stp.get_step_type()  == "rinexmod":
+                warnmsg = "step 'rinexmod' is deprecated, use 'modify' instead"
+                logger.warning(warnmsg)
+                DeprecationWarning(warnmsg)
             stp.load_tab_inpdir(update_epochs=True)
-            stp.rinexmod(**stp.options)
+            stp.modify(**stp.options)
 
         ##### close the step
 
