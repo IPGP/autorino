@@ -296,20 +296,14 @@ class StepGnss:
         n_out_ok = self.table["ok_out"].sum()
         n_total = len(self.table)
 
-        if n_inp_ok == 0:
-            exicod_out = 0  # no input and no output OR no input but all output ok
-        elif n_out_ok == 0:
-            if n_inp_ok == n_total:
-                exicod_out = 6  # all input ok, but no output
-            else:
-                exicod_out = 5  # some input ok, but no output
-        else:
-            if n_inp_ok == n_total and n_out_ok == n_total:
-                exicod_out = 0  # everything ok
-            elif n_inp_ok == n_total:
-                exicod_out = 4  # all input ok, some output ok
-            else:
-                exicod_out = 3  # some input ok, some output ok
+        if n_inp_ok == 0:  # no input cases
+            exicod_out = 0
+        elif n_out_ok == 0: # no output cases
+            exicod_out = 6 if n_inp_ok == n_total else 5
+        elif n_out_ok == n_total:  # everything ok
+            exicod_out = 0
+        else: # partial output cases
+            exicod_out = 4 if n_inp_ok == n_total else 3
 
         if inplace:
             self.exit_code = exicod_out
