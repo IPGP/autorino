@@ -10,7 +10,7 @@ import logging.config
 import os
 from os import path
 
-__version__ = "2.3.0-beta2"  #  changed automaticcaly with bump-my-version
+__version__ = "2.3.0"  #  changed automaticcaly with bump-my-version
 
 #### IMPORT CONFIG FOR LOGGER
 log_file_path = os.path.join(
