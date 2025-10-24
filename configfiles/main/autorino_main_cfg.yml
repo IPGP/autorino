@@ -18,6 +18,7 @@ environment:
     converto : "ConvertoCPP" # Path to ConvertoCPP tool.
     gfzrnx : "gfzrnx" # Path to GFZRNX tool.
     teqc : "teqc" # Path to TEQC tool.
+    # NB: custom handle_software ('converto' or 'gfzrnx') must be defined as an option within splice/split steps.
   general:
     log_level: "DEBUG" # Logging level for the application.
     trimble_default_software: "trm2rinex" # Default Trimble converter key (lowercase).
