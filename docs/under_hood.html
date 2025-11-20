@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Under the hood &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -55,8 +55,19 @@
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Under the hood</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stepgnss-overview"><code class="docutils literal notranslate"><span class="pre">StepGnss</span></code> Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#table-attribute">Table Attribute</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#subclasses-of-stepgnss">Subclasses of <code class="docutils literal notranslate"><span class="pre">StepGnss</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#execution">Execution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#a-simple-exemple">A simple exemple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exit-codes">Exit codes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
@@ -88,24 +99,51 @@
              
   <section id="under-the-hood">
 <span id="under-hood"></span><h1>Under the hood<a class="headerlink" href="#under-the-hood" title="Link to this heading"></a></h1>
-<p><em>autorino</em> is based on a main parent class: <code class="docutils literal notranslate"><span class="pre">StepGnss</span></code>.
-It performs generic actions on input files, saving them in an output folder.</p>
-<p><code class="docutils literal notranslate"><span class="pre">StepGnss</span></code> has three daughter classes:</p>
+<p><em>autorino</em> incorporates object-oriented programming principles, with workflow steps implemented as classes. All step classes inherit from a common parent class, <code class="docutils literal notranslate"><span class="pre">StepGnss</span></code>, which provides the core functionality for handling input files and saving processed outputs.</p>
+<section id="stepgnss-overview">
+<h2><code class="docutils literal notranslate"><span class="pre">StepGnss</span></code> Overview<a class="headerlink" href="#stepgnss-overview" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">StepGnss</span></code> represents a single, reusable processing unit within an <em>autorino</em> workflow. It:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">DownloadGnss</span></code>: for downloading a RAW file to the local server</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ConvertGnss</span></code>: for RAW &gt; RINEX conversion</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">HandleGnss</span></code>: to perform decimation, spliting or splicing operations on a RINEX. It has two daughter classes:</p>
+<li><p>Centralizes the step state in a <strong>table</strong> (see below).</p></li>
+<li><p>Manages site and epoch context, input/output path templating, and temporary/output directories.</p></li>
+<li><p>Loads input files (from lists, directories, or previous steps), applies filters, decompresses archives, determines epochs, and infers RINEX filenames.</p></li>
+<li><p>Determines required actions and skips already successful ones using <code class="docutils literal notranslate"><span class="pre">ok_inp</span></code> / <code class="docutils literal notranslate"><span class="pre">ok_out</span></code> boolean flags in the table.</p></li>
+<li><p>Performs file moves/copies, size and gap validation, metadata integration, and logging (both in the table and in external log files).</p></li>
+</ul>
+<section id="table-attribute">
+<h3>Table Attribute<a class="headerlink" href="#table-attribute" title="Link to this heading"></a></h3>
+<p>The central attribute of a <code class="docutils literal notranslate"><span class="pre">StepGnss</span></code> object is its <strong>table</strong> (<code class="docutils literal notranslate"><span class="pre">step_gnss.table</span></code>), implemented as a Pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>. This table lists, for each epoch:</p>
+<ul class="simple">
+<li><p>Input files and their paths</p></li>
+<li><p>Status flags (<code class="docutils literal notranslate"><span class="pre">ok_inp</span></code> / <code class="docutils literal notranslate"><span class="pre">ok_out</span></code>)</p></li>
+<li><p>File sizes</p></li>
+<li><p>Corresponding output files if processing was successful</p></li>
+</ul>
+<p>It forms the core mechanism for tracking the state of each file handled by the step.</p>
+</section>
+</section>
+<section id="subclasses-of-stepgnss">
+<h2>Subclasses of <code class="docutils literal notranslate"><span class="pre">StepGnss</span></code><a class="headerlink" href="#subclasses-of-stepgnss" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">StepGnss</span></code> has three direct subclasses:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">DownloadGnss</span></code></strong> – Downloads raw GNSS files from a remote receiver or server to a local destination.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ConvertGnss</span></code></strong> – Converts raw GNSS files to RINEX format.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">HandleGnss</span></code></strong> – Performs operations such as decimation, splitting, or splicing on RINEX files. This class has three further subclasses:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">SplitGnss</span></code>: to split a RINEX file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SpliceGnss</span></code>: to splice (concatenate) RINEX files</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SplitGnss</span></code></strong> – Splits a RINEX file.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SpliceGnss</span></code></strong> – Splices (concatenates) multiple RINEX files.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ModifyGnss</span></code></strong> – Modifies a RINEX file (e.g., edits its header and filename); integrates the functionality of the spin-off tool <code class="docutils literal notranslate"><span class="pre">rinexmod</span></code>.</p></li>
 </ul>
 </li>
 </ul>
-<p>The central attribute of a <code class="docutils literal notranslate"><span class="pre">StepGnss</span></code> object is its table (<code class="docutils literal notranslate"><span class="pre">step_gnss.table</span></code>).</p>
-<p>This is a pandas’ DataFrame that lists, among other things, the input files, and,
-where applicable, the output files if the operation has been successful.</p>
+<section id="execution">
+<h3>Execution<a class="headerlink" href="#execution" title="Link to this heading"></a></h3>
+<p>Each step class defines a dedicated main method, which is invoked when the step is executed. For example, the <code class="docutils literal notranslate"><span class="pre">DownloadGnss</span></code> class provides a <code class="docutils literal notranslate"><span class="pre">download()</span></code> method to perform the download operation.</p>
+</section>
+</section>
+</section>
 <section id="about-epoch-range-and-timing">
-<h2>About <em>epoch range</em> and timing.<a class="headerlink" href="#about-epoch-range-and-timing" title="Link to this heading"></a></h2>
+<h1>About <em>epoch range</em> and timing.<a class="headerlink" href="#about-epoch-range-and-timing" title="Link to this heading"></a></h1>
 <p>When defining an <em>epoch range</em> for a step, you give:</p>
 <ul class="simple">
 <li><p>a <em>first epoch</em> (<code class="docutils literal notranslate"><span class="pre">epoch1</span></code>*)</p></li>
@@ -138,7 +176,6 @@ Accepted values are:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">ceil</span></code>: round to the closest epoch <em>after</em> the <code class="docutils literal notranslate"><span class="pre">epoch1</span></code>/<code class="docutils literal notranslate"><span class="pre">epoch2</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">round</span></code>: round to the closest epoch depending where you are in the period (not recommended).</p></li>
 </ul>
-</section>
 <section id="a-simple-exemple">
 <h2>A simple exemple<a class="headerlink" href="#a-simple-exemple" title="Link to this heading"></a></h2>
 <p>If you ask on 2025-01-20 for an <em>epoch range</em> with:</p>
@@ -157,6 +194,12 @@ Accepted values are:</p>
 25-01-20 00:00:00 25-01-20 23:59:59
 </pre></div>
 </div>
+</section>
+<section id="exit-codes">
+<h2>Exit codes<a class="headerlink" href="#exit-codes" title="Link to this heading"></a></h2>
+<p><em>autorino</em> (more specifically its CLI interface <code class="docutils literal notranslate"><span class="pre">autorino_run_cfgfile</span></code>) uses exit codes to indicate the outcome of its operations.
+These codes help users and scripts understand whether a command executed successfully or encountered issues.
+See the <code class="docutils literal notranslate"><span class="pre">StepGnss.exit_code</span></code> and <code class="docutils literal notranslate"><span class="pre">StepGnss.exicod_from_tab</span></code> docstrings for more details.</p>
 </section>
 </section>
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.common.step_cls &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -88,36 +89,36 @@
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">filelock</span> <span class="kn">import</span> <span class="n">FileLock</span><span class="p">,</span> <span class="n">Timeout</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">filelock</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileLock</span><span class="p">,</span> <span class="n">Timeout</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
-<span class="kn">import</span> <span class="nn">autorino.cfglog</span> <span class="k">as</span> <span class="nn">arologcfg</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.common</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocmn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfglog</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arologcfg</span>
 
-<span class="kn">import</span> <span class="nn">rinexmod</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rinexmod</span>
 <span class="c1"># new rinexmod v4 import</span>
-<span class="c1">#import rinexmod.api as rimo_api</span>
+<span class="c1"># import rinexmod.api as rimo_api</span>
 <span class="c1"># old rinexmod import</span>
-<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rinexmod</span><span class="w"> </span><span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
 
-<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geodezyx</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
 
 <span class="c1">#### Import the logger</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
 
@@ -127,7 +128,7 @@
 
 <div class="viewcode-block" id="StepGnss">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss">[docs]</a>
-<span class="k">class</span> <span class="nc">StepGnss</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StepGnss</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The StepGnss class represents a step in a GNSS processing chain.</span>
 <span class="sd">    It contains methods for initializing and managing</span>
@@ -164,7 +165,7 @@
 
 <div class="viewcode-block" id="StepGnss.__init__">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">tmp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -250,13 +251,16 @@
 
         <span class="c1">#### list to stack temporarily the temporary files before their delete</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tmp_rnx_files</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_decmp_files</span> <span class="o">=</span> <span class="p">[]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_decmp_files</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># exit code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exit_code</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># initialized to None</span></div>
 
 
     <span class="c1"># getter and setter</span>
     <span class="c1"># site_id</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2"> elts&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_range</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
@@ -264,84 +268,149 @@
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">out_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">out_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_out_dir</span><span class="p">)</span>
 
     <span class="nd">@out_dir</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">out_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">out_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;output directory is not defined (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_out_dir</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">tmp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tmp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">)</span>
 
     <span class="nd">@tmp_dir</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">tmp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tmp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;temp directory is not defined (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">log_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_dir</span><span class="p">)</span>
 
     <span class="nd">@log_dir</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">log_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;log directory is not defined (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_dir</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">inp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inp_dir</span><span class="p">)</span>
 
     <span class="nd">@inp_dir</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">inp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inp_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;input directory is not defined (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inp_dir</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="c1">### site</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">site_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">site_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_site_id</span>
 
     <span class="nd">@site_id</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">site_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">site_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_site_id</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">site_id4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">site_id4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_site_id</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">site_id9</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">site_id9</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">make_site_id9</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_id</span><span class="p">)</span>
 
     <span class="c1"># epoch_range_inp</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">epoch_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">epoch_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_range</span>
 
     <span class="nd">@epoch_range</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">epoch_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">epoch_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_range</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="c1"># table</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span>
 
     <span class="nd">@table</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="n">value</span>
         <span class="c1"># designed for future safety tests</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exit_code</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the exit code of the StepGnss object.</span>
+
+<span class="sd">        * 0:</span>
+<span class="sd">          * everything ok</span>
+<span class="sd">          * no input and no output (the step was skipped)</span>
+<span class="sd">          * no input but all output ok (everything was already ok)</span>
+<span class="sd">        * 1-6: various exit codes based on table&#39;s inp/out booleans (see exicod_from_tab).</span>
+<span class="sd">        * 7-: the exit code has been set manually.</span>
+<span class="sd">          * 7: ping timout error</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_code</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exicod_from_tab</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">## else it has been set manually</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exit code returned: </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_code</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exit_code</span>
+
+    <span class="nd">@exit_code</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exit_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exit_code</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="StepGnss.exicod_from_tab">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.exicod_from_tab">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exicod_from_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the exit code of the StepGnss object based on table&#39;s inp/out booleans.</span>
+
+<span class="sd">        exit code is defined as follows:</span>
+<span class="sd">        * 0:</span>
+<span class="sd">          * everything ok</span>
+<span class="sd">          * no input and no output (the step was skipped)</span>
+<span class="sd">          * no input but all output ok (everything was already ok)</span>
+<span class="sd">        * 3: some input ok, some output ok</span>
+<span class="sd">        * 4: all input ok, some output ok</span>
+<span class="sd">        * 5: some input ok, but no output</span>
+<span class="sd">        * 6: all input ok, but no output</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_inp_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">n_out_ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_out&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">n_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n_out_ok</span> <span class="o">==</span> <span class="n">n_total</span><span class="p">:</span>  <span class="c1"># everything ok</span>
+            <span class="n">exicod_out</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">n_inp_ok</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># no input cases, step is skipped or disabled</span>
+            <span class="n">exicod_out</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">n_out_ok</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># no output cases</span>
+            <span class="n">exicod_out</span> <span class="o">=</span> <span class="mi">6</span> <span class="k">if</span> <span class="n">n_inp_ok</span> <span class="o">==</span> <span class="n">n_total</span> <span class="k">else</span> <span class="mi">5</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># partial output cases</span>
+            <span class="n">exicod_out</span> <span class="o">=</span> <span class="mi">4</span> <span class="k">if</span> <span class="n">n_inp_ok</span> <span class="o">==</span> <span class="n">n_total</span> <span class="k">else</span> <span class="mi">3</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exit_code</span> <span class="o">=</span> <span class="n">exicod_out</span>
+
+        <span class="k">return</span> <span class="n">exicod_out</span>
+
+        <span class="c1">#logger.debug(&quot;Exit code from table: %s, %s&quot;, exicod_out, self)</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exit_code</span> <span class="o">=</span> <span class="n">exicod_out</span>
+
+        <span class="k">return</span> <span class="n">exicod_out</span></div>
+
+
 <div class="viewcode-block" id="StepGnss._init_table">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_table">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">init_epoch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">init_epoch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the table of a StepGnss object.</span>
 
@@ -391,7 +460,7 @@
 
 <div class="viewcode-block" id="StepGnss._init_site">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_site">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_site</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_site</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the site attribute of the StepGnss object.</span>
 
@@ -419,7 +488,7 @@
 
 <div class="viewcode-block" id="StepGnss._init_session">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_session">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the session attribute of the StepGnss object.</span>
 
@@ -447,7 +516,7 @@
 
 <div class="viewcode-block" id="StepGnss._init_options">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_options">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the options attribute of the StepGnss object.</span>
 
@@ -473,7 +542,7 @@
 
 <div class="viewcode-block" id="StepGnss._init_site_id">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_site_id">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_site_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_site_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the site_id attribute of the StepGnss object.</span>
 
@@ -495,7 +564,7 @@
 
 <div class="viewcode-block" id="StepGnss._init_epoch_range">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_epoch_range">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_epoch_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_range</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_epoch_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch_range</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the epoch range of the StepGnss object.</span>
 
@@ -524,7 +593,7 @@
 
 <div class="viewcode-block" id="StepGnss._init_tmp_dirs_paths">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_tmp_dirs_paths">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_tmp_dirs_paths</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_tmp_dirs_paths</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">tmp_subdir_dwnld</span><span class="o">=</span><span class="s2">&quot;010_downloaded&quot;</span><span class="p">,</span>
         <span class="n">tmp_subdir_unzip</span><span class="o">=</span><span class="s2">&quot;020_unzipped&quot;</span><span class="p">,</span>
@@ -579,7 +648,7 @@
 
 <div class="viewcode-block" id="StepGnss._init_metadata">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss._init_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">_init_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the metadata attribute of the StepGnss object.</span>
 
@@ -612,7 +681,7 @@
 
 <div class="viewcode-block" id="StepGnss.set_translate_dict">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.set_translate_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_translate_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_translate_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates the translation dictionary based on the site and session dictionaries,</span>
 <span class="sd">        object attributes, and site id.</span>
@@ -653,7 +722,7 @@
 
 <div class="viewcode-block" id="StepGnss.set_tmp_dirs">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.set_tmp_dirs">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_tmp_dirs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_tmp_dirs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Translates and creates temporary directories.</span>
 
@@ -699,7 +768,7 @@
 
 <div class="viewcode-block" id="StepGnss.clean_tmp_dirs">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.clean_tmp_dirs">[docs]</a>
-    <span class="k">def</span> <span class="nf">clean_tmp_dirs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">keep_table_logs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_tmp_dirs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">keep_table_logs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Cleans the temporary directories of the StepGnss object.</span>
 
@@ -759,7 +828,7 @@
 
 <div class="viewcode-block" id="StepGnss.copy">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a duplicate of the current StepGnss object.</span>
 
@@ -777,9 +846,21 @@
         <span class="k">return</span> <span class="n">out_copy</span></div>
 
 
+<div class="viewcode-block" id="StepGnss.autorino_vers">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.autorino_vers">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">autorino_vers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the version of the autorino package.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">autorino</span><span class="o">.</span><span class="n">__version__</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;autorino version: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
 <div class="viewcode-block" id="StepGnss.get_step_type">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.get_step_type">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_step_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_object_name</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_step_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_object_name</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the type of the step as a string.</span>
 
@@ -809,7 +890,7 @@
 
 <div class="viewcode-block" id="StepGnss.updt_site_w_rnx_fname">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.updt_site_w_rnx_fname">[docs]</a>
-    <span class="k">def</span> <span class="nf">updt_site_w_rnx_fname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updt_site_w_rnx_fname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the site information in the table and</span>
 <span class="sd">        in the &#39;site_id&#39; object based on the RINEX filenames.</span>
@@ -843,7 +924,7 @@
 
 <div class="viewcode-block" id="StepGnss.updt_epotab_tz">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.updt_epotab_tz">[docs]</a>
-    <span class="k">def</span> <span class="nf">updt_epotab_tz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updt_epotab_tz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the epoch table with the specified timezone.</span>
 
@@ -877,7 +958,7 @@
 
 <div class="viewcode-block" id="StepGnss.updt_epotab_rnx">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.updt_epotab_rnx">[docs]</a>
-    <span class="k">def</span> <span class="nf">updt_epotab_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_rnx_filename_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update_epoch_range</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updt_epotab_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_rnx_filename_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">update_epoch_range</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the StepGnss table&#39;s columns &#39;epoch_srt&#39; and &#39;epoch_end&#39; based on the RINEX files.</span>
 
@@ -939,7 +1020,7 @@
 
 <div class="viewcode-block" id="StepGnss.updt_eporng_tab">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.updt_eporng_tab">[docs]</a>
-    <span class="k">def</span> <span class="nf">updt_eporng_tab</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updt_eporng_tab</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">column_srt</span><span class="o">=</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">,</span> <span class="n">column_end</span><span class="o">=</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">,</span> <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;none&quot;</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1003,7 +1084,7 @@
 
 <div class="viewcode-block" id="StepGnss.translate_path">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.translate_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">translate_path</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">translate_path</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path_inp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">epoch_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1055,7 +1136,7 @@
 
 <div class="viewcode-block" id="StepGnss.translate_path_row">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.translate_path_row">[docs]</a>
-    <span class="k">def</span> <span class="nf">translate_path_row</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">translate_path_row</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">path_inp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">irow</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">make_dir</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">absolute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1097,7 +1178,7 @@
 
 <div class="viewcode-block" id="StepGnss.trslt_dic_siteid">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.trslt_dic_siteid">[docs]</a>
-    <span class="k">def</span> <span class="nf">trslt_dic_siteid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_id_inp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trslt_dic_siteid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_id_inp</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns an ad hoc translation dictionary with given site IDs.</span>
 
@@ -1139,7 +1220,7 @@
 
 <div class="viewcode-block" id="StepGnss.translate_core">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.translate_core">[docs]</a>
-    <span class="k">def</span> <span class="nf">translate_core</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">translate_core</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">path_inp</span><span class="p">,</span> <span class="n">trslt_dic_use</span><span class="p">,</span> <span class="n">epoch_use</span><span class="p">,</span> <span class="n">make_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">absolute</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
         <span class="n">trslt_path_out</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">translator</span><span class="p">(</span><span class="n">path_inp</span><span class="p">,</span> <span class="n">trslt_dic_use</span><span class="p">,</span> <span class="n">epoch_use</span><span class="p">)</span>
@@ -1156,7 +1237,7 @@
 
 <div class="viewcode-block" id="StepGnss.create_lockfile">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.create_lockfile">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_lockfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span> <span class="n">prefix_lockfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_lockfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span> <span class="n">prefix_lockfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a lock file for the specified file path.</span>
 
@@ -1214,7 +1295,7 @@
 
 <div class="viewcode-block" id="StepGnss.set_logfile">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.set_logfile">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_dir_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step_suffix</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_dir_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step_suffix</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        set logging in a file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1269,7 +1350,7 @@
 <div class="viewcode-block" id="StepGnss.close_logfile">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.close_logfile">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">close_logfile</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close_logfile</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        close the file handler of the logger</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1283,7 +1364,7 @@
 
 <div class="viewcode-block" id="StepGnss.set_table_log">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.set_table_log">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_table_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_table_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">out_dir</span><span class="p">:</span>
             <span class="n">out_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span>
 
@@ -1303,7 +1384,7 @@
 
 <div class="viewcode-block" id="StepGnss.write_in_table_log">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.write_in_table_log">[docs]</a>
-    <span class="k">def</span> <span class="nf">write_in_table_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_in</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_in_table_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_in</span><span class="p">):</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">row_in</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">table_log_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
@@ -1321,7 +1402,7 @@
 
 <div class="viewcode-block" id="StepGnss.print_table">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.print_table">[docs]</a>
-    <span class="k">def</span> <span class="nf">print_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_print</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_return</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_colwidth</span><span class="o">=</span><span class="mi">33</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_print</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_return</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_colwidth</span><span class="o">=</span><span class="mi">33</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Prints the table of the StepGnss object with specified formatting.</span>
 
@@ -1364,7 +1445,7 @@
 
 <div class="viewcode-block" id="StepGnss.table_ok_cols_bool">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.table_ok_cols_bool">[docs]</a>
-    <span class="k">def</span> <span class="nf">table_ok_cols_bool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">table_ok_cols_bool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the column of the table to boolean values.</span>
 
@@ -1385,7 +1466,7 @@
 
 <div class="viewcode-block" id="StepGnss.load_tab_datelist">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.load_tab_datelist">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_tab_datelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dates_list</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_tab_datelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dates_list</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the table from a list of dates.</span>
 
@@ -1415,7 +1496,7 @@
 
 <div class="viewcode-block" id="StepGnss.load_tab_filelist">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.load_tab_filelist">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_tab_filelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_files</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_tab_filelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_files</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the table from a list of input files.</span>
 
@@ -1450,12 +1531,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;fname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">)</span>
 
+        <span class="c1"># log a warning if some files are not ok</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">not_ok_warn</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">flist</span></div>
 
 
 <div class="viewcode-block" id="StepGnss.load_tab_prev_tab">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.load_tab_prev_tab">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_tab_prev_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prev_table</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_inp_is_prev</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_tab_prev_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prev_table</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">new_inp_is_prev</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the table from the previous step&#39;s table.</span>
 
@@ -1504,12 +1588,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prev_table</span><span class="p">[</span><span class="s2">&quot;epoch_srt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prev_table</span><span class="p">[</span><span class="s2">&quot;epoch_end&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
+        <span class="c1"># log a warning if some files are not ok</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">not_ok_warn</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="StepGnss.load_tab_inpdir">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.load_tab_inpdir">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_tab_inpdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">update_epochs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_tab_inpdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">update_epochs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the table with input files from the input directory for each epoch.</span>
 
@@ -1574,7 +1661,7 @@
 
 <div class="viewcode-block" id="StepGnss.get_vals_prev_tab">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.get_vals_prev_tab">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_vals_prev_tab</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_vals_prev_tab</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">df_prev_tab</span><span class="p">,</span>
         <span class="n">col_ref</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span>
@@ -1631,7 +1718,7 @@
 
 <div class="viewcode-block" id="StepGnss.force">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.force">[docs]</a>
-    <span class="k">def</span> <span class="nf">force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">force</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Enables the force mode for the current step.</span>
 
@@ -1655,7 +1742,7 @@
 
 <div class="viewcode-block" id="StepGnss.guess_local_rnx">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.guess_local_rnx">[docs]</a>
-    <span class="k">def</span> <span class="nf">guess_local_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">shortname</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">guess_local_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">shortname</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        For a given site name and date in a table, guess the potential local RINEX files</span>
 <span class="sd">        and write it as &#39;fpath_out&#39; value in the table</span>
@@ -1686,7 +1773,7 @@
 
 <div class="viewcode-block" id="StepGnss.guess_out_files">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.guess_out_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">guess_out_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">guess_out_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generates output file paths for each row in the table and updates the table.</span>
 
@@ -1728,7 +1815,7 @@
 
 <div class="viewcode-block" id="StepGnss.check_local_files">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.check_local_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_local_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_local_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks the existence of the output (&#39;out&#39;) or input (&#39;inp&#39;) local files (for non download cases)</span>
 <span class="sd">        and updates the corresponding booleans in the &#39;ok_out&#39; or &#39;ok_inp&#39; column of the table.</span>
@@ -1771,7 +1858,7 @@
 
 <div class="viewcode-block" id="StepGnss.invalidate_small_local_files">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.invalidate_small_local_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">invalidate_small_local_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.80</span><span class="p">,</span> <span class="n">abs_min</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">invalidate_small_local_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.80</span><span class="p">,</span> <span class="n">abs_min</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Invalidates local files that are smaller than a certain threshold.</span>
 
@@ -1818,7 +1905,7 @@
 
 <div class="viewcode-block" id="StepGnss.decompress">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.decompress">[docs]</a>
-    <span class="k">def</span> <span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span> <span class="n">table_ok_col</span><span class="o">=</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span> <span class="n">table_ok_col</span><span class="o">=</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        decompress the potential compressed files in the ``table_col`` column</span>
 <span class="sd">        and its corresponding ``table_ok_col`` boolean column</span>
@@ -1859,7 +1946,7 @@
 
 <div class="viewcode-block" id="StepGnss.decompress_table_batch">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.decompress_table_batch">[docs]</a>
-    <span class="k">def</span> <span class="nf">decompress_table_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span> <span class="n">table_ok_col</span><span class="o">=</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decompress_table_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span> <span class="n">table_ok_col</span><span class="o">=</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decompresses the potential compressed files in the specified column of the table.</span>
 
@@ -1912,7 +1999,7 @@
 
 <div class="viewcode-block" id="StepGnss.move_files">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.move_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">move_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;inpout&quot;</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;inpout&quot;</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Moves or copies files based on the specified mode.</span>
 
@@ -1960,7 +2047,7 @@
 
 <div class="viewcode-block" id="StepGnss.remov_tmp_files">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.remov_tmp_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">remov_tmp_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remov_tmp_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes the temporary files which have been stored in the two lists</span>
 <span class="sd">        self.tmp_rnx_files and self.tmp_decmp_files.</span>
@@ -2017,6 +2104,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tmp_decmp_files</span> <span class="o">=</span> <span class="n">tmp_decmp_files_new</span></div>
 
 
+<div class="viewcode-block" id="StepGnss.not_ok_warn">
+<a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.not_ok_warn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">not_ok_warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;inp&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Logs a warning for each row in the table where the specified column is not OK.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_&quot;</span> <span class="o">+</span> <span class="n">io</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;file not ok, (missing?): &quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;fpath_&quot;</span> <span class="o">+</span> <span class="n">io</span><span class="p">],</span>
+                <span class="p">)</span></div>
+
+
     <span class="c1">#  ______ _ _ _              _        _     _</span>
     <span class="c1"># |  ____(_) | |            | |      | |   | |</span>
     <span class="c1"># | |__   _| | |_ ___ _ __  | |_ __ _| |__ | | ___</span>
@@ -2026,7 +2127,7 @@
 
 <div class="viewcode-block" id="StepGnss.filter_bad_keywords">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.filter_bad_keywords">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_bad_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keywords_path_excl</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_bad_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keywords_path_excl</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filters a list of raw files if the full path contains certain keywords.</span>
 
@@ -2073,7 +2174,7 @@
 
 <div class="viewcode-block" id="StepGnss.filter_year_min_max">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.filter_year_min_max">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_year_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">year_min</span><span class="o">=</span><span class="mi">1980</span><span class="p">,</span> <span class="n">year_max</span><span class="o">=</span><span class="mi">2099</span><span class="p">,</span> <span class="n">year_in_inp_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_year_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">year_min</span><span class="o">=</span><span class="mi">1980</span><span class="p">,</span> <span class="n">year_max</span><span class="o">=</span><span class="mi">2099</span><span class="p">,</span> <span class="n">year_in_inp_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filters a list of raw files based on their year range.</span>
 
@@ -2100,7 +2201,7 @@
 <span class="sd">            The list of filtered raw files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">_year_detect</span><span class="p">(</span><span class="n">fpath_inp</span><span class="p">,</span> <span class="n">year_in_inp_path0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_year_detect</span><span class="p">(</span><span class="n">fpath_inp</span><span class="p">,</span> <span class="n">year_in_inp_path0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Detects the year in the file path.</span>
 
@@ -2158,7 +2259,7 @@
 
 <div class="viewcode-block" id="StepGnss.filter_filelist">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.filter_filelist">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_filelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filelist_exclu_inp</span><span class="p">,</span> <span class="n">message_manu_exclu</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_filelist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filelist_exclu_inp</span><span class="p">,</span> <span class="n">message_manu_exclu</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filters a list of raw files based on their presence in a provided exclusion list.</span>
 
@@ -2221,7 +2322,7 @@
 
 <div class="viewcode-block" id="StepGnss.filter_ok_out">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.filter_ok_out">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_ok_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_ok_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filters the raw files based on the &#39;ok_out&#39; boolean column of the object&#39;s table.</span>
 
@@ -2237,7 +2338,7 @@
 <span class="sd">            The list of filtered raw files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span> <span class="nf">_not_impl</span><span class="p">(</span><span class="n">ok_inp</span><span class="p">,</span> <span class="n">ok_out</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_not_impl</span><span class="p">(</span><span class="n">ok_inp</span><span class="p">,</span> <span class="n">ok_out</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Implements the negation of an implication logic operation.</span>
 
@@ -2278,7 +2379,7 @@
 
 <div class="viewcode-block" id="StepGnss.filter_prev_tab">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.filter_prev_tab">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_prev_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_prev_tab</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_prev_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df_prev_tab</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filters the raw files based on their presence in previous conversion tables.</span>
 
@@ -2328,7 +2429,7 @@
 
 <div class="viewcode-block" id="StepGnss.filter_purge">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.filter_purge">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filters the table based on the values in a specified column.</span>
 
@@ -2367,7 +2468,7 @@
 
 <div class="viewcode-block" id="StepGnss.filter_na">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.filter_na">[docs]</a>
-    <span class="k">def</span> <span class="nf">filter_na</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_na</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filters the table to remove rows with NaN values in the specified columns,</span>
 <span class="sd">        and prints the dropped rows.</span>
@@ -2411,14 +2512,14 @@
 
 <div class="viewcode-block" id="StepGnss.mono_ok_check">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_ok_check">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_ok_check</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_ok_check</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">irow</span><span class="p">,</span>
         <span class="n">step_name</span><span class="p">,</span>
         <span class="n">fname_custom</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">switch_ok_out_false</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">mv_final_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">ok_out_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks the status of the input and output files for a specific row in the table.</span>
@@ -2442,9 +2543,10 @@
 <span class="sd">        switch_ok_out_false : bool, optional</span>
 <span class="sd">            If True, the &#39;ok_out&#39; column of the table is set to False if the step should be skipped.</span>
 <span class="sd">            Default is False.</span>
-<span class="sd">        mv_final_mode : bool, optional</span>
-<span class="sd">            If True, the step is skipped if the output file does not exists.</span>
-<span class="sd">            Designed for final move (mv_final) steps.</span>
+<span class="sd">        ok_out_mode : bool, optional</span>
+<span class="sd">            If True, the step is skipped if &#39;ok_out&#39; column is False</span>
+<span class="sd">            (i.e. the output file does not exist).</span>
+<span class="sd">            Designed for final move (mv_final) &amp; rinexmod steps.</span>
 <span class="sd">            Default is False.</span>
 
 <span class="sd">        Returns</span>
@@ -2473,9 +2575,9 @@
         <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> forced: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">step_name</span><span class="p">,</span> <span class="n">finp_use</span><span class="p">)</span>
             <span class="n">bool_ok</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">elif</span> <span class="n">mv_final_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]:</span>
+        <span class="k">elif</span> <span class="n">ok_out_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]:</span>
             <span class="n">bool_ok</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">elif</span> <span class="n">mv_final_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]:</span>
+        <span class="k">elif</span> <span class="n">ok_out_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;ok_out&quot;</span><span class="p">]:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> skipped (output not found): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">step_name</span><span class="p">,</span> <span class="n">fout_use</span><span class="p">)</span>
             <span class="n">bool_ok</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># NB: we disable this option since it is not used (2025-01-14)</span>
@@ -2504,7 +2606,7 @@
 
 <div class="viewcode-block" id="StepGnss.updt_rnxmodopts">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.updt_rnxmodopts">[docs]</a>
-    <span class="k">def</span> <span class="nf">updt_rnxmodopts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rinexmod_options_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">irow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">updt_rnxmodopts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rinexmod_options_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">irow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug_print</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates the rinexmod options dictionnary.</span>
 
@@ -2599,8 +2701,8 @@
 
 <div class="viewcode-block" id="StepGnss.mono_rinexmod">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_rinexmod">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_rinexmod</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_rinexmod</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">check_ok_out</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;on row&quot; method</span>
@@ -2625,6 +2727,9 @@
 <span class="sd">            The column in the table which contains the file path to be modified. Defaults to &#39;fpath_out&#39;.</span>
 <span class="sd">        rinexmod_options : dict, optional</span>
 <span class="sd">            The options to be used by the rinexmod function. If not provided, default options are used.</span>
+<span class="sd">        check_ok_out : bool, optional</span>
+<span class="sd">            If True, mono_rinexmod checks the &#39;ok_out&#39; table&#39;s column (defaut behavior).</span>
+<span class="sd">            If False, it checks the &#39;ok_inp&#39; column (necessary for the stand-alone rinexmod step).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2632,7 +2737,7 @@
 <span class="sd">            The path of the modified file if the operation is successful, None otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="s2">&quot;rinexmod&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="s2">&quot;rinexmod&quot;</span><span class="p">,</span> <span class="n">ok_out_mode</span><span class="o">=</span><span class="n">check_ok_out</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># definition of the output directory (after the action)</span>
@@ -2683,7 +2788,7 @@
 
 <div class="viewcode-block" id="StepGnss.mono_mv_final">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_mv_final">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_mv_final</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_mv_final</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2735,8 +2840,8 @@
         <span class="c1"># #NB: for mv it&#39;s ok_out column the one to check</span>
 
         <span class="n">mvcp</span> <span class="o">=</span> <span class="s2">&quot;copy&quot;</span> <span class="k">if</span> <span class="n">copy_only</span> <span class="k">else</span> <span class="s2">&quot;move&quot;</span>
-        <span class="c1"># NB: for a final move it&#39;s ok_out column the one to check =&gt; mv_final_mode=True</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="s2">&quot;final &quot;</span> <span class="o">+</span> <span class="n">mvcp</span><span class="p">,</span> <span class="n">mv_final_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="c1"># NB: for a final move it&#39;s ok_out column the one to check =&gt; ok_out_mode=True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="s2">&quot;final &quot;</span> <span class="o">+</span> <span class="n">mvcp</span><span class="p">,</span> <span class="n">ok_out_mode</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># definition of the output directory (after the action)</span>
@@ -2763,7 +2868,7 @@
 
 <div class="viewcode-block" id="StepGnss.mono_mv_inpout">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_mv_inpout">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_mv_inpout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_mv_inpout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Moves or copies the input file to the output file.</span>
 
@@ -2805,7 +2910,7 @@
 
 <div class="viewcode-block" id="StepGnss.mono_mv_validat">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_mv_validat">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_mv_validat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">file_moved</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_mv_validat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">file_moved</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_out&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validates the move operation for a file in the table.</span>
 
@@ -2844,7 +2949,7 @@
 
 <div class="viewcode-block" id="StepGnss.mono_decompress">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_decompress">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_decompress</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_decompress</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_col</span><span class="o">=</span><span class="s2">&quot;fpath_inp&quot;</span><span class="p">,</span> <span class="n">table_ok_col</span><span class="o">=</span><span class="s2">&quot;ok_inp&quot;</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2928,7 +3033,7 @@
 
 <div class="viewcode-block" id="StepGnss.mono_guess_rnx">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_guess_rnx">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_guess_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">shortname</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_guess_rnx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">shortname</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Guesses the local RINEX file path for a given row in the table.</span>
 
@@ -3012,7 +3117,7 @@
 
 <div class="viewcode-block" id="StepGnss.mono_chk_local">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_cls.StepGnss.mono_chk_local">[docs]</a>
-    <span class="k">def</span> <span class="nf">mono_chk_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mono_chk_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">io</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks the existence and validity of a local file for a specific row in the table.</span>
 

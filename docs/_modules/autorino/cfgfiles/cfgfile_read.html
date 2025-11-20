@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.cfgfiles.cfgfile_read &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -88,31 +89,31 @@
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">collections.abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections.abc</span>
 
 <span class="c1"># Create a logger object.</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">import</span> <span class="nn">mergedeep</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mergedeep</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pprint</span>
 
-<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
-<span class="kn">import</span> <span class="nn">autorino.convert</span> <span class="k">as</span> <span class="nn">arocnv</span>
-<span class="kn">import</span> <span class="nn">autorino.download</span> <span class="k">as</span> <span class="nn">arodwl</span>
-<span class="kn">import</span> <span class="nn">autorino.handle</span> <span class="k">as</span> <span class="nn">arohdl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.common</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocmn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.convert</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocnv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.download</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arodwl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.handle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arohdl</span>
 
 <span class="c1">#### new rinexmod v4 import</span>
-<span class="c1">#import rinexmod.api as rimo_api</span>
-<span class="c1">#import rinexmod.classes.metadata as rimo_mda</span>
+<span class="c1"># import rinexmod.api as rimo_api</span>
+<span class="c1"># import rinexmod.classes.metadata as rimo_mda</span>
 <span class="c1">#### old rinexmod import (for compatibility with older versions)</span>
-<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
-<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">metadata</span> <span class="k">as</span> <span class="n">rimo_mda</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rinexmod</span><span class="w"> </span><span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rinexmod</span><span class="w"> </span><span class="kn">import</span> <span class="n">metadata</span> <span class="k">as</span> <span class="n">rimo_mda</span>
 
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
 
 <span class="c1">#### Import the logger</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
@@ -123,7 +124,7 @@
 
 <div class="viewcode-block" id="load_cfg">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.load_cfg">[docs]</a>
-<span class="k">def</span> <span class="nf">load_cfg</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_cfg</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads quickly one or several configuration files (YAML format) **without interpretation**.</span>
 
@@ -161,7 +162,7 @@
 
 <div class="viewcode-block" id="read_cfg">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg">[docs]</a>
-<span class="k">def</span> <span class="nf">read_cfg</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_cfg</span><span class="p">(</span>
     <span class="n">site_cfg_path</span><span class="p">,</span> <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_cfg_paths_xtra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -229,7 +230,7 @@
 
 <div class="viewcode-block" id="read_cfg_core">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_core">[docs]</a>
-<span class="k">def</span> <span class="nf">read_cfg_core</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">epoch_range_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_cfg_core</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">epoch_range_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reads and interprets session configurations from a dictionary</span>
 <span class="sd">    and returns lists and dictionaries of StepGnss objects.</span>
@@ -368,7 +369,7 @@
 
 <div class="viewcode-block" id="step_cls_select">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.step_cls_select">[docs]</a>
-<span class="k">def</span> <span class="nf">step_cls_select</span><span class="p">(</span><span class="n">step_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">step_cls_select</span><span class="p">(</span><span class="n">step_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Selects the appropriate class for a given step name.</span>
 
@@ -404,7 +405,11 @@
         <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SplitGnss</span>
     <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;splice&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SpliceGnss</span>
-    <span class="k">elif</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">step_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;modify&quot;</span><span class="p">,</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">step_name</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+            <span class="n">warnmsg</span> <span class="o">=</span> <span class="s2">&quot;step &#39;rinexmod&#39; is deprecated, use &#39;modify&#39; instead&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warnmsg</span><span class="p">)</span>
+            <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="n">warnmsg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">ModifyGnss</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;unknown step </span><span class="si">%s</span><span class="s2"> in cfgfiles file, skip&quot;</span><span class="p">,</span> <span class="n">step_name</span><span class="p">)</span>
@@ -414,7 +419,7 @@
 
 <div class="viewcode-block" id="run_steps">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.run_steps">[docs]</a>
-<span class="k">def</span> <span class="nf">run_steps</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_steps</span><span class="p">(</span>
     <span class="n">steps_lis</span><span class="p">,</span>
     <span class="n">steps_select_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude_steps_select</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -522,9 +527,13 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">load_table_msg_str</span><span class="p">,</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">())</span>
             <span class="n">stp_rnx_inp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">stp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_mode</span><span class="o">=</span><span class="s2">&quot;given&quot;</span><span class="p">,</span> <span class="n">input_rinexs</span><span class="o">=</span><span class="n">stp_rnx_inp</span><span class="p">,</span> <span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;modify&quot;</span><span class="p">,</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">stp</span><span class="o">.</span><span class="n">get_step_type</span><span class="p">()</span>  <span class="o">==</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">:</span>
+                <span class="n">warnmsg</span> <span class="o">=</span> <span class="s2">&quot;step &#39;rinexmod&#39; is deprecated, use &#39;modify&#39; instead&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warnmsg</span><span class="p">)</span>
+                <span class="ne">DeprecationWarning</span><span class="p">(</span><span class="n">warnmsg</span><span class="p">)</span>
             <span class="n">stp</span><span class="o">.</span><span class="n">load_tab_inpdir</span><span class="p">(</span><span class="n">update_epochs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">stp</span><span class="o">.</span><span class="n">rinexmod</span><span class="p">(</span><span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+            <span class="n">stp</span><span class="o">.</span><span class="n">modify</span><span class="p">(</span><span class="o">**</span><span class="n">stp</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
 
         <span class="c1">##### close the step</span>
 
@@ -534,7 +543,7 @@
 
 <div class="viewcode-block" id="_chk_parent_dir">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._chk_parent_dir">[docs]</a>
-<span class="k">def</span> <span class="nf">_chk_parent_dir</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_chk_parent_dir</span><span class="p">(</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">parent_dir_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks if a parent directory exists and translates it with the environment variable first.</span>
 
@@ -594,7 +603,7 @@
 
 <div class="viewcode-block" id="_is_cfg_bloc_active">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._is_cfg_bloc_active">[docs]</a>
-<span class="k">def</span> <span class="nf">_is_cfg_bloc_active</span><span class="p">(</span><span class="n">ywkf</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_cfg_bloc_active</span><span class="p">(</span><span class="n">ywkf</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks if a configuration block is active.</span>
 
@@ -630,7 +639,7 @@
 
 <div class="viewcode-block" id="_epoch_range_from_cfg_bloc">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._epoch_range_from_cfg_bloc">[docs]</a>
-<span class="k">def</span> <span class="nf">_epoch_range_from_cfg_bloc</span><span class="p">(</span><span class="n">epoch_range_dic</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_epoch_range_from_cfg_bloc</span><span class="p">(</span><span class="n">epoch_range_dic</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    get an EpochRange object from epoch_range dictionary bloc</span>
 <span class="sd">    internal function for read_cfg</span>
@@ -647,7 +656,7 @@
 
 <div class="viewcode-block" id="_get_dir_path">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._get_dir_path">[docs]</a>
-<span class="k">def</span> <span class="nf">_get_dir_path</span><span class="p">(</span><span class="n">y_step</span><span class="p">,</span> <span class="n">dir_type</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">check_parent_dir_exist</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_dir_path</span><span class="p">(</span><span class="n">y_step</span><span class="p">,</span> <span class="n">dir_type</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">check_parent_dir_exist</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a directory path based on the provided parameters.</span>
 
@@ -675,7 +684,7 @@
 <span class="sd">        the parent directory, and the structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_key_check</span><span class="p">(</span><span class="n">key_inp</span><span class="p">,</span> <span class="n">y_step_inp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_key_check</span><span class="p">(</span><span class="n">key_inp</span><span class="p">,</span> <span class="n">y_step_inp</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">key_inp</span> <span class="ow">in</span> <span class="n">y_step_inp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no </span><span class="si">{</span><span class="n">key_parent</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">y_step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -702,7 +711,7 @@
 
 <div class="viewcode-block" id="_device2mda">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read._device2mda">[docs]</a>
-<span class="k">def</span> <span class="nf">_device2mda</span><span class="p">(</span><span class="n">y_station</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_device2mda</span><span class="p">(</span><span class="n">y_station</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a device block from a configuration file to a MetaData object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -757,7 +766,7 @@
 
 <div class="viewcode-block" id="format_dir_path">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.format_dir_path">[docs]</a>
-<span class="k">def</span> <span class="nf">format_dir_path</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_dir_path</span><span class="p">(</span><span class="n">dir_parent</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Formats a directory path by adding or removing a leading slash.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -782,7 +791,7 @@
 
 <div class="viewcode-block" id="get_incl_cfg_paths">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_cfg_paths">[docs]</a>
-<span class="k">def</span> <span class="nf">get_incl_cfg_paths</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">site_cfg_path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_incl_cfg_paths</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">site_cfg_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates a list of absolute paths for included configuration files.</span>
 
@@ -818,7 +827,7 @@
 
 <div class="viewcode-block" id="get_incl_strategy">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.get_incl_strategy">[docs]</a>
-<span class="k">def</span> <span class="nf">get_incl_strategy</span><span class="p">(</span><span class="n">strat_str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_incl_strategy</span><span class="p">(</span><span class="n">strat_str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the merging strategy for configuration files.</span>
 
@@ -864,7 +873,7 @@
 
 <div class="viewcode-block" id="check_from_main">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.check_from_main">[docs]</a>
-<span class="k">def</span> <span class="nf">check_from_main</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_from_main</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if the FROM_MAIN keyword is used in the configuration file.</span>
 
@@ -896,7 +905,7 @@
 
 <div class="viewcode-block" id="update_w_main_dic">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.update_w_main_dic">[docs]</a>
-<span class="k">def</span> <span class="nf">update_w_main_dic</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">specific_value</span><span class="o">=</span><span class="s2">&quot;FROM_MAIN&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_w_main_dic</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">specific_value</span><span class="o">=</span><span class="s2">&quot;FROM_MAIN&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Updates a dictionary with another dictionary.</span>
 
@@ -922,7 +931,7 @@
 
 <div class="viewcode-block" id="read_cfg_legacy">
 <a class="viewcode-back" href="../../../autorino.cfgfiles.html#autorino.cfgfiles.cfgfile_read.read_cfg_legacy">[docs]</a>
-<span class="k">def</span> <span class="nf">read_cfg_legacy</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">y_main</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_cfg_legacy</span><span class="p">(</span><span class="n">y_inp</span><span class="p">,</span> <span class="n">y_main</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handles legacy configuration files with the &#39;FROM_MAIN&#39; keyword.</span>
 

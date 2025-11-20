@@ -35,6 +35,7 @@ def convert_rnx(
     raw_out_structure=None,
     processes=1,
     filter_prev_tables=False,
+    converter="auto"
 ):
     """
     Frontend function that performs RAW > RINEX conversion.
@@ -93,6 +94,9 @@ def convert_rnx(
         If True, filters and skip previously converted files
         with tables stored in the tmp tables directory.
         Default is False.
+    converter: str, optional
+        The software to be used for converting the RAW files to RINEX.
+        Default is "auto".
 
     Returns
     -------
@@ -124,6 +128,7 @@ def convert_rnx(
             force_rnx,
             rinexmod_options,
             filter_prev_tables,
+            converter,
         )
         args_wrap.append(args)
 
@@ -200,6 +205,8 @@ def convert_raw_wrap(args):
         - filter_prev_tables : bool
             If True, filters and skips previously converted files with
             tables stored in the tmp tables directory.
+        - converter : str
+            The software to be used for converting the RAW files to RINEX.
 
     Returns
     -------
@@ -215,6 +222,7 @@ def convert_raw_wrap(args):
         force_rnx,
         rinexmod_options,
         filter_prev_tables,
+        converter
     ) = args
     # Initialize the ConvertGnss object with the provided directories and metadata
     cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
@@ -225,6 +233,7 @@ def convert_raw_wrap(args):
         force=force_rnx,
         rinexmod_options=rinexmod_options,
         filter_prev_tables=filter_prev_tables,
+        converter=converter,
     )
     # Return the ConvertGnss object containing the conversion results
     return cnv
