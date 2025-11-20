@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.convert.cnv_cmd_run &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -88,20 +89,20 @@
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">PIPE</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="kn">import</span> <span class="n">PIPE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">autorino.convert</span> <span class="k">as</span> <span class="nn">arocnv</span>
-<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.convert</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geodezyx</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
 
 <span class="c1">#### Import the logger</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
@@ -112,7 +113,7 @@
 
 <div class="viewcode-block" id="_convert_select">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run._convert_select">[docs]</a>
-<span class="k">def</span> <span class="nf">_convert_select</span><span class="p">(</span><span class="n">converter_inp</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_convert_select</span><span class="p">(</span><span class="n">converter_inp</span><span class="p">,</span> <span class="n">inp_raw_fpath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    internal function for ``converter_run``.</span>
 <span class="sd">    Find the correct RAW &gt; RINEX converter and gives its corresponding attributes</span>
@@ -309,7 +310,7 @@
 
 <div class="viewcode-block" id="converter_run">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run.converter_run">[docs]</a>
-<span class="k">def</span> <span class="nf">converter_run</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">converter_run</span><span class="p">(</span>
     <span class="n">inp_raw_fpath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">out_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">converter</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
@@ -415,7 +416,8 @@
     <span class="c1"># then could handle both raw_fpath_mono or raw_fpath_multi</span>
     <span class="c1"># thus alias variable raw_fpath will work in both cases</span>
     <span class="c1"># *. but we thus we just keep the 1st list elt as the representent</span>
-    <span class="c1"># of the full list (we assue it homogene)</span>
+    <span class="c1"># of the full list (we assue it homogeneous)</span>
+
     <span class="n">out_conv_sel</span> <span class="o">=</span> <span class="n">_convert_select</span><span class="p">(</span><span class="n">converter</span><span class="p">,</span> <span class="n">raw_fpath</span><span class="p">)</span>
     <span class="p">(</span>
         <span class="n">converter_name</span><span class="p">,</span>
@@ -529,7 +531,7 @@
 
 <div class="viewcode-block" id="find_conv_files">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run.find_conv_files">[docs]</a>
-<span class="k">def</span> <span class="nf">find_conv_files</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">pattern_main</span><span class="p">,</span> <span class="n">pattern_annex</span><span class="p">,</span> <span class="n">n_sec</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_conv_files</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">pattern_main</span><span class="p">,</span> <span class="n">pattern_annex</span><span class="p">,</span> <span class="n">n_sec</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Searches for the files in a directory that were recently created (within the last n_sec seconds)</span>
 <span class="sd">    and match the main and annex patterns.</span>
@@ -548,7 +550,8 @@
 <span class="sd">    pattern_annex : str</span>
 <span class="sd">        The regular expression pattern that the annex files should match.</span>
 <span class="sd">    n_sec : int, optional</span>
-<span class="sd">        The number of seconds in the past to consider for file creation. Default is 10.</span>
+<span class="sd">        The number of seconds in the past to consider for file creation.</span>
+<span class="sd">         Default is 20.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -596,7 +599,7 @@
 
 <div class="viewcode-block" id="_ashtech_name_2_date">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cmd_run._ashtech_name_2_date">[docs]</a>
-<span class="k">def</span> <span class="nf">_ashtech_name_2_date</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_ashtech_name_2_date</span><span class="p">(</span><span class="n">inp_raw_fpath</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts the record date from an ASHTECH file name.</span>
 

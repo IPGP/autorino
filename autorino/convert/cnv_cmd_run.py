@@ -156,7 +156,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_kwoptions = dict()
 
     # +++++ SEPTENTRIO
-    elif re.match(".[0-9]{2}_", ext) or converter_inp == "sbf2rin":
+    elif re.match(".([0-9]{2}_|A)", ext) or converter_inp == "sbf2rin":
         converter_name = "sbf2rin"
         brand = "Septentrio"
         cmd_build_fct = arocnv.cmd_build_sbf2rin

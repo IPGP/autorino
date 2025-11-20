@@ -137,6 +137,27 @@ def main():
         default=False,
     )
 
+    parser.add_argument(
+        "-c",
+        "--converter",
+        help="The software to be used for converting the RAW files to RINEX. "
+             "Default is 'auto' which lets autorino choose the best available converter based on RAW file extension."
+             "Possible values are:"
+             "* 'auto' (automatic choice based on the extension),"
+             "* 'trm2rnx' (Trimble unofficial),"
+             "* 't0xconvert' (Trimble official),"
+             "* 'runpkr00' (Trimble legacy),"
+             "* 'teqc' (legacy conversion & RINEX Handeling),"
+             "* 'mdb2rinex' (Leica),"
+             "* 'sbf2rin' (Septentrio),"
+             "* 'convbin' (BINEX),"
+             "* 'tps2rin' (Topcon),"
+             "* 'converto' (RINEX Handeling),"
+             "* 'gfzrnx' (RINEX Handeling)",
+        default="auto",
+    )
+
+
     args = parser.parse_args()
 
     aroapi.convert_rnx(
@@ -153,6 +174,7 @@ def main():
         raw_out_structure=args.raw_out_structure,
         processes=args.processes,
         filter_prev_tables=args.filter_prev_tables,
+        converter=args.converter
     )
 
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.api.check_rnx &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -87,15 +88,15 @@
 
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">import</span> <span class="nn">autorino.cfgenv</span> <span class="k">as</span> <span class="nn">aroenv</span>
-<span class="kn">import</span> <span class="nn">autorino.check</span> <span class="k">as</span> <span class="nn">arochk</span>
-<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.check</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arochk</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.common</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocmn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geodezyx</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
@@ -103,7 +104,7 @@
 
 <div class="viewcode-block" id="check_rnx">
 <a class="viewcode-back" href="../../../autorino.api.html#autorino.api.check_rnx.check_rnx">[docs]</a>
-<span class="k">def</span> <span class="nf">check_rnx</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_rnx</span><span class="p">(</span>
     <span class="n">inp_dir_parent</span><span class="p">,</span>
     <span class="n">inp_dir_structure</span><span class="p">,</span>
     <span class="n">epoch_start</span><span class="p">,</span>
@@ -112,7 +113,8 @@
     <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This function checks the RINEX files in the input directory.</span>
+<span class="sd">    Checks the presence of RINEX files in the input directory over a specified time range,</span>
+<span class="sd">    and computes their completeness ratio.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -188,7 +190,7 @@
 <span class="c1"># checkrnx_format</span>
 <div class="viewcode-block" id="checkrnx_output">
 <a class="viewcode-back" href="../../../autorino.api.html#autorino.api.check_rnx.checkrnx_output">[docs]</a>
-<span class="k">def</span> <span class="nf">checkrnx_output</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">checkrnx_output</span><span class="p">(</span>
     <span class="n">output_dir</span><span class="p">,</span> <span class="n">eporng</span><span class="p">,</span> <span class="n">tabu_chk_col</span><span class="p">,</span> <span class="n">tabu_chk_bnw</span><span class="p">,</span> <span class="n">df_chk_sum</span><span class="p">,</span> <span class="n">df_chk_full_stats</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

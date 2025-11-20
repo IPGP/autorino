@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.convert.cnv_regex &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -94,8 +95,8 @@
 <span class="sd">#### thus annex regex will finally not include the main</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 
 <span class="c1">###################################################################</span>
@@ -103,7 +104,7 @@
 
 <div class="viewcode-block" id="conv_regex_void">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_void">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_void</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_void</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the main and annex converted files</span>
 <span class="sd">    equivalent to the input filename</span>
@@ -140,9 +141,47 @@
 
 
 
+<div class="viewcode-block" id="conv_regex_custom">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_custom">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_custom</span><span class="p">(</span><span class="n">regex_tup_inp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the regular expressions of the main and annex converted files</span>
+<span class="sd">    equivalent to the input regex tuple</span>
+
+<span class="sd">    It has the same behavior as all the `conv_regex` functions</span>
+<span class="sd">    See note below</span>
+<span class="sd">    **but** the input is a tuple of regex strings</span>
+<span class="sd">    not the input raw filename</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    regex_tup_inp : 2-tuple of str</span>
+<span class="sd">        the input tuple of 2 regex strings for main and annex files</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    conv_regex_main &amp; conv_regex_annex : Complied Regex Objects</span>
+<span class="sd">        The regular expressions.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    general behavior of the `conv_regex` functions:</span>
+<span class="sd">    main = the regex for the main file i.e. the Observation RINEX</span>
+<span class="sd">    annex = the regex for the ALL outputed files (Observation RINEX included)</span>
+<span class="sd">    the main with be processed before the annex,</span>
+<span class="sd">    thus annex regex will finally not include the main one</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">regex_main</span><span class="p">,</span> <span class="n">regex_annex</span> <span class="o">=</span> <span class="n">regex_tup_inp</span>
+    <span class="n">conv_regex_main</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex_main</span><span class="p">)</span>
+    <span class="n">conv_regex_annex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex_annex</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">conv_regex_main</span><span class="p">,</span> <span class="n">conv_regex_annex</span></div>
+
+
+
 <div class="viewcode-block" id="conv_regex_runpkr00">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_runpkr00">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_runpkr00</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_runpkr00</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
 <span class="sd">    outputed by runpkr00 (Trimble)</span>
@@ -182,7 +221,7 @@
 
 <div class="viewcode-block" id="conv_regex_teqc">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_teqc">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_teqc</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_teqc</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the main and annex converted files</span>
 <span class="sd">    outputed by teqc (polyvalent)</span>
@@ -219,7 +258,7 @@
 
 <div class="viewcode-block" id="conv_regex_converto">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_converto">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_converto</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_converto</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the main and annex converted files</span>
 <span class="sd">    outputed by converto (polyvalent)</span>
@@ -256,7 +295,7 @@
 
 <div class="viewcode-block" id="conv_regex_gfzrnx">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_gfzrnx">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_gfzrnx</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_gfzrnx</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the main and annex converted files</span>
 <span class="sd">    outputed by GFZRNX (polyvalent)</span>
@@ -293,7 +332,7 @@
 
 <div class="viewcode-block" id="conv_regex_trm2rinex">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_trm2rinex">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_trm2rinex</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_trm2rinex</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
 <span class="sd">    outputed by trm2rinex (Trimble)</span>
@@ -337,7 +376,7 @@
 
 <div class="viewcode-block" id="conv_regex_t0xconvert">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_t0xconvert">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_t0xconvert</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_t0xconvert</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
 <span class="sd">    outputed by t0xconvert (Trimble)</span>
@@ -377,7 +416,7 @@
 
 <div class="viewcode-block" id="conv_regex_mdb2rnx">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_mdb2rnx">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_mdb2rnx</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_mdb2rnx</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
 <span class="sd">    outputed by mdb2rnx (Leica)</span>
@@ -452,7 +491,7 @@
 
 <div class="viewcode-block" id="conv_regex_convbin">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_convbin">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_convbin</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_convbin</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the mainand annex converted files</span>
 <span class="sd">    outputed by RTKLIB&#39;s convbin (polyvalent)</span>
@@ -494,7 +533,7 @@
 
 <div class="viewcode-block" id="conv_regex_tps2rin">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_regex.conv_regex_tps2rin">[docs]</a>
-<span class="k">def</span> <span class="nf">conv_regex_tps2rin</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conv_regex_tps2rin</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate the regular expressions of the main and annex converted files</span>
 <span class="sd">    outputed by tps2rin (Topcon)</span>
