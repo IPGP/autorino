@@ -10,7 +10,7 @@ import numpy as np
 
 import autorino.handle as arohdl
 import autorino.check as arochk
-import rinexmod
+import rinexmod.classes as rimo_cls
 import tqdm
 
 
@@ -73,7 +73,7 @@ class CheckGnss(arohdl.HandleGnss):
                 ds["%"] = 0
             else:
                 ### get RINEX as an rinexMod's Object
-                rnxobj = rinexmod.rinexfile.RinexFile(ds["fpath"])
+                rnxobj = rimo_cls.RinexFile(ds["fpath"])
                 ### get RINEX site code
                 ds["site"] = rnxobj.get_site(lower_case=False, only_4char=False)
 
