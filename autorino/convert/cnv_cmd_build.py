@@ -96,7 +96,7 @@ def _options_list2str(options):
 
     Returns
     -------
-    cmd_list : list
+    cmd_list : list of str
         A list where the elements are command line options and their values.
     cmd_str : str
         A string that represents the command line options and their values.

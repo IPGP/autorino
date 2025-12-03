@@ -278,7 +278,7 @@ class ConvertGnss(arocmn.StepGnss):
                 converter_name_use = converter  # converter is forced
             else:
                 # ++ do a first converter selection by identifying odd files
-                converter_name_use = arocnv.select_conv_odd_file(fraw)
+                converter_name_use = arocnv.slct_conv_odd_f(fraw)
                 # NB: converter selection for regular files is done in
                 # autorino.conv_cmd_run._convert_select
 
