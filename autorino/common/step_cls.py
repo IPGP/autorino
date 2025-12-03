@@ -21,11 +21,12 @@ import autorino
 import autorino.common as arocmn
 import autorino.cfglog as arologcfg
 
-import rinexmod
+#import rinexmod
 # new rinexmod v4 import
-# import rinexmod.api as rimo_api
+import rinexmod.api as rimo_api
+import rinexmod.classes as rimo_cls
 # old rinexmod import
-from rinexmod import rinexmod_api as rimo_api
+#from rinexmod import rinexmod_api as rimo_api
 
 from geodezyx import utils, conv
 
@@ -851,11 +852,11 @@ class StepGnss:
 
         for irow, row in self.table.iterrows():
             if not use_rnx_filename_only:
-                rnx = rinexmod.rinexfile.RinexFile(row["fpath_inp"])
+                rnx = rimo_cls.RinexFile(row["fpath_inp"])
                 epo_srt = rnx.start_date
                 epo_end = rnx.end_date
             else:
-                epo_srt, epo_end, _ = rinexmod.rinexfile.dates_from_rinex_filename(
+                epo_srt, epo_end, _ = rimo_api.dates_from_rinex_filename(
                     row["fpath_inp"]
                 )
 
@@ -2518,7 +2519,7 @@ class StepGnss:
                 not self.table.loc[irow, "epoch_srt"]
                 or not self.table.loc[irow, "epoch_end"]
             ):
-                epo_srt_ok, epo_end_ok = rinexmod.rinexfile.dates_from_rinex_filename(
+                epo_srt_ok, epo_end_ok = rimo_api.dates_from_rinex_filename(
                     frnxmod
                 )
                 self.table.loc[irow, "epoch_srt"] = epo_srt_ok
@@ -2818,7 +2819,7 @@ class StepGnss:
         epo_end = epo_end.replace(tzinfo=None)
 
         # Determine the file period string based on the epoch range
-        prd_str = rinexmod.rinexfile.file_period_from_timedelta(epo_srt, epo_end)[0]
+        prd_str = rimo_api.file_period_from_timedelta(epo_srt, epo_end)[0]
 
         # Generate the RINEX file name using site and session information
         if not shortname:

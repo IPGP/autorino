@@ -20,11 +20,11 @@ import autorino.download as arodwl
 import autorino.handle as arohdl
 
 #### new rinexmod v4 import
-# import rinexmod.api as rimo_api
-# import rinexmod.classes.metadata as rimo_mda
+import rinexmod.api as rimo_api
+import rinexmod.classes as rimo_cls
 #### old rinexmod import (for compatibility with older versions)
-from rinexmod import rinexmod_api as rimo_api
-from rinexmod import metadata as rimo_mda
+#from rinexmod import rinexmod_api as rimo_api
+#from rinexmod import metadata as rimo_mda
 
 import datetime as dt
 
@@ -613,7 +613,7 @@ def _device2mda(y_station):
             )
             y_dev[attkw] = "unknown"
 
-    metadata = rimo_mda.MetaData()
+    metadata = rimo_cls.MetaData()
     rec_dic = dict()
     rec_dic["Receiver Type"] = y_dev["rec_type"]
     rec_dic["Serial Number"] = str(y_dev["rec_sn"])

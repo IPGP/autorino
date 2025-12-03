@@ -16,9 +16,9 @@ import pwd
 import grp
 
 ### new rinexmod v4 import
-# import rinexmod.api as rimo_api
+import rinexmod.api as rimo_api
 ### old rinexmod import
-from rinexmod import rinexmod_api as rimo_api
+#from rinexmod import rinexmod_api as rimo_api
 
 #### Import the logger
 import logging
