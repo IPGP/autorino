@@ -6,7 +6,7 @@ Extracts the second/last table from each download log file.
 
 import os
 import re
-import csv
+import pandas as pd
 from pathlib import Path
 from datetime import datetime
 
@@ -241,7 +241,7 @@ def parse_download_log(log_file_path):
 def main():
     """Main function to process all download logs"""
 
-    base_dir = Path('/home/sakic/CODES/IPGP/autorino')
+    base_dir = Path('/')
 
     # Find all download log files from both directories
     download_logs = []
@@ -263,16 +263,15 @@ def main():
 
     print(f"\nTotal rows extracted: {len(all_results)}")
 
-    # Write to CSV
+    # Write to CSV using pandas
     if all_results:
-        fieldnames = ['epoch_exec', 'exec_time', 'site', 'epoch_srt', 'epoch_end', 'ok_inp', 'ok_out']
-
-        with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(all_results)
+        df = pd.DataFrame(all_results)
+        # Ensure column order
+        df = df[['epoch_exec', 'exec_time', 'site', 'epoch_srt', 'epoch_end', 'ok_inp', 'ok_out']]
+        df.to_csv(output_csv, index=False, encoding='utf-8')
 
         print(f"\nCSV file created: {output_csv}")
+        print(f"Shape: {df.shape}")
     else:
         print("\nNo data extracted!")
 
