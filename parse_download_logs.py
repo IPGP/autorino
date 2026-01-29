@@ -64,6 +64,22 @@ def calculate_execution_time(first_timestamp, last_timestamp):
 def parse_download_log(log_file_path):
     """Parse a download log file and extract the last table data"""
 
+    def extract_filename_from_mono_line(line):
+        """Extract filename from mono_fetch or mono_ok_check line"""
+        # Example: "250701T00:13:08.786Imono_fetch     >>>> fetch remote raw file: DSD0______202506270000A.T02"
+        # Example: "250701T00:13:08.785Imono_ok_check  fetch skipped (output already exists): http:/gps-dsd.terrain.ovsg.univ-ag.fr/download/Internal/202506/DSD0______202506210000A.T02"
+
+        if 'mono_fetch' in line:
+            match = re.search(r'fetch remote raw file:\s*(\S+)', line)
+            if match:
+                return match.group(1).strip()
+        elif 'mono_ok_check' in line:
+            # Extract filename from URL path
+            match = re.search(r'/([^/]+\.T\d+)', line)
+            if match:
+                return match.group(1).strip()
+        return None
+
     results = []
 
     with open(log_file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -80,17 +96,39 @@ def parse_download_log(log_file_path):
     if not execution_timestamp and lines:
         execution_timestamp = parse_timestamp_from_log_line(lines[0])
 
-    # Get first and last timestamps for execution time
-    first_ts = None
-    last_ts = None
-    for line in lines:
-        ts_match = re.match(r'(\d{6}T\d{2}:\d{2}:\d{2}\.\d+)', line)
-        if ts_match:
-            if not first_ts:
-                first_ts = ts_match.group(1)
-            last_ts = ts_match.group(1)
+    # Build a dictionary of mono_fetch/mono_ok_check operations with their timestamps
+    mono_operations = {}  # filename -> (start_timestamp, end_timestamp)
 
-    execution_time = calculate_execution_time(first_ts, last_ts) if first_ts and last_ts else None
+    for i, line in enumerate(lines):
+        # Extract timestamp from this line
+        ts_match = re.match(r'(\d{6}T\d{2}:\d{2}:\d{2}\.\d+)', line)
+        if not ts_match:
+            continue
+
+        timestamp = ts_match.group(1)
+
+        # Check if this is a mono_fetch or mono_ok_check operation
+        if 'mono_fetch' in line or 'mono_ok_check' in line:
+            file_name = extract_filename_from_mono_line(line)
+            if file_name:
+                # Find the next mono operation to determine end time
+                end_timestamp = None
+                for j in range(i + 1, len(lines)):
+                    if 'mono_fetch' in lines[j] or 'mono_ok_check' in lines[j] or 'print_table' in lines[j]:
+                        end_ts_match = re.match(r'(\d{6}T\d{2}:\d{2}:\d{2}\.\d+)', lines[j])
+                        if end_ts_match:
+                            end_timestamp = end_ts_match.group(1)
+                            break
+
+                # If no next operation found, use the last timestamp in the file
+                if not end_timestamp:
+                    for j in range(len(lines) - 1, i, -1):
+                        end_ts_match = re.match(r'(\d{6}T\d{2}:\d{2}:\d{2}\.\d+)', lines[j])
+                        if end_ts_match:
+                            end_timestamp = end_ts_match.group(1)
+                            break
+
+                mono_operations[file_name] = (timestamp, end_timestamp)
 
     # Find all tables (marked by "print_table" lines)
     table_starts = []
@@ -177,9 +215,19 @@ def parse_download_log(log_file_path):
                         ok_inp = parts[3]
                         ok_out = parts[4]
 
+                        # Extract the filename from parts[1]
+                        fname = parts[1]
+
+                        # Calculate exec_time for this specific file
+                        exec_time = None
+                        if fname in mono_operations:
+                            start_ts, end_ts = mono_operations[fname]
+                            if start_ts and end_ts:
+                                exec_time = calculate_execution_time(start_ts, end_ts)
+
                         row_data = {
                             'epoch_exec': execution_timestamp,
-                            'exec_time': execution_time if execution_time else '',
+                            'exec_time': exec_time if exec_time is not None else '',
                             'site': site,
                             'epoch_srt': epoch_srt,
                             'epoch_end': epoch_end,
@@ -193,11 +241,16 @@ def parse_download_log(log_file_path):
 def main():
     """Main function to process all download logs"""
 
-    logs_dir = Path('/home/sakic/CODES/IPGP/autorino/logs_ovpf')
-    output_csv = logs_dir.parent / 'download_logs_analysis.csv'
+    base_dir = Path('/home/sakic/CODES/IPGP/autorino')
 
-    # Find all download log files
-    download_logs = sorted(logs_dir.glob('*_download.log'))
+    # Find all download log files from both directories
+    download_logs = []
+    obs = "ovsm"
+    logs_dir = base_dir / ('logs_' + obs)
+    output_csv = base_dir / f'download_logs_analysis_{obs}.csv'
+
+    if logs_dir.exists():
+        download_logs.extend(sorted(logs_dir.glob('*_download.log')))
 
     print(f"Found {len(download_logs)} download log files")
 
