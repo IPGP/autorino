@@ -129,7 +129,7 @@ class ModifyGnss(arohdlcls.HandleGnss):
 
         # if force is True, force the splicing operation
         if force:
-            self.force("rinexmod")
+            self.force("modify")
 
         # Find the input RINEX files
         # stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
@@ -139,7 +139,7 @@ class ModifyGnss(arohdlcls.HandleGnss):
 
         for irow, row in self.table.iterrows():
             # Check if the operation is valid for the current row
-            if not self.mono_ok_check(irow, "rinexmod"):
+            if not self.mono_ok_check(irow, "modify"):
                 continue
 
             # Update the RINEX modification options for the current row
