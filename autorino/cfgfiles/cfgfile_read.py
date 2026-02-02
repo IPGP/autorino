@@ -7,6 +7,8 @@ Created on Thu Dec  1 15:47:05 2022
 """
 
 import collections.abc
+import copy
+import json
 
 # Create a logger object.
 import os
@@ -45,6 +47,9 @@ def load_cfg(cfg_path, verbose=True):
 
     This function reads a YAML configuration file from the specified path and returns the parsed content.
 
+    Note: A deep copy is performed after loading to avoid issues with YAML anchors/aliases
+    creating shared references in memory that can cause unexpected behavior during merge operations.
+
     Parameters
     ----------
     cfg_path : str or list of str
@@ -71,6 +76,10 @@ def load_cfg(cfg_path, verbose=True):
         raise FileNotFoundError(None, msg)
     else:
         y_out = yaml.safe_load(open(cfg_path))
+        # Break shared references created by YAML anchors using JSON serialization
+        # This prevents issues when merging configs with YAML anchors/aliases
+        # yaml.dump preserves anchors, but json.dumps breaks all references
+        y_out = json.loads(json.dumps(y_out))
         return y_out
 
 
@@ -184,6 +193,11 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
     steps_lis_lis = []
     steps_dic_dic = {}
     for k_ses, y_ses in y_sessions.items():
+
+        if "_template" in k_ses:
+            # skip generic or template sessions
+            logging.debug("skip template session %s", k_ses)
+            continue
 
         steps_lis = []
         steps_dic = {}
