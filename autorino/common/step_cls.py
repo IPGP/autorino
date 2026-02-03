@@ -21,12 +21,12 @@ import autorino
 import autorino.common as arocmn
 import autorino.cfglog as arologcfg
 
-#import rinexmod
+# import rinexmod
 # new rinexmod v4 import
 import rinexmod.api as rimo_api
 import rinexmod.classes as rimo_cls
 # old rinexmod import
-#from rinexmod import rinexmod_api as rimo_api
+# from rinexmod import rinexmod_api as rimo_api
 
 from geodezyx import utils, conv
 
@@ -311,7 +311,7 @@ class StepGnss:
 
         return exicod_out
 
-        #logger.debug("Exit code from table: %s, %s", exicod_out, self)
+        # logger.debug("Exit code from table: %s, %s", exicod_out, self)
 
         if inplace:
             self.exit_code = exicod_out
@@ -1572,6 +1572,7 @@ class StepGnss:
         logger.info("nbr local RINEX files guessed: %s", len(loc_paths_list))
 
         return loc_paths_list
+
 
     def guess_out_files(self):
         """
