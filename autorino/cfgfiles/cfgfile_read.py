@@ -251,6 +251,12 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
             ## concatenate the dir_parent and the structure
             # (but not the file_regex, it is just about the directory)
             out_dir, _, _ = _get_dir_path(y_stp, "out")
+
+            # Check if out_bis keys exist
+            if "out_bis_dir_parent" in y_stp.keys() and "out_bis_dir_structure" in y_stp.keys():
+                out_dir_bis, _, _ = _get_dir_path(y_stp, "out_bis", check_parent_dir_exist=False)
+                out_dir = (out_dir, out_dir_bis)  # Create tuple
+
             inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
 
             if "inp_file_regex" in y_stp.keys():
