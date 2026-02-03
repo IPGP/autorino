@@ -111,9 +111,8 @@ class ModifyGnss(arohdlcls.HandleGnss):
         # set the ok_inp to True per default
         self.table["ok_inp"] = True
 
-        guess_local_rnx = False
+        guess_local_rnx = True
         if guess_local_rnx:
-
             # special case if we downgrade the name
             if rinexmod_options and "shortname" in rinexmod_options.keys():
                 shortname = rinexmod_options["shortname"]
