@@ -140,7 +140,7 @@ class DownloadGnss(arocmn.StepGnss):
     def inp_basename(self):
         return os.path.basename(self.inp_dir)
 
-    def clear_remote_listing_cache(self):
+    def clear_cache_remot(self):
         """
         Clear the cache of remote file listings.
 
@@ -150,7 +150,7 @@ class DownloadGnss(arocmn.StepGnss):
         self._remote_listing_cache = {}
         logger.debug("Remote listing cache cleared")
 
-    def get_cached_remote_listing(self, remote_dir):
+    def get_cache_remot(self, remote_dir):
         """
         Get cached remote file listing for a given directory.
 
@@ -170,7 +170,7 @@ class DownloadGnss(arocmn.StepGnss):
             logger.debug(f"Using cached remote listing for {remote_dir} ({len(cached_result)} files)")
         return cached_result
 
-    def set_cached_remote_listing(self, remote_dir, file_list):
+    def set_cache_remot(self, remote_dir, file_list):
         """
         Store a remote file listing in the cache.
 
@@ -183,7 +183,7 @@ class DownloadGnss(arocmn.StepGnss):
         """
         cache_key = (self.access["protocol"], self.access["hostname"], remote_dir)
         self._remote_listing_cache[cache_key] = file_list
-        logger.debug(f"Cached remote listing for {remote_dir} ({len(file_list)} files)")
+        logger.debug(f"Set cached remote listing for {remote_dir} ({len(file_list)} files)")
 
 
     def guess_remot_raw(self):
@@ -327,7 +327,7 @@ class DownloadGnss(arocmn.StepGnss):
             rmot_dir_use = row["fpath_inp"]
 
             # Check if the remote listing is already cached
-            rmot_fil_epo_bulk_lis = self.get_cached_remote_listing(rmot_dir_use)
+            rmot_fil_epo_bulk_lis = self.get_cache_remot(rmot_dir_use)
 
             if rmot_fil_epo_bulk_lis is None:
                 # Cache miss - need to fetch from remote
@@ -352,7 +352,7 @@ class DownloadGnss(arocmn.StepGnss):
 
                 rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
                 # Store in cache for future use
-                self.set_cached_remote_listing(rmot_dir_use, rmot_fil_epo_bulk_lis)
+                self.set_cache_remot(rmot_dir_use, rmot_fil_epo_bulk_lis)
 
             ### match the right input structure, if a regex input is provided
             if self.inp_file_regex:
@@ -539,7 +539,7 @@ class DownloadGnss(arocmn.StepGnss):
 
         # Clear the remote listing cache if requested
         if clear_cache:
-            self.clear_remote_listing_cache()
+            self.clear_cache_remot()
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()
