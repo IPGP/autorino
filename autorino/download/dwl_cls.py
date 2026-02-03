@@ -126,6 +126,10 @@ class DownloadGnss(arocmn.StepGnss):
         # initialize the ftp object
         self.ftp_obj = None
 
+        # initialize the cache for remote file listings
+        # key: (protocol, hostname, remote_dir), value: list of files
+        self._remote_listing_cache = {}
+
     # legacy properties, specific to the DownloadGnss class
     #### They become more or less useless since the implementation of self.inp_file_regex (2025-01)
     @property
@@ -135,6 +139,52 @@ class DownloadGnss(arocmn.StepGnss):
     @property
     def inp_basename(self):
         return os.path.basename(self.inp_dir)
+
+    def clear_remote_listing_cache(self):
+        """
+        Clear the cache of remote file listings.
+
+        This method clears all cached remote file listings stored in memory.
+        Use this when you need to force a fresh listing of remote files.
+        """
+        self._remote_listing_cache = {}
+        logger.debug("Remote listing cache cleared")
+
+    def get_cached_remote_listing(self, remote_dir):
+        """
+        Get cached remote file listing for a given directory.
+
+        Parameters
+        ----------
+        remote_dir : str
+            The remote directory path.
+
+        Returns
+        -------
+        list or None
+            The cached file listing if available, None otherwise.
+        """
+        cache_key = (self.access["protocol"], self.access["hostname"], remote_dir)
+        cached_result = self._remote_listing_cache.get(cache_key)
+        if cached_result is not None:
+            logger.debug(f"Using cached remote listing for {remote_dir} ({len(cached_result)} files)")
+        return cached_result
+
+    def set_cached_remote_listing(self, remote_dir, file_list):
+        """
+        Store a remote file listing in the cache.
+
+        Parameters
+        ----------
+        remote_dir : str
+            The remote directory path.
+        file_list : list
+            The list of files to cache.
+        """
+        cache_key = (self.access["protocol"], self.access["hostname"], remote_dir)
+        self._remote_listing_cache[cache_key] = file_list
+        logger.debug(f"Cached remote listing for {remote_dir} ({len(file_list)} files)")
+
 
     def guess_remot_raw(self):
         """
@@ -276,27 +326,33 @@ class DownloadGnss(arocmn.StepGnss):
             epoch = row["epoch_srt"]
             rmot_dir_use = row["fpath_inp"]
 
-            if self.access["protocol"] == "http":
-                logger.warning(
-                    "HTTP protocol doesn't support well file listing. Nasty effects may occur."
-                )
-                rmot_fil_epo_bulk_lis = arodwl.list_remote_http(
-                    self.access["hostname"], rmot_dir_use
-                )
-            elif self.access["protocol"] == "ftp":
-                rmot_fil_epo_bulk_lis = arodwl.list_remote_ftp(
-                    self.access["hostname"],
-                    rmot_dir_use,
-                    self.access["login"],
-                    self.access["password"],
-                    ftp_obj_inp=self.ftp_obj,
-                )
+            # Check if the remote listing is already cached
+            rmot_fil_epo_bulk_lis = self.get_cached_remote_listing(rmot_dir_use)
 
-            else:
-                logger.error("wrong protocol. Only 'http' and 'ftp' are supported.")
-                raise Exception
+            if rmot_fil_epo_bulk_lis is None:
+                # Cache miss - need to fetch from remote
+                if self.access["protocol"] == "http":
+                    logger.warning(
+                        "HTTP protocol doesn't support well file listing. Nasty effects may occur."
+                    )
+                    rmot_fil_epo_bulk_lis = arodwl.list_remote_http(
+                        self.access["hostname"], rmot_dir_use
+                    )
+                elif self.access["protocol"] == "ftp":
+                    rmot_fil_epo_bulk_lis = arodwl.list_remote_ftp(
+                        self.access["hostname"],
+                        rmot_dir_use,
+                        self.access["login"],
+                        self.access["password"],
+                        ftp_obj_inp=self.ftp_obj,
+                    )
+                else:
+                    logger.error("wrong protocol. Only 'http' and 'ftp' are supported.")
+                    raise Exception
 
-            rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
+                rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
+                # Store in cache for future use
+                self.set_cached_remote_listing(rmot_dir_use, rmot_fil_epo_bulk_lis)
 
             ### match the right input structure, if a regex input is provided
             if self.inp_file_regex:
@@ -442,6 +498,7 @@ class DownloadGnss(arocmn.StepGnss):
         ping_max_try=4,
         ping_timeout=20,
         ping_disable=False,
+        clear_cache=False,
     ):
         """
         Frontend method to download files from a GNSS receiver
@@ -470,6 +527,8 @@ class DownloadGnss(arocmn.StepGnss):
             Timeout in seconds for pinging the remote server. Default is 20.
         ping_disable : bool, optional
             If True, skips the pinging of the remote server. Default is False.
+        clear_cache : bool, optional
+            If True, clears the remote listing cache before starting the download. Default is False.
 
         Returns
         -------
@@ -477,6 +536,10 @@ class DownloadGnss(arocmn.StepGnss):
         """
         self.set_logfile()
         logger.info(BOLD_SRT + ">>>>>> RAW files download" + BOLD_END)
+
+        # Clear the remote listing cache if requested
+        if clear_cache:
+            self.clear_remote_listing_cache()
 
         # Set up and clean temporary directories
         self.set_tmp_dirs()
