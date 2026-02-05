@@ -1065,7 +1065,6 @@ class StepGnss:
 
         return trsltdict_out
 
-    @staticmethod
     def translate_core(
         self, path_inp, trslt_dic_use, epoch_use, make_dir=False, absolute=False
     ):
