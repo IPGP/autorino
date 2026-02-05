@@ -490,6 +490,7 @@ class DownloadGnss(arocmn.StepGnss):
         self,
         verbose=False,
         force=False,
+        reverse_order=False,
         remote_find_method="ask",
         invalidate_small_local_files=True,
         timeout=60,
@@ -509,6 +510,9 @@ class DownloadGnss(arocmn.StepGnss):
             If True, prints detailed information during the download process. Default is False.
         force : bool, optional
             If True, forces the download even if the files already exist locally. Default is False.
+        reverse_order : bool, optional
+            If True, processes the files in reverse order (anti-chronological, newer first).
+            Default is False.
         remote_find_method : str, optional
             Method to find remote files.
             Can be 'ask' to list files from the server (for FTP only) or 'guess' to guess file paths.
@@ -590,6 +594,8 @@ class DownloadGnss(arocmn.StepGnss):
         # Force download if required
         if force:
             self.force(step_name="download")
+        if reverse_order:
+            self.reverse_table()
 
         # Log the number of files to be downloaded and excluded
         n_ok_inp = (self.table["ok_inp"]).sum()

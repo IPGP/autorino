@@ -109,6 +109,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
         rinexmod_options=None,
         verbose=False,
         force=False,
+        reverse_order=False,
     ):
         """
         Splice RINEX files.
@@ -137,6 +138,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
             If True, prints the table for debugging purposes. Default is False.
         force : bool, optional
             If True, forces the splicing operation. Default is False.
+        reverse_order : bool, optional
+            If True, processes the files in reverse order (anti-chronological, newer first).
+            Default is False.
 
         Returns
         -------
@@ -161,6 +165,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
         # if force is True, force the splicing operation
         if force:
             self.force("splice")
+
+        if reverse_order:
+            self.reverse_table()
 
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)

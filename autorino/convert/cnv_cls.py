@@ -124,6 +124,7 @@ class ConvertGnss(arocmn.StepGnss):
         self,
         verbose=False,
         force=False,
+        reverse_order=False,
         rinexmod_options=None,
         converter="auto",
         filter_prev_tables=False,
@@ -147,9 +148,12 @@ class ConvertGnss(arocmn.StepGnss):
             If True, prints the conversion table. Default is False.
         force : bool, optional
             If True, forces the conversion even if output files already exist. Default is False.
+        reverse_order : bool, optional
+            If True, processes the files in reverse order (anti-chronological, newer first).
+            Default is False.
         rinexmod_options : dict, optional
             A dictionary containing options for the rinexmod process.
-             If not specified, default options are used.
+            If not specified, default options are used.
         converter : str, optional
             The converter to be used for the conversion.
             If not specified, the best converter is automatically selected.
@@ -213,6 +217,8 @@ class ConvertGnss(arocmn.StepGnss):
 
         if force:
             self.force("convert")
+        if reverse_order:
+            self.reverse_table()
 
         if filter_prev_tables:
             logger.debug(f"Loading filter previous tables in: {self.tmp_dir_tables:}")
