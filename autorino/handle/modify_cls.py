@@ -76,7 +76,7 @@ class ModifyGnss(arohdlcls.HandleGnss):
             metadata=metadata,
         )
 
-    def modify(self, verbose=False, force=False, rinexmod_options=None):
+    def modify(self, verbose=False, force=False, reverse_order=False, rinexmod_options=None):
         """
         Apply RINEX modifications to the data.
 
@@ -90,6 +90,9 @@ class ModifyGnss(arohdlcls.HandleGnss):
             If True, prints the table of operations. Default is False.
         force : bool, optional
             If True, forces the rinexmod operation even if the output files already exist.
+            Default is False.
+        reverse_order : bool, optional
+            If True, processes the files in reverse order (anti-chronological, newer first).
             Default is False.
         rinexmod_options : dict, optional
             The options to be used by the rinexmod function.
@@ -131,6 +134,8 @@ class ModifyGnss(arohdlcls.HandleGnss):
         # if force is True, force the splicing operation
         if force:
             self.force("modify")
+        if reverse_order:
+            self.reverse_table()
 
         # Find the input RINEX files
         # stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)

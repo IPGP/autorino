@@ -1091,6 +1091,7 @@ class StepGnss:
 
         return trsltdict_out
 
+    @staticmethod
     def translate_core(
         self, path_inp, trslt_dic_use, epoch_use, make_dir=False, absolute=False
     ):
@@ -1311,6 +1312,19 @@ class StepGnss:
         self.table["ok_inp"] = self.table["ok_inp"].apply(arocmn.is_ok)
         self.table["ok_out"] = self.table["ok_out"].apply(arocmn.is_ok)
 
+        return None
+
+    def reverse_table(self):
+        """
+        Reverses the order of the rows in the table.
+
+        This method reverses the order of the rows in the table. The first row becomes the last row, and the last row becomes the first row.
+
+        Returns
+        -------
+        None
+        """
+        self.table = self.table.iloc[::-1].reset_index(drop=True)
         return None
 
     def load_tab_datelist(self, dates_list, period="1D"):
