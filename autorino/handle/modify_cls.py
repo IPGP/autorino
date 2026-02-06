@@ -21,16 +21,7 @@ BOLD_END = "\033[0m"
 class ModifyGnss(arohdlcls.HandleGnss):
     def __init__(
         self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        inp_dir=None,
-        inp_file_regex=None,
-        epoch_range=None,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
+        **kwargs
     ):
         """
         Initialize a ModifyGnss object.
@@ -42,39 +33,21 @@ class ModifyGnss(arohdlcls.HandleGnss):
 
         Parameters
         ----------
-        out_dir : str
-            The output directory for the modified RINEX files.
-        tmp_dir : str
-            The temporary directory for intermediate files.
-        log_dir : str
-            The directory for log files.
-        inp_dir : str, optional
-            The input directory for raw files. Default is None.
-        inp_file_regex : str, optional
-            The regular expression for filtering input files. Default is None.
-        epoch_range : EpochRange, optional
-            The range of epochs to be processed. Default is None.
-        site : dict, optional
-            Information about the site. Default is None.
-        session : dict, optional
-            Information about the session. Default is None.
-        options : dict, optional
-            Additional options for the modification operation. Default is None.
-        metadata : dict, optional
-            Metadata for the modification operation. Default is None.
+        **kwargs : keyword arguments
+            Additional keyword arguments passed to the parent HandleGnss class.
+            Common parameters include:
+            - out_dir : str - The output directory for the modified RINEX files.
+            - tmp_dir : str - The temporary directory for intermediate files.
+            - log_dir : str - The directory for log files.
+            - inp_dir : str, optional - The input directory for raw files. Default is None.
+            - inp_file_regex : str, optional - Regular expression pattern for input files.
+            - epoch_range : EpochRange, optional - The range of epochs to be processed. Default is None.
+            - site : dict, optional - Information about the site. Default is None.
+            - session : dict, optional - Information about the session. Default is None.
+            - options : dict, optional - Additional options for the modification operation. Default is None.
+            - metadata : str or list, optional - Metadata for the modification operation. Default is None.
         """
-        super().__init__(
-            out_dir=out_dir,
-            tmp_dir=tmp_dir,
-            log_dir=log_dir,
-            inp_dir=inp_dir,
-            inp_file_regex=inp_file_regex,
-            epoch_range=epoch_range,
-            site=site,
-            session=session,
-            options=options,
-            metadata=metadata,
-        )
+        super().__init__(**kwargs)
 
     def modify(self, verbose=False, force=False, reverse_order=False, rinexmod_options=None):
         """
