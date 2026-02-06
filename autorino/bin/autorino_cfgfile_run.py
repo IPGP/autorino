@@ -68,8 +68,8 @@ def main():
         type=str,
         help="The period for the epoch range i.e. the sampling of the files: "
         "daily = '1D', hourly = '1H', 15 minutes = '15M'. "
-        "Default is '1D'.",
-        default="1D",
+        "Default is None.",
+        default=None,
     )
     parser.add_argument(
         "-si",
