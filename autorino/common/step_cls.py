@@ -301,12 +301,7 @@ class StepGnss:
         else: # partial output cases
             exicod_out = 4 if n_inp_ok == n_total else 3
 
-        if inplace:
-            self.exit_code = exicod_out
-
-        return exicod_out
-
-        # logger.debug("Exit code from table: %s, %s", exicod_out, self)
+        logger.debug("Exit code from table: %s, %s", exicod_out, self)
 
         if inplace:
             self.exit_code = exicod_out
