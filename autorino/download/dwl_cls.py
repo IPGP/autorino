@@ -34,91 +34,42 @@ class DownloadGnss(arocmn.StepGnss):
     Inherits from
     ----------
     arocmn.StepGnss
-
-    Parameters
-    ----------
-    out_dir : str
-        The output directory where the downloaded files will be stored.
-    tmp_dir : str
-        The temporary directory used during the download process.
-    log_dir : str
-        The directory where log files will be stored.
-    epoch_range : EpochRange
-        The range of epochs for which data will be downloaded.
-    access : dict
-        A dictionary containing access information such as protocol, hostname, login, and password.
-    site : dict, optional
-        The site information. Default is None.
-    session : dict, optional
-        The session information. Default is None.
-    options : dict, optional
-        Additional options for the download process. Default is None.
-    metadata : str or list, optional
-        The metadata to be included in the converted RINEX files. Possible inputs are:
-         * list of string (sitelog file paths),
-         * single string (single sitelog file path)
-         * single string (directory containing the sitelogs)
-         * list of MetaData objects
-         * single MetaData object.
-         Defaults to None.
     """
 
     def __init__(
         self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        inp_dir,
-        inp_file_regex,
-        epoch_range,
-        access,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
+        access: dict,
+        **kwargs
     ):
         """
         Initialize the DownloadGnss object.
 
         Parameters
         ----------
-        out_dir : str
-            The output directory where the downloaded files will be stored.
-        tmp_dir : str
-            The temporary directory used during the download process.
-        log_dir : str
-            The directory where log files will be stored.
-        epoch_range : EpochRange
-            The range of epochs for which data will be downloaded.
         access : dict
             A dictionary containing access information such as protocol, hostname, login, and password.
-        site : dict, optional
-            The site information. Default is None.
-        session : dict, optional
-            The session information. Default is None.
-        options : dict, optional
-            Additional options for the download process. Default is None.
-        metadata : str or list, optional
-            The metadata to be included in the converted RINEX files. Possible inputs are:
-             * list of string (sitelog file paths),
-             * single string (single sitelog file path)
-             * single string (directory containing the sitelogs)
-             * list of MetaData objects
-             * single MetaData object.
-             Defaults to None.
+        **kwargs : keyword arguments
+            Additional keyword arguments passed to the parent StepGnss class.
+            Common parameters include:
+            - out_dir : str - The output directory where the downloaded files will be stored.
+            - tmp_dir : str - The temporary directory used during the download process.
+            - log_dir : str - The directory where log files will be stored.
+            - inp_dir : str - The input directory path (remote directory).
+            - inp_file_regex : str - Regular expression pattern for input files.
+            - epoch_range : EpochRange - The range of epochs for which data will be downloaded.
+            - site : dict - The site information. Default is None.
+            - session : dict - The session information. Default is None.
+            - options : dict - Additional options for the download process. Default is None.
+            - metadata : str or list - The metadata to be included in the converted RINEX files.
+              Possible inputs are:
+               * list of string (sitelog file paths),
+               * single string (single sitelog file path)
+               * single string (directory containing the sitelogs)
+               * list of MetaData objects
+               * single MetaData object.
+               Defaults to None.
         """
-        super().__init__(
-            out_dir=out_dir,
-            tmp_dir=tmp_dir,
-            log_dir=log_dir,
-            inp_dir=inp_dir,
-            inp_file_regex=inp_file_regex,
-            epoch_range=epoch_range,
-            site=site,
-            session=session,
-            options=options,
-            metadata=metadata,
-        )
+        super().__init__(**kwargs)
 
         # specific to the DownloadGnss class
         self.access = access

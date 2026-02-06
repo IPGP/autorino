@@ -52,31 +52,6 @@ class StepGnss:
     sites, sessions, options, and metadata. It also provides
     methods for handling temporary directories, logging,
     and table management.
-
-    Attributes
-    ----------
-    out_dir : str
-        The output directory for the step.
-    tmp_dir : str
-        The temporary directory for the step.
-    log_dir : str
-        The log directory for the step.
-    epoch_range : EpochRange
-        The epoch range for the step.
-    site : dict
-        The site information for the step.
-    session : dict
-        The session information for the step.
-    options : dict
-        The options for the step.
-    metadata : str or list, optional
-        The metadata to be included in the converted RINEX files. Possible inputs are:
-         * list of string (sitelog file paths),
-         * single string (single sitelog file path)
-         * single string (directory containing the sitelogs)
-         * list of MetaData objects
-         * single MetaData object.
-         Defaults to None.
     """
 
     def __init__(
