@@ -95,7 +95,12 @@ def convert_rnx(
 
     ###### Convert RAW > RINEX files
     raws_use = inp_raws
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    cnv = arocnv.ConvertGnss(
+        out_dir=out_dir_use,
+        tmp_dir=tmp_dir,
+        log_dir=log_dir,
+        metadata=metadata
+    )
     cnv.load_tab_filelist(raws_use)
     cnv.convert(
         force=force_rnx,
