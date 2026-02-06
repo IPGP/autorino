@@ -386,8 +386,10 @@ def timedelta2freq_alias(timedelta_in):
     https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
     """
     from pandas.tseries.frequencies import to_offset
+
     offset = to_offset(pd.Timedelta(timedelta_in))
     return offset.freqstr
+
 
 def rnx_period2freq_alias(period_inp):
     """
@@ -438,10 +440,11 @@ def rnx_period2freq_alias(period_inp):
     elif period_inp.endswith("Y"):
         return period_inp.replace("Y", "Y")
     else:
-        errmsg = "period_inp {} not understood. Must end with M, H, D or Y".format(period_inp)
+        errmsg = "period_inp {} not understood. Must end with M, H, D or Y".format(
+            period_inp
+        )
         logger.critical(errmsg)
         raise ValueError(errmsg)
-
 
 
 def create_dummy_epochrange():
@@ -475,5 +478,3 @@ def iso_zulu_epoch(epo_in):
         The epoch in ISO 8601 format with Zulu time (UTC).
     """
     return pd.Timestamp(epo_in).isoformat().replace("+00:00", "Z")
-
-
