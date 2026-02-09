@@ -1612,7 +1612,6 @@ class StepGnss:
             If True and out_bis_dir is defined, generates paths for out_bis_dir (fpath_out_bis).
             If False, generates paths for out_dir (fpath_out).
             Default is False.
-            Exclusive OR: treats EITHER out OR out_bis, not both.
 
         Returns
         -------
@@ -1758,6 +1757,8 @@ class StepGnss:
 
     def decompress_table_batch(self, table_col="fpath_inp", table_ok_col="ok_inp"):
         """
+        THIS FUNCTION IS DISCONTINUED IN FAVOR OF THE decompress() FUNCTION
+
         Decompresses the potential compressed files in the specified column of the table.
 
         This method checks if the files specified in the 'table_col' column of the table are compressed.
