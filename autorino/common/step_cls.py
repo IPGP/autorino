@@ -1685,9 +1685,9 @@ class StepGnss:
             local_paths_list.append(local_path_use)
             self.table.loc[irow, "fname"] = local_fname_use
             self.table.loc[irow, "fpath_out"] = local_path_use
-            logger.debug("local file guessed: %s", local_path_use)
+            logger.debug("local file %sed: %s", method, local_path_use)
 
-        logger.info("nbr local raw files guessed: %s", len(local_paths_list))
+        logger.info("nbr local raw files %sed: %s", method, len(local_paths_list))
 
         return local_paths_list
 
