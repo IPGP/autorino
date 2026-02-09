@@ -1631,6 +1631,66 @@ class StepGnss:
 
         return out_paths_list
 
+    def find_local_raw(self, method="ask"):
+        """
+        Find the paths and names of the local raw files based on the specified method.
+
+        Parameters
+        ----------
+        method : str, optional
+            The method to find local files. Can be 'guess' or 'ask'. Default is 'guess'.
+            - 'guess': Guess local file paths based on EpochRange and `inp_file_regex` attributes.
+            - 'ask': Determine local file paths based on the table's `fpath_inp` basename
+                     (theoretical remote file name from `ask_remote_raw` or `guess_remot_raw`).
+
+        Returns
+        -------
+        list
+            A list of local file paths.
+
+        Note
+        ----
+        Merge of 2 previous methods:
+        guess_remot_raw : Method to guess remote file paths.
+        ask_remote_raw : Method to retrieve remote file listing from the server.
+        """
+
+        local_paths_list = []
+
+        if not method in ("ask", "guess"):
+            logger.error("Wrong method: %s ('ask' or 'guess' only are allowed)",method)
+            raise Exception
+
+        local_dir_use = str(self.out_dir)
+
+        for irow, row in self.table.iterrows():
+
+            if method == "ask":
+                local_fname_use = os.path.basename(row["fpath_inp"])
+            elif method == "guess":
+                local_fname_use = str(self.inp_file_regex)
+            else:
+                local_fname_use = ""  # this case should never happen since there is a method test at the begining
+                pass
+
+            local_path_use = os.path.join(local_dir_use, local_fname_use)
+            local_path_use = self.translate_path(
+                local_path_use, row["epoch_srt"], make_dir=False
+            )
+
+            if method == "guess":
+                ## because in "guess" mode, the basic local filename is a regex
+                local_fname_use = os.path.basename(local_path_use)
+
+            local_paths_list.append(local_path_use)
+            self.table.loc[irow, "fname"] = local_fname_use
+            self.table.loc[irow, "fpath_out"] = local_path_use
+            logger.debug("local file guessed: %s", local_path_use)
+
+        logger.info("nbr local raw files guessed: %s", len(local_paths_list))
+
+        return local_paths_list
+
     def check_local_files(self, io="out", bis=False):
         """
         Checks the existence of the output ('out') or input ('inp') local files (for non download cases)
