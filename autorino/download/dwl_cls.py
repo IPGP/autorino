@@ -180,17 +180,18 @@ class DownloadGnss(arocmn.StepGnss):
         # Guess remote raw file paths
         if remote_find_method == "guess":
             self.guess_remot_raw()
-            self.guess_local_raw()
         # Ask remote raw file paths (works for FTP only!
         elif remote_find_method == "ask":
             self.ask_remote_raw()
-            self.ask_local_raw()
         else:
             logger.error(
                 "Wrong remote_find_method: %s ('ask' or 'guess' only are allowed)",
                 remote_find_method,
             )
             raise Exception
+
+        # Guess or ask corresponding local raw file
+        self.find_local_raw(method=remote_find_method)
 
         # Check local files and update table
         self.check_local_files()
@@ -295,7 +296,6 @@ class DownloadGnss(arocmn.StepGnss):
         cache_key = (self.access["protocol"], self.access["hostname"], remote_dir)
         self._remote_listing_cache[cache_key] = file_list
         logger.debug(f"Set cached remote listing for {remote_dir} ({len(file_list)} files)")
-
 
     def guess_remot_raw(self):
         """
@@ -550,6 +550,65 @@ class DownloadGnss(arocmn.StepGnss):
             logger.debug("local file asked: %s", local_path_use)
 
         logger.info("nbr local raw files asked: %s", len(local_paths_list))
+
+        return local_paths_list
+
+    def find_local_raw(self, method="ask"):
+        """
+        Find the paths and names of the local raw files based on the specified method.
+
+        Parameters
+        ----------
+        method : str, optional
+            The method to find local files. Can be 'guess' or 'ask'. Default is 'guess'.
+            - 'guess': Guess local file paths based on EpochRange and `inp_file_regex` attributes.
+            - 'ask': Determine local file paths based on the table's `fpath_inp` basename
+                     (theoretical remote file name from `ask_remote_raw` or `guess_remot_raw`).
+
+        Returns
+        -------
+        list
+            A list of local file paths.
+
+        Note
+        ----
+        Merge of 2 previous methods:
+        guess_remot_raw : Method to guess remote file paths.
+        ask_remote_raw : Method to retrieve remote file listing from the server.
+        """
+
+        local_paths_list = []
+
+        if not method in ("ask", "guess"):
+            logger.error("Wrong method: %s ('ask' or 'guess' only are allowed)",method)
+            raise Exception
+
+        local_dir_use = str(self.out_dir)
+
+        for irow, row in self.table.iterrows():
+
+            if method == "ask":
+                local_fname_use = os.path.basename(row["fpath_inp"])
+            elif method == "guess":
+                local_fname_use = str(self.inp_file_regex)
+            else:
+                local_fname_use = ""  # this case should never happen since there is a method test at the begining
+                pass
+
+            local_path_use = os.path.join(local_dir_use, local_fname_use)
+            local_path_use = self.translate_path(
+                local_path_use, row["epoch_srt"], make_dir=False
+            )
+
+            if method == "guess":
+                local_fname_use = os.path.basename(local_path_use)
+
+            local_paths_list.append(local_path_use)
+            self.table.loc[irow, "fname"] = local_fname_use
+            self.table.loc[irow, "fpath_out"] = local_path_use
+            logger.debug("local file guessed: %s", local_path_use)
+
+        logger.info("nbr local raw files guessed: %s", len(local_paths_list))
 
         return local_paths_list
 
