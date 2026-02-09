@@ -4,6 +4,8 @@
 Created on 21/05/2025 15:18:00
 
 @author: psakic
+
+this is a dirty backup, since now the convert_rnx function is multiprocessing
 """
 
 import os
