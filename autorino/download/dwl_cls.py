@@ -105,6 +105,7 @@ class DownloadGnss(arocmn.StepGnss):
         ping_timeout=20,
         ping_disable=False,
         clear_cache=False,
+        check_out_bis=False
     ):
         """
         Frontend method to download files from a GNSS receiver
@@ -138,6 +139,10 @@ class DownloadGnss(arocmn.StepGnss):
             If True, skips the pinging of the remote server. Default is False.
         clear_cache : bool, optional
             If True, clears the remote listing cache before starting the download. Default is False.
+        check_out_bis : bool, optional
+            If True, performs an additional check on the second output destination (out_bis)
+            if it is defined, and skip the download if the file is already there and valid.
+            Default is False.
 
         Returns
         -------
