@@ -1623,6 +1623,7 @@ class StepGnss:
         # !!!!! THIS METHOD IS REDUNDANT WITH find_local_raw !!!!!
         # !!!!! must be merged with find_local_raw !!!!!!!
 
+        logger.warning("guess_out_files is redundant with find_local_raw, should be merged")
 
         out_paths_list = []
 
