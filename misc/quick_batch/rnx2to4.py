@@ -8,7 +8,7 @@ import hatanaka
 import shutil
 
 sl_dir = "/home/sysop/DonneesTemporaires_GNSS/sitelogs"
-p = "/home/sysop/DonneesTemporaires_GNSS/rinex15m/enriched/"
+p = "/home/sysop/DonneesTemporaires_GNSS/rinex15m/"
 l = utils.find_recursive(p, "*d.gz")
 dir_out_main = "/home/sysop/autorino_workflow/RNX2to4_wrk_tmp"
 dir_out_uncmp =  dir_out_main + "/010_UNCMP"
