@@ -7,10 +7,11 @@ import os
 import hatanaka
 import shutil
 
+gfzrnx = "/opt/softs_gnss/gfzrnx/gfzrnx_latest"
 sl_dir = "/home/sysop/DonneesTemporaires_GNSS/sitelogs"
 p = "/home/sysop/DonneesTemporaires_GNSS/rinex15m/"
-l = utils.find_recursive(p, "*d.gz")
 dir_out_main = "/home/sysop/autorino_workflow/RNX2to4_wrk_tmp"
+
 dir_out_uncmp =  dir_out_main + "/010_UNCMP"
 dir_out_gfzrnx = dir_out_main + "/020_RNX4_gfzrnx"
 dir_out_obsok = dir_out_main + "/030_RNX4_obsOK"
@@ -22,6 +23,8 @@ utils.create_dir(dir_out_uncmp)
 utils.create_dir(dir_out_gfzrnx)
 utils.create_dir(dir_out_obsok)
 utils.create_dir(dir_out_rnxmod)
+
+l = utils.find_recursive(p, "*d.gz")
 
 for f in l:
 
@@ -52,12 +55,11 @@ for f in l:
     if not os.path.exists(f_uncmp):
         shutil.move(f_uncmp0,dir_out_uncmp)
 
-
     bn_rnx3 = conv.statname_dt2rinexname_long(bn[:4],t)
     f_rnx3 = os.path.join(str(dir_out_gfzrnx), str(bn_rnx3))
 
     #### GFZRNX CONVERSION
-    cmd = ["/opt/softs_gnss/gfzrnx/gfzrnx_latest",
+    cmd = [gfzrnx,
              "-finp",
              f_uncmp,
              "-vo 4",
@@ -67,13 +69,19 @@ for f in l:
     print(" ".join(cmd))
     subprocess.call(" ".join(cmd), shell=True)
 
+    if os.path.isfile(f_uncmp):
+        os.remove(f_uncmp)
+
     #### RINEXMOD ADVANCED FOR OBSERVATION MAPPING
     r = RinexFile(f_rnx3)
     r.mod_sys_obs_types(core_fcts.map_sys_obs(r.get_sys_obs_types()[0],
                                               core_fcts.map_sys_obs_dic_default('SEPT POLARX5')))
     r.clean_translation_comments(True, True)
+    r.add_map_sys_obs_comments(core_fcts.map_sys_obs_dic_default('SEPT POLARX5'))
     f_obsok = r.write_to_path(dir_out_obsok)
-    os.remove(f_rnx3)
+
+    if os.path.isfile(f_rnx3):
+        os.remove(f_rnx3)
 
     #### RINEXMOD "CLASSIC"
     sl = utils.find_recursive(sl_dir, bn[:4].lower() + "*" )[0]
