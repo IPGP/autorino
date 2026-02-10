@@ -25,6 +25,7 @@ utils.create_dir(dir_out_obsok)
 utils.create_dir(dir_out_rnxmod)
 
 l = utils.find_recursive(p, "*d.gz")
+l = sorted(l, key=lambda x: int(os.path.basename(x)[4:7]), reverse=True)
 
 for f in l:
 
