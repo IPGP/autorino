@@ -1631,12 +1631,12 @@ class StepGnss:
             fpath_out = self.m_guess_out_fil(irow, bis=bis)
             out_paths_list.append(fpath_out)
 
-        # Check the validity of the output files
+        # Check the exisitence of the output files
         self.check_local_files(io="out", bis=bis)
 
         return out_paths_list
 
-    def find_local_raw(self, method="ask", bis=False):
+    def find_local_raw(self, method="ask", bis=False, check=False):
         """
         Find the paths and names of the local raw files based on the specified method.
 
@@ -1644,11 +1644,15 @@ class StepGnss:
         ----------
         method : str, optional
             The method to find local files. Can be 'guess' or 'ask'. Default is 'guess'.
-            - 'guess': Guess local file paths based on EpochRange and `inp_file_regex` attributes.
             - 'ask': Determine local file paths based on the table's `fpath_inp` basename
-                     (theoretical remote file name from `ask_remote_raw` or `guess_remot_raw`).
+            - 'guess': Guess local file paths based on EpochRange and `inp_file_regex` attributes.
         bis : bool, optional
-            If True, uses out_bis_dir instead of out_dir for guessing
+            If True and out_bis_dir is defined, generates paths for out_bis_dir.
+            If False, generates paths for out_dir.
+            Default is False.
+        check : bool, optional
+            If True, checks the exisitence of the output files after finding local raw files.
+            Default is False.
 
         Returns
         -------
@@ -1673,6 +1677,10 @@ class StepGnss:
             local_paths_list.append(local_path_use)
 
         logger.info("nbr local raw files %sed: %s", method, len(local_paths_list))
+
+        # Check the exisitence of the output files
+        if check:
+            self.check_local_files(io="out", bis=bis)
 
         return local_paths_list
 
