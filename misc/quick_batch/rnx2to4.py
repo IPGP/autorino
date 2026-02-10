@@ -57,7 +57,7 @@ for f in l:
     f_rnx3 = os.path.join(str(dir_out_gfzrnx), str(bn_rnx3))
 
     #### GFZRNX CONVERSION
-    cmd = ["/home/sakic/SOFTWARE/GFZRNX/GFZRNX",
+    cmd = ["/opt/softs_gnss/gfzrnx/gfzrnx_latest",
              "-finp",
              f_uncmp,
              "-vo 4",
