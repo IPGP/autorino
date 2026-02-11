@@ -7,6 +7,8 @@ import os
 import hatanaka
 import shutil
 
+computer = "PitonHutson"
+
 gfzrnx = "/opt/softs_gnss/gfzrnx/gfzrnx_latest"
 sl_dir = "/home/sysop/DonneesTemporaires_GNSS/sitelogs"
 p = "/home/sysop/DonneesTemporaires_GNSS/rinex15m/"
@@ -16,7 +18,8 @@ dir_out_uncmp =  dir_out_main + "/010_UNCMP"
 dir_out_gfzrnx = dir_out_main + "/020_RNX4_gfzrnx"
 dir_out_obsok = dir_out_main + "/030_RNX4_obsOK"
 dir_out_rnxmod = dir_out_main + "/040_RNX4_rinexmoded"
-dir_out_final = dir_out_main + "/050_RNX4_final"
+#dir_out_final = dir_out_main + "/050_RNX4_final"
+dir_out_final = "/home/sysop/DonneesTemporaires_GNSS/RINEX/15M01S/PF"
 
 utils.create_dir(dir_out_main)
 utils.create_dir(dir_out_uncmp)
