@@ -99,5 +99,5 @@ for f in l:
     bn_rnxmoded = os.path.basename(f_rnxmoded)
     utils.create_dir(dir_out_final_doy_site)
     if not os.path.exists(os.path.join(dir_out_final_doy_site, bn_rnxmoded)):
-        os.chmod(f_rnxmoded, 0o644)
+        #os.chmod(f_rnxmoded, 0o644)
         shutil.move(f_rnxmoded, dir_out_final_doy_site)
