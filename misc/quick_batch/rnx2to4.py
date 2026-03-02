@@ -91,6 +91,8 @@ for f in l:
     sl = utils.find_recursive(sl_dir, bn[:4].lower() + "*" )[0]
     f_rnxmoded = rinexmod_main.rinexmod(f_obsok,
                                         dir_out_rnxmod,
+                                        modif_kw={"filename_file_period" : "15M",
+                                                  "filename_data_freq" : "01S"},
                                         sitelog=sl,
                                         remove=True,
                                         verbose=False)
