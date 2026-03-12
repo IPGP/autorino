@@ -31,7 +31,14 @@ dwl.print_table()
 out = "/home/sysop/workflow_tests/convert_tests"
 sitelog_dir = '/home/sysop/metadata/OVPF'
 
-conv = arocnv.ConvertGnss(ses, dwl.epoch_range, out, sitelog_dir)
+conv = arocnv.ConvertGnss(
+    out_dir=out,
+    tmp_dir=out,
+    log_dir=out,
+    epoch_range=dwl.epoch_range,
+    session=ses,
+    metadata=sitelog_dir
+)
 
 conv.load_tab_prev_tab(dwl.table)
 conv.print_table()

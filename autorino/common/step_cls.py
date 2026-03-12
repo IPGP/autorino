@@ -52,31 +52,6 @@ class StepGnss:
     sites, sessions, options, and metadata. It also provides
     methods for handling temporary directories, logging,
     and table management.
-
-    Attributes
-    ----------
-    out_dir : str
-        The output directory for the step.
-    tmp_dir : str
-        The temporary directory for the step.
-    log_dir : str
-        The log directory for the step.
-    epoch_range : EpochRange
-        The epoch range for the step.
-    site : dict
-        The site information for the step.
-    session : dict
-        The session information for the step.
-    options : dict
-        The options for the step.
-    metadata : str or list, optional
-        The metadata to be included in the converted RINEX files. Possible inputs are:
-         * list of string (sitelog file paths),
-         * single string (single sitelog file path)
-         * single string (directory containing the sitelogs)
-         * list of MetaData objects
-         * single MetaData object.
-         Defaults to None.
     """
 
     def __init__(
@@ -132,6 +107,16 @@ class StepGnss:
         self._init_options(options)
         self.site_id = None  # initialized in the next line
         self._init_site_id()
+
+        # Initialize out_bis_dir BEFORE _init_table so table columns can be conditional
+        # Handle out_dir as either a string or a 2-tuple
+        if isinstance(out_dir, (tuple, list)) and len(out_dir) == 2:
+            self._out_dir = out_dir[0]
+            self._out_bis_dir = out_dir[1]
+        else:
+            self._out_dir = out_dir
+            self._out_bis_dir = None
+
         self.table = None  # initialized in the next line
         self._init_table()
         self.translate_dict = None  # initialized in the next line
@@ -140,7 +125,7 @@ class StepGnss:
         ### sitelog init (needs translate dict)
         self._init_metadata(metadata)
 
-        self.out_dir = out_dir
+        # Set directories using setters (translation happens in getters)
         self.tmp_dir = tmp_dir
         self.log_dir = log_dir
         self.inp_dir = inp_dir
@@ -189,6 +174,16 @@ class StepGnss:
         if not value:
             logger.warning("output directory is not defined (%s)", value)
         self._out_dir = value
+
+    @property
+    def out_bis_dir(self):
+        return self.translate_path(self._out_bis_dir) if self._out_bis_dir else None
+
+    @out_bis_dir.setter
+    def out_bis_dir(self, value):
+        if value and not value:  # Only warn if explicitly set to empty string, not None
+            logger.warning("output bis directory is not defined (%s)", value)
+        self._out_bis_dir = value
 
     @property
     def tmp_dir(self):
@@ -306,12 +301,7 @@ class StepGnss:
         else: # partial output cases
             exicod_out = 4 if n_inp_ok == n_total else 3
 
-        if inplace:
-            self.exit_code = exicod_out
-
-        return exicod_out
-
-        # logger.debug("Exit code from table: %s, %s", exicod_out, self)
+        logger.debug("Exit code from table: %s, %s", exicod_out, self)
 
         if inplace:
             self.exit_code = exicod_out
@@ -353,6 +343,12 @@ class StepGnss:
                 "size_out",
                 "note",
             ]
+
+            # Add bis columns only if out_bis_dir is defined
+            if hasattr(self, '_out_bis_dir') and self._out_bis_dir:
+                table_cols.insert(table_cols.index("fpath_inp"), "ok_out_bis")
+                table_cols.insert(table_cols.index("size_inp"), "fpath_out_bis")
+                table_cols.insert(table_cols.index("note"), "size_out_bis")
 
         df = pd.DataFrame([], columns=table_cols)
 
@@ -1558,10 +1554,26 @@ class StepGnss:
         self.table["note"] = "force_" + step_name
         return None
 
-    def guess_local_rnx(self, io="out", shortname=False):
+    def guess_local_rnx(self, io="out", shortname=False, bis=False):
         """
         For a given site name and date in a table, guess the potential local RINEX files
-        and write it as 'fpath_out' value in the table
+        and write it as 'fpath_out' (or 'fpath_out_bis' if bis=True) value in the table
+
+        Parameters
+        ----------
+        io : str, optional
+            Specifies whether to guess the input (`inp`) or output (`out`) file path.
+            Default is `out`.
+        shortname : bool, optional
+            guess RINEX's shortname if True. Default is False.
+        bis : bool, optional
+            If True and io='out', uses out_bis_dir instead of out_dir.
+            Default is False.
+
+        Returns
+        -------
+        list
+            List of guessed local RINEX file paths.
         """
 
         loc_paths_list = []
@@ -1579,54 +1591,100 @@ class StepGnss:
 
         loc_paths_list = []
         for irow, row in self.table.iterrows():
-            loc_path = self.mono_guess_rnx(irow, io=io, shortname=shortname)
+            loc_path = self.m_guess_loc_rnx(irow, io=io, shortname=shortname, bis=bis)
             loc_paths_list.append(loc_path)
 
         logger.info("nbr local RINEX files guessed: %s", len(loc_paths_list))
 
         return loc_paths_list
 
-
-    def guess_out_files(self):
+    def guess_out_files(self, bis=False):
         """
         Generates output file paths for each row in the table and updates the table.
 
         This method iterates over the rows of the table, constructs the output file path
-        for each input file, and updates the `fpath_out` column in the table. It also
-        ensures that the output directory exists and checks the validity of the output files.
+        for each input file, and updates the `fpath_out` or `fpath_out_bis` column in the table.
+        It also ensures that the output directory exists and checks the validity of the output files.
+
+        Parameters
+        ----------
+        bis : bool, optional
+            If True and out_bis_dir is defined, generates paths for out_bis_dir (fpath_out_bis).
+            If False, generates paths for out_dir (fpath_out).
+            Default is False.
 
         Returns
         -------
         list
             A list of output file paths generated for the table rows.
 
-        Notes
-        -----
-        - The output directory is created if it does not exist.
-        - The `check_local_files` method is called to validate the output files.
         """
+
+        # !!!!! THIS METHOD IS REDUNDANT WITH find_local_raw !!!!!
+        # !!!!! must be merged with find_local_raw !!!!!!!
+
+        logger.warning("guess_out_files is redundant with find_local_raw, should be merged")
+
         out_paths_list = []
 
         for irow, row in self.table.iterrows():
-            # Translate the output directory path for the current row and create it if necessary
-            outdir_use = self.translate_path_row(self.out_dir, irow=irow, make_dir=True)
-
-            # Construct the output file path using the input file's base name
-            bnam_inp = os.path.basename(row["fpath_inp"])
-            fpath_out = os.path.join(outdir_use, bnam_inp)
-
-            # Append the output file path to the list
+            fpath_out = self.m_guess_out_fil(irow, bis=bis)
             out_paths_list.append(fpath_out)
 
-        # Update the table with the generated output file path
-        self.table["fpath_out"] = out_paths_list
-
-        # Check the validity of the output files
-        self.check_local_files(io="out")
+        # Check the exisitence of the output files
+        self.check_local_files(io="out", bis=bis)
 
         return out_paths_list
 
-    def check_local_files(self, io="out"):
+    def find_local_raw(self, method="ask", bis=False, check=False):
+        """
+        Find the paths and names of the local raw files based on the specified method.
+
+        Parameters
+        ----------
+        method : str, optional
+            The method to find local files. Can be 'guess' or 'ask'. Default is 'guess'.
+            - 'ask': Determine local file paths based on the table's `fpath_inp` basename
+            - 'guess': Guess local file paths based on EpochRange and `inp_file_regex` attributes.
+        bis : bool, optional
+            If True and out_bis_dir is defined, generates paths for out_bis_dir.
+            If False, generates paths for out_dir.
+            Default is False.
+        check : bool, optional
+            If True, checks the exisitence of the output files after finding local raw files.
+            Default is False.
+
+        Returns
+        -------
+        list
+            A list of local file paths.
+
+        Note
+        ----
+        Merge of 2 previous methods:
+        guess_remot_raw : Method to guess remote file paths.
+        ask_remote_raw : Method to retrieve remote file listing from the server.
+        """
+
+        local_paths_list = []
+
+        if not method in ("ask", "guess"):
+            logger.error("Wrong method: %s ('ask' or 'guess' only are allowed)",method)
+            raise Exception
+
+        for irow, row in self.table.iterrows():
+            local_path_use = self.m_find_loc_raw(irow, method=method, bis=bis)
+            local_paths_list.append(local_path_use)
+
+        logger.info("nbr local raw files %sed: %s", method, len(local_paths_list))
+
+        # Check the exisitence of the output files
+        if check:
+            self.check_local_files(io="out", bis=bis)
+
+        return local_paths_list
+
+    def check_local_files(self, io="out", bis=False):
         """
         Checks the existence of the output ('out') or input ('inp') local files (for non download cases)
         and updates the corresponding booleans in the 'ok_out' or 'ok_inp' column of the table.
@@ -1646,6 +1704,8 @@ class StepGnss:
         ----------
         io : str, optional
             The input/output direction to check. Default is 'out'.
+        bis : bool, optional
+            If True and io='out', uses out_bis_dir instead of out_dir.
 
         Returns
         -------
@@ -1660,7 +1720,7 @@ class StepGnss:
             raise Exception
 
         for irow, row in self.table.iterrows():
-            loc_file_out = self.mono_chk_local(irow, io=io)
+            loc_file_out = self.m_chk_loc_file(irow, io=io, bis=bis)
             if loc_file_out:
                 local_files_list.append(loc_file_out)
 
@@ -1750,6 +1810,8 @@ class StepGnss:
 
     def decompress_table_batch(self, table_col="fpath_inp", table_ok_col="ok_inp"):
         """
+        THIS FUNCTION IS DISCONTINUED IN FAVOR OF THE decompress() FUNCTION
+
         Decompresses the potential compressed files in the specified column of the table.
 
         This method checks if the files specified in the 'table_col' column of the table are compressed.
@@ -2781,7 +2843,7 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
-    def mono_guess_rnx(self, irow, io="out", shortname=False):
+    def m_guess_loc_rnx(self, irow, io="out", shortname=False, bis=False):
         """
         Guesses the local RINEX file path for a given row in the table.
 
@@ -2798,6 +2860,9 @@ class StepGnss:
             Default is `out`.
         shortname : bool, optional
             guess RINEX's shortname if True
+            Default is False.
+        bis : bool, optional
+            If True and io='out', uses out_bis_dir instead of out_dir.
             Default is False.
 
         Returns
@@ -2822,7 +2887,13 @@ class StepGnss:
             logging.error("io must be 'inp' or 'out'")
             raise Exception
 
-        loc_dir = str(self.out_dir if io == "out" else self.inp_dir)
+        # Handle bis directory for output
+        if io == "out" and bis:
+            loc_dir = str(self.out_bis_dir) if self.out_bis_dir else str(self.out_dir)
+            col_suffix = "_bis"
+        else:
+            loc_dir = str(self.out_dir if io == "out" else self.inp_dir)
+            col_suffix = ""
 
         # Retrieve the start and end epochs for the specified row
         epo_srt = self.table.loc[irow, "epoch_srt"].to_pydatetime()
@@ -2857,12 +2928,128 @@ class StepGnss:
         loc_fname = os.path.basename(loc_path)
 
         # Update the table with the guessed file path
-        self.table.loc[irow, "fpath_" + io] = loc_path
+        self.table.loc[irow, "fpath_" + io + col_suffix] = loc_path
         logger.debug("local RINEX file guessed: %s", loc_path)
 
         return loc_path
 
-    def mono_chk_local(self, irow, io="out"):
+    def m_guess_out_fil(self, irow, bis=False):
+        """
+        Guesses the output file path for a given row in the table.
+
+        This method constructs the output file path based on the input file basename
+        for a specific row in the table. It supports both standard output (`out`)
+        and bis output (`out_bis`) modes.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table for which the output file path is to be guessed.
+        bis : bool, optional
+            If True and io='out', uses out_bis_dir instead of out_dir.
+            Default is False.
+
+        Returns
+        -------
+        str
+            The guessed output file path.
+
+        Raises
+        ------
+        Exception
+            If the `io` parameter is not 'out'.
+
+        Notes
+        -----
+        - The guessed file path is stored in the `fpath_out` or `fpath_out_bis` column of the table.
+        - The output directory is created if it does not exist.
+        """
+
+        # Determine directory and column suffix
+        if bis:
+            out_dir_use = self.out_bis_dir if self.out_bis_dir else self.out_dir
+            col_suffix = "_bis"
+        else:
+            out_dir_use = self.out_dir
+            col_suffix = ""
+
+        out_dir_use = str(out_dir_use)
+
+        # Translate the output directory path for the current row and create it if necessary
+        out_dir_trslt = self.translate_path_row(out_dir_use, irow=irow, make_dir=True)
+
+        # Construct the output file path using the input file's base name
+        bnam_inp = os.path.basename(self.table.loc[irow, "fpath_inp"])
+        fpath_out = os.path.join(out_dir_trslt, bnam_inp)
+
+        # Update the table with the guessed file path
+        self.table.loc[irow, "fpath_out" + col_suffix] = fpath_out
+        logger.debug("output file guessed: %s", fpath_out)
+
+        return fpath_out
+
+    def m_find_loc_raw(self, irow, method="ask", bis=False):
+        """
+        Finds the local file path for a given row in the table based on the specified method.
+
+        This method determines the local file path for a specific row in the table. It supports two methods:
+        'ask' and 'guess'. Based on the method, it either retrieves the file name from the table or generates
+        a file name using a regex pattern. The method also supports handling an alternate output directory
+        if the `bis` parameter is set to True.
+
+        Parameters
+        ----------
+        irow : int
+            The index of the row in the table for which the local file path is to be determined.
+        method : str, optional
+            The method to use for determining the file path. Can be either 'ask' or 'guess'.
+            Default is 'ask'.
+        bis : bool, optional
+            If True, uses the alternate output directory (`out_bis_dir`) instead of the standard
+            output directory (`out_dir`). Default is False.
+
+        Returns
+        -------
+        str
+            The determined local file path.
+
+        Raises
+        ------
+        Exception
+            If the `method` parameter is not 'ask' or 'guess'.
+        """
+        # Determine directory and column suffix
+        if bis:
+            out_dir_use = self.out_bis_dir if self.out_bis_dir else self.out_dir
+            col_suffix = "_bis"
+        else:
+            out_dir_use = self.out_dir
+            col_suffix = ""
+
+        out_dir_use = str(out_dir_use)
+
+        if method == "ask":
+            local_fname_use = os.path.basename(self.table.loc[irow,"fpath_inp"])
+        elif method == "guess":
+            local_fname_use = str(self.inp_file_regex)
+        else:
+            local_fname_use = ""  # this case should never happen since there is a method test at the begining
+            pass
+
+        local_path_use = os.path.join(out_dir_use, local_fname_use)
+        local_path_use = self.translate_path_row(local_path_use, irow, make_dir=False)
+
+        if method == "guess":
+            ## because in guess mode, the basic local filename is a generic regex
+            local_fname_use = os.path.basename(local_path_use)
+
+        self.table.loc[irow, "fname"] = local_fname_use
+        self.table.loc[irow, "fpath_out" + col_suffix] = local_path_use
+        logger.debug("local file %sed: %s", method, local_path_use)
+
+        return local_path_use
+
+    def m_chk_loc_file(self, irow, io="out", bis=False):
         """
         Checks the existence and validity of a local file for a specific row in the table.
 
@@ -2878,6 +3065,7 @@ class StepGnss:
             Specifies whether to check the input (`inp`) or output (`out`) file path.
             Default is `out`.
 
+
         Returns
         -------
         str or None
@@ -2890,19 +3078,23 @@ class StepGnss:
           with the file size.
         - If the file does not exist or is empty, the method sets `ok_<io>` to False and `size_<io>` to NaN.
         """
-        loc_file = self.table.loc[irow, "fpath_" + io]
+
+        b = "_bis" if bis else ""
+        io_use = io + b if io == "out" else io
+
+        loc_file = self.table.loc[irow, "fpath_" + io_use]
         if isinstance(loc_file, float) and np.isnan(loc_file):
             ### if not initialized, value is NaN (and then a float)
-            self.table.loc[irow, "ok_" + io] = False
+            self.table.loc[irow, "ok_" + io_use] = False
             loc_file_out = None
         else:
             loc_file_abs = os.path.abspath(loc_file)
             if os.path.exists(loc_file_abs) and os.path.getsize(loc_file_abs) > 0:
-                self.table.loc[irow, "ok_" + io] = True
-                self.table.loc[irow, "size_" + io] = os.path.getsize(loc_file_abs)
+                self.table.loc[irow, "ok_" + io_use] = True
+                self.table.loc[irow, "size_" + io_use] = os.path.getsize(loc_file_abs)
                 loc_file_out = loc_file_abs
             else:
-                self.table.loc[irow, "ok_" + io] = False
-                self.table.loc[irow, "size_" + io] = np.nan
+                self.table.loc[irow, "ok_" + io_use] = False
+                self.table.loc[irow, "size_" + io_use] = np.nan
                 loc_file_out = None
         return loc_file_out

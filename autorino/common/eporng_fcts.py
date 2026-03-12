@@ -5,13 +5,13 @@ Created on Mon Jan  8 15:47:58 2024
 
 @author: psakic
 """
-
 import logging
 import re
 
 import dateparser
 import numpy as np
 import pandas as pd
+from pandas.tseries.frequencies import to_offset
 import datetime as dt
 
 import autorino.common as arocmn
@@ -23,22 +23,15 @@ logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 def epoch_range_intrpt(epo_inp):
     """
-    This function interprets an input to get an output EpochRange object.
-    The input can either be a 3-tuple, a 2-tuple, or an EpochRange object.
-    or an instance of the EpochRange class.
-    If the input is an EpochRange object, it is returned as is.
-    If the input is a tuple, a new EpochRange object
-    is created using the elements of the tuple.
-    A 3-tuple has the form of (epo1, epo2, period),
-    A 2-tuple has the form of (epo1, epo2) and the period is set to default.
-
+    This function interprets an input to get an output EpochRange object. The input can either be a tuple,
+    typically in the form of (epo1, epo2, period), or an instance of the EpochRange class. If the input is
+    an EpochRange object, it is returned as is. If the input is a tuple, a new EpochRange object is created
+    using the elements of the tuple.
 
     Parameters
     ----------
     epo_inp : tuple or EpochRange
-        The input to be interpreted.
-        If it's a tuple, it should be in
-        the form of (epo1, epo2, period).
+        The input to be interpreted. If it's a tuple, it should be in the form of (epo1, epo2, period).
 
     Returns
     -------
@@ -114,9 +107,7 @@ def datepars_intrpt(date_inp, tz=None, tz_if_naive="UTC"):
         return date_out
     ### if the date is timezone-naive, apply the tz_if_naive
     if not date_out.tz:
-        logger.warning(
-            "date %s is timezone-naive. Applying tz %s", date_out, tz_if_naive
-        )
+        logger.warning("date %s is timezone-naive. Applying tz %s", date_out, tz_if_naive)
         date_out = pd.Timestamp(date_out, tz=tz_if_naive)
     ### apply the tz
     if tz:
@@ -168,80 +159,6 @@ def dates_list2epoch_range(dates_list_inp, period=None, round_method="floor"):
     return epo_out
 
 
-def round_date_legacy(date_in, period, round_method="floor"):
-    """
-    low-level function to round a Pandas Serie or a datetime-like object
-    according to the "ceil", "floor", "round", "none" approach
-
-    Parameters
-    ----------
-    date_in : Pandas Serie or a datetime-like object
-        Input date .
-    period : str, optional
-        the rounding period.
-        Use the pandas' frequency aliases convention (see bellow for details).
-    round_method : str, optional
-        round method: 'ceil', 'floor', 'round', 'none'. The default is "floor".
-
-    Returns
-    -------
-    date_out : Pandas Serie or datetime-like object (same as input)
-        rounded date.
-
-    Note
-    ----
-    Pandas' frequency aliases memo
-    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
-
-    """
-
-    # we separate the Series case of the simple datetime-like
-    # both for ease and performance reason
-
-    if pd.isna(date_in):  ### NaT case
-        date_out = date_in
-    elif isinstance(date_in, pd.Series):
-        date_use = date_in
-
-        if round_method == "ceil":
-            date_out = date_use.dt.ceil(period)
-        elif round_method == "floor":
-            date_out = date_use.dt.floor(period)
-        elif round_method == "round":
-            date_out = date_use.dt.round(period)
-        elif round_method == "none":
-            date_out = date_use
-        else:
-            logger.critical("round_method not understood")
-            raise Exception
-    else:
-        date_typ = type(date_in)
-        if date_typ in (pd.Timedelta,):
-            date_use = pd.Timedelta(date_in)
-        else:
-            date_use = pd.Timestamp(date_in)
-
-        if round_method == "ceil":
-            date_out = date_use.ceil(period)
-        elif round_method == "floor":
-            date_out = date_use.floor(period)
-        elif round_method == "round":
-            date_out = date_use.round(period)
-        elif round_method == "none":
-            date_out = date_use
-        else:
-            logger.critical("round_method not understood")
-            raise Exception
-
-        # ++++ back to the original type
-        if date_typ in (dt.datetime,):
-            date_out = date_out.to_pydatetime()
-        else:
-            date_out = date_typ(date_out)
-
-    return date_out
-
-
 def round_date(date_in, period, round_method="floor"):
     """
     low-level function to round a Pandas Serie or a datetime-like object
@@ -278,21 +195,11 @@ def round_date(date_in, period, round_method="floor"):
         return getattr(date_in.dt, round_method)(period)
 
     # ++++ Singleton case
-    date_use = (
-        pd.Timedelta(date_in)
-        if isinstance(date_in, pd.Timedelta)
-        else pd.Timestamp(date_in)
-    )
-    date_out = (
-        getattr(date_use, round_method)(period) if round_method != "none" else date_use
-    )
+    date_use = pd.Timedelta(date_in) if isinstance(date_in, pd.Timedelta) else pd.Timestamp(date_in)
+    date_out = getattr(date_use, round_method)(period) if round_method != "none" else date_use
 
     # ++++ back to the original type
-    date_out = (
-        date_out.to_pydatetime()
-        if isinstance(date_in, dt.datetime)
-        else type(date_in)(date_out)
-    )
+    date_out = date_out.to_pydatetime() if isinstance(date_in, dt.datetime) else type(date_in)(date_out)
 
     return date_out
 
@@ -385,66 +292,9 @@ def timedelta2freq_alias(timedelta_in):
     Pandas' frequency aliases memo
     https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases
     """
-    from pandas.tseries.frequencies import to_offset
 
     offset = to_offset(pd.Timedelta(timedelta_in))
     return offset.freqstr
-
-
-def rnx_period2freq_alias(period_inp):
-    """
-    Converts a RINEX period string to a Pandas frequency alias.
-
-    This function takes a period string commonly used in RINEX files
-    (e.g., '15M', '1H', '1D', '1Y') and converts it into a Pandas frequency alias
-    (e.g., '15min', '1h', '1d', '1y').
-
-    Parameters
-    ----------
-    period_inp : str
-        The input period string. It must end with one of the following:
-        - 'M' for minutes
-        - 'H' for hours
-        - 'D' for days
-        - 'Y' for years
-
-    Returns
-    -------
-    str
-        The corresponding Pandas frequency alias.
-
-    Raises
-    ------
-    ValueError
-        If the input string does not end with 'M', 'H', 'D', or 'Y'.
-
-    Examples
-    --------
-    >>> rnx_period2freq_alias("15M")
-    '15min'
-    >>> rnx_period2freq_alias("1H")
-    '1h'
-    >>> rnx_period2freq_alias("1D")
-    '1d'
-    >>> rnx_period2freq_alias("1Y")
-    '1y'
-    >>> rnx_period2freq_alias("10U")
-    ValueError: period_inp 10X not understood. Must end with M, H, D or Y
-    """
-    if period_inp.endswith("M"):
-        return period_inp.replace("M", "min")
-    elif period_inp.endswith("H"):
-        return period_inp.replace("H", "h")
-    elif period_inp.endswith("D"):
-        return period_inp.replace("D", "d")
-    elif period_inp.endswith("Y"):
-        return period_inp.replace("Y", "Y")
-    else:
-        errmsg = "period_inp {} not understood. Must end with M, H, D or Y".format(
-            period_inp
-        )
-        logger.critical(errmsg)
-        raise ValueError(errmsg)
 
 
 def create_dummy_epochrange():

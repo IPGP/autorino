@@ -28,95 +28,44 @@ BOLD_END = "\033[0m"
 
 class ConvertGnss(arocmn.StepGnss):
     """
-    A class used to represent the GNSS conversion process.
+    A class to handle the conversion of GNSS data.
 
-    This class inherits from the StepGnss class
-    and is used to handle the conversion of GNSS data.
-
-    Attributes
+    Inherits from
     ----------
-    out_dir : str
-        The directory where the output of the conversion should be stored.
-    tmp_dir : str
-        The directory where temporary files during the conversion process should be stored.
-    log_dir : str
-        The directory where log files should be stored.
-    epoch_range : tuple, optional
-        A tuple containing the start and end epochs for the conversion process.
-    site : str, optional
-        The site for which the conversion process should be performed.
-    session : str, optional
-        The session for which the conversion process should be performed.
-    options : dict, optional
-        A dictionary containing any additional options for the conversion process.
-    metadata : str or list, optional
-        The metadata to be included in the converted RINEX files
-        Possible inputs are:
-        * list of string (sitelog file paths),
-        * single string (single sitelog file path)
-        * single string (directory containing the sitelogs)
-        * list of MetaData objects
-        * single MetaData object
-
-    Methods
-    -------
-    __init__(self, out_dir, tmp_dir, log_dir, epoch_range_inp=None, site=None, session=None, options=None, metadata=None)
-        Initializes the ConvertGnss class with the specified parameters.
+    arocmn.StepGnss
     """
 
     def __init__(
         self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        inp_dir=None,
-        inp_file_regex=None,
-        epoch_range=None,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
+        **kwargs
     ):
         """
         Initializes the ConvertGnss class with the specified parameters.
 
         Parameters
         ----------
-        out_dir : str
-            The directory where the output of the conversion should be stored.
-        tmp_dir : str
-            The directory where temporary files during the conversion process should be stored.
-        log_dir : str
-            The directory where log files should be stored.
-        epoch_range : tuple, optional
-            A tuple containing the start and end epochs for the conversion process.
-        site : str, optional
-            The site for which the conversion process should be performed.
-        session : str, optional
-            The session for which the conversion process should be performed.
-        options : dict, optional
-            A dictionary containing any additional options for the conversion process.
-        metadata : str or list, optional
-            The metadata to be included in the converted RINEX files
-            Possible inputs are:
-            * list of string (sitelog file paths),
-            * single string (single sitelog file path)
-            * single string (directory containing the sitelogs)
-            * list of MetaData objects
-            * single MetaData object
+        **kwargs : keyword arguments
+            Additional keyword arguments passed to the parent StepGnss class.
+            Common parameters include:
+            - out_dir : str - The directory where the output of the conversion should be stored.
+            - tmp_dir : str - The directory where temporary files during the conversion process should be stored.
+            - log_dir : str - The directory where log files should be stored.
+            - inp_dir : str, optional - The input directory path.
+            - inp_file_regex : str, optional - Regular expression pattern for input files.
+            - epoch_range : EpochRange, optional - A tuple containing the start and end epochs for the conversion process.
+            - site : dict, optional - The site for which the conversion process should be performed.
+            - session : dict, optional - The session for which the conversion process should be performed.
+            - options : dict, optional - A dictionary containing any additional options for the conversion process.
+            - metadata : str or list, optional - The metadata to be included in the converted RINEX files.
+              Possible inputs are:
+               * list of string (sitelog file paths),
+               * single string (single sitelog file path)
+               * single string (directory containing the sitelogs)
+               * list of MetaData objects
+               * single MetaData object.
+               Defaults to None.
         """
-        super().__init__(
-            out_dir=out_dir,
-            tmp_dir=tmp_dir,
-            log_dir=log_dir,
-            inp_dir=inp_dir,
-            inp_file_regex=inp_file_regex,
-            epoch_range=epoch_range,
-            site=site,
-            session=session,
-            options=options,
-            metadata=metadata,
-        )
+        super().__init__(**kwargs)
 
     ###############################################
 

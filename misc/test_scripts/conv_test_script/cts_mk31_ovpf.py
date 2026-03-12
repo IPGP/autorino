@@ -27,8 +27,12 @@ nyear = 5
 
 psitelogs = "/work/metadata/SITELOGS"
 
-CONV = arcv.ConvertGnss(pout, pout, pout,
-                        metadata=psitelogs)
+CONV = arcv.ConvertGnss(
+    out_dir=pout,
+    tmp_dir=pout,
+    log_dir=pout,
+    metadata=psitelogs
+)
 
 
 

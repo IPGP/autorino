@@ -30,11 +30,14 @@ EPOC = REQ.epoch_range
 pout = "/home/sakic/020_TEMP/convcls_test"
 psitelogs = "/work/metadata/SITELOGS"
 
-CONV = arcv.ConvertGnss(SES,
-                        EPOC,
-                        pout,
-                        pout,
-                        psitelogs)
+CONV = arcv.ConvertGnss(
+    out_dir=pout,
+    tmp_dir=pout,
+    log_dir=pout,
+    epoch_range=EPOC,
+    session=SES,
+    metadata=psitelogs
+)
 
 
 flist = "/home/sakic/020_TEMP/Raw_all_MQ_mk01a.list"
