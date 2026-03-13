@@ -16,9 +16,9 @@ import pwd
 import grp
 
 ### new rinexmod v4 import
-# import rinexmod.api as rimo_api
+import rinexmod.api as rimo_api
 ### old rinexmod import
-from rinexmod import rinexmod_api as rimo_api
+#from rinexmod import rinexmod_api as rimo_api
 
 #### Import the logger
 import logging
@@ -112,7 +112,7 @@ def site_search_from_list(fraw_inp, site_list_inp):
     return site_out
 
 
-def select_conv_odd_file(fraw_inp, ext_excluded=None):
+def slct_conv_odd_f(fraw_inp, ext_excluded=None):
     """
     Identifies the right converter for a raw file with an unconventional extension, or excludes the file
     if its extension matches an excluded one.
@@ -129,7 +129,7 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
         The name of the raw file with an unconventional extension.
     ext_excluded : list, optional
         A list of file extensions to be excluded. If a file's extension matches one in this list, the file is skipped.
-        Default is [".TG!$", ".DAT", ".Z", ".BCK", "^.[0-9]{3}$", ".A$", "Trimble", ".ORIG"].
+        Default is [".TG!$", ".DAT", ".Z", ".BCK", "^.[0-9]{3}$", "Trimble", ".ORIG"].
 
     Returns
     -------
@@ -147,7 +147,7 @@ def select_conv_odd_file(fraw_inp, ext_excluded=None):
             ".Z",
             ".BCK",
             "^.[0-9]{3}$",
-            ".A$",
+            #".A$", # allowed .A files allowed as Septentrio
             "Trimble",
             ".ORIG",
         ]

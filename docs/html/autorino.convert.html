@@ -1838,7 +1838,7 @@ It also returns the date as a Python datetime object.</p>
 Find the correct RAW &gt; RINEX converter and gives its corresponding attributes</p>
 <p>Returns directly those attributes based on <cite>converter_inp</cite> keyword,
 or can do a basic research based on the RAW file extension</p>
-<p>See also autorino.conv_fcts.select_conv_odd_file
+<p>See also autorino.conv_fcts.slct_conv_odd_f
 for the converter selection of oddly named files</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2015,8 +2015,8 @@ username and the current group’s name.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="autorino.convert.cnv_fcts.select_conv_odd_file">
-<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_fcts.</span></span><span class="sig-name descname"><span class="pre">select_conv_odd_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraw_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_excluded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_fcts.html#select_conv_odd_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_fcts.select_conv_odd_file" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.convert.cnv_fcts.slct_conv_odd_f">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_fcts.</span></span><span class="sig-name descname"><span class="pre">slct_conv_odd_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraw_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_excluded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_fcts.html#slct_conv_odd_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_fcts.slct_conv_odd_f" title="Link to this definition"></a></dt>
 <dd><p>Identifies the right converter for a raw file with an unconventional extension, or excludes the file
 if its extension matches an excluded one.</p>
 <p>This function performs a high-level case matching to determine the appropriate converter for a raw file.

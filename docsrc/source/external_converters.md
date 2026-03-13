@@ -92,8 +92,12 @@ You might also need RINEX handeling software:
 * [GFZRNX](https://www.gfz-potsdam.de/en/section/global-geodetic-observation-and-modelling/software/gfzrinex/)
 * IGN's _converto_
 
-NB: GFZRNX usage is **not allowed** in _routine mode_ without a **proper commercial license**. Be sure to comply with it.
-**The authors of _autorino_ are not responsible for any misuse of GFZRNX without license**.
+```{eval-rst}
+.. important::
+   GFZRNX usage is **not allowed** in *routine mode* without a **proper commercial license**. Be sure to comply with it.  
+
+   **The authors of autorino are not responsible for any misuse of GFZRNX without license**.
+```
 
 ### A recommended receipe for setting up the external utilities
 

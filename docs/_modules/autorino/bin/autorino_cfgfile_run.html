@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.bin.autorino_cfgfile_run &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -80,13 +81,14 @@
            <div itemprop="articleBody">
              
   <h1>Source code for autorino.bin.autorino_cfgfile_run</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">autorino.api</span> <span class="k">as</span> <span class="nn">aroapi</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroapi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 
 
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../../autorino.bin.html#autorino.bin.autorino_cfgfile_run.main">[docs]</a>
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="c1">##### Parsing Args</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Assisted Unloading, Treatment and Organization of RINEX observations&quot;</span><span class="p">,</span>
@@ -214,7 +216,7 @@
     <span class="n">exclude_steps</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">exclude_steps</span>
     <span class="n">force</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">force</span>
 
-    <span class="n">aroapi</span><span class="o">.</span><span class="n">cfgfile_run</span><span class="p">(</span>
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">aroapi</span><span class="o">.</span><span class="n">cfgfile_run</span><span class="p">(</span>
         <span class="n">cfg_in</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
         <span class="n">incl_cfg_in</span><span class="o">=</span><span class="n">include_config</span><span class="p">,</span>
         <span class="n">sites_list</span><span class="o">=</span><span class="n">sites_list</span><span class="p">,</span>
@@ -225,7 +227,9 @@
         <span class="n">steps_list</span><span class="o">=</span><span class="n">steps_list</span><span class="p">,</span>
         <span class="n">exclude_steps</span><span class="o">=</span><span class="n">exclude_steps</span><span class="p">,</span>
         <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
+
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span></div>
 
 
 

@@ -3,8 +3,8 @@ autorino package
 
 .. automodule:: autorino
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Subpackages
 -----------

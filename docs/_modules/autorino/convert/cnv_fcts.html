@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.convert.cnv_fcts &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -88,23 +89,24 @@
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">dateutil</span>
-<span class="kn">import</span> <span class="nn">docker</span>
-<span class="kn">import</span> <span class="nn">pwd</span>
-<span class="kn">import</span> <span class="nn">grp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dateutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">docker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pwd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">grp</span>
 
 <span class="c1">### new rinexmod v4 import</span>
 <span class="c1"># import rinexmod.api as rimo_api</span>
 <span class="c1">### old rinexmod import</span>
-<span class="kn">from</span> <span class="nn">rinexmod</span> <span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rinexmod</span><span class="w"> </span><span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
 
 <span class="c1">#### Import the logger</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.convert</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocnv</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
@@ -112,7 +114,7 @@
 
 <div class="viewcode-block" id="site_list_from_metadata">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.site_list_from_metadata">[docs]</a>
-<span class="k">def</span> <span class="nf">site_list_from_metadata</span><span class="p">(</span><span class="n">metadata_inp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">site_list_from_metadata</span><span class="p">(</span><span class="n">metadata_inp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts a list of site IDs from the provided metadata.</span>
 
@@ -160,7 +162,7 @@
 
 <div class="viewcode-block" id="site_search_from_list">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.site_search_from_list">[docs]</a>
-<span class="k">def</span> <span class="nf">site_search_from_list</span><span class="p">(</span><span class="n">fraw_inp</span><span class="p">,</span> <span class="n">site_list_inp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">site_search_from_list</span><span class="p">(</span><span class="n">fraw_inp</span><span class="p">,</span> <span class="n">site_list_inp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Searches for the correct site name of a raw file from a list of correct site names.</span>
 
@@ -199,9 +201,9 @@
 
 
 
-<div class="viewcode-block" id="select_conv_odd_file">
-<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.select_conv_odd_file">[docs]</a>
-<span class="k">def</span> <span class="nf">select_conv_odd_file</span><span class="p">(</span><span class="n">fraw_inp</span><span class="p">,</span> <span class="n">ext_excluded</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="slct_conv_odd_f">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.slct_conv_odd_f">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">slct_conv_odd_f</span><span class="p">(</span><span class="n">fraw_inp</span><span class="p">,</span> <span class="n">ext_excluded</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Identifies the right converter for a raw file with an unconventional extension, or excludes the file</span>
 <span class="sd">    if its extension matches an excluded one.</span>
@@ -264,7 +266,7 @@
 
 <div class="viewcode-block" id="stop_old_docker">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.stop_old_docker">[docs]</a>
-<span class="k">def</span> <span class="nf">stop_old_docker</span><span class="p">(</span><span class="n">max_running_time</span><span class="o">=</span><span class="mi">120</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">stop_old_docker</span><span class="p">(</span><span class="n">max_running_time</span><span class="o">=</span><span class="mi">120</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stops Docker containers that have been running for a specified amount of time.</span>
 
@@ -317,7 +319,7 @@
 
 <div class="viewcode-block" id="get_current_user_grp">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.get_current_user_grp">[docs]</a>
-<span class="k">def</span> <span class="nf">get_current_user_grp</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_current_user_grp</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the current user and group names.</span>
 
@@ -339,7 +341,7 @@
 
 <div class="viewcode-block" id="get_owner">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.get_owner">[docs]</a>
-<span class="k">def</span> <span class="nf">get_owner</span><span class="p">(</span><span class="n">file_inp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_owner</span><span class="p">(</span><span class="n">file_inp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the owner of the specified file.</span>
 
@@ -375,7 +377,7 @@
 
 <div class="viewcode-block" id="change_owner">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.change_owner">[docs]</a>
-<span class="k">def</span> <span class="nf">change_owner</span><span class="p">(</span><span class="n">file_inp</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_owner</span><span class="p">(</span><span class="n">file_inp</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">group</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Changes the ownership of the specified file to the given user and group.</span>
 
@@ -410,6 +412,54 @@
                 <span class="sa">f</span><span class="s2">&quot;Unable to change owner </span><span class="si">{</span><span class="n">user_ini</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">group_ini</span><span class="si">}</span><span class="s2"> &gt; </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
     <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="prep_rgx_custom">
+<a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_fcts.prep_rgx_custom">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prep_rgx_custom</span><span class="p">(</span><span class="n">conv_regex_custom_main_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conv_regex_custom_annex_inp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepares a custom regex function to catch converted files based on provided main and annex regex patterns.</span>
+<span class="sd">    This function checks if both main and annex custom regex patterns are provided.</span>
+<span class="sd">    If both are provided, it returns a function that always returns the tuple of these patterns.</span>
+<span class="sd">    If only one or neither is</span>
+<span class="sd">    provided, it logs a warning and returns None.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    conv_regex_custom_main_inp : str or None</span>
+<span class="sd">        Custom regex pattern for the main converted file.</span>
+<span class="sd">    conv_regex_custom_annex_inp : str or None</span>
+<span class="sd">        Custom regex pattern for the annex converted file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    function or None</span>
+<span class="sd">        A function that returns a tuple of the provided regex patterns if both are provided,</span>
+<span class="sd">        otherwise None.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">conv_regex_custom_main_inp</span> <span class="ow">and</span> <span class="n">conv_regex_custom_annex_inp</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;main&amp;annex custom regex for converted file provided: </span><span class="si">%s</span><span class="s2"> / </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">conv_regex_custom_main_inp</span><span class="p">,</span>
+            <span class="n">conv_regex_custom_annex_inp</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">conv_regex_custom_tup</span> <span class="o">=</span> <span class="p">(</span><span class="n">conv_regex_custom_main_inp</span><span class="p">,</span> <span class="n">conv_regex_custom_annex_inp</span><span class="p">)</span>
+        <span class="c1"># here, conv_regex_fct_use, is the *function* itself (not the fonction return), then a lambda</span>
+        <span class="n">conv_regex_fct_out</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">arocnv</span><span class="o">.</span><span class="n">conv_regex_custom</span><span class="p">(</span><span class="n">conv_regex_custom_tup</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">conv_regex_custom_main_inp</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">conv_regex_custom_annex_inp</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Error: both main&amp;annex custom regex for converted file must be provided: </span><span class="si">%s</span><span class="s2"> &amp; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">conv_regex_custom_main_inp</span><span class="p">,</span>
+            <span class="n">conv_regex_custom_annex_inp</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No custom regex will be used.&quot;</span><span class="p">)</span>
+        <span class="n">conv_regex_fct_out</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">conv_regex_fct_out</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">conv_regex_fct_out</span></div>
 
 </pre></div>
 

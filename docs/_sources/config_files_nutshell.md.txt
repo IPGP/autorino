@@ -124,4 +124,9 @@ Per default values can be called and used in the configuration files using reser
 * `FROM_SESSION`: Then, the value is taken from the `session` block
 * `FROM_MAIN`: Now obsolete and deprecated since introduction of `include` in version 2.0.0.
 
-
+### About the datalink
+`datalink` in the config file a free keyword that groups together all stations 
+that communicate using the same technology (same VSAT link, same WiFi network, etc.). 
+Any simultaneous downloads from the same datalink are temporarily blocked 
+in order to limit them to one at a time, thereby saving bandwidth and
+avoiding download failures.

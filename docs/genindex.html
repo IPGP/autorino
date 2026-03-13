@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Index &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
@@ -95,6 +96,7 @@
  | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
@@ -118,7 +120,7 @@
 </li>
         <li><a href="autorino.handle.html#autorino.handle.handle_cls.HandleGnss.__init__">(autorino.handle.handle_cls.HandleGnss method)</a>
 </li>
-        <li><a href="autorino.handle.html#autorino.handle.rinexmod_cls.ModifyGnss.__init__">(autorino.handle.rinexmod_cls.ModifyGnss method)</a>
+        <li><a href="autorino.handle.html#autorino.handle.modify_cls.ModifyGnss.__init__">(autorino.handle.modify_cls.ModifyGnss method)</a>
 </li>
         <li><a href="autorino.handle.html#autorino.handle.splice_cls.SpliceGnss.__init__">(autorino.handle.splice_cls.SpliceGnss method)</a>
 </li>
@@ -283,6 +285,13 @@
 
       <ul>
         <li><a href="autorino.bin.html#module-autorino.bin.autorino_convert_rnx">module</a>
+</li>
+      </ul></li>
+      <li>
+    autorino.bin.autorino_splice_rnx_relative
+
+      <ul>
+        <li><a href="autorino.bin.html#module-autorino.bin.autorino_splice_rnx_relative">module</a>
 </li>
       </ul></li>
       <li>
@@ -498,10 +507,10 @@
 </li>
       </ul></li>
       <li>
-    autorino.handle.rinexmod_cls
+    autorino.handle.modify_cls
 
       <ul>
-        <li><a href="autorino.handle.html#module-autorino.handle.rinexmod_cls">module</a>
+        <li><a href="autorino.handle.html#module-autorino.handle.modify_cls">module</a>
 </li>
       </ul></li>
       <li>
@@ -518,6 +527,8 @@
         <li><a href="autorino.handle.html#module-autorino.handle.split_cls">module</a>
 </li>
       </ul></li>
+      <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.autorino_vers">autorino_vers() (autorino.common.step_cls.StepGnss static method)</a>
+</li>
       <li><a href="autorino.download.html#autorino.download.dwl_fcts.AutorinoDownloadError">AutorinoDownloadError</a>
 </li>
       <li><a href="autorino.download.html#autorino.download.dwl_fcts.AutorinoError">AutorinoError</a>
@@ -580,10 +591,10 @@
 </li>
       <li><a href="autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_tps2rin">cmd_build_tps2rin() (in module autorino.convert.cnv_cmd_build)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.convert.html#autorino.convert.cnv_cmd_build.cmd_build_trm2rinex">cmd_build_trm2rinex() (in module autorino.convert.cnv_cmd_build)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.check.html#autorino.check.check_fcts.color">color() (in module autorino.check.check_fcts)</a>
 </li>
       <li><a href="autorino.check.html#autorino.check.check_fcts.colorize_list">colorize_list() (in module autorino.check.check_fcts)</a>
@@ -591,6 +602,8 @@
       <li><a href="autorino.convert.html#autorino.convert.cnv_regex.conv_regex_convbin">conv_regex_convbin() (in module autorino.convert.cnv_regex)</a>
 </li>
       <li><a href="autorino.convert.html#autorino.convert.cnv_regex.conv_regex_converto">conv_regex_converto() (in module autorino.convert.cnv_regex)</a>
+</li>
+      <li><a href="autorino.convert.html#autorino.convert.cnv_regex.conv_regex_custom">conv_regex_custom() (in module autorino.convert.cnv_regex)</a>
 </li>
       <li><a href="autorino.convert.html#autorino.convert.cnv_regex.conv_regex_gfzrnx">conv_regex_gfzrnx() (in module autorino.convert.cnv_regex)</a>
 </li>
@@ -688,15 +701,19 @@
 </li>
       <li><a href="autorino.common.html#autorino.common.eporng_cls.EpochRange.epoch_start">epoch_start (autorino.common.eporng_cls.EpochRange property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.common.html#autorino.common.eporng_cls.EpochRange">EpochRange (class in autorino.common.eporng_cls)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.common.html#autorino.common.eporng_cls.EpochRange.eporng_list">eporng_list() (autorino.common.eporng_cls.EpochRange method)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.eporng_cls.EpochRange.eporng_list_manual">eporng_list_manual() (autorino.common.eporng_cls.EpochRange method)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.eporng_cls.EpochRange.eporng_list_regular">eporng_list_regular() (autorino.common.eporng_cls.EpochRange method)</a>
+</li>
+      <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.exicod_from_tab">exicod_from_tab() (autorino.common.step_cls.StepGnss method)</a>
+</li>
+      <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.exit_code">exit_code (autorino.common.step_cls.StepGnss property)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.eporng_cls.EpochRange.extra_margin_splice">extra_margin_splice() (autorino.common.eporng_cls.EpochRange method)</a>
 </li>
@@ -875,6 +892,8 @@
 </li>
         <li><a href="autorino.bin.html#autorino.bin.autorino_convert_rnx.main">(in module autorino.bin.autorino_convert_rnx)</a>
 </li>
+        <li><a href="autorino.bin.html#autorino.bin.autorino_splice_rnx_relative.main">(in module autorino.bin.autorino_splice_rnx_relative)</a>
+</li>
         <li><a href="autorino.bin.html#autorino.bin.autorino_trimble_filelist.main">(in module autorino.bin.autorino_trimble_filelist)</a>
 </li>
       </ul></li>
@@ -900,6 +919,10 @@
         <li><a href="misc.test_scripts.html#module-misc.test_scripts">module</a>
 </li>
       </ul></li>
+      <li><a href="autorino.handle.html#autorino.handle.modify_cls.ModifyGnss.modify">modify() (autorino.handle.modify_cls.ModifyGnss method)</a>
+</li>
+      <li><a href="autorino.handle.html#autorino.handle.modify_cls.ModifyGnss">ModifyGnss (class in autorino.handle.modify_cls)</a>
+</li>
       <li>
     module
 
@@ -931,6 +954,8 @@
         <li><a href="autorino.bin.html#module-autorino.bin.autorino_check_rnx">autorino.bin.autorino_check_rnx</a>
 </li>
         <li><a href="autorino.bin.html#module-autorino.bin.autorino_convert_rnx">autorino.bin.autorino_convert_rnx</a>
+</li>
+        <li><a href="autorino.bin.html#module-autorino.bin.autorino_splice_rnx_relative">autorino.bin.autorino_splice_rnx_relative</a>
 </li>
         <li><a href="autorino.bin.html#module-autorino.bin.autorino_trimble_filelist">autorino.bin.autorino_trimble_filelist</a>
 </li>
@@ -992,7 +1017,7 @@
 </li>
         <li><a href="autorino.handle.html#module-autorino.handle.handle_cls">autorino.handle.handle_cls</a>
 </li>
-        <li><a href="autorino.handle.html#module-autorino.handle.rinexmod_cls">autorino.handle.rinexmod_cls</a>
+        <li><a href="autorino.handle.html#module-autorino.handle.modify_cls">autorino.handle.modify_cls</a>
 </li>
         <li><a href="autorino.handle.html#module-autorino.handle.splice_cls">autorino.handle.splice_cls</a>
 </li>
@@ -1038,6 +1063,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.not_ok_warn">not_ok_warn() (autorino.common.step_cls.StepGnss method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1069,11 +1102,13 @@
 </li>
       <li><a href="autorino.common.html#autorino.common.eporng_cls.EpochRange.period_values">period_values (autorino.common.eporng_cls.EpochRange property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.download.html#autorino.download.dwl_fcts.ping">ping() (in module autorino.download.dwl_fcts)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autorino.download.html#autorino.download.dwl_cls.DownloadGnss.ping_remote">ping_remote() (autorino.download.dwl_cls.DownloadGnss method)</a>
+</li>
+      <li><a href="autorino.convert.html#autorino.convert.cnv_fcts.prep_rgx_custom">prep_rgx_custom() (in module autorino.convert.cnv_fcts)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_fcts.print_tab_core">print_tab_core() (in module autorino.common.step_fcts)</a>
 </li>
@@ -1095,12 +1130,8 @@
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.remov_tmp_files">remov_tmp_files() (autorino.common.step_cls.StepGnss method)</a>
 </li>
-      <li><a href="autorino.handle.html#autorino.handle.rinexmod_cls.ModifyGnss.rinexmod">rinexmod() (autorino.handle.rinexmod_cls.ModifyGnss method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autorino.handle.html#autorino.handle.rinexmod_cls.ModifyGnss">ModifyGnss (class in autorino.handle.rinexmod_cls)</a>
-</li>
       <li><a href="autorino.common.html#autorino.common.step_fcts.rnxs2step_obj">rnxs2step_obj() (in module autorino.common.step_fcts)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.eporng_fcts.round_date">round_date() (in module autorino.common.eporng_fcts)</a>
@@ -1119,7 +1150,7 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autorino.convert.html#autorino.convert.cnv_fcts.select_conv_odd_file">select_conv_odd_file() (in module autorino.convert.cnv_fcts)</a>
+      <li><a href="autorino.convert.html#autorino.convert.cnv_fcts.slct_conv_odd_f">slct_conv_odd_f() (in module autorino.convert.cnv_fcts)</a>
 </li>
       <li><a href="autorino.common.html#autorino.common.step_cls.StepGnss.session">session (autorino.common.step_cls.StepGnss attribute)</a>
 

@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino’s exemple cookbook &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -85,6 +85,7 @@
 <li class="toctree-l1"><a class="reference internal" href="config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
@@ -131,13 +132,14 @@ See the next chapters <a class="reference internal" href="config_files_nutshell.
 <section id="synopsis">
 <h3>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading"></a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_cfgfile_run --help
-250430T23:55:24.696|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+251107T09:27:41.676|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.3.1-beta0 &amp; 3.7.3[0m
+251107T09:27:41.676|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
 usage: autorino_cfgfile_run [-h] -c CONFIG
                             [-i INCLUDE_CONFIG [INCLUDE_CONFIG ...]]
                             [-s START] [-e END] [-p PERIOD]
-                            [-l LIST_SITES [LIST_SITES ...]] [-is]
-                            [-sc STEPS_SELECT_LIST [STEPS_SELECT_LIST ...]]
-                            [-es] [-f]
+                            [-si SITES_LIST [SITES_LIST ...]] [-xsi]
+                            [-sp {download,convert,split,splice,rinexmod} [{download,convert,split,splice,rinexmod} ...]]
+                            [-xsp] [-f]
 
 Assisted Unloading, Treatment and Organization of RINEX observations
 
@@ -154,48 +156,51 @@ options:
                         These files override the `include` section of the main
                         configuration file.
   -s START, --start START
-                        The start date for the epoch range. Can be a date e.g.
-                        &#39;2025-01-01&#39;, &#39;2025-001&#39; or a literal e.g. &#39;2 days
-                        ago&#39;. Can also be a list; if so, each epoch is
-                        considered separately. Can also be a file path; if so,
-                        the file contains a list of start epochs. Default is
-                        None.
-  -e END, --end END     The end date for the epoch range. Can be a date e.g.
-                        &#39;2025-01-01&#39;, &#39;2025-001&#39; or a literal e.g. &#39;2 days
-                        ago&#39;. Default is None.
+                        The start date for the epoch range. * a litteral, e.g.
+                        &#39;yesterday&#39;, &#39;10 days ago&#39; * YYYY-DDD, year-day of
+                        year, e.g. 2025-140 * YYYY-MM-DD, classic calendar
+                        date, e.g. 2025-05-20 Can also be a list; if so, each
+                        epoch is considered separately. Can also be a file
+                        path; if so, the file contains a list of start epochs.
+                        Default is None.
+  -e END, --end END     The end date for the epoch range. The epoch can be
+                        formatted as: * a litteral, e.g. &#39;yesterday&#39;, &#39;10 days
+                        ago&#39; * YYYY-DDD, year-day of year, e.g. 2025-140 *
+                        YYYY-MM-DD, classic calendar date, e.g. 2025-05-20
+                        Default is None.
   -p PERIOD, --period PERIOD
                         The period for the epoch range i.e. the sampling of
                         the files: daily = &#39;1D&#39;, hourly = &#39;1H&#39;, 15 minutes =
                         &#39;15M&#39;. Default is &#39;1D&#39;.
-  -l LIST_SITES [LIST_SITES ...], --list_sites LIST_SITES [LIST_SITES ...]
+  -si SITES_LIST [SITES_LIST ...], --sites_list SITES_LIST [SITES_LIST ...]
                         list of site identifiers (&#39;site_id&#39;) in the config
-                        fileto filter the configuration files. If provided,
+                        file to filter the configuration files. If provided,
                         only configurations for sites in this list will be
                         processed. Default is None.
-  -is, --ignore_sites   If True, the sites in --list_sites will be ignored.It
-                        is the opposed behavior of the regular one using
-                        list_sites.Default is False.
-  -sc STEPS_SELECT_LIST [STEPS_SELECT_LIST ...], --steps_select_list STEPS_SELECT_LIST [STEPS_SELECT_LIST ...]
+  -xsi, --exclude_sites
+                        If True, the sites in --sites_list will be ignored.
+                        This is the opposed behavior of the regular one using
+                        sites_list.Default is False.
+  -sp {download,convert,split,splice,rinexmod} [{download,convert,split,splice,rinexmod} ...], --steps_list {download,convert,split,splice,rinexmod} [{download,convert,split,splice,rinexmod} ...]
                         A list of selected steps to be executed. If not
-                        provided, all steps in &#39;steps_list&#39; will be executed.
-                        Accepted steps are: &#39;download&#39;, &#39;convert&#39;, &#39;splice&#39;,
-                        &#39;split&#39;. Default is None.
-  -es, --exclude_steps_select
+                        provided, all steps in the configuration file will be
+                        executed. Default is None.
+  -xsp, --exclude_steps
                         If True the selected steps indicated in
-                        step_select_list are excluded. It is the opposite
-                        behavior of the regular one using steps_select_list.
-                        Default is False.
+                        step_select_list are excluded. This is the opposite
+                        behavior of the regular one using steps_list. Default
+                        is False.
   -f, --force           If True, the steps will be executed even if the output
                         files already exist. Overrides the &#39;force&#39; parameters
                         in the configuration file. Default is False.
 
 Examples:
-  * run all the config files within cfgfiles_dir directory, using a main config file and per default epoch ranges:
-    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml
+  * run all the config files within cfgfiles_dir directory, using per default epoch ranges:
+    autorino_cfgfile_run -c cfgfiles_dir
   * run the config file site_cfg.yml from the 1st January 2025 for a range of 10 days:
     autorino_cfgfile_run -c site_cfg.yml -s 2025-01-01 -e &#39;10 days ago&#39;
   * run download and convert steps only for HOUZ00GLP &amp; BORG00REU sites only:
-    autorino_cfgfile_run -c cfgfiles_dir -m main_cfg.yml -l HOUZ00GLP BORG00REU -sc download convert
+    autorino_cfgfile_run -c cfgfiles_dir -si HOUZ00GLP BORG00REU -sp download convert
 </pre></div>
 </div>
 </section>
@@ -241,12 +246,13 @@ Examples:
 <section id="id1">
 <h3>Synopsis<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_convert_rnx --help
-250501T00:22:43.465|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+251107T09:27:43.096|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.3.1-beta0 &amp; 3.7.3[0m
+251107T09:27:43.096|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
 usage: autorino_convert_rnx [-h] -i INP_RAWS [INP_RAWS ...] -o OUT_DIR
                             [-t OUT_STRUCTURE] [-m METADATA] [-frnx] [-fraw]
                             [-l] [-tmp TMP_DIR] [-log LOG_DIR]
                             [-rimo RINEXMOD_OPTIONS] [-ro RAW_OUT_DIR]
-                            [-rt RAW_OUT_STRUCTURE]
+                            [-rt RAW_OUT_STRUCTURE] [-p PROCESSES] [-fpt]
 
 Convert RAW files to RINEX.
 
@@ -266,7 +272,7 @@ options:
                         the converted files will be stored in a subdirectory
                         of out_dir following this structure. See README.md for
                         more information. Typical values are &#39;&lt;SITE_ID4&gt;/%Y/&#39;
-                        or &#39;%Y/%j/.
+                        or &#39;%Y/%j/ (default).
   -m METADATA, --metadata METADATA
                         The metadata to be included in the converted RINEX
                         files. Possible inputs are: * list of string (sitelog
@@ -282,10 +288,10 @@ options:
   -tmp TMP_DIR, --tmp_dir TMP_DIR
                         The temporary directory used during the conversion
                         process. If not provided, it defaults to
-                        &lt;$HOME&gt;/tmp_convert_rnx.
+                        &lt;$HOME&gt;/autorino_workflow/tmp.
   -log LOG_DIR, --log_dir LOG_DIR
                         The directory where logs will be stored. If not
-                        provided, it defaults to tmp_dir
+                        provided, it defaults to &lt;$HOME&gt;/autorino_workflow/log
   -rimo RINEXMOD_OPTIONS, --rinexmod_options RINEXMOD_OPTIONS
                         The options for modifying the RINEX files during the
                         conversion. The options must be provided in a
@@ -296,8 +302,14 @@ options:
                         deletion will occur, your RAW files are sacred.
   -rt RAW_OUT_STRUCTURE, --raw_out_structure RAW_OUT_STRUCTURE
                         Structure for archiving RAW files. Defaults to the
-                        same structure as the output directory if not
-                        provided.
+                        same structure as the output directory (-o/--out_dir)
+                        if not provided.
+  -p PROCESSES, --processes PROCESSES
+                        Number of processes to use for conversion. Defaults to
+                        1 (single process).
+  -fpt, --filter_prev_tables
+                        If set, filters and skips previously converted files
+                        with tables stored in the tmp tables directory.
 </pre></div>
 </div>
 </section>
@@ -308,7 +320,8 @@ options:
 <section id="id2">
 <h3>Synopsis<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_cfgfile_check --help
-250501T00:28:05.803|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+251107T09:27:44.523|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.3.1-beta0 &amp; 3.7.3[0m
+251107T09:27:44.523|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
 usage: autorino_cfgfile_check [-h] -c CONFIG
                               [-i INCLUDE_CONFIG [INCLUDE_CONFIG ...]]
                               [-o OUTPUT]
@@ -336,8 +349,8 @@ options:
 RAW files to RINEX.</p>
 <section id="convert-rnx-function-minimal-example">
 <h3>convert_rnx function minimal example<a class="headerlink" href="#convert-rnx-function-minimal-example" title="Link to this heading"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
-<span class="kn">import</span> <span class="nn">glob</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">autorino.common</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocmn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 
 <span class="c1">### Find all BINEX files in a folder</span>
 <span class="n">p</span> <span class="o">=</span> <span class="s2">&quot;/home/user/where_your/raw_data/are_stored/&quot;</span>

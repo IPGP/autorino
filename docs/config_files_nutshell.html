@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Configuration files in a nutshell &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
@@ -61,10 +61,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#the-configuration-file-s-main-sections">The configuration file’s main sections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#aliases-in-the-configuration-files">Aliases in the configuration files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reserved-keywords">Reserved keywords</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#about-the-datalink">About the datalink</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autorino.html">autorino package</a></li>
 </ul>
 
@@ -219,6 +221,14 @@ using <code class="docutils literal notranslate"><span class="pre">$</span></cod
 <li><p><code class="docutils literal notranslate"><span class="pre">FROM_SESSION</span></code>: Then, the value is taken from the <code class="docutils literal notranslate"><span class="pre">session</span></code> block</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">FROM_MAIN</span></code>: Now obsolete and deprecated since introduction of <code class="docutils literal notranslate"><span class="pre">include</span></code> in version 2.0.0.</p></li>
 </ul>
+</section>
+<section id="about-the-datalink">
+<h2>About the datalink<a class="headerlink" href="#about-the-datalink" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">datalink</span></code> in the config file a free keyword that groups together all stations
+that communicate using the same technology (same VSAT link, same WiFi network, etc.).
+Any simultaneous downloads from the same datalink are temporarily blocked
+in order to limit them to one at a time, thereby saving bandwidth and
+avoiding download failures.</p>
 </section>
 </section>
 
