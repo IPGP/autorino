@@ -1,0 +1,79 @@
+cfgfile_version: 20.2 # Version of the configuration file format.
+
+# Example configuration demonstrating the out_bis feature
+# This shows how to use a secondary output directory to skip files that have already been processed
+
+station:
+    sessions:
+        session_example_outbis:
+            general:
+                active: True
+                tmp_dir_parent: '/tmp/autorino_work'
+                tmp_dir_structure: '<SITE_ID9>/tmp'
+                log_dir_parent: '/tmp/autorino_logs'
+                log_dir_structure: '<SITE_ID9>/logs'
+
+            epoch_range:
+                epoch1: 2024-01-01 00:00:00
+                epoch2: 2024-01-31 23:59:59
+                period: 1D
+                round_method: floor
+                tz: UTC
+
+            steps:
+                # Download step - standard configuration
+                download:
+                    active: True
+                    inp_dir_parent: "/SD Card/Data/"
+                    inp_dir_structure: "<SITE_ID4>_30s_MDB/<SITE_ID4>/%Y/%m/%d"
+                    inp_file_regex: "<SITE_ID4>%j.\\.m[0-9]{2}"
+                    out_dir_parent: '/data/raw'
+                    out_dir_structure: '<SITE_ID9>/%Y/%j'
+
+                # Convert step - USING out_bis feature
+                convert:
+                    active: True
+                    inp_dir_parent: '/data/raw'
+                    inp_dir_structure: '<SITE_ID9>/%Y/%j'
+                    inp_file_regex: ".*\\.(m[0-9]{2}|raw)$"
+
+                    # Primary output: local working directory
+                    out_dir_parent: '/data/rinex/working'
+                    out_dir_structure: '<SITE_ID9>/%Y/%j'
+
+                    # Secondary output: archive directory (NEW!)
+                    # If files exist here, they will be skipped
+                    out_bis_dir_parent: '/archive/rinex/final'
+                    out_bis_dir_structure: '<SITE_ID9>/%Y/%j'
+
+                    epoch_range: FROM_SESSION
+
+                    options:
+                        force: False
+                        rinexmod_options:
+                            compression: "gz"
+                            longname: True
+                            filename_style: basic
+
+                # Modify step - also can use out_bis
+                modify:
+                    active: True
+                    inp_dir_parent: '/data/rinex/working'
+                    inp_dir_structure: '<SITE_ID9>/%Y/%j'
+                    inp_file_regex: ".*\\.(rnx|crx)(\\.gz)?$"
+
+                    out_dir_parent: '/data/rinex/processed'
+                    out_dir_structure: '<SITE_ID9>/%Y/%j'
+
+                    # Check if already processed to archive
+                    out_bis_dir_parent: '/archive/rinex/processed'
+                    out_bis_dir_structure: '<SITE_ID9>/%Y/%j'
+
+                    epoch_range: FROM_SESSION
+
+                    options:
+                        force: False
+                        rinexmod_options:
+                            compression: "gz"
+                            longname: True
+                            force_rnx_load: True

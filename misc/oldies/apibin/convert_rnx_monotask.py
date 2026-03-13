@@ -4,6 +4,8 @@
 Created on 21/05/2025 15:18:00
 
 @author: psakic
+
+this is a dirty backup, since now the convert_rnx function is multiprocessing
 """
 
 import os
@@ -95,7 +97,12 @@ def convert_rnx(
 
     ###### Convert RAW > RINEX files
     raws_use = inp_raws
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    cnv = arocnv.ConvertGnss(
+        out_dir=out_dir_use,
+        tmp_dir=tmp_dir,
+        log_dir=log_dir,
+        metadata=metadata
+    )
     cnv.load_tab_filelist(raws_use)
     cnv.convert(
         force=force_rnx,

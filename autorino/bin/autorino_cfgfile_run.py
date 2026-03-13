@@ -98,7 +98,7 @@ def main():
         help="A list of selected steps to be executed. "
         "If not provided, all steps in the configuration file will be executed. "
         "Default is None.",
-        choices=["download", "convert", "split", "splice", "rinexmod"],
+        choices=["download", "convert", "split", "splice", "rinexmod", "modify"],
         default=None,
     )
     parser.add_argument(

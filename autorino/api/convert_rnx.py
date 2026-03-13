@@ -225,7 +225,12 @@ def convert_raw_wrap(args):
         converter
     ) = args
     # Initialize the ConvertGnss object with the provided directories and metadata
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    cnv = arocnv.ConvertGnss(
+        out_dir=out_dir_use,
+        tmp_dir=tmp_dir,
+        log_dir=log_dir,
+        metadata=metadata
+    )
     # Load the list of RAW files to be converted
     cnv.load_tab_filelist(raws)
     # Perform the conversion with the specified options

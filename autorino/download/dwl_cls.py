@@ -34,97 +34,52 @@ class DownloadGnss(arocmn.StepGnss):
     Inherits from
     ----------
     arocmn.StepGnss
-
-    Parameters
-    ----------
-    out_dir : str
-        The output directory where the downloaded files will be stored.
-    tmp_dir : str
-        The temporary directory used during the download process.
-    log_dir : str
-        The directory where log files will be stored.
-    epoch_range : EpochRange
-        The range of epochs for which data will be downloaded.
-    access : dict
-        A dictionary containing access information such as protocol, hostname, login, and password.
-    site : dict, optional
-        The site information. Default is None.
-    session : dict, optional
-        The session information. Default is None.
-    options : dict, optional
-        Additional options for the download process. Default is None.
-    metadata : str or list, optional
-        The metadata to be included in the converted RINEX files. Possible inputs are:
-         * list of string (sitelog file paths),
-         * single string (single sitelog file path)
-         * single string (directory containing the sitelogs)
-         * list of MetaData objects
-         * single MetaData object.
-         Defaults to None.
     """
 
     def __init__(
         self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        inp_dir,
-        inp_file_regex,
-        epoch_range,
-        access,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
+        access: dict,
+        **kwargs
     ):
         """
         Initialize the DownloadGnss object.
 
         Parameters
         ----------
-        out_dir : str
-            The output directory where the downloaded files will be stored.
-        tmp_dir : str
-            The temporary directory used during the download process.
-        log_dir : str
-            The directory where log files will be stored.
-        epoch_range : EpochRange
-            The range of epochs for which data will be downloaded.
         access : dict
             A dictionary containing access information such as protocol, hostname, login, and password.
-        site : dict, optional
-            The site information. Default is None.
-        session : dict, optional
-            The session information. Default is None.
-        options : dict, optional
-            Additional options for the download process. Default is None.
-        metadata : str or list, optional
-            The metadata to be included in the converted RINEX files. Possible inputs are:
-             * list of string (sitelog file paths),
-             * single string (single sitelog file path)
-             * single string (directory containing the sitelogs)
-             * list of MetaData objects
-             * single MetaData object.
-             Defaults to None.
+        **kwargs : keyword arguments
+            Additional keyword arguments passed to the parent StepGnss class.
+            Common parameters include:
+            - out_dir : str - The output directory where the downloaded files will be stored.
+            - tmp_dir : str - The temporary directory used during the download process.
+            - log_dir : str - The directory where log files will be stored.
+            - inp_dir : str - The input directory path (remote directory).
+            - inp_file_regex : str - Regular expression pattern for input files.
+            - epoch_range : EpochRange - The range of epochs for which data will be downloaded.
+            - site : dict - The site information. Default is None.
+            - session : dict - The session information. Default is None.
+            - options : dict - Additional options for the download process. Default is None.
+            - metadata : str or list - The metadata to be included in the converted RINEX files.
+              Possible inputs are:
+               * list of string (sitelog file paths),
+               * single string (single sitelog file path)
+               * single string (directory containing the sitelogs)
+               * list of MetaData objects
+               * single MetaData object.
+               Defaults to None.
         """
-        super().__init__(
-            out_dir=out_dir,
-            tmp_dir=tmp_dir,
-            log_dir=log_dir,
-            inp_dir=inp_dir,
-            inp_file_regex=inp_file_regex,
-            epoch_range=epoch_range,
-            site=site,
-            session=session,
-            options=options,
-            metadata=metadata,
-        )
+        super().__init__(**kwargs)
 
         # specific to the DownloadGnss class
         self.access = access
 
         # initialize the ftp object
         self.ftp_obj = None
+
+        # initialize the cache for remote file listings
+        # key: (protocol, hostname, remote_dir), value: list of files
+        self._remote_listing_cache = {}
 
     # legacy properties, specific to the DownloadGnss class
     #### They become more or less useless since the implementation of self.inp_file_regex (2025-01)
@@ -135,6 +90,212 @@ class DownloadGnss(arocmn.StepGnss):
     @property
     def inp_basename(self):
         return os.path.basename(self.inp_dir)
+
+    def download(
+        self,
+        verbose=False,
+        force=False,
+        reverse_order=False,
+        remote_find_method="ask",
+        invalidate_small_local_files=True,
+        timeout=60,
+        max_try=4,
+        sleep_time=5,
+        ping_max_try=4,
+        ping_timeout=20,
+        ping_disable=False,
+        clear_cache=False,
+        check_out_bis=False
+    ):
+        """
+        Frontend method to download files from a GNSS receiver
+
+        Parameters
+        ----------
+        verbose : bool, optional
+            If True, prints detailed information during the download process. Default is False.
+        force : bool, optional
+            If True, forces the download even if the files already exist locally. Default is False.
+        reverse_order : bool, optional
+            If True, processes the files in reverse order (anti-chronological, newer first).
+            Default is False.
+        remote_find_method : str, optional
+            Method to find remote files.
+            Can be 'ask' to list files from the server (for FTP only) or 'guess' to guess file paths.
+            Default is 'ask'.
+        invalidate_small_local_files : bool, optional
+            If True, invalidates small local files to ensure they are re-downloaded. Default is True.
+        timeout : int, optional
+            Timeout in seconds for the download operations. Default is 60.
+        max_try : int, optional
+            Maximum number of retry attempts for the download operations. Default is 4.
+        sleep_time : int, optional
+            Sleep time in seconds between retry attempts. Default is 5.
+        ping_max_try : int, optional
+            Maximum number of retry attempts for pinging the remote server. Default is 4.
+        ping_timeout : int, optional
+            Timeout in seconds for pinging the remote server. Default is 20.
+        ping_disable : bool, optional
+            If True, skips the pinging of the remote server. Default is False.
+        clear_cache : bool, optional
+            If True, clears the remote listing cache before starting the download. Default is False.
+        check_out_bis : bool, optional
+            If True, performs an additional check on the second output destination (out_bis)
+            if it is defined, and skip the download if the file is already there and valid.
+            Default is False.
+
+        Returns
+        -------
+        None
+        """
+        self.set_logfile()
+        logger.info(BOLD_SRT + ">>>>>> RAW files download" + BOLD_END)
+
+        # Clear the remote listing cache if requested
+        if clear_cache:
+            self.clear_cache_remot()
+
+        # Set up and clean temporary directories
+        self.set_tmp_dirs()
+        self.clean_tmp_dirs()
+
+        # Check the remote find method, and switch to 'guess' if HTTP protocol is used
+        if remote_find_method == "ask" and self.access["protocol"] == "http":
+            logger.warning("HTTP protocol doesn't support file listing ('ask' method).")
+            logger.warning("Switching to 'guess' remote find method.")
+            remote_find_method = "guess"
+
+        # Ping the remote server to check if it is reachable (unless ping_disable is True)
+        ping_out = True if ping_disable else self.ping_remote(ping_max_try, ping_timeout)
+
+        if not ping_out:
+            # local raw are guessed anyway, to resume the next steps if download is not possible
+            self.guess_local_raw()
+            return None
+
+        # Set up the DownloadGnss's FTP object if the protocol is FTP
+        if self.access["protocol"] == "ftp":
+            self.set_ftp_obj(timeout=timeout, max_try=max_try, sleep_time=sleep_time)
+
+        # Guess remote raw file paths
+        if remote_find_method == "guess":
+            self.guess_remot_raw()
+        # Ask remote raw file paths (works for FTP only!
+        elif remote_find_method == "ask":
+            self.ask_remote_raw()
+        else:
+            logger.error(
+                "Wrong remote_find_method: %s ('ask' or 'guess' only are allowed)",
+                remote_find_method,
+            )
+            raise Exception
+
+        # Guess or ask corresponding local raw file
+        self.find_local_raw(method=remote_find_method)
+
+        # Check local files and update table
+        self.check_local_files()
+        # be sure ok_xxx columns are booleans
+        self.table_ok_cols_bool()
+        if invalidate_small_local_files:
+            self.invalidate_small_local_files()
+        # switch ok_inp to False if the output files are already there
+        self.filter_ok_out()
+
+        # Force download if required
+        if force:
+            self.force(step_name="download")
+        if reverse_order:
+            self.reverse_table()
+
+        # Log the number of files to be downloaded and excluded
+        n_ok_inp = (self.table["ok_inp"]).sum()
+        n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()
+        n_tot_inp = len(self.table)
+
+        logger.info(
+            "%3i/%3i files will be downloaded, %3i/%3i files are excluded",
+            n_ok_inp,
+            n_tot_inp,
+            n_not_ok_inp,
+            n_tot_inp,
+        )
+
+        # Print the table if verbose is enabled
+        if verbose:
+            self.print_table()
+
+        # Create a lockfile to ensure exclusive access during download
+        lock = self.create_lockfile()
+
+        ###############################
+        # +++ DOWNLOAD CORE a.k.a FETCH
+        lock.acquire()
+        try:
+            self.fetch_remote_files(
+                force=force,  # force argument is now redudant, because ok_inp can be forced with .force() method
+                timeout=timeout,
+                max_try=max_try,
+                sleep_time=sleep_time,
+            )
+        finally:
+            lock.release()
+            os.remove(lock.lock_file)
+        ###############################
+
+        # Print the table if verbose is enabled
+        if verbose:
+            self.print_table()
+
+        # close the log file
+        self.close_logfile()
+
+        return None
+
+    def clear_cache_remot(self):
+        """
+        Clear the cache of remote file listings.
+
+        This method clears all cached remote file listings stored in memory.
+        Use this when you need to force a fresh listing of remote files.
+        """
+        self._remote_listing_cache = {}
+        logger.debug("Remote listing cache cleared")
+
+    def get_cache_remot(self, remote_dir):
+        """
+        Get cached remote file listing for a given directory.
+
+        Parameters
+        ----------
+        remote_dir : str
+            The remote directory path.
+
+        Returns
+        -------
+        list or None
+            The cached file listing if available, None otherwise.
+        """
+        cache_key = (self.access["protocol"], self.access["hostname"], remote_dir)
+        cached_result = self._remote_listing_cache.get(cache_key)
+        if cached_result is not None:
+            logger.debug(f"Using cached remote listing for {remote_dir} ({len(cached_result)} files)")
+        return cached_result
+
+    def set_cache_remot(self, remote_dir, file_list):
+        """
+        Store a remote file listing in the cache.
+
+        Parameters
+        ----------
+        remote_dir : str
+            The remote directory path.
+        file_list : list
+            The list of files to cache.
+        """
+        cache_key = (self.access["protocol"], self.access["hostname"], remote_dir)
+        self._remote_listing_cache[cache_key] = file_list
+        logger.debug(f"Set cached remote listing for {remote_dir} ({len(file_list)} files)")
 
     def guess_remot_raw(self):
         """
@@ -188,42 +349,6 @@ class DownloadGnss(arocmn.StepGnss):
 
         return rmot_paths_list
 
-    def guess_local_raw(self):
-        """
-        Guess the paths and name of the local raw files based on the
-        EpochRange and `inp_file_regex` attributes of the DownloadGnss object
-
-        see also method ``guess_remot_raw()``,
-        """
-
-        local_paths_list = []
-
-        # for epoch in self.epoch_range.eporng_list():  # go for irow ! ### IMPROVE ME !!!
-
-        for irow, row in self.table.iterrows():
-            # epoch = row["epoch_srt"]
-
-            # guess the potential local files
-            local_dir_use = str(self.out_dir)
-            local_fname_use = str(self.inp_file_regex)
-            local_path_use = os.path.join(local_dir_use, local_fname_use)
-
-            local_path_use = self.translate_path(local_path_use, row["epoch_srt"], make_dir=False)
-
-            local_fname_use = os.path.basename(local_path_use)
-
-            local_paths_list.append(local_path_use)
-
-            # iepoch = self.table[self.table["epoch_srt"] == epoch].index
-
-            self.table.loc[irow, "fname"] = local_fname_use
-            self.table.loc[irow, "fpath_out"] = local_path_use
-            logger.debug("local file guessed: %s", local_path_use)
-
-        logger.info("nbr local raw files guessed: %s", len(local_paths_list))
-
-        return local_paths_list
-
     def guess_remote_dirs(self):
         """
         this method is specific for ask_remote_raw
@@ -276,27 +401,33 @@ class DownloadGnss(arocmn.StepGnss):
             epoch = row["epoch_srt"]
             rmot_dir_use = row["fpath_inp"]
 
-            if self.access["protocol"] == "http":
-                logger.warning(
-                    "HTTP protocol doesn't support well file listing. Nasty effects may occur."
-                )
-                rmot_fil_epo_bulk_lis = arodwl.list_remote_http(
-                    self.access["hostname"], rmot_dir_use
-                )
-            elif self.access["protocol"] == "ftp":
-                rmot_fil_epo_bulk_lis = arodwl.list_remote_ftp(
-                    self.access["hostname"],
-                    rmot_dir_use,
-                    self.access["login"],
-                    self.access["password"],
-                    ftp_obj_inp=self.ftp_obj,
-                )
+            # Check if the remote listing is already cached
+            rmot_fil_epo_bulk_lis = self.get_cache_remot(rmot_dir_use)
 
-            else:
-                logger.error("wrong protocol. Only 'http' and 'ftp' are supported.")
-                raise Exception
+            if rmot_fil_epo_bulk_lis is None:
+                # Cache miss - need to fetch from remote
+                if self.access["protocol"] == "http":
+                    logger.warning(
+                        "HTTP protocol doesn't support well file listing. Nasty effects may occur."
+                    )
+                    rmot_fil_epo_bulk_lis = arodwl.list_remote_http(
+                        self.access["hostname"], rmot_dir_use
+                    )
+                elif self.access["protocol"] == "ftp":
+                    rmot_fil_epo_bulk_lis = arodwl.list_remote_ftp(
+                        self.access["hostname"],
+                        rmot_dir_use,
+                        self.access["login"],
+                        self.access["password"],
+                        ftp_obj_inp=self.ftp_obj,
+                    )
+                else:
+                    logger.error("wrong protocol. Only 'http' and 'ftp' are supported.")
+                    raise Exception
 
-            rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
+                rmot_fil_epo_bulk_lis = list(rmot_fil_epo_bulk_lis)
+                # Store in cache for future use
+                self.set_cache_remot(rmot_dir_use, rmot_fil_epo_bulk_lis)
 
             ### match the right input structure, if a regex input is provided
             if self.inp_file_regex:
@@ -356,36 +487,6 @@ class DownloadGnss(arocmn.StepGnss):
         logger.info("nbr remote files found on rec: %s", len(rmot_fil_all_lis))
         return rmot_fil_all_lis
 
-    def ask_local_raw(self):
-        """
-        Guess the paths and name of the local raw files based on the
-        EpochRange and  table's fpath_inp basename i.e. the theoretical remote file name
-        generated with `guess_remot_raw()`.
-
-        see also method ``guess_remot_raw()``,
-        """
-
-        local_paths_list = []
-
-        for irow, row in self.table.iterrows():
-            epoch = row["epoch_srt"]
-
-            # guess the potential local files
-            local_dir_use = str(self.out_dir)
-            local_fname_use = os.path.basename(row["fpath_inp"])
-            local_path_use = os.path.join(local_dir_use, local_fname_use)
-            local_path_use = self.translate_path(local_path_use, epoch, make_dir=False)
-
-            local_paths_list.append(local_path_use)
-
-            self.table.loc[irow, "fname"] = local_fname_use
-            self.table.loc[irow, "fpath_out"] = local_path_use
-            logger.debug("local file asked: %s", local_path_use)
-
-        logger.info("nbr local raw files asked: %s", len(local_paths_list))
-
-        return local_paths_list
-
     def ping_remote(self, ping_max_try=4, ping_timeout=20):
         """
         Ping the remote server to check if it is reachable.
@@ -429,148 +530,6 @@ class DownloadGnss(arocmn.StepGnss):
             max_try=max_try,
             sleep_time=sleep_time,
         )
-
-    def download(
-        self,
-        verbose=False,
-        force=False,
-        remote_find_method="ask",
-        invalidate_small_local_files=True,
-        timeout=60,
-        max_try=4,
-        sleep_time=5,
-        ping_max_try=4,
-        ping_timeout=20,
-        ping_disable=False,
-    ):
-        """
-        Frontend method to download files from a GNSS receiver
-
-        Parameters
-        ----------
-        verbose : bool, optional
-            If True, prints detailed information during the download process. Default is False.
-        force : bool, optional
-            If True, forces the download even if the files already exist locally. Default is False.
-        remote_find_method : str, optional
-            Method to find remote files.
-            Can be 'ask' to list files from the server (for FTP only) or 'guess' to guess file paths.
-            Default is 'ask'.
-        invalidate_small_local_files : bool, optional
-            If True, invalidates small local files to ensure they are re-downloaded. Default is True.
-        timeout : int, optional
-            Timeout in seconds for the download operations. Default is 60.
-        max_try : int, optional
-            Maximum number of retry attempts for the download operations. Default is 4.
-        sleep_time : int, optional
-            Sleep time in seconds between retry attempts. Default is 5.
-        ping_max_try : int, optional
-            Maximum number of retry attempts for pinging the remote server. Default is 4.
-        ping_timeout : int, optional
-            Timeout in seconds for pinging the remote server. Default is 20.
-        ping_disable : bool, optional
-            If True, skips the pinging of the remote server. Default is False.
-
-        Returns
-        -------
-        None
-        """
-        self.set_logfile()
-        logger.info(BOLD_SRT + ">>>>>> RAW files download" + BOLD_END)
-
-        # Set up and clean temporary directories
-        self.set_tmp_dirs()
-        self.clean_tmp_dirs()
-
-        # Check the remote find method, and switch to 'guess' if HTTP protocol is used
-        if remote_find_method == "ask" and self.access["protocol"] == "http":
-            logger.warning("HTTP protocol doesn't support file listing ('ask' method).")
-            logger.warning("Switching to 'guess' remote find method.")
-            remote_find_method = "guess"
-
-        # Ping the remote server to check if it is reachable (unless ping_disable is True)
-        ping_out = True if ping_disable else self.ping_remote(ping_max_try, ping_timeout)
-
-        if not ping_out:
-            # local raw are guessed anyway, to resume the next steps if download is not possible
-            self.guess_local_raw()
-            return None
-
-        # Set up the DownloadGnss's FTP object if the protocol is FTP
-        if self.access["protocol"] == "ftp":
-            self.set_ftp_obj(timeout=timeout, max_try=max_try, sleep_time=sleep_time)
-
-        # Guess remote raw file paths
-        if remote_find_method == "guess":
-            self.guess_remot_raw()
-            self.guess_local_raw()
-        # Ask remote raw file paths (works for FTP only!
-        elif remote_find_method == "ask":
-            self.ask_remote_raw()
-            self.ask_local_raw()
-        else:
-            logger.error(
-                "Wrong remote_find_method: %s ('ask' or 'guess' only are allowed)",
-                remote_find_method,
-            )
-            raise Exception
-
-        # Check local files and update table
-        self.check_local_files()
-        # be sure ok_xxx columns are booleans
-        self.table_ok_cols_bool()
-        if invalidate_small_local_files:
-            self.invalidate_small_local_files()
-        # switch ok_inp to False if the output files are already there
-        self.filter_ok_out()
-
-        # Force download if required
-        if force:
-            self.force(step_name="download")
-
-        # Log the number of files to be downloaded and excluded
-        n_ok_inp = (self.table["ok_inp"]).sum()
-        n_not_ok_inp = np.logical_not(self.table["ok_inp"]).sum()
-        n_tot_inp = len(self.table)
-
-        logger.info(
-            "%3i/%3i files will be downloaded, %3i/%3i files are excluded",
-            n_ok_inp,
-            n_tot_inp,
-            n_not_ok_inp,
-            n_tot_inp,
-        )
-
-        # Print the table if verbose is enabled
-        if verbose:
-            self.print_table()
-
-        # Create a lockfile to ensure exclusive access during download
-        lock = self.create_lockfile()
-
-        ###############################
-        # +++ DOWNLOAD CORE a.k.a FETCH
-        lock.acquire()
-        try:
-            self.fetch_remote_files(
-                force=force,  # force argument is now redudant, because ok_inp can be forced with .force() method
-                timeout=timeout,
-                max_try=max_try,
-                sleep_time=sleep_time,
-            )
-        finally:
-            lock.release()
-            os.remove(lock.lock_file)
-        ###############################
-
-        # Print the table if verbose is enabled
-        if verbose:
-            self.print_table()
-
-        # close the log file
-        self.close_logfile()
-
-        return None
 
     def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):
         """

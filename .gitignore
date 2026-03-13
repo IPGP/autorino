@@ -1,9 +1,9 @@
 *.pyc
 .idea/
 venv/
-venvraro1/
-venvraro2/
-venvaro99a/
+venvaro01d/
 autorino.egg-info/
 build/
 .configfiles/sites/*
+uv.lock
+

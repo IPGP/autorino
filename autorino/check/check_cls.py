@@ -17,30 +17,31 @@ import tqdm
 class CheckGnss(arohdl.HandleGnss):
     def __init__(
         self,
-        out_dir=None,
-        tmp_dir=None,
-        log_dir=None,
-        inp_dir=None,
-        inp_file_regex=None,
-        epoch_range=None,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
+        **kwargs
     ):
+        """
+        Initialize a CheckGnss object.
 
-        super().__init__(
-            out_dir=out_dir,
-            tmp_dir=tmp_dir,
-            log_dir=log_dir,
-            inp_dir=inp_dir,
-            inp_file_regex=inp_file_regex,
-            epoch_range=epoch_range,
-            site=site,
-            session=session,
-            options=options,
-            metadata=metadata,
-        )
+        This constructor initializes a CheckGnss object, which is used for checking
+        and analyzing RINEX files. It inherits from the HandleGnss class.
+
+        Parameters
+        ----------
+        **kwargs : keyword arguments
+            Additional keyword arguments passed to the parent HandleGnss class.
+            Common parameters include:
+            - out_dir : str, optional - The output directory for the check results.
+            - tmp_dir : str, optional - The temporary directory for intermediate files.
+            - log_dir : str, optional - The directory for log files.
+            - inp_dir : str, optional - The input directory for RINEX files.
+            - inp_file_regex : str, optional - Regular expression pattern for input files.
+            - epoch_range : EpochRange, optional - The range of epochs to be checked.
+            - site : dict, optional - Information about the site.
+            - session : dict, optional - Information about the session.
+            - options : dict, optional - Additional options for the check operation.
+            - metadata : str or list, optional - Metadata for the check operation.
+        """
+        super().__init__(**kwargs)
 
         self.table_stats = pd.DataFrame()
 
