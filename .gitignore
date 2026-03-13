@@ -7,3 +7,4 @@ venvaro99a/
 autorino.egg-info/
 build/
 .configfiles/sites/*
+uv.lock
