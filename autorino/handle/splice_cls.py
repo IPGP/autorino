@@ -263,7 +263,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
-            conv_options, conv_kwoptions = self.handl_soft_opts(
+            handl_opts, handl_kwopts = self.handl_soft_opts(
                 irow, handle_software=handle_software, mode="splice"
             )
             try:
@@ -272,8 +272,8 @@ class SpliceGnss(arohdlcls.HandleGnss):
                     fpath_inp_lst,
                     out_dir_use,
                     converter=handle_software,
-                    bin_options=conv_options,
-                    bin_kwoptions=conv_kwoptions,
+                    bin_options=handl_opts,
+                    bin_kwoptions=handl_kwopts,
                 )
             except Exception as e:
                 logger.error("Error for: %s", fpath_inp_lst)
