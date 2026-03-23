@@ -437,6 +437,8 @@ class HandleGnss(arocmn.StepGnss):
                 "-d": duration,
             }
             handl_opts_bas = ["-f"]
+            if mode == "splice":
+                handl_opts_bas.append("-splice_direct")
         else:
             logger.critical("wrong handle software: %s", handle_software)
             raise ValueError
