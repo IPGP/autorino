@@ -7,8 +7,6 @@ Created on 20/05/2025 20:26:56
 """
 
 
-
-
 # Create a logger object.
 import os
 import time
@@ -274,6 +272,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
                     converter=handle_software,
                     bin_options=handl_opts,
                     bin_kwoptions=handl_kwopts,
+                    timeout=600,
                 )
             except Exception as e:
                 logger.error("Error for: %s", fpath_inp_lst)
@@ -291,5 +290,3 @@ class SpliceGnss(arohdlcls.HandleGnss):
         spc_row.remov_tmp_files()
 
         return frnx_spliced
-
-
