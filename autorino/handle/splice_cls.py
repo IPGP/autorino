@@ -214,7 +214,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
 
-        #self.remov_tmp_files() #### reactivate me!!!!
+        self.remov_tmp_files()
         return None
 
     def mono_splice(
@@ -288,7 +288,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
             # raise e
 
         ### it is not the current object temps which are removed, but the row sub object's ones
-        # spc_row.remov_tmp_files() ### reactiveate me!!!
+        spc_row.remov_tmp_files()
 
         return frnx_spliced
 
