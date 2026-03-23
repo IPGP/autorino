@@ -5,6 +5,7 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
+
 # Create a logger object.
 import os
 import time
@@ -30,10 +31,7 @@ BOLD_END = "\033[0m"
 
 
 class HandleGnss(arocmn.StepGnss):
-    def __init__(
-        self,
-        **kwargs
-    ):
+    def __init__(self, **kwargs):
         """
         Initialize a HandleGnss object.
 
@@ -413,32 +411,37 @@ class HandleGnss(arocmn.StepGnss):
 
         return stp_obj_rnxs_inp
 
-    def conv_softs_opts(
-        self, irow, handle_software, conv_options_sup=[], conv_kwoptions_sup=dict()
+    def handl_soft_opts(
+        self,
+        irow,
+        handle_software,
+        mode="splice",
+        handl_opts_sup=[],
+        handl_kwopts_sup=dict(),
     ):
+        srt = self.table.loc[irow, "epoch_srt"]
+        end = self.table.loc[irow, "epoch_end"]
+
         if handle_software == "converto":
-            conv_kwoptions_basis = {
-                "-st": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d%H%M%S"),
-                "-e": self.table.loc[irow, "epoch_end"].strftime("%Y%m%d%H%M%S"),
+            handl_kwopts_bas = {
+                "-st": srt.strftime("%Y%m%d%H%M%S"),
+                "-e": end.strftime("%Y%m%d%H%M%S"),
             }
-            conv_options_basis = ["-cat"]
+            handl_opts_bas = []
+            if mode == "splice":
+                handl_opts_bas.append("-cat")
         elif handle_software == "gfzrnx":
-            duration = int(
-                (
-                    self.table.loc[irow, "epoch_end"]
-                    - self.table.loc[irow, "epoch_srt"]
-                ).total_seconds()
-            )
-            conv_kwoptions_basis = {
-                "-epo_beg": self.table.loc[irow, "epoch_srt"].strftime("%Y%m%d_%H%M%S"),
+            duration = int((end - srt).total_seconds())
+            handl_kwopts_bas = {
+                "-epo_beg": srt.strftime("%Y%m%d_%H%M%S"),
                 "-d": duration,
             }
-            conv_options_basis = ["-f"]
+            handl_opts_bas = ["-f"]
         else:
-            logger.critical("wrong handle_software value: %s", handle_software)
+            logger.critical("wrong handle software: %s", handle_software)
             raise ValueError
 
-        conv_option_out = conv_options_basis + conv_options_sup
-        conv_kwoption_out = {**conv_kwoptions_basis, **conv_kwoptions_sup}
+        handl_opts_out = handl_opts_bas + handl_opts_sup
+        handl_kwopts_out = {**handl_kwopts_bas, **handl_kwopts_sup}
 
-        return conv_option_out, conv_kwoption_out
+        return handl_opts_out, handl_kwopts_out

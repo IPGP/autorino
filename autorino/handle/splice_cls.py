@@ -263,8 +263,8 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
             fpath_inp_lst = list(spc_row.table["fpath_inp"])
 
-            conv_options, conv_kwoptions = self.conv_softs_opts(
-                irow, handle_software=handle_software, conv_options_sup=["-cat"]
+            conv_options, conv_kwoptions = self.handl_soft_opts(
+                irow, handle_software=handle_software, mode="splice"
             )
             try:
                 time.sleep(1)

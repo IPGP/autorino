@@ -237,7 +237,7 @@ class SplitGnss(arohdlcls.HandleGnss):
 
         frnx_inp = self.table.loc[irow, table_col]
 
-        conv_options, conv_kwoptions = self.conv_softs_opts(
+        conv_options, conv_kwoptions = self.handl_soft_opts(
             irow, handle_software=handle_software
         )
         try:
