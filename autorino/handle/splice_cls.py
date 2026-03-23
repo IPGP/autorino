@@ -214,7 +214,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
 
-        self.remov_tmp_files()
+        #self.remov_tmp_files()
         return None
 
     def mono_splice(
