@@ -146,7 +146,7 @@ dependencies = {file = ["requirements.txt"]}
 # Optional dependencies the project provides. These are commonly
 # referred to as "extras". For a more extensive definition see:
 # https://packaging.python.org/en/latest/specifications/dependency-specifiers/#extras
-[project.optional-dependencies]
+#[project.optional-dependencies]
 #dev = ["check-manifest"]
 #test = ["coverage"]
 
