@@ -9,9 +9,9 @@ import pandas as pd
 import numpy as np
 
 import autorino.handle as arohdl
-import autorino.check as arochk
-import rinexmod.classes as rimo_cls
-import tqdm
+#import autorino.check as arochk
+#import rinexmod.classes as rimo_cls
+#import tqdm
 
 
 class CheckGnss(arohdl.HandleGnss):
