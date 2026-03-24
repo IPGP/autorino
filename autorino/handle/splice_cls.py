@@ -259,7 +259,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
                 out_dir_main_use, self.table.loc[irow, "epoch_srt"]
             )
 
-            fpath_inp_lst = list(spc_row.table["fpath_inp"])
+            fpath_inp_lst = list(sorted(spc_row.table[table_col]))
 
             handl_opts, handl_kwopts = self.handl_soft_opts(
                 irow, handle_software=handle_software, mode="splice"
