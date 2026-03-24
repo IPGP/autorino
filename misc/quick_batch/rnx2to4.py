@@ -66,7 +66,7 @@ for f in l:
     cmd = [gfzrnx,
              "-finp",
              f_uncmp,
-             "-vo 4",
+             "-vo 3",
              "-f",
              "-fout " + f_rnx3]
 
