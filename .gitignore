@@ -1,9 +1,10 @@
 *.pyc
 .idea/
 venv/
-venvaro01d/
+venvraro1/
+venvraro2/
+venvaro99a/
 autorino.egg-info/
 build/
 .configfiles/sites/*
 uv.lock
-

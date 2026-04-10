@@ -656,7 +656,7 @@ def _device2mda(y_station):
 
     metadata.add_instru(rec_dic, ant_dic)
 
-    metadata.set_meta(
+    metadata.set_misc_meta(
         site_id=y_sit["site_id"],
         domes=y_sit["domes"],
         operator=y_sit["operator"],
