@@ -26,7 +26,7 @@ def cfgfile_run(
     exclude_sites=False,
     epo_srt=None,
     epo_end=None,
-    period="1D",
+    period=None,
     steps_list=None,
     exclude_steps=False,
     force=False,
@@ -66,7 +66,7 @@ def cfgfile_run(
     epo_end : str, optional
         The end date for the epoch range. Default is None.
     period : str, optional
-        The period for the epoch range. Default is "1D".
+        The period for the epoch range. Default is None.
     steps_list : list, optional
         A list of selected steps to be executed.
         If not provided, all steps in 'steps_lis' will be executed.
@@ -105,8 +105,11 @@ def cfgfile_run(
 
     # Determine the epoch range based on the provided start and end dates
     if epo_srt and epo_end:
+        ## defalut period is 1 day if not provided
+        ## a warning will be issued by arocmn.EpochRange
         epoch_range = arocmn.EpochRange(epo_srt, epo_end, period)
     elif epo_srt and not epo_end:
+        logger.info("Only 'epo_srt' provided, using it as a list of start epochs")
         if os.path.isfile(epo_srt):
             with open(epo_srt, "r") as f:
                 start_use = f.read().splitlines()
