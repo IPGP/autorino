@@ -36,8 +36,18 @@ See the following link:
 See the following link:  
 [https://ipgp.github.io/autorino/](https://ipgp.github.io/autorino/)
 
+## References
+If you find _autorino_ useful for your research, please consider citing the following reference:
+* Sakic, P., Boissier, P., Saurel, J.-M., Deroussi, S., Andrieu, A., Griot, C., Bosson, A., Vidal, C., Pardo, C., de Chabalier, J.-B., and OVPF, OVSG & OVSM Teams: _Modernizing GNSS data acquisition, pre-processing, and distribution at volcanological observatories_,
+ Geosci. Instrum. Method. Data Syst., 15, 89–106, https://doi.org/10.5194/gi-15-89-2026, 2026.
+
 ## Authors & Contributors
 * [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
 * [Patrice Boissier](https://github.com/PBoissier) (OVPF-IPGP, La Réunion, France)
 * [Jean-Marie Saurel](https://github.com/jmsaurel) (IPGP-OVS, Paris, France)
 * [Diane Pacaud](https://github.com/DianouPac) (OVPF-IPGP, La Réunion, France)
+
+---
+___The ideal case would be if the receiver manufacturers themselves developed the necessary software to translate the raw data of their receivers into RINEX because probably nobody else knows their receiver better___
+
+Werner Gurtner (AIUB) & Gerald M. Mader (NGS), _The RINEX Format: Current Status, Future Developments_,  Proceedings of the Second International Symposium of Precise Positioning with the Global Positioning System, Ottawa, 1990.
