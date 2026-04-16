@@ -82,9 +82,9 @@ def splice_rnx_abs(
     epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
 
     spc = arohdl.SpliceGnss(
-        out_dir,
-        tmp_dir,
-        log_dir,
+        out_dir=out_dir,
+        tmp_dir=tmp_dir,
+        log_dir=log_dir,
         epoch_range=epo_rng,
         site={'site_id':site},
         session={"data_frequency": data_frequency},

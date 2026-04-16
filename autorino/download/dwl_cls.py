@@ -489,8 +489,31 @@ class DownloadGnss(arocmn.StepGnss):
 
     def ping_remote(self, ping_max_try=4, ping_timeout=20):
         """
-        Ping the remote server to check if it is reachable.
+        Ping the remote server to verify it is reachable before attempting downloads.
+
+        This method attempts to ping the remote hostname specified in the access
+        dictionary. If the initial ping fails, it will retry up to the maximum
+        number of attempts. The method sets the exit_code attribute to 7 if the
+        server is unreachable after all retry attempts.
+
+        Parameters
+        ----------
+        ping_max_try : int, optional
+            Maximum number of ping attempts before giving up.
+            Default is 4.
+        ping_timeout : int, optional
+            Timeout in seconds for each ping attempt.
+            Default is 20.
+
+        Returns
+        -------
+        float or bool or None
+            The round-trip time in seconds if the ping succeeds (float),
+            False if the ping fails after all attempts,
+            or None if no response was received.
+            When successful, the value represents the latency to the remote server.
         """
+
         count = 0
         ping_out = None
         while count < ping_max_try and not ping_out:
@@ -520,7 +543,24 @@ class DownloadGnss(arocmn.StepGnss):
 
     def set_ftp_obj(self, timeout=15, max_try=4, sleep_time=5):
         """
-        Create the FTP object for the FTP protocol.
+        Initialize and configure an FTP object for remote file transfers.
+
+        Parameters
+        ----------
+        timeout : int, optional
+            Timeout in seconds for FTP connection operations.
+            Default is 15.
+        max_try : int, optional
+            Maximum number of retry attempts for FTP operations.
+            Default is 4.
+        sleep_time : int, optional
+            Sleep time in seconds between retry attempts.
+            Default is 5.
+
+        Returns
+        -------
+        None
+            The FTP object is stored in the instance attribute `self.ftp_obj`.
         """
         self.ftp_obj = arodwl.ftp_create_obj(
             hostname_inp=self.access["hostname"],
@@ -531,24 +571,38 @@ class DownloadGnss(arocmn.StepGnss):
             sleep_time=sleep_time,
         )
 
+
     def fetch_remote_files(self, force=False, timeout=60, max_try=4, sleep_time=5):
         """
-        will download locally the files which have been identified by
-        the guess_remote_files method
+        Download locally the files which have been identified by remote file discovery methods.
 
-        exploits the fname_remote column of the DownloadGnss.table
-        attribute
+        Parameters
+        ----------
+        force : bool, optional
+            If True, forces download even if the file already exists locally.
+            Default is False.
+        timeout : int, optional
+            Timeout in seconds for each download operation.
+            Default is 60.
+        max_try : int, optional
+            Maximum number of retry attempts for each download operation.
+            Default is 4.
+        sleep_time : int, optional
+            Sleep time in seconds between retry attempts.
+            Default is 5.
 
-        This `fetch_remote_files` method is for the download stricly speaking.
-        Ìn operation, use the `download` method which does a broader
-        preliminary actions.
+        Returns
+        -------
+        list of str
+            A list of file paths for successfully downloaded files.
+            Empty list if no files were successfully downloaded.
         """
         download_files_list = []
 
         for irow, row in self.table.iterrows():
             file_dl_out = self.mono_fetch(
                 irow,
-                force=force,  # force argument is now redudant, because ok_inp can be forced with .force() method
+                force=force,
                 timeout=timeout,
                 max_try=max_try,
                 sleep_time=sleep_time,

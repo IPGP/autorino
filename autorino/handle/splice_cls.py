@@ -6,16 +6,8 @@ Created on 20/05/2025 20:26:56
 @author: psakic
 """
 
-
 # Create a logger object.
-import os
 import time
-
-import numpy as np
-import pandas as pd
-from pathlib import Path
-
-from geodezyx import utils, conv
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -43,10 +35,7 @@ BOLD_END = "\033[0m"
 
 
 class SpliceGnss(arohdlcls.HandleGnss):
-    def __init__(
-        self,
-        **kwargs
-    ):
+    def __init__(self, **kwargs):
         """
         Initialize a SpliceGnss object.
 
@@ -76,6 +65,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
         input_mode="find",
         input_rinexs=None,
         handle_software="converto",
+        handle_software_options=None,
         rinexmod_options=None,
         verbose=False,
         force=False,
@@ -102,6 +92,12 @@ class SpliceGnss(arohdlcls.HandleGnss):
             Default is None.
         handle_software : str, optional
             The software to use for handling the RINEX files. Default is "converto".
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the handling software.
+            - A list of strings, where each string is an option to be passed to the handling
+                software.
+            - None, if no additional options are needed. Default is None.
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
         verbose : bool, optional
@@ -146,7 +142,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
         # Perform the core splicing operation
         self.splice_core(
-            handle_software=handle_software, rinexmod_options=rinexmod_options
+            handle_software=handle_software,
+            handle_software_options=handle_software_options,
+            rinexmod_options=rinexmod_options,
         )
 
         # close the log file
@@ -155,7 +153,11 @@ class SpliceGnss(arohdlcls.HandleGnss):
         return None
 
     def splice_core(
-        self, handle_software="converto", rinexmod_options=None, rm_inp_files=False
+        self,
+        handle_software="converto",
+        handle_software_options=None,
+        rinexmod_options=None,
+        rm_inp_files=False,
     ):
         """
         Perform the core splicing operation.
@@ -170,6 +172,11 @@ class SpliceGnss(arohdlcls.HandleGnss):
             The software to use for handling the RINEX files. Default is "converto".
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the handling software.
+            - A list of strings, where each string is an option to be passed to the handling software.
+            - None, if no additional options are needed. Default is None.
 
         Returns
         -------
@@ -194,7 +201,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
             )
 
             self.mono_splice(
-                irow, self.tmp_dir_converted, handle_software=handle_software
+                irow, self.tmp_dir_converted,
+                handle_software=handle_software,
+                handle_software_options=handle_software_options
             )
 
             if not self.table.loc[irow, "ok_out"] and self.table.loc[irow, "ok_inp"]:
@@ -216,7 +225,12 @@ class SpliceGnss(arohdlcls.HandleGnss):
         return None
 
     def mono_splice(
-        self, irow, out_dir=None, table_col="fpath_inp", handle_software="converto"
+        self,
+        irow,
+        out_dir=None,
+        table_col="fpath_inp",
+        handle_software="converto",
+        handle_software_options=None,
     ):
         """
         "on row" method
@@ -259,10 +273,12 @@ class SpliceGnss(arohdlcls.HandleGnss):
                 out_dir_main_use, self.table.loc[irow, "epoch_srt"]
             )
 
-            fpath_inp_lst = list(sorted(spc_row.table[table_col]))
+            fpath_inp_lst = list(sorted([str(e) for e in spc_row.table[table_col]]))
 
-            handl_opts, handl_kwopts = self.handl_soft_opts(
-                irow, handle_software=handle_software, mode="splice"
+            hndl_opts_use, hndl_kwopts_use = self.handl_soft_opts(
+                irow, handl_soft=handle_software,
+                mode="splice",
+                handl_opts_supl=handle_software_options
             )
             try:
                 time.sleep(1)
@@ -270,8 +286,8 @@ class SpliceGnss(arohdlcls.HandleGnss):
                     fpath_inp_lst,
                     out_dir_use,
                     converter=handle_software,
-                    bin_options=handl_opts,
-                    bin_kwoptions=handl_kwopts,
+                    bin_options=hndl_opts_use,
+                    bin_kwoptions=hndl_kwopts_use,
                     timeout=600,
                 )
             except Exception as e:

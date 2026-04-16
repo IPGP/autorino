@@ -6,17 +6,7 @@ Created on 20/05/2025 20:26:44
 @author: psakic
 """
 
-
 # Create a logger object.
-import os
-import time
-
-import numpy as np
-import pandas as pd
-from pathlib import Path
-
-from geodezyx import utils, conv
-
 import autorino.common as arocmn
 import autorino.convert as arocnv
 import autorino.handle.handle_cls as arohdlcls
@@ -42,10 +32,7 @@ BOLD_END = "\033[0m"
 
 
 class SplitGnss(arohdlcls.HandleGnss):
-    def __init__(
-        self,
-        **kwargs
-    ):
+    def __init__(self, **kwargs):
         """
         Initialize a SplitGnss object.
 
@@ -75,6 +62,7 @@ class SplitGnss(arohdlcls.HandleGnss):
         input_mode="given",
         input_rinexs=None,
         handle_software="converto",
+        handle_software_options=None,
         rinexmod_options=None,
         verbose=False,
         force=False,
@@ -101,6 +89,11 @@ class SplitGnss(arohdlcls.HandleGnss):
             Default is None.
         handle_software : str, optional
             The software to use for handling the RINEX files. Default is "converto".
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the software.
+            - A list of strings, where each string is an option to be passed to the software.
+            - None, if no additional options are needed. Default is None.
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
         verbose : bool, optional
@@ -144,7 +137,9 @@ class SplitGnss(arohdlcls.HandleGnss):
 
         # Perform the core splitting operation
         self.split_core(
-            handle_software=handle_software, rinexmod_options=rinexmod_options
+            handle_software=handle_software,
+            handle_software_options=handle_software_options,
+            rinexmod_options=rinexmod_options
         )
 
         # close the log file
@@ -152,7 +147,12 @@ class SplitGnss(arohdlcls.HandleGnss):
 
         return None
 
-    def split_core(self, handle_software="converto", rinexmod_options=None):
+    def split_core(
+        self,
+        handle_software="converto",
+        handle_software_options=None,
+        rinexmod_options=None,
+    ):
         """
         Perform the core splitting operation.
 
@@ -164,6 +164,11 @@ class SplitGnss(arohdlcls.HandleGnss):
         ----------
         handle_software : str, optional
             The software to use for handling the RINEX files. Default is "converto".
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the software.
+            - A list of strings, where each string is an option to be passed to the software.
+            - None, if no additional options are needed. Default is None.
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
 
@@ -186,7 +191,10 @@ class SplitGnss(arohdlcls.HandleGnss):
             self.tmp_decmp_files.append(fdecmptmp)
 
             frnx_splited = self.mono_split(
-                irow, self.tmp_dir_converted, handle_software=handle_software
+                irow,
+                self.tmp_dir_converted,
+                handle_software=handle_software,
+                handle_software_options=handle_software_options,
             )
             if not self.table.loc[irow, "ok_out"]:
                 logger.error("unable to split %s, skip", self.table.loc[irow])
@@ -206,7 +214,12 @@ class SplitGnss(arohdlcls.HandleGnss):
         return None
 
     def mono_split(
-        self, irow, out_dir=None, table_col="fpath_inp", handle_software="converto"
+        self,
+        irow,
+        out_dir=None,
+        table_col="fpath_inp",
+        handle_software="converto",
+        handle_software_options=None,
     ):
         """
         "on row" method
@@ -238,7 +251,10 @@ class SplitGnss(arohdlcls.HandleGnss):
         frnx_inp = self.table.loc[irow, table_col]
 
         handl_opts, handl_kwopts = self.handl_soft_opts(
-            irow, handle_software=handle_software, mode="split"
+            irow,
+            handl_soft=handle_software,
+            mode="split",
+            handl_opts_supl=handle_software_options,
         )
         try:
             frnxtmp, _ = arocnv.converter_run(

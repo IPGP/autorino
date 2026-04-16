@@ -148,8 +148,8 @@ def ftp_create_obj(
 def list_remote_ftp(
     hostname,
     remote_dir,
-    username=None,
-    password=None,
+    username="",
+    password="",
     timeout=15,
     max_try=3,
     ftp_obj_inp=None,

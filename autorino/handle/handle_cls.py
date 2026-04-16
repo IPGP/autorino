@@ -8,17 +8,15 @@ Created on Wed Jan 10 15:00:40 2024
 
 # Create a logger object.
 import os
-import time
-
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 from geodezyx import utils, conv
 
 import autorino.common as arocmn
-#import autorino.convert as arocnv
-#import autorino.check as arochk
+
+# import autorino.convert as arocnv
+# import autorino.check as arochk
 
 import rinexmod.classes as rimo_cls
 import tqdm
@@ -66,6 +64,7 @@ class HandleGnss(arocmn.StepGnss):
                Defaults to None.
         """
         super().__init__(**kwargs)
+        self.table_stats = None
 
     def group_by_epochs(
         self,
@@ -418,15 +417,24 @@ class HandleGnss(arocmn.StepGnss):
     def handl_soft_opts(
         self,
         irow,
-        handle_software,
+        handl_soft="converto",
         mode="splice",
-        handl_opts_sup=[],
-        handl_kwopts_sup=dict(),
+        handl_opts_supl=None,
+        handl_kwopts_supl=None,
     ):
+
+        if not handl_opts_supl:
+            handl_opts_supl = []
+        else:
+            handl_opts_supl = utils.listify(handl_opts_supl)
+
+        if not handl_kwopts_supl:
+            handl_kwopts_supl = {}
+
         srt = self.table.loc[irow, "epoch_srt"]
         end = self.table.loc[irow, "epoch_end"]
 
-        if handle_software == "converto":
+        if handl_soft == "converto":
             handl_kwopts_bas = {
                 "-st": srt.strftime("%Y%m%d%H%M%S"),
                 "-e": end.strftime("%Y%m%d%H%M%S"),
@@ -434,7 +442,7 @@ class HandleGnss(arocmn.StepGnss):
             handl_opts_bas = []
             if mode == "splice":
                 handl_opts_bas.append("-cat")
-        elif handle_software == "gfzrnx":
+        elif handl_soft == "gfzrnx":
             duration = int((end - srt).total_seconds())
             handl_kwopts_bas = {
                 "-epo_beg": srt.strftime("%Y%m%d_%H%M%S"),
@@ -444,14 +452,14 @@ class HandleGnss(arocmn.StepGnss):
             if mode == "splice":
                 handl_opts_bas.append("-splice_direct")
         else:
-            logger.critical("wrong handle software: %s", handle_software)
+            logger.critical("wrong handle software: %s", handl_soft)
             raise ValueError
 
-        handl_opts_out = handl_opts_bas + handl_opts_sup
-        handl_kwopts_out = {**handl_kwopts_bas, **handl_kwopts_sup}
+        ## concatenate with exisiting options
+        handl_opts_out = handl_opts_bas + handl_opts_supl
+        handl_kwopts_out = {**handl_kwopts_bas, **handl_kwopts_supl}
 
         return handl_opts_out, handl_kwopts_out
-
 
     def analyze_rnxs(self):
         """
@@ -470,14 +478,17 @@ class HandleGnss(arocmn.StepGnss):
 
         ds_stk = []
 
-        for irow, row in tqdm.tqdm(self.table.iterrows(), total=len(self.table),
-                                   desc="Analyzing RINEX files for " + self.site_id):
+        for irow, row in tqdm.tqdm(
+            self.table.iterrows(),
+            total=len(self.table),
+            desc="Analyzing RINEX files for " + self.site_id,
+        ):
 
             ds = dict()
             ds["fpath"] = self.table.loc[irow, "fpath_inp"]
             ds["site"] = self.table.loc[irow, "site"]
 
-            if not self.mono_ok_check(int(irow), 'check'):
+            if not self.mono_ok_check(int(irow), "check"):
                 ds["%"] = 0
             else:
                 ### get RINEX as an rinexMod's Object
@@ -490,8 +501,12 @@ class HandleGnss(arocmn.StepGnss):
                 ds["epoch_end"] = self.table.loc[irow, "epoch_end"]
 
                 ### get RINEX start/end in the data
-                ds["epoch_srt_data"] = pd.to_datetime(rnxobj.start_date, format='%H:%M:%S')
-                ds["epoch_end_data"] = pd.to_datetime(rnxobj.end_date, format='%H:%M:%S')
+                ds["epoch_srt_data"] = pd.to_datetime(
+                    rnxobj.start_date, format="%H:%M:%S"
+                )
+                ds["epoch_end_data"] = pd.to_datetime(
+                    rnxobj.end_date, format="%H:%M:%S"
+                )
                 ### get RINEX nominal interval
                 ds["itrvl"] = rnxobj.sample_rate_numeric
                 ### get RINEX number of epochs
@@ -517,14 +532,9 @@ class HandleGnss(arocmn.StepGnss):
 
         return dfts
 
-
     def check(self):
         self.guess_local_rnx(io="inp")
         self.check_local_files(io="inp")
         self.print_table()
         self.analyze_rnxs()
         self.table["%"] = self.table_stats["%"]
-
-
-
-

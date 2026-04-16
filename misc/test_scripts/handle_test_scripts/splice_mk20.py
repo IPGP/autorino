@@ -25,7 +25,7 @@ spc = arohdl.SpliceGnss(
 
 rnxsinp = spc.find_local_inp(return_as_step_obj=True)
 
-spc.splice("given", rnxsinp)
+spc.splice(input_mode="given", input_rinexs=rnxsinp)
 
 
 import versioningit
