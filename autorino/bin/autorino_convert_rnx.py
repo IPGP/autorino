@@ -13,7 +13,10 @@ import yaml
 import autorino.api as aroapi
 
 def main():
-    parser = argparse.ArgumentParser(description="Convert RAW files to RINEX.")
+    parser = argparse.ArgumentParser(
+        description=aroapi.convert_rnx.__doc__.split("Parameters")[0],
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("-i",
         "--inp_raws",
         required=True,
