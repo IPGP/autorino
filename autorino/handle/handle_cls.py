@@ -187,8 +187,9 @@ class HandleGnss(arocmn.StepGnss):
             if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
             (all the needed ones for the splice)
 
-        print_table : bool, optional
-            If True, prints the tables for debugging purposes. Default is False.
+        print_table : bool
+            If True, prints the tables for debugging purposes.
+            Default is False.
 
         Returns
         -------
@@ -310,12 +311,14 @@ class HandleGnss(arocmn.StepGnss):
 
         Parameters
         ----------
-        return_as_step_obj : bool, optional
+        return_as_step_obj : bool
             If True, returns the result as a StepGnss object.
-            If False, returns a list of file paths. Default is True.
-        rnx3_regex : bool, optional
+            If False, returns a list of file paths.
+            Default is True.
+        rnx3_regex : bool
             If True, uses a regex pattern for RINEX 3 filenames.
-            If False, uses a wildcard pattern. Default is False.
+            If False, uses a wildcard pattern.
+            Default is False.
 
         Returns
         -------
@@ -336,7 +339,7 @@ class HandleGnss(arocmn.StepGnss):
                 patrn = ".*"
 
             local_paths_list_epo = utils.find_recursive(
-                local_dir_use, pattern=patrn, regex=True
+                local_dir_use, pattern=patrn, regex=rnx3_regex
             )
             local_paths_list.extend(local_paths_list_epo)
 
@@ -365,6 +368,7 @@ class HandleGnss(arocmn.StepGnss):
             It can be:
             - A list of RINEX file paths.
             - An existing StepGnss object.
+            Default is None.
 
         Returns
         -------

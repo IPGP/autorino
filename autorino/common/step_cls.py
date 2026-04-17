@@ -505,16 +505,21 @@ class StepGnss:
 
         Parameters
         ----------
-        tmp_subdir_dwnld : str, optional
-            The subdirectory for downloaded files. Default is 'downloaded'.
-        tmp_subdir_unzip : str, optional
-            The subdirectory for unzipped files. Default is 'unzipped'.
-        tmp_subdir_conv : str, optional
-            The subdirectory for converted files. Default is 'converted'.
-        tmp_subdir_rnxmod : str, optional
-            The subdirectory for rinexmoded files. Default is 'rinexmoded'.
-        tmp_subdir_tables : str, optional
-            The subdirectory for logs. Default is 'logs'.
+        tmp_subdir_dwnld : str
+            The subdirectory for downloaded files.
+            Default is 'downloaded'.
+        tmp_subdir_unzip : str
+            The subdirectory for unzipped files.
+            Default is 'unzipped'.
+        tmp_subdir_conv : str
+            The subdirectory for converted files.
+            Default is 'converted'.
+        tmp_subdir_rnxmod : str
+            The subdirectory for rinexmoded files.
+            Default is 'rinexmoded'.
+        tmp_subdir_tables : str
+            The subdirectory for logs.
+            Default is 'logs'.
 
         Returns
         -------
@@ -547,7 +552,7 @@ class StepGnss:
 
         Parameters
         ----------
-        metadata : str, optional
+        metadata : str
             The metadata for the step. If not provided, the 'metadata' attribute is set to None.
 
         Returns
@@ -940,7 +945,7 @@ class StepGnss:
     def translate_path(
         self,
         path_inp: str,
-        epoch_inp=None,
+        epoch_inp =None,
         make_dir: bool = False,
         absolute: bool = False,
     ) -> str:
@@ -956,12 +961,14 @@ class StepGnss:
         path_inp : str
             The input path to be translated.
         epoch_inp : datetime, optional
-            The epoch input to be used in the translation. Default is None.
+            The epoch input to be used in the translation.
+            Default is None.
         make_dir : bool, optional
             If True, the function will create the directory corresponding to the translated path.
             Default is False.
         absolute : bool, optional
-            If True, the function will return the absolute path. Default is False.
+            If True, the function will return the absolute path.
+            Default is False.
 
         Returns
         -------

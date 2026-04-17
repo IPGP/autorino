@@ -10,7 +10,7 @@ import os.path
 
 import autorino.handle as arohdl
 import autorino.common as arocmn
-import datetime as dt
+from geodezyx import utils
 
 #### Import the logger
 import logging
@@ -80,10 +80,13 @@ def splice_rnx(
         If ``True``, ``epoch_srt`` and ``epoch_end`` are ignored (set to
         ``None``), forcing relative mode regardless of their values.
         Defaults to ``False``.
-    site : str, optional
-        The site name to be used for the spliced RINEX files (*absolute* mode).
+    site : list or str, optional
+        site(s) name to be used for the spliced RINEX files (*absolute* mode).
         Facultative but highly recommended to detect existing files to be
-        skipped. Defaults to ``None``.
+        skipped.
+        If not site(s) provided, a list of potential sites will be
+        automatically detected.
+        Defaults to ``None``.
     data_frequency : str, optional
         The data frequency for the spliced RINEX files (*absolute* mode).
         Facultative but highly recommended to detect existing files to be
@@ -144,67 +147,85 @@ def splice_rnx(
         logger.info("Absolute-mode splice")
 
     # ------------------------------------------------------------------ #
-    #  Determine input RINEXs                                            #
+    #  Determine sites                                                   #
     # ------------------------------------------------------------------ #
 
+    inp_dir_use = str(rnxs_inp[0]) if len(rnxs_inp) == 1 else None
 
-    inp_dir_use = rnxs_inp[0] if len(rnxs_inp) == 1 else None
-
-    spc_inp_rnx = arohdl.SpliceGnss(
-        inp_dir=inp_dir_use,
-        out_dir=out_dir,
-        tmp_dir=tmp_dir,
-        log_dir=log_dir,
-        epoch_range=epo_rng,
-        site={"site_id": site},
-        session={"data_frequency": data_frequency},
-        metadata=metadata,
-    )
-
-    if inp_dir_use:
-        spc_inp_rnx = spc_inp_rnx.load_input_rnxs("find", None)
+    if site:
+        sites_use = utils.listify(site)
+    elif not site and os.path.isdir(inp_dir_use):
+        logger.info("sites will be detected automatically based on the input directory")
+        sites_use = arocmn.guess_sites_list(inp_dir_use)
     else:
-        spc_inp_rnx = spc_inp_rnx.load_input_rnxs("given", rnxs_inp)
+        logger.error("unable to detect site list. aborting...")
+        errmsg = "check parent directory %s or for site list with 'site' argument"
+        logger.error(errmsg, inp_dir_use)
+        return None
 
-    # ------------------------------------------------------------------ #
-    #  Absolute mode                                                     #
-    # ------------------------------------------------------------------ #
-    if not relative_mode:
-        spc_main_obj = arohdl.SpliceGnss(
+    for site_use in sites_use:
+
+        logger.info("splicing site %s", site_use)
+
+        # ------------------------------------------------------------------ #
+        #  Determine input RINEXs                                            #
+        # ------------------------------------------------------------------ #
+
+        spc_inp_rnx = arohdl.SpliceGnss(
+            inp_dir=inp_dir_use,
             out_dir=out_dir,
             tmp_dir=tmp_dir,
             log_dir=log_dir,
             epoch_range=epo_rng,
-            site={"site_id": site},
+            site={"site_id": site_use},
             session={"data_frequency": data_frequency},
             metadata=metadata,
         )
 
-        spc_main_obj.splice(
-            input_mode="given",
-            input_rinexs=spc_inp_rnx,
-            handle_software=handle_software,
-            rinexmod_options=rinexmod_options,
-        )
+        if inp_dir_use:
+            inp_mode, inp_rnxs = "find", None
+        else:
+            inp_mode, inp_rnxs = "given", rnxs_inp
 
-        return spc_main_obj
+        spc_inp_rnx = spc_inp_rnx.load_input_rnxs(inp_mode, inp_rnxs)
 
-    # ------------------------------------------------------------------ #
-    #  Relative mode                                                     #
-    # ------------------------------------------------------------------ #
+        # ------------------------------------------------------------------ #
+        #  Absolute mode                                                     #
+        # ------------------------------------------------------------------ #
+        if not relative_mode:
+            spc_main_obj = arohdl.SpliceGnss(
+                out_dir=out_dir,
+                tmp_dir=tmp_dir,
+                log_dir=log_dir,
+                epoch_range=epo_rng,
+                site={"site_id": site},
+                session={"data_frequency": data_frequency},
+                metadata=metadata,
+            )
 
-    else:
-        spc_main_obj, _ = spc_inp_rnx.group_by_epochs(
-            period=period,
-            rolling_period=rolling_period,
-            rolling_ref=rolling_ref,
-            round_method=round_method,
-            drop_epoch_rnd=drop_epoch_rnd,
-        )
+            spc_main_obj.splice(
+                input_mode="given",
+                input_rinexs=spc_inp_rnx,
+                handle_software=handle_software,
+                rinexmod_options=rinexmod_options,
+            )
 
-        spc_main_obj.splice_core(
-            handle_software=handle_software,
-            rinexmod_options=rinexmod_options,
-        )
+        # ------------------------------------------------------------------ #
+        #  Relative mode                                                     #
+        # ------------------------------------------------------------------ #
 
-        return spc_main_obj
+        else:
+            spc_main_obj, _ = spc_inp_rnx.group_by_epochs(
+                period=period,
+                rolling_period=rolling_period,
+                rolling_ref=rolling_ref,
+                round_method=round_method,
+                drop_epoch_rnd=drop_epoch_rnd,
+            )
+
+            spc_main_obj.splice_core(
+                handle_software=handle_software,
+                rinexmod_options=rinexmod_options,
+            )
+
+    return None
