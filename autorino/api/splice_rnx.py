@@ -75,7 +75,7 @@ def splice_rnx(
     site : str, optional
         The site name to be used for the spliced RINEX files (*absolute* mode).
         Facultative but highly recommended to detect existing files to be
-        skipped. Defaults to ``None``.
+        skipped. Defaults to ``XXXX00XXX``.
     data_frequency : str, optional
         The data frequency for the spliced RINEX files (*absolute* mode).
         Facultative but highly recommended to detect existing files to be
