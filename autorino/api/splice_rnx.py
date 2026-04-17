@@ -147,7 +147,8 @@ def splice_rnx(
     #  Determine input RINEXs                                            #
     # ------------------------------------------------------------------ #
 
-    inp_dir_use = rnxs_inp[0] if os.path.isdir(rnxs_inp[0]) else None
+
+    inp_dir_use = rnxs_inp[0] if len(rnxs_inp) == 1 else None
 
     spc_inp_rnx = arohdl.SpliceGnss(
         inp_dir=inp_dir_use,
