@@ -12,8 +12,9 @@ from autorino.api.splice_rnx_rel import splice_rnx_rel
 
 
 def main():
+    desc = splice_rnx_rel.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
-        description=splice_rnx_rel.__doc__.split("Parameters")[0],
+        description=desc,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(

@@ -13,9 +13,9 @@ from autorino.api.check_rnx import check_rnx
 
 def main():
     # Get the docstring from check_rnx function for the description
-    description = "Checks the presence of RINEX files in the input directory over a specified time range, and computes their completeness ratio."
+    desc = check_rnx.__doc__.split("Parameters")[0]
 
-    parser = argparse.ArgumentParser(description=description)
+    parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
         "-i",
         "--input_dir_parent",

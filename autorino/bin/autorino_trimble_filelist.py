@@ -21,8 +21,9 @@ def main():
     """
     Shell function to call trimble_filelist_html with command-line arguments.
     """
+    desc = arochk.trimble_filelist_html.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
-        description="Generate a list of Trimble files from a remote HTML directory.",
+        description=desc,
         epilog="Example: autorino_trimble_filelist CBEZ <URL_of_CBEZ> /output/directory 2024-01-01 2024-12-31'",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

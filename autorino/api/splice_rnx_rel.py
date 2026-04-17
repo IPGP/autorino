@@ -7,7 +7,6 @@ Created on 18/09/2024 18:26:37
 """
 
 
-
 import autorino.handle as arohdl
 
 
@@ -17,7 +16,6 @@ import autorino.cfgenv.env_read as aroenv
 
 logger = logging.getLogger('autorino')
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
-
 
 
 def splice_rnx_rel(
@@ -113,7 +111,8 @@ def splice_rnx_rel(
     )
 
     spc_main_obj.splice_core(
-        handle_software=handle_software, rinexmod_options=rinexmod_options
+        handle_software=handle_software,
+        rinexmod_options=rinexmod_options
     )
 
     return spc_main_obj

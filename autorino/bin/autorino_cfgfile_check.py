@@ -11,8 +11,9 @@ import argparse
 import yaml
 
 def main():
+    desc = arocfg.read_cfg.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
-        description="Check autorino configuration file",
+        description=desc,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 

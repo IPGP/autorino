@@ -13,8 +13,9 @@ import yaml
 import autorino.api as aroapi
 
 def main():
+    desc = aroapi.convert_rnx.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
-        description=aroapi.convert_rnx.__doc__.split("Parameters")[0],
+        description=desc,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("-i",

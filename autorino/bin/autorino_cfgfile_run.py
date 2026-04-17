@@ -5,8 +5,9 @@ import sys
 
 def main():
     ##### Parsing Args
+    desc = aroapi.cfgfile_run.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
-        description="Assisted Unloading, Treatment and Organization of RINEX observations",
+        description=desc,
         epilog=(
             "Examples:\n"
             "  * run all the config files within cfgfiles_dir directory, using per default epoch ranges:\n"
