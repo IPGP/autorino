@@ -5,6 +5,7 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
+import re
 
 # Create a logger object.
 import os
@@ -331,6 +332,7 @@ class HandleGnss(arocmn.StepGnss):
 
             if rnx3_regex:
                 patrn = self.site_id9 + conv.rinex_regex_long_name()[17:]
+                patrn = re.compile(patrn)
             else:
                 patrn = ".*"
 
@@ -382,6 +384,7 @@ class HandleGnss(arocmn.StepGnss):
         elif input_mode == "given":
             if not input_rinexs:
                 logger.error("input mode is 'given' but no input_rinexs provided")
+                return None
 
             if utils.is_iterable(input_rinexs):
                 # Convert a list of RINEX files to a StepGnss object

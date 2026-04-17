@@ -14,7 +14,7 @@ import datetime as dt
 import logging
 import autorino.cfgenv.env_read as aroenv
 
-logger = logging.getLogger('autorino')
+logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
@@ -145,8 +145,10 @@ def splice_rnx(
     #  Determine input RINEXs                                            #
     # ------------------------------------------------------------------ #
 
+    rnxs_inp_use = rnxs_inp
+
     spc_inp_rnx = arohdl.SpliceGnss(
-        inp_dir=rnxs_inp,
+        inp_dir=rnxs_inp_use,
         out_dir=out_dir,
         tmp_dir=tmp_dir,
         log_dir=log_dir,
@@ -156,10 +158,10 @@ def splice_rnx(
         metadata=metadata,
     )
 
-    spc_inp_rnx = spc_inp_rnx.load_input_rnxs("find", None)
-
-    #spc_inp_rnx.load_tab_filelist(rnxs_inp)
-    #spc_inp_rnx.updt_epotab_rnx(use_rnx_filename_only=True)
+    if True:
+        spc_inp_rnx = spc_inp_rnx.load_input_rnxs("find", None)
+    else:
+        spc_inp_rnx = spc_inp_rnx.load_input_rnxs("given", rnxs_inp)
 
     # ------------------------------------------------------------------ #
     #  Absolute mode                                                     #
@@ -170,7 +172,7 @@ def splice_rnx(
             tmp_dir=tmp_dir,
             log_dir=log_dir,
             epoch_range=epo_rng,
-            site={'site_id': site},
+            site={"site_id": site},
             session={"data_frequency": data_frequency},
             metadata=metadata,
         )
