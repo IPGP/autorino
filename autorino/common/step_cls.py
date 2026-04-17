@@ -25,6 +25,7 @@ import autorino.cfglog as arologcfg
 # new rinexmod v4 import
 import rinexmod.api as rimo_api
 import rinexmod.classes as rimo_cls
+
 # old rinexmod import
 # from rinexmod import rinexmod_api as rimo_api
 
@@ -153,7 +154,7 @@ class StepGnss:
         self.tmp_decmp_files = []
 
         # exit code
-        self._exit_code = None # initialized to None
+        self._exit_code = None  # initialized to None
 
     # getter and setter
     # site_id
@@ -222,7 +223,11 @@ class StepGnss:
 
     @site_id.setter
     def site_id(self, value):
-        self._site_id = value
+        if not value:
+            logger.warning("site id is not defined (%s), set to XXXX00XXX", value)
+            self._site_id = "XXXX00XXX"
+        else:
+            self._site_id = value
 
     @property
     def site_id4(self):
@@ -296,9 +301,9 @@ class StepGnss:
             exicod_out = 0
         elif n_inp_ok == 0:  # no input cases, step is skipped or disabled
             exicod_out = 0
-        elif n_out_ok == 0: # no output cases
+        elif n_out_ok == 0:  # no output cases
             exicod_out = 6 if n_inp_ok == n_total else 5
-        else: # partial output cases
+        else:  # partial output cases
             exicod_out = 4 if n_inp_ok == n_total else 3
 
         logger.debug("Exit code from table: %s, %s", exicod_out, self)
@@ -345,7 +350,7 @@ class StepGnss:
             ]
 
             # Add bis columns only if out_bis_dir is defined
-            if hasattr(self, '_out_bis_dir') and self._out_bis_dir:
+            if hasattr(self, "_out_bis_dir") and self._out_bis_dir:
                 table_cols.insert(table_cols.index("fpath_inp"), "ok_out_bis")
                 table_cols.insert(table_cols.index("size_inp"), "fpath_out_bis")
                 table_cols.insert(table_cols.index("note"), "size_out_bis")
@@ -555,9 +560,7 @@ class StepGnss:
             else:  # all the other cases, i.e. already some MetaData objects
                 metadata_set = metadata
 
-            self.metadata = rimo_api.metadata_input_manage(
-                metadata_set, force=False
-            )
+            self.metadata = rimo_api.metadata_input_manage(metadata_set, force=False)
         else:
             self.metadata = None
 
@@ -1623,7 +1626,9 @@ class StepGnss:
         # !!!!! THIS METHOD IS REDUNDANT WITH find_local_raw !!!!!
         # !!!!! must be merged with find_local_raw !!!!!!!
 
-        logger.warning("guess_out_files is redundant with find_local_raw, should be merged")
+        logger.warning(
+            "guess_out_files is redundant with find_local_raw, should be merged"
+        )
 
         out_paths_list = []
 
@@ -1669,7 +1674,7 @@ class StepGnss:
         local_paths_list = []
 
         if not method in ("ask", "guess"):
-            logger.error("Wrong method: %s ('ask' or 'guess' only are allowed)",method)
+            logger.error("Wrong method: %s ('ask' or 'guess' only are allowed)", method)
             raise Exception
 
         for irow, row in self.table.iterrows():
@@ -2527,7 +2532,12 @@ class StepGnss:
         return rimopts_out
 
     def mono_rinexmod(
-        self, irow, out_dir=None, table_col="fpath_out", rinexmod_options=None, check_ok_out=True
+        self,
+        irow,
+        out_dir=None,
+        table_col="fpath_out",
+        rinexmod_options=None,
+        check_ok_out=True,
     ):
         """
         "on row" method
@@ -2578,9 +2588,7 @@ class StepGnss:
         frnx = self.table.loc[irow, table_col]
 
         try:
-            frnxmod = rimo_api.rinexmod(
-                frnx, out_dir_use, **rinexmod_options_use
-            )
+            frnxmod = rimo_api.rinexmod(frnx, out_dir_use, **rinexmod_options_use)
         except Exception as e:
             logger.error("Error for: %s", frnx)
             logger.exception("Exception raised: %s", e)
@@ -2595,9 +2603,7 @@ class StepGnss:
                 not self.table.loc[irow, "epoch_srt"]
                 or not self.table.loc[irow, "epoch_end"]
             ):
-                epo_srt_ok, epo_end_ok = rimo_api.dates_from_rinex_filename(
-                    frnxmod
-                )
+                epo_srt_ok, epo_end_ok = rimo_api.dates_from_rinex_filename(frnxmod)
                 self.table.loc[irow, "epoch_srt"] = epo_srt_ok
                 self.table.loc[irow, "epoch_end"] = epo_end_ok
 
@@ -3029,7 +3035,7 @@ class StepGnss:
         out_dir_use = str(out_dir_use)
 
         if method == "ask":
-            local_fname_use = os.path.basename(self.table.loc[irow,"fpath_inp"])
+            local_fname_use = os.path.basename(self.table.loc[irow, "fpath_inp"])
         elif method == "guess":
             local_fname_use = str(self.inp_file_regex)
         else:

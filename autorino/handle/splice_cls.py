@@ -58,7 +58,6 @@ class SpliceGnss(arohdlcls.HandleGnss):
             - options : dict, optional - Additional options for the splicing operation. Default is None.
             - metadata : str or list, optional - Metadata for the splicing operation. Default is None.
         """
-        print("AAAAAAAAAAAAAAAAA", kwargs["site"])
         super().__init__(**kwargs)
 
     def splice(
