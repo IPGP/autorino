@@ -26,7 +26,7 @@ def splice_rnx(
     log_dir=None,
     epoch_srt=None,
     epoch_end=None,
-    site=None,
+    site="XXXX00XXX",
     data_frequency="30S",
     handle_software="converto",
     rolling_period=False,
