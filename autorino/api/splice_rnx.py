@@ -128,13 +128,30 @@ def splice_rnx(
     if not log_dir:
         log_dir = tmp_dir
 
-    # ------------------------------------------------------------------ #
-    #  Absolute mode                                                       #
-    # ------------------------------------------------------------------ #
     if epoch_srt is not None and epoch_end is not None:
         epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period, tz="UTC")
+        absolute = True
+    else:
+        epo_rng = arocmn.dummy_epochrange(period)
+        absolute = False
 
-        spc = arohdl.SpliceGnss(
+
+    spc_inp_rnx = arohdl.SpliceGnss(
+        out_dir=out_dir,
+        tmp_dir=tmp_dir,
+        log_dir=log_dir,
+        epoch_range=epo_rng,
+        metadata=metadata,
+    )
+    spc_inp_rnx.load_tab_filelist(rnxs_inp)
+    spc_inp_rnx.updt_epotab_rnx(use_rnx_filename_only=True)
+
+    # ------------------------------------------------------------------ #
+    #  Absolute mode                                                     #
+    # ------------------------------------------------------------------ #
+    if absolute:
+
+        spc_main_obj = arohdl.SpliceGnss(
             out_dir=out_dir,
             tmp_dir=tmp_dir,
             log_dir=log_dir,
@@ -144,41 +161,31 @@ def splice_rnx(
             metadata=metadata,
         )
 
-        spc.splice(
-            input_rinexs=rnxs_inp,
+        spc_main_obj.splice(
+            input_rinexs=spc_inp_rnx,
             input_mode="find",
             handle_software=handle_software,
             rinexmod_options=rinexmod_options,
         )
 
-        return spc
+        return spc_main_obj
 
     # ------------------------------------------------------------------ #
-    #  Relative mode                                                       #
+    #  Relative mode                                                     #
     # ------------------------------------------------------------------ #
-    epo_rng = arocmn.dummy_epochrange(period)
 
-    spc_inp = arohdl.SpliceGnss(
-        out_dir=out_dir,
-        tmp_dir=tmp_dir,
-        log_dir=log_dir,
-        epoch_range=epo_rng,
-        metadata=metadata,
-    )
-    spc_inp.load_tab_filelist(rnxs_inp)
-    spc_inp.updt_epotab_rnx(use_rnx_filename_only=True)
+    else:
+        spc_main_obj, _ = spc_inp_rnx.group_by_epochs(
+            period=period,
+            rolling_period=rolling_period,
+            rolling_ref=rolling_ref,
+            round_method=round_method,
+            drop_epoch_rnd=drop_epoch_rnd,
+        )
 
-    spc_main_obj, _ = spc_inp.group_by_epochs(
-        period=period,
-        rolling_period=rolling_period,
-        rolling_ref=rolling_ref,
-        round_method=round_method,
-        drop_epoch_rnd=drop_epoch_rnd,
-    )
+        spc_main_obj.splice_core(
+            handle_software=handle_software,
+            rinexmod_options=rinexmod_options,
+        )
 
-    spc_main_obj.splice_core(
-        handle_software=handle_software,
-        rinexmod_options=rinexmod_options,
-    )
-
-    return spc_main_obj
+        return spc_main_obj
