@@ -12,7 +12,10 @@ from autorino.api.splice_rnx_rel import splice_rnx_rel
 
 
 def main():
-    parser = argparse.ArgumentParser(description=splice_rnx_rel.__doc__)
+    parser = argparse.ArgumentParser(
+        description=splice_rnx_rel.__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument(
         "-i", "--rnxs_inp",
         required=True,
