@@ -145,8 +145,8 @@ def splice_rnx(
         )
 
         spc.splice(
-            input_mode="given",
             input_rinexs=rnxs_inp,
+            input_mode="find",
             handle_software=handle_software,
             rinexmod_options=rinexmod_options,
         )

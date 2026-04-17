@@ -374,10 +374,8 @@ class HandleGnss(arocmn.StepGnss):
 
         if input_mode == "find":
             # Find local RINEX files and convert them to a StepGnss object
-            logger.debug(
-                method_msg
-                + "find local RINEX files and convert them to a StepGnss object"
-            )
+            dbgmsg = "find local RINEX files and convert them to a StepGnss object"
+            logger.debug(method_msg + dbgmsg)
             stp_obj_rnxs_inp = self.find_local_inp(
                 return_as_step_obj=True, rnx3_regex=True
             )
@@ -387,29 +385,26 @@ class HandleGnss(arocmn.StepGnss):
 
             if utils.is_iterable(input_rinexs):
                 # Convert a list of RINEX files to a StepGnss object
-                logger.debug(
-                    method_msg + "convert a RINEX files list to a StepGnss object"
-                )
+                dbgmsg = "convert a RINEX files list to a StepGnss object"
+                logger.debug(method_msg + dbgmsg)
                 stp_obj_rnxs_inp = arocmn.rnxs2step_obj(rnxs_lis_inp=input_rinexs)
 
             elif isinstance(input_rinexs, arocmn.StepGnss):
                 # Use an existing StepGnss object containing the RINEX files
-                logger.debug(
-                    method_msg + "a StepGnss object containing the RINEX files"
-                )
+                dbgmsg = "a StepGnss object containing the RINEX files"
+                logger.debug(method_msg + dbgmsg)
                 stp_obj_rnxs_inp = input_rinexs
             else:
                 # Log an error if the input_rinexs value is invalid
-                logger.error(
-                    "wrong input_rinexs value for the creation of a StepGnss object: %s",
-                    input_rinexs,
+                errmsg = (
+                    "wrong input_rinexs value for the creation of a StepGnss object: %s"
                 )
+                logger.error(errmsg, input_rinexs)
                 return None
         else:
             # Log an error if the mode value is invalid
-            logger.error(
-                "wrong mode value: %s (only 'find' and 'given' are valid)", input_mode
-            )
+            errmsg = "wrong mode value: %s (only 'find' and 'given' are valid)"
+            logger.error(errmsg, input_mode)
             return None
 
         return stp_obj_rnxs_inp
