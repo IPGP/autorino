@@ -26,7 +26,8 @@ def splice_rnx(
     log_dir=None,
     epoch_srt=None,
     epoch_end=None,
-    site="XXXX00XXX",
+    relative_mode=False,
+    site=None,
     data_frequency="30S",
     handle_software="converto",
     rolling_period=False,
@@ -72,10 +73,15 @@ def splice_rnx(
     epoch_end : str or datetime-like, optional
         The end epoch for the splicing operation (*absolute* mode only).
         If ``None``, *relative* mode is used. Defaults to ``None``.
+    relative_mode : bool, optional
+        Explicitly enable *relative* mode.
+        If ``True``, ``epoch_srt`` and ``epoch_end`` are ignored (set to
+        ``None``), forcing relative mode regardless of their values.
+        Defaults to ``False``.
     site : str, optional
         The site name to be used for the spliced RINEX files (*absolute* mode).
         Facultative but highly recommended to detect existing files to be
-        skipped. Defaults to ``XXXX00XXX``.
+        skipped. Defaults to ``None``.
     data_frequency : str, optional
         The data frequency for the spliced RINEX files (*absolute* mode).
         Facultative but highly recommended to detect existing files to be
@@ -128,29 +134,37 @@ def splice_rnx(
     if not log_dir:
         log_dir = tmp_dir
 
-    if epoch_srt is not None and epoch_end is not None:
-        epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period, tz="UTC")
-        absolute = True
-    else:
+    if relative_mode:
         epo_rng = arocmn.dummy_epochrange(period)
-        absolute = False
+        logger.info("relative splice")
+    else:
+        epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period, tz="UTC")
+        logger.info("absolute splice")
 
+    # ------------------------------------------------------------------ #
+    #  Determine input RINEXs                                            #
+    # ------------------------------------------------------------------ #
 
     spc_inp_rnx = arohdl.SpliceGnss(
+        inp_dir=rnxs_inp,
         out_dir=out_dir,
         tmp_dir=tmp_dir,
         log_dir=log_dir,
         epoch_range=epo_rng,
+        site={"site_id": site},
+        session={"data_frequency": data_frequency},
         metadata=metadata,
     )
-    spc_inp_rnx.load_tab_filelist(rnxs_inp)
-    spc_inp_rnx.updt_epotab_rnx(use_rnx_filename_only=True)
+
+    spc_inp_rnx = spc_inp_rnx.load_input_rnxs("find", None)
+
+    #spc_inp_rnx.load_tab_filelist(rnxs_inp)
+    #spc_inp_rnx.updt_epotab_rnx(use_rnx_filename_only=True)
 
     # ------------------------------------------------------------------ #
     #  Absolute mode                                                     #
     # ------------------------------------------------------------------ #
-    if absolute:
-
+    if not relative_mode:
         spc_main_obj = arohdl.SpliceGnss(
             out_dir=out_dir,
             tmp_dir=tmp_dir,
@@ -162,8 +176,8 @@ def splice_rnx(
         )
 
         spc_main_obj.splice(
+            input_mode="given",
             input_rinexs=spc_inp_rnx,
-            input_mode="find",
             handle_software=handle_software,
             rinexmod_options=rinexmod_options,
         )

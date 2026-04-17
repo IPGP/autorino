@@ -100,7 +100,7 @@ def main():
     abs_grp.add_argument(
         "-si",
         "--site",
-        default="XXXX00XXX",
+        default=None,
         help="Site name for the spliced RINEX files. "
         "Recommended to detect existing files to skip. (optional)",
     )
@@ -117,6 +117,13 @@ def main():
     rel_grp = parser.add_argument_group(
         "Relative mode",
         "Arguments for relative mode (used when --epoch_srt and --epoch_end are NOT provided).",
+    )
+    rel_grp.add_argument(
+        "-r",
+        "--relative_mode",
+        action="store_true",
+        help="Explicitly enable relative mode. "
+        "Forces --epoch_srt and --epoch_end to be ignored (set to None). (optional)",
     )
     rel_grp.add_argument(
         "-rop",
@@ -155,6 +162,7 @@ def main():
         log_dir=args.log_dir,
         epoch_srt=args.epoch_srt,
         epoch_end=args.epoch_end,
+        relative_mode=args.relative_mode,
         site=args.site,
         data_frequency=args.data_frequency,
         handle_software=args.handle_software,

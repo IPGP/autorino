@@ -115,23 +115,28 @@ def dummy_sess_dic():
 
 def import_files(inp_fil, inp_regex=".*"):
     """
-    Handles multiple types of input lists and returns a python list of the input.
+    Handles multiple types of input lists and returns a
+    python list of the input.
 
-    This function can handle various types of input lists and convert them into a python list.
+    This function can handle various types of input lists
+     and convert them into a python list.
     The input can be:
      * a python list
      * a text file path containing a list of files
      * a tuple containing several text files path
      * a directory path.
-    If the input is a directory path, all the files matching the regular expression specified by 'inp_regex' are read.
+    If the input is a directory path, all the files matching the
+     regular expression specified by 'inp_regex' are read.
 
     Parameters
     ----------
     inp_fil : list or str or tuple
-        The input list to be interpreted. It can be a python list, a text file path containing a list of files,
+        The input list to be interpreted. It can be a python list,
+         a text file path containing a list of files,
         a tuple containing several text files path, or a directory path.
     inp_regex : str, optional
-        The regular expression used to filter the files when 'inp_fil' is a directory path.
+        The regular expression used to filter the files when
+        'inp_fil' is a directory path.
         Default is ".*" which matches any file.
 
     Returns

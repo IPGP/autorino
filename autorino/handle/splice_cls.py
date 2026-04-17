@@ -62,8 +62,8 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
     def splice(
         self,
-        input_rinexs,
         input_mode="find",
+        input_rinexs=None,
         handle_software="converto",
         handle_software_options=None,
         rinexmod_options=None,
@@ -80,16 +80,16 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
         Parameters
         ----------
-        input_rinexs : str or list or StepGnss or None, optional
-            The input RINEX files. It can be:
-            - A list of RINEX file paths.
-            - An existing StepGnss object.
-            Default is None.
         input_mode : str, optional
             The mode for finding input RINEX files. It can be:
             - "find": to find local input files.
             - "given": to use provided input RINEX files.
             Default is "find".
+        input_rinexs : str or list or StepGnss or None, optional
+            The input RINEX files. It can be:
+            - A list of RINEX file paths.
+            - An existing StepGnss object.
+            Default is None.
         handle_software : str, optional
             The software to use for handling the RINEX files. Default is "converto".
         handle_software_options : str or list of str or None, optional
