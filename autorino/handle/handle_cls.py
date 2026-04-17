@@ -378,7 +378,7 @@ class HandleGnss(arocmn.StepGnss):
             dbgmsg = "find local RINEX files and convert them to a StepGnss object"
             logger.debug(method_msg + dbgmsg)
             stp_obj_rnxs_inp = self.find_local_inp(
-                return_as_step_obj=True, rnx3_regex=True
+                return_as_step_obj=True, rnx3_regex=False
             )
         elif input_mode == "given":
             if not input_rinexs:

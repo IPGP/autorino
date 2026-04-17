@@ -138,10 +138,10 @@ def splice_rnx(
 
     if relative_mode:
         epo_rng = arocmn.dummy_epochrange(period)
-        logger.info("relative splice")
+        logger.info("Relative-mode splice (experimental)")
     else:
         epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period, tz="UTC")
-        logger.info("absolute splice")
+        logger.info("Absolute-mode splice")
 
     # ------------------------------------------------------------------ #
     #  Determine input RINEXs                                            #
