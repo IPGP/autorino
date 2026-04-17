@@ -65,18 +65,18 @@ class EpochRange:
             the end of the epoch range.
         period : str, optional
             the rounding period. Use the pandas' frequency aliases convention.
+            set to "1d" if not provided.
         round_method : str, optional
             the method used for rounding the epochs.
         tz : str, optional
             the timezone used for the epochs.
         """
 
+        if not period:
+            period = "1d"
+
         self._epoch1_raw = epoch1
         self._epoch2_raw = epoch2
-
-        if not period:
-            logger.warning("No period provided, using default '1d'")
-            period = "1d"
 
         self.period = period
         self.round_method = round_method
@@ -257,7 +257,6 @@ class EpochRange:
             return False
         else:
             return True
-
 
     def extra_margin_splice(self):
         """

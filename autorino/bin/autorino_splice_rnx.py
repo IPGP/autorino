@@ -97,13 +97,17 @@ def main():
         help="End epoch for the splicing operation (absolute mode). "
         "If omitted, relative mode is used. (optional)",
     )
+
     abs_grp.add_argument(
         "-si",
         "--site",
+        nargs="+",
         default=None,
-        help="Site name for the spliced RINEX files. "
+        help="Site name(s) for the spliced RINEX files. "
+        "One or more site names can be provided. "
         "Recommended to detect existing files to skip. (optional)",
     )
+
     abs_grp.add_argument(
         "-df",
         "--data_frequency",
