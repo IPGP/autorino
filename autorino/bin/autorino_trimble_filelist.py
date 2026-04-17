@@ -18,9 +18,6 @@ logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
 
 
 def main():
-    """
-    Shell function to call trimble_filelist_html with command-line arguments.
-    """
     desc = arochk.trimble_filelist_html.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
         description=desc,

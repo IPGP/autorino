@@ -175,6 +175,7 @@ autorino_cfgfile_check = "autorino.bin.autorino_cfgfile_check:main"
 autorino_convert_rnx = "autorino.bin.autorino_convert_rnx:main"
 autorino_trimble_filelist = "autorino.bin.autorino_trimble_filelist:main"
 autorino_check_rnx = "autorino.bin.autorino_check_rnx:main"
+autorino_splice_rnx = "autorino.bin.autorino_splice_rnx:main"
 
 # This is configuration specific to the `setuptools` build backend.
 # If you are using a different build backend, you will need to change this.

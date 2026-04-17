@@ -9,6 +9,7 @@ Created on 25/10/2025 16:09:59
 import argparse
 import yaml
 from autorino.api.splice_rnx_rel import splice_rnx_rel
+from autorino.common.cli_fcts import prep_inputs
 
 
 def main():
@@ -86,7 +87,7 @@ def main():
     rolling_ref_val = args.rolling_ref
 
     spc_main_obj = splice_rnx_rel(
-        rnxs_inp=args.rnxs_inp,
+        rnxs_inp=prep_inputs(args.rnxs_inp),
         out_dir=args.out_dir,
         tmp_dir=args.tmp_dir,
         log_dir=args.log_dir,

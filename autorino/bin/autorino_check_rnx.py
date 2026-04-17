@@ -14,7 +14,6 @@ from autorino.api.check_rnx import check_rnx
 def main():
     # Get the docstring from check_rnx function for the description
     desc = check_rnx.__doc__.split("Parameters")[0]
-
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
         "-i",
