@@ -8,6 +8,7 @@ Created on 18/09/2024 18:26:05
 
 import autorino.handle as arohdl
 import autorino.common as arocmn
+import datetime as dt
 
 #### Import the logger
 import logging
@@ -155,10 +156,15 @@ def splice_rnx(
     # ------------------------------------------------------------------ #
     #  Relative mode                                                       #
     # ------------------------------------------------------------------ #
+    epo_rng = arocmn.EpochRange(dt.datetime(1980,1,1),
+                                dt.datetime(2099,1,1),
+                                period)
+
     spc_inp = arohdl.SpliceGnss(
         out_dir=out_dir,
         tmp_dir=tmp_dir,
         log_dir=log_dir,
+        epoch_range=epo_rng,
         metadata=metadata,
     )
     spc_inp.load_tab_filelist(rnxs_inp)
@@ -178,4 +184,3 @@ def splice_rnx(
     )
 
     return spc_main_obj
-

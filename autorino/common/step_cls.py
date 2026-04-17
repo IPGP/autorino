@@ -844,7 +844,7 @@ class StepGnss:
             logger.warning(
                 "epoch update impossible, no file matches a RINEX pattern in %s", self
             )
-            return
+            return None
 
         for irow, row in self.table.iterrows():
             if not use_rnx_filename_only:

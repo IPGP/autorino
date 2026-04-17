@@ -15,58 +15,65 @@ from autorino.common.cli_fcts import prep_inputs
 def main():
     desc = splice_rnx.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
-        description=desc,
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description=desc, formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     # ------------------------------------------------------------------ #
     #  Common arguments                                                    #
     # ------------------------------------------------------------------ #
     parser.add_argument(
-        "-i", "--rnxs_inp",
+        "-i",
+        "--rnxs_inp",
         required=True,
         nargs="+",
         help="Input RINEX files to be spliced. Can be a list of files, a text file path, "
-             "a tuple of text file paths, or a directory path."
+        "a tuple of text file paths, or a directory path.",
     )
     parser.add_argument(
-        "-o", "--out_dir",
+        "-o",
+        "--out_dir",
         required=True,
-        help="Output directory where the spliced files will be stored."
+        help="Output directory where the spliced files will be stored.",
     )
     parser.add_argument(
-        "-t", "--tmp_dir",
+        "-t",
+        "--tmp_dir",
         required=True,
-        help="Temporary directory used during the splicing process."
+        help="Temporary directory used during the splicing process.",
     )
     parser.add_argument(
-        "-l", "--log_dir",
+        "-l",
+        "--log_dir",
         default=None,
-        help="Directory where logs will be stored. Defaults to tmp_dir. (optional)"
+        help="Directory where logs will be stored. Defaults to tmp_dir. (optional)",
     )
     parser.add_argument(
-        "-p", "--period",
+        "-p",
+        "--period",
         default="1d",
-        help="Period for splicing the RINEX files. Defaults to '1d'. (optional)"
+        help="Period for splicing the RINEX files. Defaults to '1d'. (optional)",
     )
     parser.add_argument(
-        "-S", "--handle_software",
+        "-hs",
+        "--handle_software",
         default="converto",
-        help="Software used for handling the RINEX files. Defaults to 'converto'. (optional)"
+        help="Software used for handling the RINEX files. Defaults to 'converto'. (optional)",
     )
     parser.add_argument(
-        "-rimo", "--rinexmod_options",
+        "-rimo",
+        "--rinexmod_options",
         type=yaml.safe_load,
         default=None,
         help="Options for modifying the RINEX files, provided as a YAML/JSON string "
-             "(e.g. '{longname: False}'). (optional)"
+        "(e.g. '{longname: False}'). (optional)",
     )
     parser.add_argument(
-        "-m", "--metadata",
+        "-m",
+        "--metadata",
         nargs="+",
         default=None,
         help="Metadata to include: list of sitelog paths, single sitelog path, "
-             "directory containing sitelogs, or MetaData objects. (optional)"
+        "directory containing sitelogs, or MetaData objects. (optional)",
     )
 
     # ------------------------------------------------------------------ #
@@ -74,30 +81,34 @@ def main():
     # ------------------------------------------------------------------ #
     abs_grp = parser.add_argument_group(
         "Absolute mode",
-        "Arguments for absolute mode (used when --epoch_srt and --epoch_end are provided)."
+        "Arguments for absolute mode (used when --epoch_srt and --epoch_end are provided).",
     )
     abs_grp.add_argument(
-        "-es", "--epoch_srt",
+        "-s",
+        "--epoch_srt",
         default=None,
         help="Start epoch for the splicing operation (absolute mode). "
-             "If omitted, relative mode is used. (optional)"
+        "If omitted, relative mode is used. (optional)",
     )
     abs_grp.add_argument(
-        "-ee", "--epoch_end",
+        "-e",
+        "--epoch_end",
         default=None,
         help="End epoch for the splicing operation (absolute mode). "
-             "If omitted, relative mode is used. (optional)"
+        "If omitted, relative mode is used. (optional)",
     )
     abs_grp.add_argument(
-        "-si", "--site",
+        "-si",
+        "--site",
         default=None,
         help="Site name for the spliced RINEX files. "
-             "Recommended to detect existing files to skip. (optional)"
+        "Recommended to detect existing files to skip. (optional)",
     )
     abs_grp.add_argument(
-        "-df", "--data_frequency",
+        "-df",
+        "--data_frequency",
         default="30S",
-        help="Data frequency for the spliced RINEX files. Defaults to '30S'. (optional)"
+        help="Data frequency for the spliced RINEX files. Defaults to '30S'. (optional)",
     )
 
     # ------------------------------------------------------------------ #
@@ -105,29 +116,33 @@ def main():
     # ------------------------------------------------------------------ #
     rel_grp = parser.add_argument_group(
         "Relative mode",
-        "Arguments for relative mode (used when --epoch_srt and --epoch_end are NOT provided)."
+        "Arguments for relative mode (used when --epoch_srt and --epoch_end are NOT provided).",
     )
     rel_grp.add_argument(
-        "-rop", "--rolling_period",
+        "-rop",
+        "--rolling_period",
         action="store_true",
-        help="Use a rolling period for splicing. (optional)"
+        help="Use a rolling period for splicing. (optional)",
     )
     rel_grp.add_argument(
-        "-ror", "--rolling_ref",
+        "-ror",
+        "--rolling_ref",
         default="-1",
         help="Reference for the rolling period (datetime-like or int). "
-             "Use -1 for the last epoch. Defaults to -1. (optional)"
+        "Use -1 for the last epoch. Defaults to -1. (optional)",
     )
     rel_grp.add_argument(
-        "-rnd", "--round_method",
+        "-rnd",
+        "--round_method",
         default="floor",
         help="Method for rounding epochs during the splice operation. "
-             "Defaults to 'floor'. (optional)"
+        "Defaults to 'floor'. (optional)",
     )
     rel_grp.add_argument(
-        "-d", "--drop_epoch_rnd",
+        "-der",
+        "--drop_epoch_rnd",
         action="store_true",
-        help="Drop the rounded epochs during the splice operation. (optional)"
+        help="Drop the rounded epochs during the splice operation. (optional)",
     )
 
     args = parser.parse_args()
@@ -157,4 +172,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
