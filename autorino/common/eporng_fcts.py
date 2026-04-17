@@ -186,15 +186,18 @@ def round_date(date_in, period, round_method="floor"):
 
     """
 
-    # ++++ NaT case
-    if pd.isna(date_in):
-        return date_in
+
 
     # ++++ Series case
     if isinstance(date_in, pd.Series):
         return getattr(date_in.dt, round_method)(period)
 
     # ++++ Singleton case
+
+    # + NaT case
+    if pd.isna(date_in):
+        return date_in
+
     date_use = pd.Timedelta(date_in) if isinstance(date_in, pd.Timedelta) else pd.Timestamp(date_in)
     date_out = getattr(date_use, round_method)(period) if round_method != "none" else date_use
 

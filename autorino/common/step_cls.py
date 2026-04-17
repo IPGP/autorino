@@ -1968,7 +1968,7 @@ class StepGnss:
         for irow, row in self.table.iterrows():
             if not self.table.loc[irow, "ok_" + io]:
                 logger.warning(
-                    "file not ok, (missing?): ",
+                    "file not ok, (missing?): %s",
                     self.table.loc[irow, "fpath_" + io],
                 )
 
