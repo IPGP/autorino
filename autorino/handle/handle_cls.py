@@ -235,6 +235,7 @@ class HandleGnss(arocmn.StepGnss):
                 # we add one hour as margin, the splice software integrates the option
                 # to stop at the right epoch
                 m = self.epoch_range.extra_margin_splice()
+                logger.debug("adding an extra margin of %s to the end epoch", m)
                 epo_end_bol = epo_end_to_feed + m >= step_obj_feeder.table["epoch_end"]
 
                 # epo_end_bol = np.array([True] * len(epo_end_to_feed))
