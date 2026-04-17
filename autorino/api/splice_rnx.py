@@ -156,9 +156,7 @@ def splice_rnx(
     # ------------------------------------------------------------------ #
     #  Relative mode                                                       #
     # ------------------------------------------------------------------ #
-    epo_rng = arocmn.EpochRange(dt.datetime(1980, 1, 1),
-                                dt.datetime(2099, 1, 1),
-                                period, tz="UTC")
+    epo_rng = arocmn.create_dummy_epochrange(period)
 
     spc_inp = arohdl.SpliceGnss(
         out_dir=out_dir,

@@ -300,7 +300,7 @@ def timedelta2freq_alias(timedelta_in):
     return offset.freqstr
 
 
-def create_dummy_epochrange():
+def create_dummy_epochrange(period="15min"):
     """
     Create a fake/dummy EpochRange object
     for test/development purpose
@@ -312,7 +312,7 @@ def create_dummy_epochrange():
 
     """
 
-    epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period="15min")
+    epo = arocmn.EpochRange(epoch1=pd.NaT, epoch2=pd.NaT, period=period)
     return epo
 
 
