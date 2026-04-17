@@ -48,17 +48,17 @@ def main():
         help="The period for splicing the RINEX files. Defaults to '1d'. (optional)"
     )
     parser.add_argument(
-        "-R", "--rolling_period",
+        "-rop", "--rolling_period",
         action="store_true",
         help="Whether to use a rolling period for splicing the RINEX files. (optional)"
     )
     parser.add_argument(
-        "-r", "--rolling_ref",
+        "-ror", "--rolling_ref",
         default="-1",
         help="The reference for the rolling period (datetime-like or int). Use -1 for the last epoch. (optional)"
     )
     parser.add_argument(
-        "-m", "--round_method",
+        "-rnd", "--round_method",
         default="floor",
         help="The method for rounding the epochs during the splice operation. Defaults to 'floor'. (optional)"
     )
@@ -68,13 +68,13 @@ def main():
         help="Whether to drop the rounded epochs during the splice operation. (optional)"
     )
     parser.add_argument(
-        "-x", "--rinexmod_options",
+        "-rimo", "--rinexmod_options",
         type=yaml.safe_load,
         default=None,
         help="Options for modifying the RINEX files, provided as a YAML/JSON string or file content (e.g. '{longname: False}'). (optional)"
     )
     parser.add_argument(
-        "-M", "--metadata",
+        "-m", "--metadata",
         nargs="+",
         default=None,
         help="Metadata to include (list of sitelog paths, single sitelog path, directory, or MetaData objects). (optional)"
