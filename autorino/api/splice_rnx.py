@@ -132,7 +132,7 @@ def splice_rnx(
     #  Absolute mode                                                       #
     # ------------------------------------------------------------------ #
     if epoch_srt is not None and epoch_end is not None:
-        epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period)
+        epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period, tz="UTC")
 
         spc = arohdl.SpliceGnss(
             out_dir=out_dir,
@@ -156,9 +156,9 @@ def splice_rnx(
     # ------------------------------------------------------------------ #
     #  Relative mode                                                       #
     # ------------------------------------------------------------------ #
-    epo_rng = arocmn.EpochRange(dt.datetime(1980,1,1),
-                                dt.datetime(2099,1,1),
-                                period)
+    epo_rng = arocmn.EpochRange(dt.datetime(1980, 1, 1, tzinfo=dt.timezone.utc),
+                                dt.datetime(2099, 1, 1, tzinfo=dt.timezone.utc),
+                                period, tz="UTC")
 
     spc_inp = arohdl.SpliceGnss(
         out_dir=out_dir,
