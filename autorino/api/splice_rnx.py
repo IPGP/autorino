@@ -198,7 +198,7 @@ def splice_rnx(
                 tmp_dir=tmp_dir,
                 log_dir=log_dir,
                 epoch_range=epo_rng,
-                site={"site_id": site},
+                site={"site_id": site_use},
                 session={"data_frequency": data_frequency},
                 metadata=metadata,
             )
