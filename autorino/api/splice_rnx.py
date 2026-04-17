@@ -141,10 +141,10 @@ def splice_rnx(
 
     if relative_mode:
         epo_rng = arocmn.dummy_epochrange(period)
-        logger.info("Relative-mode splice (experimental)")
+        logger.info(">>>>>>>>> Relative-mode splice (experimental)")
     else:
         epo_rng = arocmn.EpochRange(epoch_srt, epoch_end, period, tz="UTC")
-        logger.info("Absolute-mode splice")
+        logger.info(">>>>>>>>> Absolute-mode splice")
 
     # ------------------------------------------------------------------ #
     #  Determine sites                                                   #
@@ -159,14 +159,13 @@ def splice_rnx(
         sites_use = arocmn.guess_sites_list(inp_dir_use)
     else:
         logger.error("unable to detect site list. aborting...")
-        logger.error("give site list with 'site' argument or")
-        errmsg = "check parent directory (aliases not allowed for site detection): %s"
+        errmsg = "give site list with 'site' argument or check parent directory (aliases not allowed for site detection): %s"
         logger.error(errmsg, inp_dir_use)
         return None
 
     for site_use in sites_use:
 
-        logger.info("splicing site %s", site_use)
+        logger.info(">>>>>>>>> Splicing site %s", site_use)
 
         # ------------------------------------------------------------------ #
         #  Determine input RINEXs                                            #

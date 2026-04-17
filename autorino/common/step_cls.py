@@ -44,6 +44,7 @@ warnings.simplefilter("always", UserWarning)
 # from logging_tree import printout
 # print("Logging Tree:", printout())
 
+VERBOSE_INIT = False
 
 class StepGnss:
     """
@@ -112,8 +113,8 @@ class StepGnss:
         # Initialize out_bis_dir BEFORE _init_table so table columns can be conditional
         # Handle out_dir as either a string or a 2-tuple
         if isinstance(out_dir, (tuple, list)) and len(out_dir) == 2:
-            self._out_dir = out_dir[0]
-            self._out_bis_dir = out_dir[1]
+            self._out_dir = str(out_dir[0])
+            self._out_bis_dir = str(out_dir[1])
         else:
             self._out_dir = out_dir
             self._out_bis_dir = None
@@ -172,7 +173,7 @@ class StepGnss:
 
     @out_dir.setter
     def out_dir(self, value):
-        if not value:
+        if not value and VERBOSE_INIT:
             logger.warning("output directory is not defined (%s)", value)
         self._out_dir = value
 
@@ -182,7 +183,7 @@ class StepGnss:
 
     @out_bis_dir.setter
     def out_bis_dir(self, value):
-        if value and not value:  # Only warn if explicitly set to empty string, not None
+        if value and VERBOSE_INIT:  # Only warn if explicitly set to empty string, not None
             logger.warning("output bis directory is not defined (%s)", value)
         self._out_bis_dir = value
 
@@ -192,7 +193,7 @@ class StepGnss:
 
     @tmp_dir.setter
     def tmp_dir(self, value):
-        if not value:
+        if not value and VERBOSE_INIT:
             logger.warning("temp directory is not defined (%s)", value)
         self._tmp_dir = value
 
@@ -202,7 +203,7 @@ class StepGnss:
 
     @log_dir.setter
     def log_dir(self, value):
-        if not value:
+        if not value and VERBOSE_INIT:
             logger.warning("log directory is not defined (%s)", value)
         self._log_dir = value
 
@@ -212,7 +213,7 @@ class StepGnss:
 
     @inp_dir.setter
     def inp_dir(self, value):
-        if not value:
+        if not value and VERBOSE_INIT:
             logger.warning("input directory is not defined (%s)", value)
         self._inp_dir = value
 
@@ -223,7 +224,7 @@ class StepGnss:
 
     @site_id.setter
     def site_id(self, value):
-        if not value:
+        if not value and VERBOSE_INIT:
             logger.warning("site id is not defined (%s), set to XXXX00XXX", value)
             self._site_id = "XXXX00XXX"
         else:
