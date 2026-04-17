@@ -176,7 +176,7 @@ def main():
         force_raw=args.force_raw,
         raw_out_dir=args.raw_out_dir,
         raw_out_structure=args.raw_out_structure,
-        processes=args.processes,
+        processes=int(args.processes),
         filter_prev_tables=args.filter_prev_tables,
         converter=args.converter
     )

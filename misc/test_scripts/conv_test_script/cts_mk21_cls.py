@@ -43,7 +43,7 @@ pout = "/home/sakic/090_TEMP/convcls_test"
 psitelogs = "/work/metadata/SITELOGS"
 
 SES = arogen.create_dummy_session()
-EPOC = arogen.create_dummy_epochrange()
+EPOC = arogen.dummy_epochrange()
 
 SES.tmp_dir =  pout + "/tmp_conv"
 

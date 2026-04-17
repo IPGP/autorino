@@ -191,10 +191,10 @@ class DownloadGnss(arocmn.StepGnss):
             raise Exception
 
         # Guess or ask corresponding local raw file
-        self.find_local_raw(method=remote_find_method)
+        self.find_loc_files(method=remote_find_method)
 
         # Check local files and update table
-        self.check_local_files()
+        self.check_loc_files()
         # be sure ok_xxx columns are booleans
         self.table_ok_cols_bool()
         if invalidate_small_local_files:

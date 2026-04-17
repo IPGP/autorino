@@ -156,9 +156,9 @@ class ConvertGnss(arocmn.StepGnss):
         # generate the potential local files
         self.guess_local_rnx()
         # tests if the input local files are here
-        self.check_local_files("inp")
+        self.check_loc_files("inp")
         # tests if the output local files are already there
-        self.check_local_files("out")
+        self.check_loc_files("out")
         # be sure ok_xxx columns are booleans
         self.table_ok_cols_bool()
         # switch ok_inp to False if the output files are already there

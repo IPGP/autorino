@@ -14,7 +14,7 @@ tmp_dir = "/home/psakicki/autorino_workflow_tests/temp"
 out_dir = "/home/psakicki/autorino_workflow_tests/handle"
 log_dir = tmp_dir
 
-epo = arocmn.epoch_range.create_dummy_epochrange()
+epo = arocmn.epoch_range.dummy_epochrange()
 hdl = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo)  # , site_id='CFNG')
 
 p = "/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"

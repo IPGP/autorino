@@ -534,7 +534,7 @@ class HandleGnss(arocmn.StepGnss):
 
     def check(self):
         self.guess_local_rnx(io="inp")
-        self.check_local_files(io="inp")
+        self.check_loc_files(io="inp")
         self.print_table()
         self.analyze_rnxs()
         self.table["%"] = self.table_stats["%"]

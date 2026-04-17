@@ -100,7 +100,7 @@ class ModifyGnss(arohdlcls.HandleGnss):
             # generate the potential local files
             self.guess_local_rnx(shortname=shortname)
             # tests if the output local files are already there
-            self.check_local_files("out")
+            self.check_loc_files("out")
             # switch ok_inp to False if the output files are already there
             self.filter_ok_out()
 

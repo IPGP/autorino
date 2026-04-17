@@ -16,7 +16,7 @@ import autorino.general as arogen
 # import autorino.session as aroses
 import autorino.handle as arohdl
 
-epo = arogen.create_dummy_epochrange()
+epo = arogen.dummy_epochrange()
 ses = arogen.create_dummy_session()
 
 H = arohdl.HandleGnss(ses, epo, out_dir="/tmp/")

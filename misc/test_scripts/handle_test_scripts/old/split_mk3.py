@@ -18,7 +18,7 @@ rnxmod_dir = "/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/rinexmoded"
 out_dir = "/home/ovsgnss/090_TEMP_STUFFS/autorino_workflow_tests/handle"
 log_dir = tmp_dir
 
-epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
+epo_dummy = arocmn.epoch_range.dummy_epochrange()
 hdl_store = arocmn.StepGnss(out_dir, tmp_dir, log_dir, epo_dummy)
 
 p = "/home/ovsgnss/090_TEMP_STUFFS/2402_tests_PF_pride"

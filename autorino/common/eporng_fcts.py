@@ -300,7 +300,7 @@ def timedelta2freq_alias(timedelta_in):
     return offset.freqstr
 
 
-def create_dummy_epochrange(period="15min"):
+def dummy_epochrange(period="15min"):
     """
     Create a fake/dummy EpochRange object
     for test/development purpose

@@ -1632,13 +1632,13 @@ class StepGnss:
             out_paths_list.append(fpath_out)
 
         # Check the exisitence of the output files
-        self.check_local_files(io="out", bis=bis)
+        self.check_loc_files(io="out", bis=bis)
 
         return out_paths_list
 
-    def find_local_raw(self, method="ask", bis=False, check=False):
+    def find_loc_files(self, method="ask", bis=False, check=False):
         """
-        Find the paths and names of the local raw files based on the specified method.
+        Find the paths and names of the local files based on the specified method.
 
         Parameters
         ----------
@@ -1673,18 +1673,18 @@ class StepGnss:
             raise Exception
 
         for irow, row in self.table.iterrows():
-            local_path_use = self.m_find_loc_raw(irow, method=method, bis=bis)
+            local_path_use = self.m_find_loc_file(irow, method=method, bis=bis)
             local_paths_list.append(local_path_use)
 
         logger.info("nbr local raw files %sed: %s", method, len(local_paths_list))
 
         # Check the exisitence of the output files
         if check:
-            self.check_local_files(io="out", bis=bis)
+            self.check_loc_files(io="out", bis=bis)
 
         return local_paths_list
 
-    def check_local_files(self, io="out", bis=False):
+    def check_loc_files(self, io="out", bis=False):
         """
         Checks the existence of the output ('out') or input ('inp') local files (for non download cases)
         and updates the corresponding booleans in the 'ok_out' or 'ok_inp' column of the table.
@@ -2988,7 +2988,7 @@ class StepGnss:
 
         return fpath_out
 
-    def m_find_loc_raw(self, irow, method="ask", bis=False):
+    def m_find_loc_file(self, irow, method="ask", bis=False):
         """
         Finds the local file path for a given row in the table based on the specified method.
 

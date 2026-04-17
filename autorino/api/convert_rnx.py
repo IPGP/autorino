@@ -157,7 +157,7 @@ def convert_rnx(
         logger.info(">>>>>> RAW files archive")
         if not raw_out_structure:
             raw_out_structure = out_structure
-        raw_out_dir_use = str(os.path.join(raw_out_dir, raw_out_structure))
+        raw_out_dir_use = str(os.path.join(str(raw_out_dir), str(raw_out_structure)))
 
         cnv_table_cat = pd.concat([cnv.table for cnv in cnv_out_lis], ignore_index=True)
 

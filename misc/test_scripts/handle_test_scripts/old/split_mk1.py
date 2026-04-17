@@ -18,7 +18,7 @@ rnxmod_dir = "/home/psakicki/autorino_workflow_tests/rinexmoded"
 out_dir = "/home/psakicki/autorino_workflow_tests/handle"
 log_dir = tmp_dir
 
-epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
+epo_dummy = arocmn.epoch_range.dummy_epochrange()
 hdl_store = arohdl.HandleGnss(out_dir, tmp_dir, log_dir, epo_dummy)  # , site_id='CFNG')
 
 p = "/home/psakicki/autorino_workflow_tests/conv_tests/CFNG00REU/2024"

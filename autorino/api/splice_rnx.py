@@ -156,7 +156,7 @@ def splice_rnx(
     # ------------------------------------------------------------------ #
     #  Relative mode                                                       #
     # ------------------------------------------------------------------ #
-    epo_rng = arocmn.create_dummy_epochrange(period)
+    epo_rng = arocmn.dummy_epochrange(period)
 
     spc_inp = arohdl.SpliceGnss(
         out_dir=out_dir,

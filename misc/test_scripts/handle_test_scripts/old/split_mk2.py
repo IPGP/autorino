@@ -22,7 +22,7 @@ p = "/home/ovsgnss/090_TEMP_STUFFS/2402_tests_PF_pride"
 L = utils.find_recursive(p, "*BORG*crx*gz")
 
 
-epo_dummy = arocmn.epoch_range.create_dummy_epochrange()
+epo_dummy = arocmn.epoch_range.dummy_epochrange()
 hdl_store = arocmn.StepGnss(
     out_dir, tmp_dir, log_dir, epoch_range=None
 )  # , site_id='CFNG')
