@@ -6,6 +6,8 @@ Created on 18/09/2024 18:26:05
 @author: psakic
 """
 
+import os.path
+
 import autorino.handle as arohdl
 import autorino.common as arocmn
 import datetime as dt
@@ -145,10 +147,10 @@ def splice_rnx(
     #  Determine input RINEXs                                            #
     # ------------------------------------------------------------------ #
 
-    rnxs_inp_use = rnxs_inp
+    inp_dir_use = rnxs_inp[0] if os.path.isdir(rnxs_inp[0]) else None
 
     spc_inp_rnx = arohdl.SpliceGnss(
-        inp_dir=rnxs_inp_use,
+        inp_dir=inp_dir_use,
         out_dir=out_dir,
         tmp_dir=tmp_dir,
         log_dir=log_dir,
@@ -158,7 +160,7 @@ def splice_rnx(
         metadata=metadata,
     )
 
-    if True:
+    if inp_dir_use:
         spc_inp_rnx = spc_inp_rnx.load_input_rnxs("find", None)
     else:
         spc_inp_rnx = spc_inp_rnx.load_input_rnxs("given", rnxs_inp)
