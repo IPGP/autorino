@@ -97,7 +97,10 @@ def splice_rnx_rel(
     if not log_dir:
         log_dir = tmp_dir
 
-    spc_inp = arohdl.SpliceGnss(out_dir, tmp_dir, log_dir, metadata=metadata)
+    spc_inp = arohdl.SpliceGnss(out_dir=out_dir,
+                                tmp_dir=tmp_dir,
+                                log_dir=log_dir,
+                                metadata=metadata)
     spc_inp.load_tab_filelist(rnxs_inp)
     spc_inp.updt_epotab_rnx(use_rnx_filename_only=True)
 
