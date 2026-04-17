@@ -331,8 +331,7 @@ class HandleGnss(arocmn.StepGnss):
             local_dir_use = self.translate_path(self.inp_dir, epoch, make_dir=False)
 
             if rnx3_regex:
-                patrn = self.site_id9 + conv.rinex_regex_long_name()[17:]
-                patrn = re.compile(patrn)
+                patrn = re.escape(self.site_id9) + conv.rinex_regex_long_name()[17:]
             else:
                 patrn = ".*"
 
