@@ -159,7 +159,8 @@ def splice_rnx(
         sites_use = arocmn.guess_sites_list(inp_dir_use)
     else:
         logger.error("unable to detect site list. aborting...")
-        errmsg = "check parent directory %s or for site list with 'site' argument"
+        logger.error("give site list with 'site' argument or")
+        errmsg = "check parent directory (aliases not allowed for site detection): %s"
         logger.error(errmsg, inp_dir_use)
         return None
 
