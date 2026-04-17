@@ -100,7 +100,7 @@ def main():
     abs_grp.add_argument(
         "-si",
         "--site",
-        default=None,
+        default="XXXX00XXX",
         help="Site name for the spliced RINEX files. "
         "Recommended to detect existing files to skip. (optional)",
     )
