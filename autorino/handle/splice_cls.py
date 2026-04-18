@@ -157,7 +157,6 @@ class SpliceGnss(arohdlcls.HandleGnss):
         handle_software="converto",
         handle_software_options=None,
         rinexmod_options=None,
-        rm_inp_files=False,
     ):
         """
         Perform the core splicing operation.
@@ -214,9 +213,6 @@ class SpliceGnss(arohdlcls.HandleGnss):
             self.mono_rinexmod(
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
-
-            # if rm_inp_files:
-            # IMPLEMENT ME !!!!!!
 
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
