@@ -11,6 +11,7 @@ import re
 import os
 import numpy as np
 import pandas as pd
+import datetime as dt
 
 from geodezyx import utils, conv
 
@@ -168,7 +169,7 @@ class HandleGnss(arocmn.StepGnss):
 
         return spc_main_obj, spc_obj_lis_out
 
-    def feed_by_epochs(self, step_obj_feeder, mode="split", print_table=False):
+    def feed_by_epochs(self, step_obj_feeder, mode="split", print_table=False, add_extra_margin=False):
         """
         For a HandleGnss object, with a predefined epoch range
         find the corresponding RINEX for splice/split in the step_obj_feeder StepGnss,
@@ -186,6 +187,12 @@ class HandleGnss(arocmn.StepGnss):
             (the need one for the split)
             if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
             (all the needed ones for the splice)
+
+        add_extra_margin : bool, str
+            If True, adds an extra margin to the end epoch for splicing operations.
+            This is useful for handling cases where the end epoch of the RINEX files may be slightly
+            over the theoretical end epoch, such as with Leica raw files.
+             Default is False (no extra margin).
 
         print_table : bool
             If True, prints the tables for debugging purposes.
@@ -234,8 +241,11 @@ class HandleGnss(arocmn.StepGnss):
                 # For Leica, the end epoch of the RINEX can be after the theoretical one...
                 # we add one hour as margin, the splice software integrates the option
                 # to stop at the right epoch
-                m = self.epoch_range.extra_margin_splice()
-                logger.debug("adding an extra margin of %s to the end epoch", m)
+                if add_extra_margin:
+                    logger.debug("adding an extra margin of %s to the end epoch", m)
+                    m = self.epoch_range.extra_margin_splice()
+                else:
+                    m = dt.timedelta(seconds=0)
                 epo_end_bol = epo_end_to_feed + m >= step_obj_feeder.table["epoch_end"]
 
                 # epo_end_bol = np.array([True] * len(epo_end_to_feed))
