@@ -302,7 +302,11 @@ class SpliceGnss(arohdlcls.HandleGnss):
             self.table.loc[irow, "ok_out"] = False
             # raise e
 
-        ### it is not the current object temps which are removed, but the row sub object's ones
+        ### it is not the current object tmps files which are removed,
+        # but the row sub object's ones
         spc_row.remov_tmp_files()
+
+        ### add the tmp spliced file to the tmp list
+        self.tmp_rnx_files.append(frnx_spliced)
 
         return frnx_spliced
