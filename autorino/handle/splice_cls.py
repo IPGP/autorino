@@ -219,12 +219,10 @@ class SpliceGnss(arohdlcls.HandleGnss):
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
 
-            logger.info("AAAAAAAAAAAAA tmp rnx files %s", self.tmp_rnx_files)
-            self.remov_tmp_files()
-
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
 
+            self.remov_tmp_files()
 
         return None
 
