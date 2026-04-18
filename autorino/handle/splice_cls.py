@@ -171,6 +171,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
             The software to use for handling the RINEX files. Default is "converto".
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
+        handle_software : str, optional
+            The software to use for handling the RINEX files.
+            Default is "converto".
         handle_software_options : str or list of str or None, optional
             Additional options for the handling software. It can be:
             - A string of options to be passed to the handling software.
@@ -219,7 +222,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
 
-        logger.debug("AAAAAAAAAAAAA tmp rnx files %s", self.tmp_rnx_files)
+        logger.info("AAAAAAAAAAAAA tmp rnx files %s", self.tmp_rnx_files)
 
         self.remov_tmp_files()
         return None
