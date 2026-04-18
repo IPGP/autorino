@@ -186,8 +186,6 @@ class SpliceGnss(arohdlcls.HandleGnss):
         """
 
         self.set_tmp_dirs()
-        logger.debug("AAAAAAAAABBBBBBBBB tmp rnx files %s", self.tmp_rnx_files)
-
 
         for irow, row in self.table.iterrows():
             if not self.mono_ok_check(
