@@ -144,9 +144,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
             self.reverse_table()
 
         # Find the input RINEX files
-        stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
+        stp_obj_rnxs_inp = self.load_input_rnxs(str(input_mode), input_rinexs)
         # Feed the epochs for splicing
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose, add_extra_margin=add_extra_margin)
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=bool(verbose), add_extra_margin=add_extra_margin)
 
         # Perform the core splicing operation
         self.splice_core(
@@ -212,7 +212,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
             self.mono_splice(
                 irow, self.tmp_dir_converted,
-                handle_software=handle_software,
+                handle_software=str(handle_software),
                 handle_software_options=handle_software_options
             )
 

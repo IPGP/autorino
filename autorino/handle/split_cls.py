@@ -135,7 +135,7 @@ class SplitGnss(arohdlcls.HandleGnss):
             self.reverse_table()
 
         # Find the input RINEX files
-        stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
+        stp_obj_rnxs_inp = self.load_input_rnxs(str(input_mode), input_rinexs)
 
         # Feed the epochs for splitting
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose, add_extra_margin=add_extra_margin)

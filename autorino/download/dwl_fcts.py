@@ -140,7 +140,7 @@ def ftp_create_obj(
                 raise e
             else:
                 print(e)
-                time.sleep(sleep_time)
+                time.sleep(float(sleep_time))
         except (OSError, ftplib.error_perm, Exception) as e:
             logger.error("Unable to create FTP object: %s", str(e))
             return None
@@ -380,7 +380,7 @@ def download_ftp(
                 logger.warning(
                     "download failed (%s), try %i/%i", str(e), try_count, max_try
                 )
-                time.sleep(sleep_time)
+                time.sleep(float(sleep_time))
 
     f.close()
 
@@ -516,7 +516,7 @@ def download_http(url, output_dir, timeout=120, max_try=4, sleep_time=5):
 #                |___/
 
 
-def ping(host, ping_timeout=20):
+def ping(host, ping_timeout=20) -> float | None:
     """
     Executes the ping command and captures the output.
 
@@ -528,11 +528,12 @@ def ping(host, ping_timeout=20):
     host : str
         The hostname or IP address to ping.
     ping_timeout : int, optional
-        The timeout for the ping command in seconds. Default is 10 seconds.
+        The timeout for the ping command in seconds.
+        Default is 20 seconds.
 
     Returns
     -------
-    float or None
+    ping_out : float or None
         The round-trip time (RTT) in seconds if the ping is successful,
         otherwise None.
     """
@@ -547,9 +548,11 @@ def ping(host, ping_timeout=20):
     match = re.search(r"time=(\d+\.?\d*)\s*ms", result.stdout)
 
     if match:
-        return float(match.group(1)) * 10**-3
+        ping_out = float(match.group(1)) * 10**-3
     else:
-        return None
+        ping_out = None
+
+    return ping_out
 
 
 def check_file_size(file_path, min_size=1000):

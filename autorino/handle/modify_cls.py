@@ -95,7 +95,7 @@ class ModifyGnss(arohdlcls.HandleGnss):
         # set the ok_inp to True per default
         self.table["ok_inp"] = True
 
-        # dont know why I put this test/conditional block here
+        # don't know why I put this test/conditional block here,
         # but I will keep it for now (202602)
         guess_local_rnx = True
         if guess_local_rnx:

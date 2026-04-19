@@ -438,7 +438,7 @@ class HandleGnss(arocmn.StepGnss):
         irow: Any,
         handl_soft: str = "converto",
         mode: str = "splice",
-        handl_opts_supl: list[str] | None = None,
+        handl_opts_supl: str | list[str] | None = None,
         handl_kwopts_supl: dict | None = None,
     ) -> tuple[list[str], dict]:
 
@@ -475,7 +475,11 @@ class HandleGnss(arocmn.StepGnss):
             raise ValueError
 
         ## concatenate with exisiting options
-        handl_opts_out = handl_opts_bas + list(handl_opts_supl)
+        if handl_opts_supl:
+            handl_opts_out = handl_opts_bas + list(handl_opts_supl)
+        else:
+            handl_opts_out = handl_opts_bas
+
         handl_kwopts_out = {**handl_kwopts_bas, **handl_kwopts_supl}
 
         return handl_opts_out, handl_kwopts_out

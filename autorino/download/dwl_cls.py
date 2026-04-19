@@ -437,7 +437,7 @@ class DownloadGnss(arocmn.StepGnss):
                 rmot_fil_epo_lis = [
                     f
                     for f in rmot_fil_epo_bulk_lis
-                    if rmot_fname_theo.search(os.path.basename(f))
+                    if rmot_fname_theo.search(str(os.path.basename(f)))
                 ]
             else:
                 rmot_fil_epo_lis = rmot_fil_epo_bulk_lis
@@ -515,9 +515,9 @@ class DownloadGnss(arocmn.StepGnss):
         """
 
         count = 0
-        ping_out = None
-        while count < ping_max_try and not ping_out:
-            ping_out = arodwl.ping(
+        ping_use = None
+        while count < ping_max_try and not ping_use:
+            ping_use = arodwl.ping(
                 host=self.access["hostname"], ping_timeout=ping_timeout
             )
             count += 1
@@ -529,17 +529,17 @@ class DownloadGnss(arocmn.StepGnss):
                     self.access["hostname"],
                 )
 
-        if not ping_out:
+        if not ping_use:
             logger.error("Remote server %s is not reachable.", self.access["hostname"])
             self.exit_code = 7
         else:
             logger.info(
                 "Remote server %s is reachable. (%d ms)",
                 self.access["hostname"],
-                int(ping_out * 10**3),
+                int(ping_use * 10**3),
             )
 
-        return ping_out
+        return ping_use
 
     def set_ftp_obj(self, timeout=15, max_try=4, sleep_time=5):
         """
@@ -584,10 +584,10 @@ class DownloadGnss(arocmn.StepGnss):
         timeout : int, optional
             Timeout in seconds for each download operation.
             Default is 60.
-        max_try : int
+        max_try : int, optional
             Maximum number of retry attempts for each download operation.
             Default is 4.
-        sleep_time : int
+        sleep_time : int, optional
             Sleep time in seconds between retry attempts.
             Default is 5.
 
@@ -621,6 +621,40 @@ class DownloadGnss(arocmn.StepGnss):
     #                                                                           \_\                                 /_/
 
     def mono_fetch(self, irow, force=False, timeout=60, max_try=4, sleep_time=5):
+        """
+        Download a single remote file and store it locally.
+
+        This method downloads a single remote file identified by its row index
+        in the download table. It performs validation checks, creates necessary
+        directories, downloads the file (via HTTP or FTP), verifies file size,
+        and stores the result in the download table.
+
+        Parameters
+        ----------
+        irow : int
+            The row index in the download table (self.table) identifying the file to download.
+        force : bool, optional
+            If True, forces download even if the file already exists locally.
+            Default is False.
+        timeout : int, optional
+            Timeout in seconds for the download operation.
+            Default is 60.
+        max_try : int, optional
+            Maximum number of retry attempts for the download operation.
+            Default is 4.
+        sleep_time : int, optional
+            Sleep time in seconds between retry attempts.
+            Default is 5.
+
+        Returns
+        -------
+        str or None
+            The local file path if the download was successful, None otherwise.
+            On success, the file is moved from the temporary directory to the
+            output directory and the row in the download table is updated with
+            ok_out=True and fpath_out set to the downloaded file path.
+
+        """
 
         if not self.mono_ok_check(irow, "fetch"):
             return None
@@ -686,14 +720,14 @@ class DownloadGnss(arocmn.StepGnss):
 
         # +++++ check the downloaded file size
         if dl_ok:
-            dl_ok, _ = arodwl.check_file_size(file_dl_tmp)
+            dl_ok, _ = arodwl.check_file_size(str(file_dl_tmp))
 
         # +++++ store the results in the table
         if dl_ok:
-            file_dl_out = shutil.copy(file_dl_tmp, outdir_use)
+            file_dl_out = shutil.copy(str(file_dl_tmp), str(outdir_use))
             self.table.loc[irow, "ok_out"] = True
             self.table.loc[irow, "fpath_out"] = file_dl_out
-            os.remove(file_dl_tmp)
+            os.remove(str(file_dl_tmp))
         else:
             self.table.loc[irow, "ok_out"] = False
 
