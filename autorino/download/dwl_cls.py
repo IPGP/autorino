@@ -584,10 +584,10 @@ class DownloadGnss(arocmn.StepGnss):
         timeout : int, optional
             Timeout in seconds for each download operation.
             Default is 60.
-        max_try : int, optional
+        max_try : int
             Maximum number of retry attempts for each download operation.
             Default is 4.
-        sleep_time : int, optional
+        sleep_time : int
             Sleep time in seconds between retry attempts.
             Default is 5.
 

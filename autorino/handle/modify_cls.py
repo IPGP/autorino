@@ -5,12 +5,14 @@ Created on 20/05/2025 20:27:15
 
 @author: psakic
 """
+from __future__ import annotations
 
 import autorino.handle.handle_cls as arohdlcls
 
 # +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+from typing import Any
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
@@ -21,8 +23,8 @@ BOLD_END = "\033[0m"
 class ModifyGnss(arohdlcls.HandleGnss):
     def __init__(
         self,
-        **kwargs
-    ):
+        **kwargs: Any
+    ) -> None:
         """
         Initialize a ModifyGnss object.
 
@@ -49,7 +51,13 @@ class ModifyGnss(arohdlcls.HandleGnss):
         """
         super().__init__(**kwargs)
 
-    def modify(self, verbose=False, force=False, reverse_order=False, rinexmod_options=None):
+    def modify(
+        self,
+        verbose: bool = False,
+        force: bool = False,
+        reverse_order: bool = False,
+        rinexmod_options: dict | None = None
+    ) -> None:
         """
         Apply RINEX modifications to the data.
 

@@ -5,6 +5,7 @@ Created on 20/05/2025 20:26:44
 
 @author: psakic
 """
+from __future__ import annotations
 
 # Create a logger object.
 import autorino.common as arocmn
@@ -14,6 +15,7 @@ import autorino.handle.handle_cls as arohdlcls
 # +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+from typing import Any
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
@@ -32,7 +34,7 @@ BOLD_END = "\033[0m"
 
 
 class SplitGnss(arohdlcls.HandleGnss):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initialize a SplitGnss object.
 
@@ -59,15 +61,16 @@ class SplitGnss(arohdlcls.HandleGnss):
 
     def split(
         self,
-        input_mode="given",
-        input_rinexs=None,
-        handle_software="converto",
-        handle_software_options=None,
-        rinexmod_options=None,
-        verbose=False,
-        force=False,
-        reverse_order=False,
-    ):
+        input_mode: str = "given",
+        input_rinexs: str | list | Any | None = None,
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+        rinexmod_options: dict | None = None,
+        verbose: bool = False,
+        force: bool = False,
+        reverse_order: bool = False,
+        add_extra_margin: bool = False
+    ) -> None:
         """
         Split RINEX files.
 
@@ -82,7 +85,7 @@ class SplitGnss(arohdlcls.HandleGnss):
             - "find": to find local input files.
             - "given": to use provided input RINEX files.
             Default is "given".
-        input_rinexs : str or list or StepGnss, optional
+        input_rinexs : str or list or StepGnss or None, optional
             The input RINEX files. It can be:
             - A list of RINEX file paths.
             - An existing StepGnss object.
@@ -103,6 +106,8 @@ class SplitGnss(arohdlcls.HandleGnss):
         reverse_order : bool, optional
             If True, processes the files in reverse order (anti-chronological, newer first).
             Default is False.
+        add_extra_margin : bool, optional
+            If True, adds an extra margin to the epochs for splitting. Default is False.
 
         Returns
         -------
@@ -133,7 +138,7 @@ class SplitGnss(arohdlcls.HandleGnss):
         stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
 
         # Feed the epochs for splitting
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose)
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose, add_extra_margin=add_extra_margin)
 
         # Perform the core splitting operation
         self.split_core(
@@ -149,10 +154,10 @@ class SplitGnss(arohdlcls.HandleGnss):
 
     def split_core(
         self,
-        handle_software="converto",
-        handle_software_options=None,
-        rinexmod_options=None,
-    ):
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+        rinexmod_options: dict | None = None,
+    ) -> None:
         """
         Perform the core splitting operation.
 
@@ -215,12 +220,12 @@ class SplitGnss(arohdlcls.HandleGnss):
 
     def mono_split(
         self,
-        irow,
-        out_dir=None,
-        table_col="fpath_inp",
-        handle_software="converto",
-        handle_software_options=None,
-    ):
+        irow: Any,
+        out_dir: str | None = None,
+        table_col: str = "fpath_inp",
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+    ) -> str | None:
         """
         "on row" method
 
