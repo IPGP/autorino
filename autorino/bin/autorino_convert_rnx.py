@@ -148,7 +148,7 @@ def main():
              "Default is 'auto' which lets autorino choose the best available converter based on RAW file extension."
              "Possible values are:"
              "* 'auto' (automatic choice based on the extension),"
-             "* 'trm2rnx' (Trimble unofficial),"
+             "* 'trm2rinex' (Trimble unofficial),"
              "* 't0xconvert' (Trimble official),"
              "* 'runpkr00' (Trimble legacy),"
              "* 'teqc' (legacy conversion & RINEX Handeling),"
