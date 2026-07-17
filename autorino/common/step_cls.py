@@ -1950,20 +1950,16 @@ class StepGnss:
         for f in self.tmp_decmp_files:
             # we also test if the file is not an original one!
             if "fpath_ori" not in self.table.columns:
-                logger.warning(
-                    "file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s",
-                    f,
-                )
+                warnmsg = "file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s"
+                logger.warning(warnmsg,f)
                 tmp_decmp_files_new.append(f)
                 continue
 
             is_original = self.table["fpath_ori"].isin([f]).any()
 
             if f and os.path.isfile(f) and is_original:
-                logger.warning(
-                    "uncompressed file is also an original one, we keep it for security: %s",
-                    f,
-                )
+                warnmsg = "uncompressed file is also an original one, we keep it for security: %s"
+                logger.warning(warnmsg,f)
                 tmp_decmp_files_new.append(f)
                 continue
             elif f and os.path.isfile(f) and not is_original:

@@ -5,12 +5,13 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
-import re
+from __future__ import annotations
 
 # Create a logger object.
 import os
 import numpy as np
 import pandas as pd
+import datetime as dt
 
 from geodezyx import utils, conv
 
@@ -25,6 +26,7 @@ import tqdm
 # +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+from typing import Any
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
@@ -34,7 +36,7 @@ BOLD_END = "\033[0m"
 
 
 class HandleGnss(arocmn.StepGnss):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initialize a HandleGnss object.
 
@@ -69,12 +71,12 @@ class HandleGnss(arocmn.StepGnss):
 
     def group_by_epochs(
         self,
-        period="1d",
-        rolling_period=False,
-        rolling_ref=-1,
-        round_method="floor",
-        drop_epoch_rnd=False,
-    ):
+        period: str = "1d",
+        rolling_period: bool = False,
+        rolling_ref: int = -1,
+        round_method: str = "floor",
+        drop_epoch_rnd: bool = False,
+    ) -> tuple[HandleGnss, list[HandleGnss]]:
         """
         Group the data by epochs.
 
@@ -168,7 +170,13 @@ class HandleGnss(arocmn.StepGnss):
 
         return spc_main_obj, spc_obj_lis_out
 
-    def feed_by_epochs(self, step_obj_feeder, mode="split", print_table=False):
+    def feed_by_epochs(
+        self,
+        step_obj_feeder: arocmn.StepGnss,
+        mode: str = "split",
+        print_table: bool = False,
+        add_extra_margin: bool = False,
+    ) -> None:
         """
         For a HandleGnss object, with a predefined epoch range
         find the corresponding RINEX for splice/split in the step_obj_feeder StepGnss,
@@ -186,6 +194,12 @@ class HandleGnss(arocmn.StepGnss):
             (the need one for the split)
             if splice: for fpath_inp, a SpliceGnss object with several RINEXs is returned
             (all the needed ones for the splice)
+
+        add_extra_margin : bool, optional
+            If True, adds an extra margin to the end epoch for splicing operations.
+            This is useful for handling cases where the end epoch of the RINEX files may be slightly
+            over the theoretical end epoch, such as with Leica raw files.
+             Default is False (no extra margin).
 
         print_table : bool
             If True, prints the tables for debugging purposes.
@@ -234,8 +248,11 @@ class HandleGnss(arocmn.StepGnss):
                 # For Leica, the end epoch of the RINEX can be after the theoretical one...
                 # we add one hour as margin, the splice software integrates the option
                 # to stop at the right epoch
-                m = self.epoch_range.extra_margin_splice()
-                logger.debug("adding an extra margin of %s to the end epoch", m)
+                if add_extra_margin:
+                    m = self.epoch_range.extra_margin_splice()
+                    logger.debug("adding an extra margin of %s to the end epoch", m)
+                else:
+                    m = dt.timedelta(seconds=0)
                 epo_end_bol = epo_end_to_feed + m >= step_obj_feeder.table["epoch_end"]
 
                 # epo_end_bol = np.array([True] * len(epo_end_to_feed))
@@ -305,7 +322,7 @@ class HandleGnss(arocmn.StepGnss):
 
         return None
 
-    def find_local_inp(self, return_as_step_obj=True, rnx3_regex=False):
+    def find_local_inp(self, return_as_step_obj: bool = True, rnx3_regex: bool = False) -> arocmn.StepGnss | list[str]:
         """
         Guess the paths and name of the local raw files based on the
         EpochRange and `inp_basename` attributes of the DownloadGnss object.
@@ -350,7 +367,7 @@ class HandleGnss(arocmn.StepGnss):
         else:
             return local_paths_list
 
-    def load_input_rnxs(self, input_mode, input_rinexs=None):
+    def load_input_rnxs(self, input_mode: str, input_rinexs: str | list | arocmn.StepGnss | None = None) -> arocmn.StepGnss | None:
         """
         Get the input RINEX files for handeling (splice or split).
 
@@ -418,12 +435,12 @@ class HandleGnss(arocmn.StepGnss):
 
     def handl_soft_opts(
         self,
-        irow,
-        handl_soft="converto",
-        mode="splice",
-        handl_opts_supl=None,
-        handl_kwopts_supl=None,
-    ):
+        irow: Any,
+        handl_soft: str = "converto",
+        mode: str = "splice",
+        handl_opts_supl: str | list[str] | None = None,
+        handl_kwopts_supl: dict | None = None,
+    ) -> tuple[list[str], dict]:
 
         if not handl_opts_supl:
             handl_opts_supl = []
@@ -458,12 +475,16 @@ class HandleGnss(arocmn.StepGnss):
             raise ValueError
 
         ## concatenate with exisiting options
-        handl_opts_out = handl_opts_bas + handl_opts_supl
+        if handl_opts_supl:
+            handl_opts_out = handl_opts_bas + list(handl_opts_supl)
+        else:
+            handl_opts_out = handl_opts_bas
+
         handl_kwopts_out = {**handl_kwopts_bas, **handl_kwopts_supl}
 
         return handl_opts_out, handl_kwopts_out
 
-    def analyze_rnxs(self):
+    def analyze_rnxs(self) -> pd.DataFrame:
         """
         this function do the basic analysis of the table of RINEXs
 
@@ -534,7 +555,7 @@ class HandleGnss(arocmn.StepGnss):
 
         return dfts
 
-    def check(self):
+    def check(self) -> None:
         self.guess_local_rnx(io="inp")
         self.check_loc_files(io="inp")
         self.print_table()
