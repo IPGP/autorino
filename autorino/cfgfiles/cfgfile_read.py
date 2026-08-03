@@ -21,8 +21,11 @@ import autorino.convert as arocnv
 import autorino.download as arodwl
 import autorino.handle as arohdl
 
+#### new rinexmod v5 import
+import rinexmod.core as rimo_cor
+
 #### new rinexmod v4 import
-import rinexmod.api as rimo_api
+#import rinexmod.api as rimo_api
 import rinexmod.classes as rimo_cls
 #### old rinexmod import (for compatibility with older versions)
 #from rinexmod import rinexmod_api as rimo_api
@@ -181,7 +184,7 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
             # Load the metadata if the path is a directory or a file
-            metadata = rimo_api.metadata_input_manage(slpath, force=False)
+            metadata = rimo_cor.load_metadata(slpath, force=False)
         else:
             # If not, keep the path it as a string
             # (because it might contain aliases and be translated later in the object)

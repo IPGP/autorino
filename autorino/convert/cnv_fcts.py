@@ -15,8 +15,11 @@ import docker
 import pwd
 import grp
 
+### new rinexmod v5 import
+import rinexmod.core as rimo_cor
+
 ### new rinexmod v4 import
-import rinexmod.api as rimo_api
+#import rinexmod.api as rimo_api
 ### old rinexmod import
 #from rinexmod import rinexmod_api as rimo_api
 
@@ -46,7 +49,7 @@ def site_list_from_metadata(metadata_inp):
      * list of MetaData objects
      * single MetaData object
 
-    This function is mainly a wrapper of `rinexmod_api.metadata_input_manage`
+    This function is mainly a wrapper of `rinexmod_core.load_metadata`
 
     Returns
     -------
@@ -60,7 +63,7 @@ def site_list_from_metadata(metadata_inp):
     ###############################################
     ### read metadata
     if not type(metadata_inp) is list and os.path.isdir(metadata_inp):
-        metadata = rimo_api.metadata_input_manage(metadata_inp, force=False)
+        metadata = rimo_cor.load_metadata(metadata_inp, force=False)
     else:
         metadata = metadata_inp
 

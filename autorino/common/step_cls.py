@@ -22,6 +22,8 @@ import autorino.common as arocmn
 import autorino.cfglog as arologcfg
 
 # import rinexmod
+# new rinexmod v5 import
+import rinexmod.core as rimo_cor
 # new rinexmod v4 import
 import rinexmod.api as rimo_api
 import rinexmod.classes as rimo_cls
@@ -547,7 +549,7 @@ class StepGnss:
         Initializes the metadata attribute of the StepGnss object.
 
         This method checks if a 'metadata' is provided. If it is, it translates the path of the metadata,
-        manages the site log input using the `metadata_input_manage` function from the `rinexmod_api` module,
+        manages the site log input using the `load_metadata` function from the `rinexmod_core` module,
         and sets the 'metadata' attribute of the StepGnss object to the managed site log input.
         If a 'metadata' is not provided, it sets the 'metadata' attribute to None.
 
@@ -566,7 +568,7 @@ class StepGnss:
             else:  # all the other cases, i.e. already some MetaData objects
                 metadata_set = metadata
 
-            self.metadata = rimo_api.metadata_input_manage(metadata_set, force=False)
+            self.metadata = rimo_cor.load_metadata(metadata_set, force=False)
         else:
             self.metadata = None
 
