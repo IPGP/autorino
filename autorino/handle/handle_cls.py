@@ -174,7 +174,7 @@ class HandleGnss(arocmn.StepGnss):
         self,
         step_obj_feeder: arocmn.StepGnss,
         mode: str = "split",
-        print_table: bool = False,
+        print_table: bool = True,
         add_extra_margin: bool = False,
     ) -> None:
         """
@@ -322,7 +322,9 @@ class HandleGnss(arocmn.StepGnss):
 
         return None
 
-    def find_local_inp(self, return_as_step_obj: bool = True, rnx3_regex: bool = False) -> arocmn.StepGnss | list[str]:
+    def find_local_inp(self,
+                       return_as_step_obj: bool = True,
+                       rnx3_regex: bool = False) -> arocmn.StepGnss | list[str]:
         """
         Guess the paths and name of the local raw files based on the
         EpochRange and `inp_basename` attributes of the DownloadGnss object.
@@ -361,13 +363,16 @@ class HandleGnss(arocmn.StepGnss):
             )
             local_paths_list.extend(local_paths_list_epo)
 
+        ## remove duplicates
+        local_paths_list = list(sorted(set(local_paths_list)))
+
         logger.info("nbr local files found: %s", len(local_paths_list))
         if return_as_step_obj:
             return arocmn.rnxs2step_obj(rnxs_lis_inp=local_paths_list)
         else:
             return local_paths_list
 
-    def load_input_rnxs(self, input_mode: str, input_rinexs: str | list | arocmn.StepGnss | None = None) -> arocmn.StepGnss | None:
+    def load_input_rnxs(self, input_mode: str, input_rinexs: str | list | arocmn.StepGnss | None = None) -> arocmn.StepGnss:
         """
         Get the input RINEX files for handeling (splice or split).
 
@@ -390,7 +395,7 @@ class HandleGnss(arocmn.StepGnss):
 
         Returns
         -------
-        StepGnss or None
+        StepGnss
             A StepGnss object containing the input RINEX files, or None if an error occurs.
         """
         method_msg = "input method to handle RINEXs: "

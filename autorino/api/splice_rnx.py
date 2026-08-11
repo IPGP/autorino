@@ -7,6 +7,7 @@ Created on 18/09/2024 18:26:05
 """
 
 import os.path
+from types import NoneType
 
 import autorino.handle as arohdl
 import autorino.common as arocmn
@@ -140,6 +141,8 @@ def splice_rnx(
         log_dir = tmp_dir
 
     if relative_mode:
+        epoch_srt = None
+        epoch_end = None
         epo_rng = arocmn.dummy_epochrange(period)
         logger.info(">>>>>>>>> Relative-mode splice (experimental)")
     else:
@@ -150,7 +153,12 @@ def splice_rnx(
     #  Determine sites                                                   #
     # ------------------------------------------------------------------ #
 
-    inp_dir_use = str(rnxs_inp[0]) if len(rnxs_inp) == 1 else None
+
+
+    if type(rnxs_inp) is str and os.path.isdir(rnxs_inp):
+        inp_dir_use = rnxs_inp
+    else:
+        inp_dir_use = ""
 
     if site:
         sites_use = utils.listify(site)
@@ -187,28 +195,49 @@ def splice_rnx(
         else:
             inp_mode, inp_rnxs = "given", rnxs_inp
 
-        spc_inp_rnx = spc_inp_rnx.load_input_rnxs(inp_mode, inp_rnxs)
+        spc_inp_rnx.load_input_rnxs(inp_mode, inp_rnxs)
+
+        if len(spc_inp_rnx.table) == 0:
+            logger.warning("No input RINEX files found for site %s. Skipping...", site_use)
+            continue
+        else:
+            logger.info(
+                "Found %d input RINEX files for site %s",
+                len(spc_inp_rnx.table),
+                site_use,
+            )
 
         # ------------------------------------------------------------------ #
         #  Absolute mode                                                     #
         # ------------------------------------------------------------------ #
         if not relative_mode:
-            spc_main_obj = arohdl.SpliceGnss(
-                out_dir=out_dir,
-                tmp_dir=tmp_dir,
-                log_dir=log_dir,
-                epoch_range=epo_rng,
-                site={"site_id": site_use},
-                session={"data_frequency": data_frequency},
-                metadata=metadata,
+            spc_main_obj = spc_inp_rnx
+            
+            # Set the log file
+            spc_main_obj.set_logfile()
+            logger.info(">>>>>> Splicing RINEX files")
+            
+            # Generate potential local files
+            spc_main_obj.guess_local_rnx(fname_update=True)
+            # Test if output files already exist
+            spc_main_obj.check_loc_files("out")
+            spc_main_obj.filter_ok_out()
+            
+            # Feed epochs with the loaded RINEXs
+            spc_main_obj.feed_by_epochs(
+                spc_inp_rnx, 
+                mode="splice",
+                print_table=False,
+                add_extra_margin=False
             )
-
-            spc_main_obj.splice(
-                input_mode="given",
-                input_rinexs=spc_inp_rnx,
+            
+            # Perform the splice operation
+            spc_main_obj.splice_core(
                 handle_software=handle_software,
                 rinexmod_options=rinexmod_options,
             )
+            
+            spc_main_obj.close_logfile()
 
         # ------------------------------------------------------------------ #
         #  Relative mode                                                     #
@@ -228,4 +257,4 @@ def splice_rnx(
                 rinexmod_options=rinexmod_options,
             )
 
-    return None
+    return spc_main_obj

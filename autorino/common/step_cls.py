@@ -778,9 +778,17 @@ class StepGnss:
         -------
         None
         """
+        print("AAAAAAAAAAAABBBBBBB")
+        self.print_table()
         for irow, row in self.table.iterrows():
-            if conv.rinex_regex_search_tester(row["fname"]):
+            print("AAAAAAAAAAAAAAAAAAAAA", row["fname"])
+            if conv.rinex_regex_search_tester(str(row["fname"])):
                 self.table.loc[irow, "site"] = self.table.loc[irow, "fname"][:9]
+            else:
+                logger.warning(
+                    "unable to update site, filename %s does not match a RINEX pattern",
+                    row["fname"],
+                )
 
         sites_uniq = self.table["site"].unique()
         if len(sites_uniq) == 1:
@@ -1567,7 +1575,7 @@ class StepGnss:
         self.table["note"] = "force_" + step_name
         return None
 
-    def guess_local_rnx(self, io="out", shortname=False, bis=False):
+    def guess_local_rnx(self, io="out", shortname=False, bis=False, fname_update=False):
         """
         For a given site name and date in a table, guess the potential local RINEX files
         and write it as 'fpath_out' (or 'fpath_out_bis' if bis=True) value in the table
@@ -1582,6 +1590,8 @@ class StepGnss:
         bis : bool, optional
             If True and io='out', uses out_bis_dir instead of out_dir.
             Default is False.
+        fname_update : bool, optional
+            If True, updates the file name in the table. Default is False.
 
         Returns
         -------
@@ -1604,7 +1614,7 @@ class StepGnss:
 
         loc_paths_list = []
         for irow, row in self.table.iterrows():
-            loc_path = self.m_guess_loc_rnx(irow, io=io, shortname=shortname, bis=bis)
+            loc_path = self.m_guess_loc_rnx(irow, io=io, shortname=shortname, bis=bis, fname_update=fname_update)
             loc_paths_list.append(loc_path)
 
         logger.info("nbr local RINEX files guessed: %s", len(loc_paths_list))
@@ -2827,6 +2837,7 @@ class StepGnss:
         else:
             out_dir_use = self.tmp_dir
 
+        print("AAAAAAAAAA", self.table.loc[irow, table_col])
         bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
         bool_ok = self.table.loc[irow, table_ok_col]
         bool_wrk = np.logical_and(bool_comp, bool_ok)
@@ -2855,7 +2866,7 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
-    def m_guess_loc_rnx(self, irow, io="out", shortname=False, bis=False):
+    def m_guess_loc_rnx(self, irow, io="out", shortname=False, bis=False, fname_update=False):
         """
         Guesses the local RINEX file path for a given row in the table.
 
@@ -2875,6 +2886,9 @@ class StepGnss:
             Default is False.
         bis : bool, optional
             If True and io='out', uses out_bis_dir instead of out_dir.
+            Default is False.
+        fname_update : bool, optional
+            If True, updates the 'fname' column in the table with the guessed file name.
             Default is False.
 
         Returns
@@ -2937,10 +2951,14 @@ class StepGnss:
         # Construct the full file path and translate it
         loc_path0 = os.path.join(loc_dir, loc_fname)
         loc_path = self.translate_path(loc_path0, epoch_inp=epo_srt)
-        loc_fname = os.path.basename(loc_path)
 
         # Update the table with the guessed file path
         self.table.loc[irow, "fpath_" + io + col_suffix] = loc_path
+
+        if fname_update:
+            loc_fname = os.path.basename(loc_path)
+            self.table.loc[irow, "fname"] = loc_fname
+
         logger.debug("local RINEX file guessed: %s", loc_path)
 
         return loc_path

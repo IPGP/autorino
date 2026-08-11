@@ -130,7 +130,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
         self.table["ok_inp"] = True
 
         # generate the potential local files
-        self.guess_local_rnx()
+        self.guess_local_rnx(fname_update=True)
         # tests if the output local files are already there
         self.check_loc_files("out")
         # switch ok_inp to False if the output files are already there
@@ -145,6 +145,13 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.load_input_rnxs(str(input_mode), input_rinexs)
+        
+        # Check if input RINEX files were found
+        if stp_obj_rnxs_inp is None or len(stp_obj_rnxs_inp.table) == 0:
+            logger.warning("No input RINEX files found. Aborting splice operation.")
+            self.close_logfile()
+            return None
+        
         # Feed the epochs for splicing
         self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=bool(verbose), add_extra_margin=add_extra_margin)
 
@@ -194,6 +201,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
         """
 
         self.set_tmp_dirs()
+
+        print("AAAAAAAAAAAAAAAACCCCCCCCCCCC")
+        print(self.table.to_string())
 
         for irow, row in self.table.iterrows():
             if not self.mono_ok_check(
