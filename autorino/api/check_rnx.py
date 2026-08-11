@@ -7,7 +7,7 @@ Created on 27/01/2025 09:50:23
 """
 
 import matplotlib.pyplot as plt
-
+from geodezyx.utils_xtra import plot_utils
 import autorino.cfgenv as aroenv
 import autorino.check as arochk
 import autorino.common as arocmn
@@ -143,7 +143,7 @@ def checkrnx_output(
     ### plot
     df_chk_sum.plot()
     fig = plt.gcf()
-    utils.figure_saver(
+    plot_utils.figure_saver(
         fig, output_dir_use, prefix + "_check_rnx_plot", outtype=(".png", ".pdf")
     )
     ### pretty print tabulate

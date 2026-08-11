@@ -863,7 +863,7 @@ class StepGnss:
                 epo_srt = rnx.start_date
                 epo_end = rnx.end_date
             else:
-                epo_srt, epo_end, _ = rimo_api.dates_from_rinex_filename(
+                epo_srt, epo_end, _ = rimo_cor.dates_from_rinex_filename(
                     row["fpath_inp"]
                 )
 
@@ -2916,7 +2916,7 @@ class StepGnss:
         epo_end = epo_end.replace(tzinfo=None)
 
         # Determine the file period string based on the epoch range
-        prd_str = rimo_api.file_period_from_timedelta(epo_srt, epo_end)[0]
+        prd_str = rimo_cor.file_period_from_timedelta(epo_srt, epo_end)[0]
 
         # Generate the RINEX file name using site and session information
         if not shortname:
