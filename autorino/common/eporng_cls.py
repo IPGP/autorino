@@ -83,8 +83,18 @@ class EpochRange:
         self.tz = tz
 
         if (
-            self._epoch1_raw and self._epoch2_raw
-        ):  # 1) regular case: a start and an end are given
+            utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw
+        ):  # 2) special when case a start is given as a list, but no end
+            _epoch1tmp = [arocmn.datepars_intrpt(e) for e in self._epoch1_raw]
+            _epoch_min_tmp = np.min(_epoch1tmp)
+            _epoch_max_tmp = np.max(_epoch1tmp)
+
+            self.epoch_start = _epoch_min_tmp
+            self.epoch_end = _epoch_max_tmp
+
+            self.manual_range = True
+            self._manu_range_list = _epoch1tmp
+        else:  # 1) regular case: a start and an end are given
             _epoch1tmp = arocmn.datepars_intrpt(self._epoch1_raw)
             _epoch2tmp = arocmn.datepars_intrpt(self._epoch2_raw)
             _epoch_min_tmp = np.min((_epoch1tmp, _epoch2tmp))
@@ -96,18 +106,6 @@ class EpochRange:
             self.manual_range = False
             self._manu_range_list = []
 
-        elif (
-            utils.is_iterable(self._epoch1_raw) and not self._epoch2_raw
-        ):  # 2) case a start is given as a list, but no end
-            _epoch1tmp = [arocmn.datepars_intrpt(e) for e in self._epoch1_raw]
-            _epoch_min_tmp = np.min(_epoch1tmp)
-            _epoch_max_tmp = np.max(_epoch1tmp)
-
-            self.epoch_start = _epoch_min_tmp
-            self.epoch_end = _epoch_max_tmp
-
-            self.manual_range = True
-            self._manu_range_list = _epoch1tmp
 
     ## NB: I think it is a bad idea to have an attribute (property) to get the list of epochs
 
