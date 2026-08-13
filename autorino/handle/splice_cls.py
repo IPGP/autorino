@@ -5,6 +5,7 @@ Created on 20/05/2025 20:26:56
 
 @author: psakic
 """
+
 from __future__ import annotations
 
 # Create a logger object.
@@ -72,7 +73,7 @@ class SpliceGnss(arohdlcls.HandleGnss):
         verbose: bool = False,
         force: bool = False,
         reverse_order: bool = False,
-        add_extra_margin: bool = False
+        add_extra_margin: bool = False,
     ) -> None:
         """
         Splice RINEX files.
@@ -145,15 +146,20 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
         # Find the input RINEX files
         stp_obj_rnxs_inp = self.load_input_rnxs(str(input_mode), input_rinexs)
-        
+
         # Check if input RINEX files were found
         if stp_obj_rnxs_inp is None or len(stp_obj_rnxs_inp.table) == 0:
             logger.warning("No input RINEX files found. Aborting splice operation.")
             self.close_logfile()
             return None
-        
+
         # Feed the epochs for splicing
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=bool(verbose), add_extra_margin=add_extra_margin)
+        self.feed_by_epochs(
+            stp_obj_rnxs_inp,
+            mode="splice",
+            print_table=bool(verbose),
+            add_extra_margin=add_extra_margin,
+        )
 
         # Perform the core splicing operation
         self.splice_core(
@@ -221,9 +227,10 @@ class SpliceGnss(arohdlcls.HandleGnss):
             )
 
             self.mono_splice(
-                irow, self.tmp_dir_converted,
+                irow,
+                self.tmp_dir_converted,
                 handle_software=str(handle_software),
-                handle_software_options=handle_software_options
+                handle_software_options=handle_software_options,
             )
 
             if not self.table.loc[irow, "ok_out"] and self.table.loc[irow, "ok_inp"]:
@@ -294,9 +301,10 @@ class SpliceGnss(arohdlcls.HandleGnss):
             fpath_inp_lst = list(sorted([str(e) for e in spc_row.table[table_col]]))
 
             hndl_opts_use, hndl_kwopts_use = self.handl_soft_opts(
-                irow, handl_soft=handle_software,
+                irow,
+                handl_soft=handle_software,
                 mode="splice",
-                handl_opts_supl=handle_software_options
+                handl_opts_supl=handle_software_options,
             )
             try:
                 time.sleep(1)

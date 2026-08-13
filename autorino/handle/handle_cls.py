@@ -199,7 +199,7 @@ class HandleGnss(arocmn.StepGnss):
             If True, adds an extra margin to the end epoch for splicing operations.
             This is useful for handling cases where the end epoch of the RINEX files may be slightly
             over the theoretical end epoch, such as with Leica raw files.
-             Default is False (no extra margin).
+            Default is False (no extra margin).
 
         print_table : bool
             If True, prints the tables for debugging purposes.

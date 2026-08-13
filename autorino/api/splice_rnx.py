@@ -217,28 +217,12 @@ def splice_rnx(
                 metadata=metadata,
             )
 
-            # Set the log file
-            spc_main_obj.set_logfile()
-            logger.info(">>>>>> Splicing RINEX files")
-
-            # Generate potential local files
-            spc_main_obj.guess_local_rnx(fname_update=True)
-            # Test if output files already exist
-            spc_main_obj.check_loc_files("out")
-            spc_main_obj.filter_ok_out()
-
-            # Feed epochs with the loaded RINEXs
-            spc_main_obj.feed_by_epochs(
-                spc_inp_rnx, mode="splice", print_table=False, add_extra_margin=False
+            spc_main_obj.splice(
+                input_mode="given",
+                input_rinexs=spc_inp_rnx,
+                verbose=True,
+                add_extra_margin=True,
             )
-
-            # Perform the splice operation
-            spc_main_obj.splice_core(
-                handle_software=handle_software,
-                rinexmod_options=rinexmod_options,
-            )
-
-            spc_main_obj.close_logfile()
 
         # ------------------------------------------------------------------ #
         #  Relative mode                                                     #
