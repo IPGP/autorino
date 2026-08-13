@@ -24,6 +24,7 @@ import autorino.cfglog as arologcfg
 # import rinexmod
 # new rinexmod v5 import
 import rinexmod.core as rimo_cor
+
 # new rinexmod v4 import
 import rinexmod.api as rimo_api
 import rinexmod.classes as rimo_cls
@@ -47,6 +48,7 @@ warnings.simplefilter("always", UserWarning)
 # print("Logging Tree:", printout())
 
 VERBOSE_INIT = False
+
 
 class StepGnss:
     """
@@ -185,7 +187,9 @@ class StepGnss:
 
     @out_bis_dir.setter
     def out_bis_dir(self, value):
-        if value and VERBOSE_INIT:  # Only warn if explicitly set to empty string, not None
+        if (
+            value and VERBOSE_INIT
+        ):  # Only warn if explicitly set to empty string, not None
             logger.warning("output bis directory is not defined (%s)", value)
         self._out_bis_dir = value
 
@@ -778,25 +782,20 @@ class StepGnss:
         -------
         None
         """
-        print("AAAAAAAAAAAABBBBBBB")
         self.print_table()
         for irow, row in self.table.iterrows():
-            print("AAAAAAAAAAAAAAAAAAAAA", row["fname"])
             if conv.rinex_regex_search_tester(str(row["fname"])):
                 self.table.loc[irow, "site"] = self.table.loc[irow, "fname"][:9]
             else:
-                logger.warning(
-                    "unable to update site, filename %s does not match a RINEX pattern",
-                    row["fname"],
-                )
+                wm = "unable to update site, filename %s does not match a RINEX pattern"
+                logger.warning(wm, row["fname"])
 
         sites_uniq = self.table["site"].unique()
         if len(sites_uniq) == 1:
             self.site_id = sites_uniq[0]
         elif len(sites_uniq) > 1:
-            logger.warning(
-                "unable to update site_id, multiple sites %s in %s", sites_uniq, self
-            )
+            wm = "unable to update site_id, multiple sites %s in %s"
+            logger.warning(wm, sites_uniq, self)
         else:
             logger.warning("unable to update site_id, no site found in %s", self)
 
@@ -956,7 +955,7 @@ class StepGnss:
     def translate_path(
         self,
         path_inp: str,
-        epoch_inp =None,
+        epoch_inp=None,
         make_dir: bool = False,
         absolute: bool = False,
     ) -> str:
@@ -1614,7 +1613,9 @@ class StepGnss:
 
         loc_paths_list = []
         for irow, row in self.table.iterrows():
-            loc_path = self.m_guess_loc_rnx(irow, io=io, shortname=shortname, bis=bis, fname_update=fname_update)
+            loc_path = self.m_guess_loc_rnx(
+                irow, io=io, shortname=shortname, bis=bis, fname_update=fname_update
+            )
             loc_paths_list.append(loc_path)
 
         logger.info("nbr local RINEX files guessed: %s", len(loc_paths_list))
@@ -1963,7 +1964,7 @@ class StepGnss:
             # we also test if the file is not an original one!
             if "fpath_ori" not in self.table.columns:
                 warnmsg = "file has been uncompressed, but no 'fpath_ori' field in table, we keep it for security: %s"
-                logger.warning(warnmsg,f)
+                logger.warning(warnmsg, f)
                 tmp_decmp_files_new.append(f)
                 continue
 
@@ -1971,7 +1972,7 @@ class StepGnss:
 
             if f and os.path.isfile(f) and is_original:
                 warnmsg = "uncompressed file is also an original one, we keep it for security: %s"
-                logger.warning(warnmsg,f)
+                logger.warning(warnmsg, f)
                 tmp_decmp_files_new.append(f)
                 continue
             elif f and os.path.isfile(f) and not is_original:
@@ -2837,7 +2838,6 @@ class StepGnss:
         else:
             out_dir_use = self.tmp_dir
 
-        print("AAAAAAAAAA", self.table.loc[irow, table_col])
         bool_comp = arocmn.is_compressed(self.table.loc[irow, table_col])
         bool_ok = self.table.loc[irow, table_ok_col]
         bool_wrk = np.logical_and(bool_comp, bool_ok)
@@ -2866,7 +2866,9 @@ class StepGnss:
 
         return file_decomp_out, bool_decomp_out
 
-    def m_guess_loc_rnx(self, irow, io="out", shortname=False, bis=False, fname_update=False):
+    def m_guess_loc_rnx(
+        self, irow, io="out", shortname=False, bis=False, fname_update=False
+    ):
         """
         Guesses the local RINEX file path for a given row in the table.
 

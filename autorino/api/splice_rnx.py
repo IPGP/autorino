@@ -153,8 +153,6 @@ def splice_rnx(
     #  Determine sites                                                   #
     # ------------------------------------------------------------------ #
 
-
-
     if type(rnxs_inp) is str and os.path.isdir(rnxs_inp):
         inp_dir_use = rnxs_inp
     else:
@@ -172,13 +170,12 @@ def splice_rnx(
         return None
 
     for site_use in sites_use:
-
         logger.info(">>>>>>>>> Splicing site %s", site_use)
-
         # ------------------------------------------------------------------ #
         #  Determine input RINEXs                                            #
         # ------------------------------------------------------------------ #
 
+        # We create a SpliceGnss object to store the input RINEX files and prepare for splicing
         spc_inp_rnx = arohdl.SpliceGnss(
             inp_dir=inp_dir_use,
             out_dir=out_dir,
@@ -190,53 +187,57 @@ def splice_rnx(
             metadata=metadata,
         )
 
-        if inp_dir_use:
-            inp_mode, inp_rnxs = "find", None
-        else:
-            inp_mode, inp_rnxs = "given", rnxs_inp
-
-        spc_inp_rnx.load_input_rnxs(inp_mode, inp_rnxs)
+        # Determine the input mode and input RINEX files based on whether an input directory is provided
+        inp_mode, inp_rnxs = ("find", None) if inp_dir_use else ("given", rnxs_inp)
+        # Load the input RINEX files into the SpliceGnss object
+        spc_inp_rnx = spc_inp_rnx.load_input_rnxs(inp_mode, inp_rnxs)
 
         if len(spc_inp_rnx.table) == 0:
-            logger.warning("No input RINEX files found for site %s. Skipping...", site_use)
+            warnmsg = "No input RINEX files found for site %s. Skipping..."
+            logger.warning(warnmsg, site_use)
             continue
-        else:
-            logger.info(
-                "Found %d input RINEX files for site %s",
-                len(spc_inp_rnx.table),
-                site_use,
-            )
+
+        logger.info(
+            "%d input RINEX files found for site %s:", len(spc_inp_rnx.table), site_use
+        )
+        spc_inp_rnx.print_table()
 
         # ------------------------------------------------------------------ #
         #  Absolute mode                                                     #
         # ------------------------------------------------------------------ #
         if not relative_mode:
-            spc_main_obj = spc_inp_rnx
-            
+            spc_main_obj = arohdl.SpliceGnss(
+                inp_dir=inp_dir_use,
+                out_dir=out_dir,
+                tmp_dir=tmp_dir,
+                log_dir=log_dir,
+                epoch_range=epo_rng,
+                site={"site_id": site_use},
+                session={"data_frequency": data_frequency},
+                metadata=metadata,
+            )
+
             # Set the log file
             spc_main_obj.set_logfile()
             logger.info(">>>>>> Splicing RINEX files")
-            
+
             # Generate potential local files
             spc_main_obj.guess_local_rnx(fname_update=True)
             # Test if output files already exist
             spc_main_obj.check_loc_files("out")
             spc_main_obj.filter_ok_out()
-            
+
             # Feed epochs with the loaded RINEXs
             spc_main_obj.feed_by_epochs(
-                spc_inp_rnx, 
-                mode="splice",
-                print_table=False,
-                add_extra_margin=False
+                spc_inp_rnx, mode="splice", print_table=False, add_extra_margin=False
             )
-            
+
             # Perform the splice operation
             spc_main_obj.splice_core(
                 handle_software=handle_software,
                 rinexmod_options=rinexmod_options,
             )
-            
+
             spc_main_obj.close_logfile()
 
         # ------------------------------------------------------------------ #

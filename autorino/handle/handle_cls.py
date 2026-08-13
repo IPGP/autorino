@@ -379,6 +379,10 @@ class HandleGnss(arocmn.StepGnss):
         This method retrieves the input RINEX files based on the specified input mode and input RINEXs.
         It can find local input files or use a provided input list.
 
+        this method is tricky because it return a StepGnss, but do not modify the current object in place.
+        it is a static method in fact, but not declared as such to be able to use self.logger
+
+
         Parameters
         ----------
         input_mode : str

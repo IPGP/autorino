@@ -41,7 +41,7 @@ def is_compressed(file_inp):
     bool
         True if the file is compressed, False otherwise.
     """
-    file_inp2 = Path(file_inp)
+    file_inp2 = Path(str(file_inp))
 
     ext = file_inp2.suffix.lower()
 
