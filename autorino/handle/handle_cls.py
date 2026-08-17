@@ -5,6 +5,7 @@ Created on Wed Jan 10 15:00:40 2024
 
 @author: psakic
 """
+
 from __future__ import annotations
 
 # Create a logger object.
@@ -322,9 +323,9 @@ class HandleGnss(arocmn.StepGnss):
 
         return None
 
-    def find_local_inp(self,
-                       return_as_step_obj: bool = True,
-                       rnx3_regex: bool = False) -> arocmn.StepGnss | list[str]:
+    def find_local_inp(
+        self, return_as_step_obj: bool = True, rnx3_regex: bool = False
+    ) -> arocmn.StepGnss | list[str]:
         """
         Guess the paths and name of the local raw files based on the
         EpochRange and `inp_basename` attributes of the DownloadGnss object.
@@ -372,7 +373,9 @@ class HandleGnss(arocmn.StepGnss):
         else:
             return local_paths_list
 
-    def load_input_rnxs(self, input_mode: str, input_rinexs: str | list | arocmn.StepGnss | None = None) -> arocmn.StepGnss:
+    def load_input_rnxs(
+        self, input_mode: str, input_rinexs: str | list | arocmn.StepGnss | None = None
+    ) -> arocmn.StepGnss:
         """
         Get the input RINEX files for handeling (splice or split).
 

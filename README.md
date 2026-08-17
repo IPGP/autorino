@@ -40,6 +40,8 @@ See the following link:
 If you find _autorino_ useful for your research, please consider citing the following reference:
 * Sakic, P., Boissier, P., Saurel, J.-M., Deroussi, S., Andrieu, A., Griot, C., Bosson, A., Vidal, C., Pardo, C., de Chabalier, J.-B., and OVPF, OVSG & OVSM Teams: _Modernizing GNSS data acquisition, pre-processing, and distribution at volcanological observatories_,
  Geosci. Instrum. Method. Data Syst., 15, 89–106, https://doi.org/10.5194/gi-15-89-2026, 2026.
+* Sakic, P., Boissier, P., Saurel, J.-M., Griot, C., Pacaud, D., Boulvais-Abbas, L. (2026).
+rinexmod & autorino: Two Tools to Enable Multi-GNSS and Near Real-Time Data Acquisition and Pre-processing. In: International Association of Geodesy Symposia. Springer, Berlin, Heidelberg. https://doi.org/10.1007/1345_2026_327
 
 ## Authors & Contributors
 * [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
