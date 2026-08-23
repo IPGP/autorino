@@ -207,10 +207,6 @@ class SpliceGnss(arohdlcls.HandleGnss):
         """
 
         self.set_tmp_dirs()
-
-        print("AAAAAAAAAAAAAAAACCCCCCCCCCCC")
-        print(self.table.to_string())
-
         for irow, row in self.table.iterrows():
             if not self.mono_ok_check(
                 irow,

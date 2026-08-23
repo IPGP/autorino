@@ -153,13 +153,17 @@ def splice_rnx(
     #  Determine sites                                                   #
     # ------------------------------------------------------------------ #
 
-    # Test flavor #1
-    # if type(rnxs_inp) is str and os.path.isdir(rnxs_inp):
-    #     inp_dir_use = rnxs_inp
-    # else:
-    #     inp_dir_use = ""
-    # Test flavor #2
-    inp_dir_use = str(rnxs_inp[0]) if len(rnxs_inp) == 1 else ""
+    ### Determine input directory from either a directory string or single-item list
+    # most common case: the input is a directory string. We use it directly.
+    if type(rnxs_inp) is str:
+        inp_dir_use = rnxs_inp
+    # in this specific case, the input is an alias directory.
+    # the CLI function could not interpret it as a directory, then it is kept in a single-item list.
+    # we grab from the list the alias.
+    elif isinstance(rnxs_inp, list) and len(rnxs_inp) == 1:
+        inp_dir_use = str(rnxs_inp[0])
+    else:
+        inp_dir_use = ""
 
     if site:
         sites_use = utils.listify(site)
@@ -167,9 +171,13 @@ def splice_rnx(
         logger.info("sites will be detected automatically based on the input directory")
         sites_use = arocmn.guess_sites_list(inp_dir_use)
     else:
-        logger.error("unable to detect site list. aborting...")
+        logger.error("Unable to detect site list. aborting...")
         errmsg = "give site list with 'site' argument or check parent directory (aliases not allowed for site detection): %s"
         logger.error(errmsg, inp_dir_use)
+        return None
+
+    if len(sites_use) == 0:
+        logger.error("no sites found. aborting...")
         return None
 
     for site_use in sites_use:
