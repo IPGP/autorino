@@ -153,10 +153,13 @@ def splice_rnx(
     #  Determine sites                                                   #
     # ------------------------------------------------------------------ #
 
-    if type(rnxs_inp) is str and os.path.isdir(rnxs_inp):
-        inp_dir_use = rnxs_inp
-    else:
-        inp_dir_use = ""
+    # Test flavor #1
+    # if type(rnxs_inp) is str and os.path.isdir(rnxs_inp):
+    #     inp_dir_use = rnxs_inp
+    # else:
+    #     inp_dir_use = ""
+    # Test flavor #2
+    inp_dir_use = str(rnxs_inp[0]) if len(rnxs_inp) == 1 else ""
 
     if site:
         sites_use = utils.listify(site)
