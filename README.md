@@ -3,8 +3,8 @@
 # autorino
 autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
-**Version: 2.4.2**  
-**Date: 2026-04-10**
+**Version: 2.4.3-beta0**  
+**Date: 2026-10-03**
 
 **Main developper:** [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France)  
 **Contact e-mail:** sakic@ipgp.fr
