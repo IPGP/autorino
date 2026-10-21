@@ -131,6 +131,7 @@ def ftp_create_obj(
     while True:
         try:
             ftp = ftplib.FTP(hostname_inp, timeout=timeout)
+            ftp.set_pasv(True)
             if (username is not None) and (password is not None):
                 ftp.login(username, password)
             return ftp
@@ -140,7 +141,7 @@ def ftp_create_obj(
                 raise e
             else:
                 print(e)
-                time.sleep(float(sleep_time))
+                time.sleep(sleep_time)
         except (OSError, ftplib.error_perm, Exception) as e:
             logger.error("Unable to create FTP object: %s", str(e))
             return None
@@ -148,8 +149,8 @@ def ftp_create_obj(
 def list_remote_ftp(
     hostname,
     remote_dir,
-    username="",
-    password="",
+    username=None,
+    password=None,
     timeout=15,
     max_try=3,
     ftp_obj_inp=None,
@@ -358,15 +359,22 @@ def download_ftp(
 
     while True:
         try:
-            with tqdm.tqdm(
-                total=file_size, unit="B", unit_scale=True, desc=filename
-            ) as pbar, open(output_path, "wb") as f:
+            exist_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+            if exist_size >= file_size and file_size > 0:
+                logger.info("File %s already downloaded (%i/%i bytes)", filename, exist_size, file_size)
+                break
 
-                _ftp_callback.bytes_transferred = 0
+            mode = "ab" if exist_size > 0 else "wb"
+            with tqdm.tqdm(
+                total=file_size, initial=exist_size, unit="B", unit_scale=True, desc=filename
+            ) as pbar, open(output_path, mode) as f:
+
+                _ftp_callback.bytes_transferred = exist_size
                 ftp_obj.retrbinary(
                     "RETR " + filename,
                     lambda data: (f.write(data), pbar.update(len(data))),
-                    1024,
+                    65536,
+                    rest=exist_size if exist_size > 0 else None,
                 )
                 break
         # here are all the possible exceptions that can be raised
@@ -378,9 +386,27 @@ def download_ftp(
                 # this error will be handled by the upper function mono_fetch
             else:
                 logger.warning(
-                    "download failed (%s), try %i/%i", str(e), try_count, max_try
+                    "download failed (%s), try %i/%i. Reconnecting FTP...", str(e), try_count, max_try
                 )
-                time.sleep(float(sleep_time))
+                time.sleep(sleep_time)
+                try:
+                    if disposable_ftp_obj:
+                        try:
+                            ftp_obj.quit()
+                        except Exception:
+                            pass
+                        ftp_obj = ftp_create_obj(
+                            url_host,
+                            username=username,
+                            password=password,
+                            timeout=timeout,
+                            max_try=max_try,
+                            sleep_time=sleep_time,
+                        )
+                    ftp_obj.cwd(url_dir)
+                    ftp_obj.sendcmd("TYPE I")
+                except Exception as reconn_err:
+                    logger.warning("FTP reconnection attempt failed: %s", str(reconn_err))
 
     f.close()
 
@@ -516,7 +542,7 @@ def download_http(url, output_dir, timeout=120, max_try=4, sleep_time=5):
 #                |___/
 
 
-def ping(host, ping_timeout=20) -> float | None:
+def ping(host, ping_timeout=20):
     """
     Executes the ping command and captures the output.
 
@@ -528,12 +554,11 @@ def ping(host, ping_timeout=20) -> float | None:
     host : str
         The hostname or IP address to ping.
     ping_timeout : int, optional
-        The timeout for the ping command in seconds.
-        Default is 20 seconds.
+        The timeout for the ping command in seconds. Default is 10 seconds.
 
     Returns
     -------
-    ping_out : float or None
+    float or None
         The round-trip time (RTT) in seconds if the ping is successful,
         otherwise None.
     """
@@ -548,11 +573,9 @@ def ping(host, ping_timeout=20) -> float | None:
     match = re.search(r"time=(\d+\.?\d*)\s*ms", result.stdout)
 
     if match:
-        ping_out = float(match.group(1)) * 10**-3
+        return float(match.group(1)) * 10**-3
     else:
-        ping_out = None
-
-    return ping_out
+        return None
 
 
 def check_file_size(file_path, min_size=1000):
