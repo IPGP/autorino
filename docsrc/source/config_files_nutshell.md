@@ -110,9 +110,13 @@ The following aliases are managed:
 
 * `<site_id4>` or `<SITE_ID4>`: the 4-characters site name
 * `<site_id9>` or `<SITE_ID9>`: the 9-characters site name
+* `<hourchar>` or `<HOURCHAR>`: character for the n-th hour in the day, as defined by the RINEX2 naming convention. 
+(`a`= 1st hour: 00h-01h, `b`= 2nd hour: 1h to 2h,..., `x`=24th hour: 23h-24h.)
 
-Time aliases can also be used. They follow the `date` format convention,
+Time aliases can also be used. 
+They follow the _C standard_ convention, like the UNIX command `date`.
 e.g. `%Y` for the year, `%H` for the hour, `%j` for the day of year, etc...
+Complete list of time aliases can be found in the [Python documentation](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes).
 
 The environment variables can also be used as aliases. They follow the `<$ENVVAR>` convention,
 using `$` and between `<` & `>`, e.g. `<$HOME>` for the home directory.
