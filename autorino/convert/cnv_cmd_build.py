@@ -403,45 +403,6 @@ def cmd_build_t0xconvert(
 
     return cmd_use, cmd_list, cmd_str
 
-
-def _rnx_vers(rnx_vers_inp, converter=""):
-    if converter == "mdb2rinex":
-        if rnx_vers_inp == 3:
-            ver_flag = "rinex3.04"
-        elif rnx_vers_inp == 4:
-            ver_flag = "rinex4.00"
-        else:
-            ver_flag = "rinex4.00"  # default
-            logger.warning("Unknown RINEX version for {converter}, using default {ver_flag}")
-
-    elif converter == "sbf2rin":
-        if rnx_vers_inp == 3:
-            ver_flag = "3"
-        elif rnx_vers_inp == 4:
-            ver_flag = "4"
-        else:
-            ver_flag = "4"  # default
-        logger.warning("Unknown RINEX version for {converter}, using default {ver_flag}")
-
-    elif converter == "trm2rinex":
-        if rnx_vers_inp == 2:
-            ver_flag = "2.11"
-        elif rnx_vers_inp == 3:
-            ver_flag = "3.04"
-        elif rnx_vers_inp == 4:
-            ver_flag = "4.00"
-        else:
-            ver_flag = "3.04"  # default
-        logger.warning("Unknown RINEX version for {converter}, using default {ver_flag}")
-
-    else:
-        errmsg = "Unknown converter {converter} for RINEX version flag"
-        logger.error(errmsg)
-        raise ValueError(errmsg)
-
-    return ver_flag
-
-
 def cmd_build_mdb2rinex(
     inp_raw_fpath,
     out_dir,
