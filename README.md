@@ -3,8 +3,8 @@
 # autorino
 autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
-**Version: 2.4.2**  
-**Date: 2026-04-10**
+**Version: 2.4.3**  
+**Date: 2026-10-03**
 
 **Main developper:** [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France)  
 **Contact e-mail:** sakic@ipgp.fr
@@ -14,6 +14,8 @@ autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Ob
 **GitHub repository:** [https://github.com/IPGP/autorino](https://github.com/IPGP/autorino) 
 
 **Licence:** GNU GPL v3 (see attached license file) 
+
+**DOI**: [https://doi.org/10.5281/zenodo.19000388](https://doi.org/10.5281/zenodo.19000388)
 
 ## Introduction
 The _autorino_ package (for _Assisted Unloading, Treatment & Organisation of RINex Observations_) is designed for
@@ -36,8 +38,20 @@ See the following link:
 See the following link:  
 [https://ipgp.github.io/autorino/](https://ipgp.github.io/autorino/)
 
+## References
+If you find _autorino_ useful for your research, please consider citing the following reference:
+* Sakic, P., Boissier, P., Saurel, J.-M., Deroussi, S., Andrieu, A., Griot, C., Bosson, A., Vidal, C., Pardo, C., de Chabalier, J.-B., and OVPF, OVSG & OVSM Teams: _Modernizing GNSS data acquisition, pre-processing, and distribution at volcanological observatories_,
+ Geosci. Instrum. Method. Data Syst., 15, 89–106, https://doi.org/10.5194/gi-15-89-2026, 2026.
+* Sakic, P., Boissier, P., Saurel, J.-M., Griot, C., Pacaud, D., Boulvais-Abbas, L. (2026).
+rinexmod & autorino: Two Tools to Enable Multi-GNSS and Near Real-Time Data Acquisition and Pre-processing. In: International Association of Geodesy Symposia. Springer, Berlin, Heidelberg. https://doi.org/10.1007/1345_2026_327
+
 ## Authors & Contributors
 * [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France) 
 * [Patrice Boissier](https://github.com/PBoissier) (OVPF-IPGP, La Réunion, France)
 * [Jean-Marie Saurel](https://github.com/jmsaurel) (IPGP-OVS, Paris, France)
 * [Diane Pacaud](https://github.com/DianouPac) (OVPF-IPGP, La Réunion, France)
+
+---
+___The ideal case would be if the receiver manufacturers themselves developed the necessary software to translate the raw data of their receivers into RINEX because probably nobody else knows their receiver better___
+
+Werner Gurtner (AIUB) & Gerald M. Mader (NGS), _The RINEX Format: Current Status, Future Developments_,  Proceedings of the Second International Symposium of Precise Positioning with the Global Positioning System, Ottawa, 1990.
