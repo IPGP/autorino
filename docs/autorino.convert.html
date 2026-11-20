@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.convert package &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -16,8 +16,8 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
@@ -69,9 +69,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.convert.cnv_cls">autorino.convert.cnv_cls module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.convert.cnv_cmd_build">autorino.convert.cnv_cmd_build module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.convert.cnv_cmd_build_refactor">autorino.convert.cnv_cmd_build_refactor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.convert.cnv_cmd_run">autorino.convert.cnv_cmd_run module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.convert.cnv_fcts">autorino.convert.cnv_fcts module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.convert.cnv_regex">autorino.convert.cnv_regex module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.convert.cnv_regex_refactor">autorino.convert.cnv_regex_refactor module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="autorino.download.html">autorino.download package</a></li>
@@ -118,140 +120,51 @@
 <p>&#64;author: psakic</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cls.</span></span><span class="sig-name descname"><span class="pre">ConvertGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cls.html#ConvertGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cls.</span></span><span class="sig-name descname"><span class="pre">ConvertGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cls.html#ConvertGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="autorino.common.html#autorino.common.step_cls.StepGnss" title="autorino.common.step_cls.StepGnss"><code class="xref py py-class docutils literal notranslate"><span class="pre">StepGnss</span></code></a></p>
-<p>A class used to represent the GNSS conversion process.</p>
-<p>This class inherits from the StepGnss class
-and is used to handle the conversion of GNSS data.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.out_dir">
-<span class="sig-name descname"><span class="pre">out_dir</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.out_dir" title="Link to this definition"></a></dt>
-<dd><p>The directory where the output of the conversion should be stored.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.tmp_dir">
-<span class="sig-name descname"><span class="pre">tmp_dir</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.tmp_dir" title="Link to this definition"></a></dt>
-<dd><p>The directory where temporary files during the conversion process should be stored.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.log_dir">
-<span class="sig-name descname"><span class="pre">log_dir</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.log_dir" title="Link to this definition"></a></dt>
-<dd><p>The directory where log files should be stored.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.epoch_range">
-<span class="sig-name descname"><span class="pre">epoch_range</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.epoch_range" title="Link to this definition"></a></dt>
-<dd><p>A tuple containing the start and end epochs for the conversion process.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.site">
-<span class="sig-name descname"><span class="pre">site</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.site" title="Link to this definition"></a></dt>
-<dd><p>The site for which the conversion process should be performed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.session">
-<span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.session" title="Link to this definition"></a></dt>
-<dd><p>The session for which the conversion process should be performed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.options">
-<span class="sig-name descname"><span class="pre">options</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.options" title="Link to this definition"></a></dt>
-<dd><p>A dictionary containing any additional options for the conversion process.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.metadata" title="Link to this definition"></a></dt>
-<dd><p>The metadata to be included in the converted RINEX files
-Possible inputs are:
-* list of string (sitelog file paths),
-* single string (single sitelog file path)
-* single string (directory containing the sitelogs)
-* list of MetaData objects
-* single MetaData object</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or list, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
+<p>A class to handle the conversion of GNSS data.</p>
+<section id="inherits-from">
+<h3>Inherits from<a class="headerlink" href="#inherits-from" title="Link to this heading"></a></h3>
+<p>arocmn.StepGnss</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range_inp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cls.html#ConvertGnss.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.__init__" title="Link to this definition"></a></dt>
-<dd><p>Initializes the ConvertGnss class with the specified parameters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cls.html#ConvertGnss.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cls.html#ConvertGnss.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initializes the ConvertGnss class with the specified parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>out_dir</strong> (<em>str</em>) – The directory where the output of the conversion should be stored.</p></li>
-<li><p><strong>tmp_dir</strong> (<em>str</em>) – The directory where temporary files during the conversion process should be stored.</p></li>
-<li><p><strong>log_dir</strong> (<em>str</em>) – The directory where log files should be stored.</p></li>
-<li><p><strong>epoch_range</strong> (<em>tuple</em><em>, </em><em>optional</em>) – A tuple containing the start and end epochs for the conversion process.</p></li>
-<li><p><strong>site</strong> (<em>str</em><em>, </em><em>optional</em>) – The site for which the conversion process should be performed.</p></li>
-<li><p><strong>session</strong> (<em>str</em><em>, </em><em>optional</em>) – The session for which the conversion process should be performed.</p></li>
-<li><p><strong>options</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary containing any additional options for the conversion process.</p></li>
-<li><p><strong>metadata</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – The metadata to be included in the converted RINEX files
-Possible inputs are:
-* list of string (sitelog file paths),
-* single string (single sitelog file path)
-* single string (directory containing the sitelogs)
-* list of MetaData objects
-* single MetaData object</p></li>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>keyword arguments</em>) – <p>Additional keyword arguments passed to the parent StepGnss class.
+Common parameters include:
+- out_dir : str - The directory where the output of the conversion should be stored.
+- tmp_dir : str - The directory where temporary files during the conversion process should be stored.
+- log_dir : str - The directory where log files should be stored.
+- inp_dir : str, optional - The input directory path.
+- inp_file_regex : str, optional - Regular expression pattern for input files.
+- epoch_range : EpochRange, optional - A tuple containing the start and end epochs for the conversion process.
+- site : dict, optional - The site for which the conversion process should be performed.
+- session : dict, optional - The session for which the conversion process should be performed.
+- options : dict, optional - A dictionary containing any additional options for the conversion process.
+- metadata : str or list, optional - The metadata to be included in the converted RINEX files.</p>
+<blockquote>
+<div><dl>
+<dt>Possible inputs are:</dt><dd><ul class="simple">
+<li><p>list of string (sitelog file paths),</p></li>
+<li><p>single string (single sitelog file path)</p></li>
+<li><p>single string (directory containing the sitelogs)</p></li>
+<li><p>list of MetaData objects</p></li>
+<li><p>single MetaData object.</p></li>
 </ul>
+<p>Defaults to None.</p>
+</dd>
+</dl>
+</div></blockquote>
+</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cls.ConvertGnss.convert">
-<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_prev_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_regex_custom_main</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_regex_custom_annex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cls.html#ConvertGnss.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.convert" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_prev_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_regex_custom_main</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conv_regex_custom_annex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cls.html#ConvertGnss.convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cls.ConvertGnss.convert" title="Link to this definition"></a></dt>
 <dd><p>“total action” method</p>
 <p>Executes the total conversion process for GNSS data.</p>
 <p>This method handles the entire conversion process for GNSS data.
@@ -264,11 +177,10 @@ It also handles logging and error checking throughout the process.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, prints the conversion table. Default is False.</p></li>
 <li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, forces the conversion even if output files already exist. Default is False.</p></li>
-<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – <dl class="simple">
-<dt>A dictionary containing options for the rinexmod process.</dt><dd><p>If not specified, default options are used.</p>
-</dd>
-</dl>
-</p></li>
+<li><p><strong>reverse_order</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, processes the files in reverse order (anti-chronological, newer first).
+Default is False.</p></li>
+<li><p><strong>rinexmod_options</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary containing options for the rinexmod process.
+If not specified, default options are used.</p></li>
 <li><p><strong>converter</strong> (<em>str</em><em>, </em><em>optional</em>) – The converter to be used for the conversion.
 If not specified, the best converter is automatically selected.
 Default is ‘auto’.</p></li>
@@ -360,6 +272,7 @@ Default is False.</p></li>
 </dl>
 </dd></dl>
 
+</section>
 </dd></dl>
 
 </section>
@@ -422,7 +335,7 @@ in a format that can be used in a command line interface.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>cmd_list</strong> (<em>list</em>) – A list where the elements are command line options and their values.</p></li>
+<li><p><strong>cmd_list</strong> (<em>list of str</em>) – A list where the elements are command line options and their values.</p></li>
 <li><p><strong>cmd_str</strong> (<em>str</em>) – A string that represents the command line options and their values.</p></li>
 </ul>
 </p>
@@ -579,7 +492,7 @@ file extension as follows.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build.cmd_build_converto">
-<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_converto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/psakicki/SOFTWARE_INSTALL/Converto/ConvertoCpp-master_1_6_0_5/bin/Release/ConvertoCPP'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_converto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_converto" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_converto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/sakic/CODES/ConvertoCpp/bin/Release/ConvertoCPP'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_converto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_converto" title="Link to this definition"></a></dt>
 <dd><blockquote>
 <div><p>Build a command to launch teqc, for legacy conversion and RINEX Handeling</p>
 <p>It has the same behavior as all the <cite>cmd_build</cite> functions</p>
@@ -1025,7 +938,7 @@ hh:mm:ss</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build.cmd_build_mdb2rinex">
-<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_mdb2rinex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/psakicki/SOFTWARE_INSTALL/GNSS_CONVERTERS/Leica_mdb2rinex/mdb2rinex'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_mdb2rinex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_mdb2rinex" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_mdb2rinex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/sakic/SOFTWARE/GNSS_CONVERTERS/Leica_mdb2rinex/mdb2rinex'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_mdb2rinex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_mdb2rinex" title="Link to this definition"></a></dt>
 <dd><p>Build a command to launch mdb2rinex, the Leica converter</p>
 <p>It has the same behavior as all the <cite>cmd_build</cite> functions</p>
 <dl class="field-list simple">
@@ -1125,7 +1038,7 @@ runpkr00 -demv &#64;r00.lst comb2330</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build.cmd_build_sbf2rin">
-<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_sbf2rin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/psakicki/SOFTWARE/SEPTENTRIO_rxtools/bin/sbf2rin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_sbf2rin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_sbf2rin" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_sbf2rin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/sakic/SOFTWARE/GNSS_CONVERTERS/READY_TO_USE/v20250127a/sbf2rin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_sbf2rin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_sbf2rin" title="Link to this definition"></a></dt>
 <dd><blockquote>
 <div><p>Build a command to launch sbf2rin, the Septentrio converter</p>
 <p>It has the same behavior as all the <cite>cmd_build</cite> functions</p>
@@ -1335,7 +1248,7 @@ ignored if the -l or the -o option is also selected.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build.cmd_build_t0xconvert">
-<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_t0xconvert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'trm2rinex:cli-light'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_t0xconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_t0xconvert" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_t0xconvert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/sakic/SOFTWARE/GNSS_CONVERTERS/TrimbleConverter_official_linux/t0xConvert-2023/t0xConvert'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_t0xconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_t0xconvert" title="Link to this definition"></a></dt>
 <dd><p>Build a command to launch t0xConvert, the Trimble converter</p>
 <p>It has the same behavior as all the <cite>cmd_build</cite> functions</p>
 <dl class="field-list simple">
@@ -1492,7 +1405,7 @@ Ready to be used by subprocess.run</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build.cmd_build_tps2rin">
-<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_tps2rin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/psakicki/SOFTWARE_INSTALL/GNSS_CONVERTERS/Topcon_TPS2RIN/tps2rin.exe'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_tps2rin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_tps2rin" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build.</span></span><span class="sig-name descname"><span class="pre">cmd_build_tps2rin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/home/sakic/SOFTWARE/GNSS_CONVERTERS/Topcon_TPS2RIN/tps2rin.exe'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build.html#cmd_build_tps2rin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build.cmd_build_tps2rin" title="Link to this definition"></a></dt>
 <dd><p>Build a command to launch tps2rin, for Topcon</p>
 <p>It has the same behavior as all the <cite>cmd_build</cite> functions</p>
 <dl class="field-list simple">
@@ -1772,6 +1685,13 @@ Valid values are “s+21b” or “2c22b” (default).</p>
 </li>
 </ol>
 <p><a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a></p>
+<p>If you get an error:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">wine</span> <span class="pre">tps2rin.exe</span>
+<span class="pre">Application</span> <span class="pre">could</span> <span class="pre">not</span> <span class="pre">be</span> <span class="pre">started,</span> <span class="pre">or</span> <span class="pre">no</span> <span class="pre">application</span> <span class="pre">associated</span> <span class="pre">with</span> <span class="pre">the</span> <span class="pre">specified</span> <span class="pre">file.</span>
+<span class="pre">ShellExecuteEx</span> <span class="pre">failed:</span> <span class="pre">File</span> <span class="pre">not</span> <span class="pre">found.</span>
+<span class="pre">`</span></code>
+It is because tps2rin.exe needs to be called with its absolute path.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1815,6 +1735,105 @@ inp/${FNAME_RAW} -p out/${SUBDIR_OUT} -n -d -s -v 3.04</p>
 -h 0.1387 to include the marker to antenna ARP vertical offset into RINEX header</p>
 </div>
 </dd></dl>
+
+</section>
+<section id="module-autorino.convert.cnv_cmd_build_refactor">
+<span id="autorino-convert-cnv-cmd-build-refactor-module"></span><h2>autorino.convert.cnv_cmd_build_refactor module<a class="headerlink" href="#module-autorino.convert.cnv_cmd_build_refactor" title="Link to this heading"></a></h2>
+<p>Created on 05/12/2025 17:37:23</p>
+<p>&#64;author: psakic</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build_refactor._build_docker_prefix">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build_refactor.</span></span><span class="sig-name descname"><span class="pre">_build_docker_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build_refactor.html#_build_docker_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build_refactor._build_docker_prefix" title="Link to this definition"></a></dt>
+<dd><p>Build Docker command prefix.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build_refactor._determine_output_path">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build_refactor.</span></span><span class="sig-name descname"><span class="pre">_determine_output_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build_refactor.html#_determine_output_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build_refactor._determine_output_path" title="Link to this definition"></a></dt>
+<dd><p>Determine output file path based on converter.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build_refactor._kw_options_dict2str">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build_refactor.</span></span><span class="sig-name descname"><span class="pre">_kw_options_dict2str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kw_options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build_refactor.html#_kw_options_dict2str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build_refactor._kw_options_dict2str" title="Link to this definition"></a></dt>
+<dd><p>Converts a dictionary of keyword options into a command line string.</p>
+<p>This function takes a dictionary where the keys are command line option flags (e.g., “-a”, “-b”)
+and the values are the corresponding values for these flags.
+It returns a string that represents these options in a format that can be used in a command line interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kw_options</strong> (<em>dict</em>) – A dictionary where the keys are command line option flags and the values
+are the corresponding values for these flags.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cmd_list</strong> (<em>list</em>) – A list where the elements are command line options and their values.</p></li>
+<li><p><strong>cmd_str</strong> (<em>str</em>) – A string that represents the command line options and their values.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">kw_options</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;-a&quot;</span><span class="p">:</span> <span class="s2">&quot;valueA&quot;</span><span class="p">,</span> <span class="s2">&quot;-b&quot;</span><span class="p">:</span> <span class="s2">&quot;42&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_kw_options_dict2str</span><span class="p">(</span><span class="n">kw_options</span><span class="p">)</span>
+<span class="go">&#39;-a valueA -b 42&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build_refactor._options_list2str">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build_refactor.</span></span><span class="sig-name descname"><span class="pre">_options_list2str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build_refactor.html#_options_list2str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build_refactor._options_list2str" title="Link to this definition"></a></dt>
+<dd><p>Converts a list of options into a command line string.</p>
+<p>This function takes a list where the elements are command line options
+(e.g., “-a”, Path(valueA), “-b”, 42) and returns a string that represents these options
+in a format that can be used in a command line interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>options</strong> (<em>list</em>) – A list where the elements are command line options.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>cmd_list</strong> (<em>list of str</em>) – A list where the elements are command line options and their values.</p></li>
+<li><p><strong>cmd_str</strong> (<em>str</em>) – A string that represents the command line options and their values.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>&gt; options = [“-a”, Path(valueA), “-b”, 42]
+&gt; _options_list2str(options)
+([‘-a’, ‘valueA’, ‘-b’, ‘42’], ‘-a valueA -b 42’)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build_refactor.cmd_build_generic_converter">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build_refactor.</span></span><span class="sig-name descname"><span class="pre">cmd_build_generic_converter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">converter_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build_refactor.html#cmd_build_generic_converter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build_refactor.cmd_build_generic_converter" title="Link to this definition"></a></dt>
+<dd><p>Generic command builder for all converters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>converter_name</strong> (<em>str</em>) – Name of the converter (e.g., ‘sbf2rin’, ‘teqc’)</p></li>
+<li><p><strong>inp_raw_fpath</strong> (<em>str</em><em>, </em><em>Path</em><em>, or </em><em>list</em>) – Input file path(s)</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em><em> or </em><em>Path</em>) – Output directory</p></li>
+<li><p><strong>bin_options_custom</strong> (<em>list</em><em>, </em><em>optional</em>) – Custom options</p></li>
+<li><p><strong>bin_kwoptions_custom</strong> (<em>dict</em><em>, </em><em>optional</em>) – Custom keyword options</p></li>
+<li><p><strong>bin_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Binary path (defaults to aro_env_soft_path[converter_name])</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>cmd_use, cmd_list, cmd_str</strong> – Command in various formats</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_cmd_build_refactor.cmd_build_sbf2rin">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_cmd_build_refactor.</span></span><span class="sig-name descname"><span class="pre">cmd_build_sbf2rin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raw_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_options_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_kwoptions_custom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_cmd_build_refactor.html#cmd_build_sbf2rin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_cmd_build_refactor.cmd_build_sbf2rin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-autorino.convert.cnv_cmd_run">
@@ -2057,34 +2076,6 @@ otherwise None.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="autorino.convert.cnv_fcts.slct_conv_odd_f">
-<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_fcts.</span></span><span class="sig-name descname"><span class="pre">slct_conv_odd_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraw_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_excluded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_fcts.html#slct_conv_odd_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_fcts.slct_conv_odd_f" title="Link to this definition"></a></dt>
-<dd><p>Identifies the right converter for a raw file with an unconventional extension, or excludes the file
-if its extension matches an excluded one.</p>
-<p>This function performs a high-level case matching to determine the appropriate converter for a raw file.
-If the file’s extension matches one in the excluded list, the file is skipped.</p>
-<p>See also autorino.conv_cmd_run._convert_select
-for the regular converter selection</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fraw_inp</strong> (<em>Path</em>) – The name of the raw file with an unconventional extension.</p></li>
-<li><p><strong>ext_excluded</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of file extensions to be excluded. If a file’s extension matches one in this list, the file is skipped.
-Default is [“.TG!$”, “.DAT”, “.Z”, “.BCK”, “^.[0-9]{3}$”, “.A$”, “Trimble”, “.ORIG”].</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The name of the appropriate converter for the raw file. If the file is to be skipped, returns None.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The function uses regular expressions to match file extensions.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="autorino.convert.cnv_fcts.site_list_from_metadata">
 <span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_fcts.</span></span><span class="sig-name descname"><span class="pre">site_list_from_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_fcts.html#site_list_from_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_fcts.site_list_from_metadata" title="Link to this definition"></a></dt>
 <dd><p>Extracts a list of site IDs from the provided metadata.</p>
@@ -2102,7 +2093,7 @@ and returns a list of 4-character site IDs extracted from the metadata.</p>
 <li><p>single MetaData object</p></li>
 </ul>
 </p></li>
-<li><p><strong>rinexmod_api.metadata_input_manage</strong> (<em>This function is mainly a wrapper of</em>)</p></li>
+<li><p><strong>rinexmod_core.load_metadata</strong> (<em>This function is mainly a wrapper of</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2141,6 +2132,34 @@ the function returns the first 4 characters of the raw file name.</p>
 </dl>
 <p class="rubric">Notes</p>
 <p>The function performs a case-insensitive search.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_fcts.slct_conv_odd_f">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_fcts.</span></span><span class="sig-name descname"><span class="pre">slct_conv_odd_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fraw_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_excluded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_fcts.html#slct_conv_odd_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_fcts.slct_conv_odd_f" title="Link to this definition"></a></dt>
+<dd><p>Identifies the right converter for a raw file with an unconventional extension, or excludes the file
+if its extension matches an excluded one.</p>
+<p>This function performs a high-level case matching to determine the appropriate converter for a raw file.
+If the file’s extension matches one in the excluded list, the file is skipped.</p>
+<p>See also autorino.conv_cmd_run._convert_select
+for the regular converter selection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fraw_inp</strong> (<em>Path</em>) – The name of the raw file with an unconventional extension.</p></li>
+<li><p><strong>ext_excluded</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of file extensions to be excluded. If a file’s extension matches one in this list, the file is skipped.
+Default is [“.TG!$”, “.DAT”, “.Z”, “.BCK”, “^.[0-9]{3}$”, “Trimble”, “.ORIG”].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The name of the appropriate converter for the raw file. If the file is to be skipped, returns None.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function uses regular expressions to match file extensions.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -2497,6 +2516,121 @@ the main with be processed before the annex,
 thus annex regex will finally not include the main one</p>
 </div>
 </dd></dl>
+
+</section>
+<section id="module-autorino.convert.cnv_regex_refactor">
+<span id="autorino-convert-cnv-regex-refactor-module"></span><h2>autorino.convert.cnv_regex_refactor module<a class="headerlink" href="#module-autorino.convert.cnv_regex_refactor" title="Link to this heading"></a></h2>
+<p>Converted files regular expressions functions</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor._get_mdb_regex">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">_get_mdb_regex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#_get_mdb_regex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor._get_mdb_regex" title="Link to this definition"></a></dt>
+<dd><p>Build regex for mdb2rnx converter.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor._get_tps_regex">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">_get_tps_regex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#_get_tps_regex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor._get_tps_regex" title="Link to this definition"></a></dt>
+<dd><p>Build regex for tps2rin converter.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor._get_year_based_regex">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">_get_year_based_regex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#_get_year_based_regex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor._get_year_based_regex" title="Link to this definition"></a></dt>
+<dd><p>Extract year from filename and build regex (trm2rinex, t0xconvert).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_convbin">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_convbin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_convbin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_convbin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_converto">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_converto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_converto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_converto" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_custom">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_custom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regex_tup_inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_custom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_custom" title="Link to this definition"></a></dt>
+<dd><p>Generate regex from custom tuple of regex strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>regex_tup_inp</strong> (<em>tuple</em><em> of </em><em>(</em><em>str</em><em>, </em><em>str</em><em>)</em>) – Regex strings for (main, annex) files</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>conv_regex_main, conv_regex_annex</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of compiled regex</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_generic">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_generic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_generic" title="Link to this definition"></a></dt>
+<dd><p>Generate regex patterns for converted files based on converter type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>str</em><em> or </em><em>Path</em>) – Input raw filename or path</p></li>
+<li><p><strong>converter_name</strong> (<em>str</em>) – Name of the converter (e.g., ‘sbf2rin’, ‘teqc’, ‘runpkr00’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>conv_regex_main, conv_regex_annex</strong> – Main regex (observation RINEX) and annex regex (all output files)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of compiled regex</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Main regex matches the primary observation file.
+Annex regex matches all output files (including main).
+Main is processed before annex, so annex excludes main in practice.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_gfzrnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_gfzrnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_gfzrnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_gfzrnx" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_mdb2rnx">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_mdb2rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_mdb2rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_mdb2rnx" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_runpkr00">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_runpkr00</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_runpkr00"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_runpkr00" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_t0xconvert">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_t0xconvert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_t0xconvert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_t0xconvert" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_teqc">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_teqc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_teqc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_teqc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_tps2rin">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_tps2rin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_tps2rin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_tps2rin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_trm2rinex">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_trm2rinex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_trm2rinex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_trm2rinex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.convert.cnv_regex_refactor.conv_regex_void">
+<span class="sig-prename descclassname"><span class="pre">autorino.convert.cnv_regex_refactor.</span></span><span class="sig-name descname"><span class="pre">conv_regex_void</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/convert/cnv_regex_refactor.html#conv_regex_void"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.convert.cnv_regex_refactor.conv_regex_void" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 </section>

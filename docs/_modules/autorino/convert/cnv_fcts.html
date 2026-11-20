@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.convert.cnv_fcts &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -15,8 +15,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -98,10 +98,13 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">pwd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">grp</span>
 
+<span class="c1">### new rinexmod v5 import</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rinexmod.core</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rimo_cor</span>
+
 <span class="c1">### new rinexmod v4 import</span>
-<span class="c1"># import rinexmod.api as rimo_api</span>
+<span class="c1">#import rinexmod.api as rimo_api</span>
 <span class="c1">### old rinexmod import</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">rinexmod</span><span class="w"> </span><span class="kn">import</span> <span class="n">rinexmod_api</span> <span class="k">as</span> <span class="n">rimo_api</span>
+<span class="c1">#from rinexmod import rinexmod_api as rimo_api</span>
 
 <span class="c1">#### Import the logger</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -131,7 +134,7 @@
 <span class="sd">     * list of MetaData objects</span>
 <span class="sd">     * single MetaData object</span>
 
-<span class="sd">    This function is mainly a wrapper of `rinexmod_api.metadata_input_manage`</span>
+<span class="sd">    This function is mainly a wrapper of `rinexmod_core.load_metadata`</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -145,7 +148,7 @@
     <span class="c1">###############################################</span>
     <span class="c1">### read metadata</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">metadata_inp</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">metadata_inp</span><span class="p">):</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="n">rimo_api</span><span class="o">.</span><span class="n">metadata_input_manage</span><span class="p">(</span><span class="n">metadata_inp</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">rimo_cor</span><span class="o">.</span><span class="n">load_metadata</span><span class="p">(</span><span class="n">metadata_inp</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata_inp</span>
 
@@ -220,7 +223,7 @@
 <span class="sd">        The name of the raw file with an unconventional extension.</span>
 <span class="sd">    ext_excluded : list, optional</span>
 <span class="sd">        A list of file extensions to be excluded. If a file&#39;s extension matches one in this list, the file is skipped.</span>
-<span class="sd">        Default is [&quot;.TG!$&quot;, &quot;.DAT&quot;, &quot;.Z&quot;, &quot;.BCK&quot;, &quot;^.[0-9]{3}$&quot;, &quot;.A$&quot;, &quot;Trimble&quot;, &quot;.ORIG&quot;].</span>
+<span class="sd">        Default is [&quot;.TG!$&quot;, &quot;.DAT&quot;, &quot;.Z&quot;, &quot;.BCK&quot;, &quot;^.[0-9]{3}$&quot;, &quot;Trimble&quot;, &quot;.ORIG&quot;].</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -238,7 +241,7 @@
             <span class="s2">&quot;.Z&quot;</span><span class="p">,</span>
             <span class="s2">&quot;.BCK&quot;</span><span class="p">,</span>
             <span class="s2">&quot;^.[0-9]</span><span class="si">{3}</span><span class="s2">$&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;.A$&quot;</span><span class="p">,</span>
+            <span class="c1">#&quot;.A$&quot;, # allowed .A files allowed as Septentrio</span>
             <span class="s2">&quot;Trimble&quot;</span><span class="p">,</span>
             <span class="s2">&quot;.ORIG&quot;</span><span class="p">,</span>
         <span class="p">]</span>

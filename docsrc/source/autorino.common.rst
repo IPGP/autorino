@@ -9,6 +9,14 @@ autorino.common package
 Submodules
 ----------
 
+autorino.common.cli\_fcts module
+--------------------------------
+
+.. automodule:: autorino.common.cli_fcts
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 autorino.common.decompress module
 ---------------------------------
 

@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.convert.cnv_cls &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -15,8 +15,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -113,97 +113,46 @@
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConvertGnss</span><span class="p">(</span><span class="n">arocmn</span><span class="o">.</span><span class="n">StepGnss</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class used to represent the GNSS conversion process.</span>
+<span class="sd">    A class to handle the conversion of GNSS data.</span>
 
-<span class="sd">    This class inherits from the StepGnss class</span>
-<span class="sd">    and is used to handle the conversion of GNSS data.</span>
-
-<span class="sd">    Attributes</span>
+<span class="sd">    Inherits from</span>
 <span class="sd">    ----------</span>
-<span class="sd">    out_dir : str</span>
-<span class="sd">        The directory where the output of the conversion should be stored.</span>
-<span class="sd">    tmp_dir : str</span>
-<span class="sd">        The directory where temporary files during the conversion process should be stored.</span>
-<span class="sd">    log_dir : str</span>
-<span class="sd">        The directory where log files should be stored.</span>
-<span class="sd">    epoch_range : tuple, optional</span>
-<span class="sd">        A tuple containing the start and end epochs for the conversion process.</span>
-<span class="sd">    site : str, optional</span>
-<span class="sd">        The site for which the conversion process should be performed.</span>
-<span class="sd">    session : str, optional</span>
-<span class="sd">        The session for which the conversion process should be performed.</span>
-<span class="sd">    options : dict, optional</span>
-<span class="sd">        A dictionary containing any additional options for the conversion process.</span>
-<span class="sd">    metadata : str or list, optional</span>
-<span class="sd">        The metadata to be included in the converted RINEX files</span>
-<span class="sd">        Possible inputs are:</span>
-<span class="sd">        * list of string (sitelog file paths),</span>
-<span class="sd">        * single string (single sitelog file path)</span>
-<span class="sd">        * single string (directory containing the sitelogs)</span>
-<span class="sd">        * list of MetaData objects</span>
-<span class="sd">        * single MetaData object</span>
-
-<span class="sd">    Methods</span>
-<span class="sd">    -------</span>
-<span class="sd">    __init__(self, out_dir, tmp_dir, log_dir, epoch_range_inp=None, site=None, session=None, options=None, metadata=None)</span>
-<span class="sd">        Initializes the ConvertGnss class with the specified parameters.</span>
+<span class="sd">    arocmn.StepGnss</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ConvertGnss.__init__">
 <a class="viewcode-back" href="../../../autorino.convert.html#autorino.convert.cnv_cls.ConvertGnss.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">out_dir</span><span class="p">,</span>
-        <span class="n">tmp_dir</span><span class="p">,</span>
-        <span class="n">log_dir</span><span class="p">,</span>
-        <span class="n">inp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">inp_file_regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the ConvertGnss class with the specified parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        out_dir : str</span>
-<span class="sd">            The directory where the output of the conversion should be stored.</span>
-<span class="sd">        tmp_dir : str</span>
-<span class="sd">            The directory where temporary files during the conversion process should be stored.</span>
-<span class="sd">        log_dir : str</span>
-<span class="sd">            The directory where log files should be stored.</span>
-<span class="sd">        epoch_range : tuple, optional</span>
-<span class="sd">            A tuple containing the start and end epochs for the conversion process.</span>
-<span class="sd">        site : str, optional</span>
-<span class="sd">            The site for which the conversion process should be performed.</span>
-<span class="sd">        session : str, optional</span>
-<span class="sd">            The session for which the conversion process should be performed.</span>
-<span class="sd">        options : dict, optional</span>
-<span class="sd">            A dictionary containing any additional options for the conversion process.</span>
-<span class="sd">        metadata : str or list, optional</span>
-<span class="sd">            The metadata to be included in the converted RINEX files</span>
-<span class="sd">            Possible inputs are:</span>
-<span class="sd">            * list of string (sitelog file paths),</span>
-<span class="sd">            * single string (single sitelog file path)</span>
-<span class="sd">            * single string (directory containing the sitelogs)</span>
-<span class="sd">            * list of MetaData objects</span>
-<span class="sd">            * single MetaData object</span>
+<span class="sd">        **kwargs : keyword arguments</span>
+<span class="sd">            Additional keyword arguments passed to the parent StepGnss class.</span>
+<span class="sd">            Common parameters include:</span>
+<span class="sd">            - out_dir : str - The directory where the output of the conversion should be stored.</span>
+<span class="sd">            - tmp_dir : str - The directory where temporary files during the conversion process should be stored.</span>
+<span class="sd">            - log_dir : str - The directory where log files should be stored.</span>
+<span class="sd">            - inp_dir : str, optional - The input directory path.</span>
+<span class="sd">            - inp_file_regex : str, optional - Regular expression pattern for input files.</span>
+<span class="sd">            - epoch_range : EpochRange, optional - A tuple containing the start and end epochs for the conversion process.</span>
+<span class="sd">            - site : dict, optional - The site for which the conversion process should be performed.</span>
+<span class="sd">            - session : dict, optional - The session for which the conversion process should be performed.</span>
+<span class="sd">            - options : dict, optional - A dictionary containing any additional options for the conversion process.</span>
+<span class="sd">            - metadata : str or list, optional - The metadata to be included in the converted RINEX files.</span>
+<span class="sd">              Possible inputs are:</span>
+<span class="sd">               * list of string (sitelog file paths),</span>
+<span class="sd">               * single string (single sitelog file path)</span>
+<span class="sd">               * single string (directory containing the sitelogs)</span>
+<span class="sd">               * list of MetaData objects</span>
+<span class="sd">               * single MetaData object.</span>
+<span class="sd">               Defaults to None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
-            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
-            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir</span><span class="p">,</span>
-            <span class="n">inp_file_regex</span><span class="o">=</span><span class="n">inp_file_regex</span><span class="p">,</span>
-            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">,</span>
-            <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
-            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
     <span class="c1">###############################################</span>
@@ -214,6 +163,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">reverse_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">converter</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
         <span class="n">filter_prev_tables</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -237,9 +187,12 @@
 <span class="sd">            If True, prints the conversion table. Default is False.</span>
 <span class="sd">        force : bool, optional</span>
 <span class="sd">            If True, forces the conversion even if output files already exist. Default is False.</span>
+<span class="sd">        reverse_order : bool, optional</span>
+<span class="sd">            If True, processes the files in reverse order (anti-chronological, newer first).</span>
+<span class="sd">            Default is False.</span>
 <span class="sd">        rinexmod_options : dict, optional</span>
 <span class="sd">            A dictionary containing options for the rinexmod process.</span>
-<span class="sd">             If not specified, default options are used.</span>
+<span class="sd">            If not specified, default options are used.</span>
 <span class="sd">        converter : str, optional</span>
 <span class="sd">            The converter to be used for the conversion.</span>
 <span class="sd">            If not specified, the best converter is automatically selected.</span>
@@ -293,9 +246,9 @@
         <span class="c1"># generate the potential local files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_rnx</span><span class="p">()</span>
         <span class="c1"># tests if the input local files are here</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="s2">&quot;inp&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_loc_files</span><span class="p">(</span><span class="s2">&quot;inp&quot;</span><span class="p">)</span>
         <span class="c1"># tests if the output local files are already there</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_loc_files</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
         <span class="c1"># be sure ok_xxx columns are booleans</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table_ok_cols_bool</span><span class="p">()</span>
         <span class="c1"># switch ok_inp to False if the output files are already there</span>
@@ -303,6 +256,8 @@
 
         <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="s2">&quot;convert&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reverse_order</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reverse_table</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">filter_prev_tables</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading filter previous tables in: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir_tables</span><span class="si">:}</span><span class="s2">&quot;</span><span class="p">)</span>
