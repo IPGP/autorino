@@ -7,6 +7,8 @@ Created on Thu Dec  1 15:47:05 2022
 """
 
 import collections.abc
+import copy
+import json
 
 # Create a logger object.
 import os
@@ -19,8 +21,11 @@ import autorino.convert as arocnv
 import autorino.download as arodwl
 import autorino.handle as arohdl
 
+#### new rinexmod v5 import
+import rinexmod.core as rimo_cor
+
 #### new rinexmod v4 import
-import rinexmod.api as rimo_api
+#import rinexmod.api as rimo_api
 import rinexmod.classes as rimo_cls
 #### old rinexmod import (for compatibility with older versions)
 #from rinexmod import rinexmod_api as rimo_api
@@ -44,6 +49,9 @@ def load_cfg(cfg_path, verbose=True):
     Loads quickly one or several configuration files (YAML format) **without interpretation**.
 
     This function reads a YAML configuration file from the specified path and returns the parsed content.
+
+    Note: A deep copy is performed after loading to avoid issues with YAML anchors/aliases
+    creating shared references in memory that can cause unexpected behavior during merge operations.
 
     Parameters
     ----------
@@ -71,6 +79,10 @@ def load_cfg(cfg_path, verbose=True):
         raise FileNotFoundError(None, msg)
     else:
         y_out = yaml.safe_load(open(cfg_path))
+        # Break shared references created by YAML anchors using JSON serialization
+        # This prevents issues when merging configs with YAML anchors/aliases
+        # yaml.dump preserves anchors, but json.dumps breaks all references
+        y_out = json.loads(json.dumps(y_out))
         return y_out
 
 
@@ -172,7 +184,7 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
         slpath = y_station["site"]["sitelog_path"]
         if os.path.isdir(slpath) or os.path.isfile(slpath):
             # Load the metadata if the path is a directory or a file
-            metadata = rimo_api.metadata_input_manage(slpath, force=False)
+            metadata = rimo_cor.load_metadata(slpath, force=False)
         else:
             # If not, keep the path it as a string
             # (because it might contain aliases and be translated later in the object)
@@ -184,6 +196,11 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
     steps_lis_lis = []
     steps_dic_dic = {}
     for k_ses, y_ses in y_sessions.items():
+
+        if "_template" in k_ses:
+            # skip generic or template sessions
+            logging.debug("skip template session %s", k_ses)
+            continue
 
         steps_lis = []
         steps_dic = {}
@@ -237,6 +254,12 @@ def read_cfg_core(y_inp, epoch_range_inp=None):
             ## concatenate the dir_parent and the structure
             # (but not the file_regex, it is just about the directory)
             out_dir, _, _ = _get_dir_path(y_stp, "out")
+
+            # Check if out_bis keys exist
+            if "out_bis_dir_parent" in y_stp.keys() and "out_bis_dir_structure" in y_stp.keys():
+                out_dir_bis, _, _ = _get_dir_path(y_stp, "out_bis", check_parent_dir_exist=False)
+                out_dir = (out_dir, out_dir_bis)  # Create tuple
+
             inp_dir, _, _ = _get_dir_path(y_stp, "inp", check_parent_dir_exist=False)
 
             if "inp_file_regex" in y_stp.keys():

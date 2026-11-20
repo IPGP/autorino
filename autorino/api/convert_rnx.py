@@ -157,7 +157,7 @@ def convert_rnx(
         logger.info(">>>>>> RAW files archive")
         if not raw_out_structure:
             raw_out_structure = out_structure
-        raw_out_dir_use = str(os.path.join(raw_out_dir, raw_out_structure))
+        raw_out_dir_use = str(os.path.join(str(raw_out_dir), str(raw_out_structure)))
 
         cnv_table_cat = pd.concat([cnv.table for cnv in cnv_out_lis], ignore_index=True)
 
@@ -225,7 +225,12 @@ def convert_raw_wrap(args):
         converter
     ) = args
     # Initialize the ConvertGnss object with the provided directories and metadata
-    cnv = arocnv.ConvertGnss(out_dir_use, tmp_dir, log_dir, metadata=metadata)
+    cnv = arocnv.ConvertGnss(
+        out_dir=out_dir_use,
+        tmp_dir=tmp_dir,
+        log_dir=log_dir,
+        metadata=metadata
+    )
     # Load the list of RAW files to be converted
     cnv.load_tab_filelist(raws)
     # Perform the conversion with the specified options

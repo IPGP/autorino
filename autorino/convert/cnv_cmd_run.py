@@ -88,7 +88,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
 
     else:
         inp_raw_fpath = Path(inp_raw_fpath)
-        ext = ""
+        ext = "" 
         fname = inp_raw_fpath.name.upper()
 
     # +++++ TRIMBLE
@@ -99,8 +99,8 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
             "Trimble default converter defined in environnement: %s", converter_inp
         )
 
-    # main test for Trimble : choose the right converter
-    if ext in (".T00", ".T01", ".T02", ".T04") and converter_inp == "t0xconvert":
+    # main test for Trimble : choose the right converter (extension is managed in the preliminary test)
+    if converter_inp == "t0xconvert":
         converter_name = "t0xconvert"
         brand = "Trimble (official converter)"
         cmd_build_fct = arocnv.cmd_build_t0xconvert
@@ -108,7 +108,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-    elif ext in (".T00", ".T01", ".T02", ".T04") and converter_inp == "trm2rinex":
+    elif converter_inp == "trm2rinex":
         converter_name = "trm2rinex"
         brand = "Trimble (unofficial Docker converter)"
         cmd_build_fct = arocnv.cmd_build_trm2rinex
@@ -116,7 +116,7 @@ def _convert_select(converter_inp, inp_raw_fpath=None):
         bin_options = []
         bin_kwoptions = dict()
 
-    elif ext == (".T00", ".T01", ".T02", ".T04") and converter_inp == "runpkr00":
+    elif converter_inp == "runpkr00":
         converter_name = "runpkr00"
         brand = "Trimble (legacy converter)"
         cmd_build_fct = arocnv.cmd_build_runpkr00

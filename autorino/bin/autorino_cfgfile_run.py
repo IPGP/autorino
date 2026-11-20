@@ -5,8 +5,9 @@ import sys
 
 def main():
     ##### Parsing Args
+    desc = aroapi.cfgfile_run.__doc__.split("Parameters")[0]
     parser = argparse.ArgumentParser(
-        description="Assisted Unloading, Treatment and Organization of RINEX observations",
+        description=desc,
         epilog=(
             "Examples:\n"
             "  * run all the config files within cfgfiles_dir directory, using per default epoch ranges:\n"
@@ -68,8 +69,8 @@ def main():
         type=str,
         help="The period for the epoch range i.e. the sampling of the files: "
         "daily = '1D', hourly = '1H', 15 minutes = '15M'. "
-        "Default is '1D'.",
-        default="1D",
+        "Default is None.",
+        default=None,
     )
     parser.add_argument(
         "-si",
@@ -98,7 +99,7 @@ def main():
         help="A list of selected steps to be executed. "
         "If not provided, all steps in the configuration file will be executed. "
         "Default is None.",
-        choices=["download", "convert", "split", "splice", "rinexmod"],
+        choices=["download", "convert", "split", "splice", "rinexmod", "modify"],
         default=None,
     )
     parser.add_argument(

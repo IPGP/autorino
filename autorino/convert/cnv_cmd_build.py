@@ -35,6 +35,11 @@ from geodezyx import utils
 ##software paths
 import autorino.cfgenv.env_read as aroenv
 
+# +++ Import the logger
+import logging
+logger = logging.getLogger("autorino")
+logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
+
 aro_env_soft_path = aroenv.ARO_ENV_DIC["conv_software_paths"]
 
 
@@ -397,7 +402,6 @@ def cmd_build_t0xconvert(
     # os.remove(inp_raw_fpath_tmp)
 
     return cmd_use, cmd_list, cmd_str
-
 
 def cmd_build_mdb2rinex(
     inp_raw_fpath,
@@ -1062,6 +1066,16 @@ def cmd_build_tps2rin(
       --print            Print all TPS messages to the log file.
       --utf8             Log file has UTF-8 charset.
     ```
+
+    If you get an error:
+    ```
+    wine tps2rin.exe
+    Application could not be started, or no application associated with the specified file.
+    ShellExecuteEx failed: File not found.
+    ```
+    It is because tps2rin.exe needs to be called with its absolute path.
+
+
     """
 
     # Convert the paths as Path objects
@@ -1070,6 +1084,8 @@ def cmd_build_tps2rin(
 
     cmd_opt_list, _ = _options_list2str(bin_options_custom)
     cmd_kwopt_list, _ = _kw_options_dict2str(bin_kwoptions_custom)
+
+
 
     cmd_list = (
         ["wine", bin_path, "-o", out_dir]

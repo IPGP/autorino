@@ -5,8 +5,9 @@ Created on 27/01/2025 09:50:23
 
 @author: psakic
 """
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+from geodezyx.utils_xtra import plot_utils
 import autorino.cfgenv as aroenv
 import autorino.check as arochk
 import autorino.common as arocmn
@@ -70,9 +71,7 @@ def check_rnx(
     chk_tab_stats_stk = []
     for site in sites_use:
         chk = arochk.CheckGnss(
-            inp_dir=str(inp_dir),
-            site={"site_id": site},
-            epoch_range=eporng
+            inp_dir=str(inp_dir), site={"site_id": site}, epoch_range=eporng
         )
         chk.check()
         chk_tab_stk.append(chk.table)
@@ -100,8 +99,6 @@ def check_rnx(
     return tabu_chk_col, tabu_chk_bnw, df_chk_sum, df_chk_full_stats
 
 
-# defcheckrnx_analyz
-# checkrnx_format
 def checkrnx_output(
     output_dir, eporng, tabu_chk_col, tabu_chk_bnw, df_chk_sum, df_chk_full_stats
 ):
@@ -146,7 +143,7 @@ def checkrnx_output(
     ### plot
     df_chk_sum.plot()
     fig = plt.gcf()
-    utils.figure_saver(
+    plot_utils.figure_saver(
         fig, output_dir_use, prefix + "_check_rnx_plot", outtype=(".png", ".pdf")
     )
     ### pretty print tabulate

@@ -7,13 +7,17 @@ Created on 30/05/2024 16:22:55
 """
 
 import argparse
-import os.path
 
 import yaml
 import autorino.api as aroapi
+from autorino.common.cli_fcts import prep_inputs
 
 def main():
-    parser = argparse.ArgumentParser(description="Convert RAW files to RINEX.")
+    desc = aroapi.convert_rnx.__doc__.split("Parameters")[0]
+    parser = argparse.ArgumentParser(
+        description=desc,
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("-i",
         "--inp_raws",
         required=True,
@@ -144,7 +148,7 @@ def main():
              "Default is 'auto' which lets autorino choose the best available converter based on RAW file extension."
              "Possible values are:"
              "* 'auto' (automatic choice based on the extension),"
-             "* 'trm2rnx' (Trimble unofficial),"
+             "* 'trm2rinex' (Trimble unofficial),"
              "* 't0xconvert' (Trimble official),"
              "* 'runpkr00' (Trimble legacy),"
              "* 'teqc' (legacy conversion & RINEX Handeling),"
@@ -161,7 +165,7 @@ def main():
     args = parser.parse_args()
 
     aroapi.convert_rnx(
-        inp_raws=_prep_raws_inp(args),
+        inp_raws=prep_inputs(args.inp_raws, list_file_input=args.list_file_input),
         out_dir=args.out_dir,
         out_structure=args.out_structure,
         tmp_dir=args.tmp_dir,
@@ -172,27 +176,12 @@ def main():
         force_raw=args.force_raw,
         raw_out_dir=args.raw_out_dir,
         raw_out_structure=args.raw_out_structure,
-        processes=args.processes,
+        processes=int(args.processes),
         filter_prev_tables=args.filter_prev_tables,
         converter=args.converter
     )
 
 
-def _prep_raws_inp(args):
-    """
-    see also step_fcts.import_files
-    """
-    if args.list_file_input:
-        ### input is a filelist of RINEXs => output is a list
-        with open(args.inp_raws[0], "r") as f:
-            return f.read().splitlines()
-    elif len(args.inp_raws) == 1 and os.path.isdir(args.inp_raws[0]):
-        ### input is a directory => output is the directory str
-        return args.inp_raws[0]
-    else:
-        ### input is a single or several RINEXs => output is a list
-        # (if one single RINEX file, then it is a singleton list)
-        return args.inp_raws
 
 if __name__ == "__main__":
     main()
