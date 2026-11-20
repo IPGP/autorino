@@ -2027,7 +2027,7 @@ class StepGnss:
         nfil = 0
         for irow, row in self.table.iterrows():
             f = row["fname"]
-            boolbad = utils.patterns_in_string_checker(f, *keywords_path_excl)
+            boolbad = utils.is_in_str(f, *keywords_path_excl)
             if boolbad:
                 self.table.loc[irow, "ok_inp"] = False
                 logger.debug("file filtered, contains an excluded keyword: %s", f)
@@ -2620,7 +2620,7 @@ class StepGnss:
                 not self.table.loc[irow, "epoch_srt"]
                 or not self.table.loc[irow, "epoch_end"]
             ):
-                epo_srt_ok, epo_end_ok = rimo_api.dates_from_rinex_filename(frnxmod)
+                epo_srt_ok, epo_end_ok = rimo_cor.dates_from_rinex_filename(frnxmod)
                 self.table.loc[irow, "epoch_srt"] = epo_srt_ok
                 self.table.loc[irow, "epoch_end"] = epo_end_ok
 

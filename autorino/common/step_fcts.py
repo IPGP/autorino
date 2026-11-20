@@ -228,7 +228,7 @@ def print_tab_core(table_inp, max_colwidth=33):
         The formatted table as a string.
     """
 
-    def _shrink_str(str_inp, maxlen=max_colwidth):
+    def _shrink_str(str_inp, maxlen:int=max_colwidth):
         """
         Shrinks a string to a specified maximum length.
 
