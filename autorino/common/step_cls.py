@@ -502,7 +502,7 @@ class StepGnss:
         """
         Initializes the temporary directories paths as attribute for the StepGnss object.
 
-        This method is internal only, for the initialisation of the StepGnss object.
+        This method is internal only, for the initialization of the StepGnss object.
 
         See set_tmp_dirs for the actual creation of the directories.
 
@@ -657,7 +657,7 @@ class StepGnss:
             self.tmp_dir_tables,
         )
 
-    def clean_tmp_dirs(self, days=7, keep_table_logs=True):
+    def clean_tmp_dirs(self, days:int=7, keep_table_logs=True):
         """
         Cleans the temporary directories of the StepGnss object.
 
@@ -1553,7 +1553,7 @@ class StepGnss:
             if epocol in get_cols:
                 self.table[epocol] = pd.to_datetime(self.table[epocol])
 
-    def force(self, step_name=""):
+    def force(self, step_name:str=""):
         """
         Enables the force mode for the current step.
 
@@ -2027,7 +2027,7 @@ class StepGnss:
         nfil = 0
         for irow, row in self.table.iterrows():
             f = row["fname"]
-            boolbad = utils.patterns_in_string_checker(f, *keywords_path_excl)
+            boolbad = utils.is_in_str(f, *keywords_path_excl)
             if boolbad:
                 self.table.loc[irow, "ok_inp"] = False
                 logger.debug("file filtered, contains an excluded keyword: %s", f)
@@ -2620,7 +2620,7 @@ class StepGnss:
                 not self.table.loc[irow, "epoch_srt"]
                 or not self.table.loc[irow, "epoch_end"]
             ):
-                epo_srt_ok, epo_end_ok = rimo_api.dates_from_rinex_filename(frnxmod)
+                epo_srt_ok, epo_end_ok = rimo_cor.dates_from_rinex_filename(frnxmod)
                 self.table.loc[irow, "epoch_srt"] = epo_srt_ok
                 self.table.loc[irow, "epoch_end"] = epo_end_ok
 
@@ -3113,8 +3113,9 @@ class StepGnss:
 
         b = "_bis" if bis else ""
         io_use = io + b if io == "out" else io
+        io_use = str(io_use)
 
-        loc_file = self.table.loc[irow, "fpath_" + io_use]
+        loc_file = str(self.table.loc[irow, "fpath_" + io_use])
         if isinstance(loc_file, float) and np.isnan(loc_file):
             ### if not initialized, value is NaN (and then a float)
             self.table.loc[irow, "ok_" + io_use] = False
