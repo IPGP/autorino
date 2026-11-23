@@ -15,6 +15,8 @@ autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Ob
 
 **Licence:** GNU GPL v3 (see attached license file) 
 
+**DOI**: [https://doi.org/10.5281/zenodo.19000388](https://doi.org/10.5281/zenodo.19000388)
+
 ## Introduction
 The _autorino_ package (for _Assisted Unloading, Treatment & Organisation of RINex Observations_) is designed for
 automated download and conversion of GNSS raw data from the main manufacturers’ receivers 
