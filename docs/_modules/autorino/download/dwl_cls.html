@@ -260,7 +260,8 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ping_out</span><span class="p">:</span>
             <span class="c1"># local raw are guessed anyway, to resume the next steps if download is not possible</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_raw</span><span class="p">()</span>
+            <span class="c1">### self.guess_local_raw()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">find_loc_files</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;guess&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Set up the DownloadGnss&#39;s FTP object if the protocol is FTP</span>
