@@ -1687,9 +1687,8 @@ class StepGnss:
 
         Note
         ----
-        Merge of 2 previous methods:
-        guess_remot_raw : Method to guess remote file paths.
-        ask_remote_raw : Method to retrieve remote file listing from the server.
+        Merge of 2 previous methods in DownloadStepGnss:
+        ask_local_raw & guess_local_raw
         """
 
         local_paths_list = []
