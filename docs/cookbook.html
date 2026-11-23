@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino’s exemple cookbook &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -16,8 +16,8 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
@@ -113,8 +113,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="autorino-s-exemple-cookbook">
-<span id="cookbook"></span><h1><em>autorino</em>’s exemple cookbook<a class="headerlink" href="#autorino-s-exemple-cookbook" title="Link to this heading"></a></h1>
+  <section id="cookbook">
+<span id="autorino-s-exemple-cookbook"></span><h1><em>autorino</em>’s exemple cookbook<a class="headerlink" href="#cookbook" title="Link to this heading"></a></h1>
 <section id="metadata-disclaimer">
 <h2>Metadata disclaimer<a class="headerlink" href="#metadata-disclaimer" title="Link to this heading"></a></h2>
 <p>autorino assumes that <strong>the metadata in your RINEX’s header are always wrong</strong>.<br />
@@ -132,16 +132,21 @@ See the next chapters <a class="reference internal" href="config_files_nutshell.
 <section id="synopsis">
 <h3>Synopsis<a class="headerlink" href="#synopsis" title="Link to this heading"></a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_cfgfile_run --help
-251107T09:27:41.676|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.3.1-beta0 &amp; 3.7.3[0m
-251107T09:27:41.676|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+261120T18:32:15.728|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.5.0-beta2 &amp; 5.0.0[0m
+261120T18:32:15.728|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/sakic/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_HPEB8a_2a.yml[0m
 usage: autorino_cfgfile_run [-h] -c CONFIG
                             [-i INCLUDE_CONFIG [INCLUDE_CONFIG ...]]
                             [-s START] [-e END] [-p PERIOD]
                             [-si SITES_LIST [SITES_LIST ...]] [-xsi]
-                            [-sp {download,convert,split,splice,rinexmod} [{download,convert,split,splice,rinexmod} ...]]
+                            [-sp {download,convert,split,splice,rinexmod,modify} [{download,convert,split,splice,rinexmod,modify} ...]]
                             [-xsp] [-f]
 
-Assisted Unloading, Treatment and Organization of RINEX observations
+    Run the Autorino configuration files.
+
+    This function takes in a configuration file or a directory of configuration files,
+    reads the configuration, and runs the steps specified in the configuration.
+
+    
 
 options:
   -h, --help            show this help message and exit
@@ -171,7 +176,7 @@ options:
   -p PERIOD, --period PERIOD
                         The period for the epoch range i.e. the sampling of
                         the files: daily = &#39;1D&#39;, hourly = &#39;1H&#39;, 15 minutes =
-                        &#39;15M&#39;. Default is &#39;1D&#39;.
+                        &#39;15M&#39;. Default is None.
   -si SITES_LIST [SITES_LIST ...], --sites_list SITES_LIST [SITES_LIST ...]
                         list of site identifiers (&#39;site_id&#39;) in the config
                         file to filter the configuration files. If provided,
@@ -181,7 +186,7 @@ options:
                         If True, the sites in --sites_list will be ignored.
                         This is the opposed behavior of the regular one using
                         sites_list.Default is False.
-  -sp {download,convert,split,splice,rinexmod} [{download,convert,split,splice,rinexmod} ...], --steps_list {download,convert,split,splice,rinexmod} [{download,convert,split,splice,rinexmod} ...]
+  -sp {download,convert,split,splice,rinexmod,modify} [{download,convert,split,splice,rinexmod,modify} ...], --steps_list {download,convert,split,splice,rinexmod,modify} [{download,convert,split,splice,rinexmod,modify} ...]
                         A list of selected steps to be executed. If not
                         provided, all steps in the configuration file will be
                         executed. Default is None.
@@ -246,15 +251,18 @@ Examples:
 <section id="id1">
 <h3>Synopsis<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_convert_rnx --help
-251107T09:27:43.096|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.3.1-beta0 &amp; 3.7.3[0m
-251107T09:27:43.096|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+261120T18:32:16.878|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.5.0-beta2 &amp; 5.0.0[0m
+261120T18:32:16.878|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/sakic/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_HPEB8a_2a.yml[0m
 usage: autorino_convert_rnx [-h] -i INP_RAWS [INP_RAWS ...] -o OUT_DIR
                             [-t OUT_STRUCTURE] [-m METADATA] [-frnx] [-fraw]
                             [-l] [-tmp TMP_DIR] [-log LOG_DIR]
                             [-rimo RINEXMOD_OPTIONS] [-ro RAW_OUT_DIR]
                             [-rt RAW_OUT_STRUCTURE] [-p PROCESSES] [-fpt]
+                            [-c CONVERTER]
 
-Convert RAW files to RINEX.
+    Frontend function that performs RAW &gt; RINEX conversion.
+
+    
 
 options:
   -h, --help            show this help message and exit
@@ -310,6 +318,18 @@ options:
   -fpt, --filter_prev_tables
                         If set, filters and skips previously converted files
                         with tables stored in the tmp tables directory.
+  -c CONVERTER, --converter CONVERTER
+                        The software to be used for converting the RAW files
+                        to RINEX. Default is &#39;auto&#39; which lets autorino choose
+                        the best available converter based on RAW file
+                        extension.Possible values are:* &#39;auto&#39; (automatic
+                        choice based on the extension),* &#39;trm2rinex&#39; (Trimble
+                        unofficial),* &#39;t0xconvert&#39; (Trimble official),*
+                        &#39;runpkr00&#39; (Trimble legacy),* &#39;teqc&#39; (legacy
+                        conversion &amp; RINEX Handeling),* &#39;mdb2rinex&#39; (Leica),*
+                        &#39;sbf2rin&#39; (Septentrio),* &#39;convbin&#39; (BINEX),* &#39;tps2rin&#39;
+                        (Topcon),* &#39;converto&#39; (RINEX Handeling),* &#39;gfzrnx&#39;
+                        (RINEX Handeling)
 </pre></div>
 </div>
 </section>
@@ -320,13 +340,23 @@ options:
 <section id="id2">
 <h3>Synopsis<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ autorino_cfgfile_check --help
-251107T09:27:44.523|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.3.1-beta0 &amp; 3.7.3[0m
-251107T09:27:44.523|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/psakicki/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_TPX1_1a.yml[0m
+261120T18:32:18.110|[32mI[0m|[32mread_env       [0m|autorino &amp; rinexmod version: 2.5.0-beta2 &amp; 5.0.0[0m
+261120T18:32:18.110|[32mI[0m|[32mread_env       [0m|Loading environment configfile: /home/sakic/CODES/IPGP/autorino_configfiles/configfiles/Paris/env/autorino_env_PS_HPEB8a_2a.yml[0m
 usage: autorino_cfgfile_check [-h] -c CONFIG
                               [-i INCLUDE_CONFIG [INCLUDE_CONFIG ...]]
                               [-o OUTPUT]
 
-Check autorino configuration file
+    Read and interpret a configuration file (YAML format) and
+    return a list of StepGnss objects to be launched sequentially.
+
+    This function takes in a path to a configuration file,
+    an optional EpochRange object, and an optional path
+    to a main configuration file.
+    It reads the configuration file, updates it with the main configuration file if provided,
+    and creates a list of StepGnss objects based on the configuration.
+    The EpochRange object, if provided, will override the epoch ranges given in the configuration file.
+
+    
 
 options:
   -h, --help            show this help message and exit
@@ -369,7 +399,7 @@ RAW files to RINEX.</p>
 <h3>convert_rnx function docstring<a class="headerlink" href="#convert-rnx-function-docstring" title="Link to this heading"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.api.convert_rnx">
-<span class="sig-prename descclassname"><span class="pre">autorino.api.</span></span><span class="sig-name descname"><span class="pre">convert_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%Y/%j'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rnx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_prev_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/convert_rnx.html#convert_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.convert_rnx" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">autorino.api.</span></span><span class="sig-name descname"><span class="pre">convert_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_raws</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%Y/%j'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rinexmod_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rnx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_raw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_out_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_prev_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/api/convert_rnx.html#convert_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.api.convert_rnx" title="Link to this definition"></a></dt>
 <dd><p>Frontend function that performs RAW &gt; RINEX conversion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -421,6 +451,8 @@ Defaults to <cite>out_structure</cite> if not provided.</p></li>
 <li><p><strong>filter_prev_tables</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, filters and skip previously converted files
 with tables stored in the tmp tables directory.
 Default is False.</p></li>
+<li><p><strong>converter</strong> (<em>str</em><em>, </em><em>optional</em>) – The software to be used for converting the RAW files to RINEX.
+Default is “auto”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

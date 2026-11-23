@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.handle.modify_cls &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -15,8 +15,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -88,12 +88,14 @@
 
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">autorino.handle.handle_cls</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arohdlcls</span>
 
 <span class="c1"># +++ Import the logger</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
@@ -108,17 +110,8 @@
 <a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.modify_cls.ModifyGnss.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">out_dir</span><span class="p">,</span>
-        <span class="n">tmp_dir</span><span class="p">,</span>
-        <span class="n">log_dir</span><span class="p">,</span>
-        <span class="n">inp_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">inp_file_regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">epoch_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize a ModifyGnss object.</span>
 
@@ -129,44 +122,32 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        out_dir : str</span>
-<span class="sd">            The output directory for the modified RINEX files.</span>
-<span class="sd">        tmp_dir : str</span>
-<span class="sd">            The temporary directory for intermediate files.</span>
-<span class="sd">        log_dir : str</span>
-<span class="sd">            The directory for log files.</span>
-<span class="sd">        inp_dir : str, optional</span>
-<span class="sd">            The input directory for raw files. Default is None.</span>
-<span class="sd">        inp_file_regex : str, optional</span>
-<span class="sd">            The regular expression for filtering input files. Default is None.</span>
-<span class="sd">        epoch_range : EpochRange, optional</span>
-<span class="sd">            The range of epochs to be processed. Default is None.</span>
-<span class="sd">        site : dict, optional</span>
-<span class="sd">            Information about the site. Default is None.</span>
-<span class="sd">        session : dict, optional</span>
-<span class="sd">            Information about the session. Default is None.</span>
-<span class="sd">        options : dict, optional</span>
-<span class="sd">            Additional options for the modification operation. Default is None.</span>
-<span class="sd">        metadata : dict, optional</span>
-<span class="sd">            Metadata for the modification operation. Default is None.</span>
+<span class="sd">        **kwargs : keyword arguments</span>
+<span class="sd">            Additional keyword arguments passed to the parent HandleGnss class.</span>
+<span class="sd">            Common parameters include:</span>
+<span class="sd">            - out_dir : str - The output directory for the modified RINEX files.</span>
+<span class="sd">            - tmp_dir : str - The temporary directory for intermediate files.</span>
+<span class="sd">            - log_dir : str - The directory for log files.</span>
+<span class="sd">            - inp_dir : str, optional - The input directory for raw files. Default is None.</span>
+<span class="sd">            - inp_file_regex : str, optional - Regular expression pattern for input files.</span>
+<span class="sd">            - epoch_range : EpochRange, optional - The range of epochs to be processed. Default is None.</span>
+<span class="sd">            - site : dict, optional - Information about the site. Default is None.</span>
+<span class="sd">            - session : dict, optional - Information about the session. Default is None.</span>
+<span class="sd">            - options : dict, optional - Additional options for the modification operation. Default is None.</span>
+<span class="sd">            - metadata : str or list, optional - Metadata for the modification operation. Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
-            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
-            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
-            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir</span><span class="p">,</span>
-            <span class="n">inp_file_regex</span><span class="o">=</span><span class="n">inp_file_regex</span><span class="p">,</span>
-            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epoch_range</span><span class="p">,</span>
-            <span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span>
-            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ModifyGnss.modify">
 <a class="viewcode-back" href="../../../autorino.handle.html#autorino.handle.modify_cls.ModifyGnss.modify">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">modify</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">reverse_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">rinexmod_options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply RINEX modifications to the data.</span>
 
@@ -180,6 +161,9 @@
 <span class="sd">            If True, prints the table of operations. Default is False.</span>
 <span class="sd">        force : bool, optional</span>
 <span class="sd">            If True, forces the rinexmod operation even if the output files already exist.</span>
+<span class="sd">            Default is False.</span>
+<span class="sd">        reverse_order : bool, optional</span>
+<span class="sd">            If True, processes the files in reverse order (anti-chronological, newer first).</span>
 <span class="sd">            Default is False.</span>
 <span class="sd">        rinexmod_options : dict, optional</span>
 <span class="sd">            The options to be used by the rinexmod function.</span>
@@ -201,9 +185,10 @@
         <span class="c1"># set the ok_inp to True per default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;ok_inp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="n">guess_local_rnx</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># don&#39;t know why I put this test/conditional block here,</span>
+        <span class="c1"># but I will keep it for now (202602)</span>
+        <span class="n">guess_local_rnx</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">guess_local_rnx</span><span class="p">:</span>
-
             <span class="c1"># special case if we downgrade the name</span>
             <span class="k">if</span> <span class="n">rinexmod_options</span> <span class="ow">and</span> <span class="s2">&quot;shortname&quot;</span> <span class="ow">in</span> <span class="n">rinexmod_options</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">shortname</span> <span class="o">=</span> <span class="n">rinexmod_options</span><span class="p">[</span><span class="s2">&quot;shortname&quot;</span><span class="p">]</span>
@@ -213,13 +198,15 @@
             <span class="c1"># generate the potential local files</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">guess_local_rnx</span><span class="p">(</span><span class="n">shortname</span><span class="o">=</span><span class="n">shortname</span><span class="p">)</span>
             <span class="c1"># tests if the output local files are already there</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">check_local_files</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_loc_files</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">)</span>
             <span class="c1"># switch ok_inp to False if the output files are already there</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filter_ok_out</span><span class="p">()</span>
 
         <span class="c1"># if force is True, force the splicing operation</span>
         <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="s2">&quot;rinexmod&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">(</span><span class="s2">&quot;modify&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reverse_order</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reverse_table</span><span class="p">()</span>
 
         <span class="c1"># Find the input RINEX files</span>
         <span class="c1"># stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)</span>
@@ -229,7 +216,7 @@
 
         <span class="k">for</span> <span class="n">irow</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
             <span class="c1"># Check if the operation is valid for the current row</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;rinexmod&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mono_ok_check</span><span class="p">(</span><span class="n">irow</span><span class="p">,</span> <span class="s2">&quot;modify&quot;</span><span class="p">):</span>
                 <span class="k">continue</span>
 
             <span class="c1"># Update the RINEX modification options for the current row</span>
@@ -252,6 +239,7 @@
 
         <span class="k">return</span> <span class="kc">None</span></div>
 </div>
+
 
 </pre></div>
 

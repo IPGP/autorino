@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.check package &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -16,8 +16,8 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
@@ -116,27 +116,31 @@
 <p>&#64;author: psakic</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="autorino.check.check_cls.CheckGnss">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.check.check_cls.</span></span><span class="sig-name descname"><span class="pre">CheckGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">autorino.check.check_cls.</span></span><span class="sig-name descname"><span class="pre">CheckGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="autorino.handle.html#autorino.handle.handle_cls.HandleGnss" title="autorino.handle.handle_cls.HandleGnss"><code class="xref py py-class docutils literal notranslate"><span class="pre">HandleGnss</span></code></a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="autorino.check.check_cls.CheckGnss.analyze_rnxs">
-<span class="sig-name descname"><span class="pre">analyze_rnxs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss.analyze_rnxs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss.analyze_rnxs" title="Link to this definition"></a></dt>
-<dd><p>this function do the basic analysis of the table of RINEXs</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Flags meaning</p>
-<ul class="simple">
-<li><p>0 = OK</p></li>
-<li><p>1 = missing RINEX or critical content</p></li>
-<li><p>2 = incomplete RINEX</p></li>
-</ul>
-</div>
+<dt class="sig sig-object py" id="autorino.check.check_cls.CheckGnss.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize a CheckGnss object.</p>
+<p>This constructor initializes a CheckGnss object, which is used for checking
+and analyzing RINEX files. It inherits from the HandleGnss class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> (<em>keyword arguments</em>) – Additional keyword arguments passed to the parent HandleGnss class.
+Common parameters include:
+- out_dir : str, optional - The output directory for the check results.
+- tmp_dir : str, optional - The temporary directory for intermediate files.
+- log_dir : str, optional - The directory for log files.
+- inp_dir : str, optional - The input directory for RINEX files.
+- inp_file_regex : str, optional - Regular expression pattern for input files.
+- epoch_range : EpochRange, optional - The range of epochs to be checked.
+- site : dict, optional - Information about the site.
+- session : dict, optional - Information about the session.
+- options : dict, optional - Additional options for the check operation.
+- metadata : str or list, optional - Metadata for the check operation.</p>
+</dd>
+</dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="autorino.check.check_cls.CheckGnss.check">
-<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/check_cls.html#CheckGnss.check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.check_cls.CheckGnss.check" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -250,7 +254,28 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.check.trimble_filelist_html.trimble_filelist_html">
 <span class="sig-prename descclassname"><span class="pre">autorino.check.trimble_filelist_html.</span></span><span class="sig-name descname"><span class="pre">trimble_filelist_html</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1M'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'download/Internal/%Y%m'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/check/trimble_filelist_html.html#trimble_filelist_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.check.trimble_filelist_html.trimble_filelist_html" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Generate a list of Trimble files from a remote HTML directory.</p>
+<p>Downloads HTML directory listings from a remote Trimble server for a specified
+time period and extracts file information into a CSV list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>site</strong> (<em>str</em>) – The site identifier (4 characters).</p></li>
+<li><p><strong>hostname</strong> (<em>str</em>) – The hostname of the remote server.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em>) – The directory where the downloaded HTML files will be saved.</p></li>
+<li><p><strong>start_date</strong> (<em>str</em>) – The start date for the file search.</p></li>
+<li><p><strong>end_date</strong> (<em>str</em>) – The end date for the file search.</p></li>
+<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – The period for the file search, usually a month. Default is ‘1M’.</p></li>
+<li><p><strong>structure</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory structure on the remote server.
+Default is ‘download/Internal/%Y%m’.</p></li>
+<li><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – Force the download even if the output files already exist. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 </section>

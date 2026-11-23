@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>autorino.api.splice_rnx &mdash; autorino  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo_autorino.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Welcome to autorino’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../external_converters.html">External GNSS converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbook.html"><em>autorino</em>’s exemple cookbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">autorino</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">autorino.api.splice_rnx</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for autorino.api.splice_rnx</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on 18/09/2024 18:26:05</span>
+
+<span class="sd">@author: psakic</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoneType</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.handle</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arohdl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.common</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocmn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geodezyx</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+
+<span class="c1">#### Import the logger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="splice_rnx">
+<a class="viewcode-back" href="../../../autorino.api.html#autorino.api.splice_rnx.splice_rnx">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">splice_rnx</span><span class="p">(</span>
+    <span class="n">rnxs_inp</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">,</span>
+    <span class="n">tmp_dir</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1d&quot;</span><span class="p">,</span>
+    <span class="n">log_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">epoch_srt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">epoch_end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">relative_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_frequency</span><span class="o">=</span><span class="s2">&quot;30S&quot;</span><span class="p">,</span>
+    <span class="n">handle_software</span><span class="o">=</span><span class="s2">&quot;converto&quot;</span><span class="p">,</span>
+    <span class="n">rolling_period</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">rolling_ref</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">round_method</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">,</span>
+    <span class="n">drop_epoch_rnd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">rinexmod_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splice RINEX files together, either in an absolute way (based on a</span>
+<span class="sd">    provided epoch range) or in a relative way (based on the epochs found</span>
+<span class="sd">    in the input files themselves).</span>
+
+<span class="sd">    If ``epoch_srt`` and ``epoch_end`` are provided, the function operates</span>
+<span class="sd">    in **absolute** mode: it builds an explicit epoch range and splices the</span>
+<span class="sd">    input RINEX files accordingly.</span>
+
+<span class="sd">    If ``epoch_srt`` and ``epoch_end`` are *not* provided, the function</span>
+<span class="sd">    operates in **relative** mode: it groups the input files by their own</span>
+<span class="sd">    epochs and splices each group.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rnxs_inp : list</span>
+<span class="sd">        The input RINEX files to be spliced.</span>
+<span class="sd">        The input can be:</span>
+<span class="sd">        * a python list,</span>
+<span class="sd">        * a text file path containing a list of files,</span>
+<span class="sd">        * a tuple containing several text files path,</span>
+<span class="sd">        * a directory path.</span>
+<span class="sd">    out_dir : str</span>
+<span class="sd">        The output directory where the spliced files will be stored.</span>
+<span class="sd">    tmp_dir : str</span>
+<span class="sd">        The temporary directory used during the splicing process.</span>
+<span class="sd">    period : str, optional</span>
+<span class="sd">        The period for splicing the RINEX files. Defaults to ``&quot;1d&quot;``.</span>
+<span class="sd">    log_dir : str, optional</span>
+<span class="sd">        The directory where logs will be stored. Defaults to ``tmp_dir``.</span>
+<span class="sd">    epoch_srt : str or datetime-like, optional</span>
+<span class="sd">        The start epoch for the splicing operation (*absolute* mode only).</span>
+<span class="sd">        If ``None``, *relative* mode is used. Defaults to ``None``.</span>
+<span class="sd">    epoch_end : str or datetime-like, optional</span>
+<span class="sd">        The end epoch for the splicing operation (*absolute* mode only).</span>
+<span class="sd">        If ``None``, *relative* mode is used. Defaults to ``None``.</span>
+<span class="sd">    relative_mode : bool, optional</span>
+<span class="sd">        Explicitly enable *relative* mode.</span>
+<span class="sd">        If ``True``, ``epoch_srt`` and ``epoch_end`` are ignored (set to</span>
+<span class="sd">        ``None``), forcing relative mode regardless of their values.</span>
+<span class="sd">        Defaults to ``False``.</span>
+<span class="sd">    site : list or str, optional</span>
+<span class="sd">        site(s) name to be used for the spliced RINEX files (*absolute* mode).</span>
+<span class="sd">        Facultative but highly recommended to detect existing files to be</span>
+<span class="sd">        skipped.</span>
+<span class="sd">        If not site(s) provided, a list of potential sites will be</span>
+<span class="sd">        automatically detected.</span>
+<span class="sd">        Defaults to ``None``.</span>
+<span class="sd">    data_frequency : str, optional</span>
+<span class="sd">        The data frequency for the spliced RINEX files (*absolute* mode).</span>
+<span class="sd">        Facultative but highly recommended to detect existing files to be</span>
+<span class="sd">        skipped. Defaults to ``&quot;30S&quot;``.</span>
+<span class="sd">    handle_software : str, optional</span>
+<span class="sd">        The software to be used for handling the RINEX files during the</span>
+<span class="sd">        splice operation. Defaults to ``&quot;converto&quot;``.</span>
+<span class="sd">    rolling_period : bool, optional</span>
+<span class="sd">        (*Relative* mode only.)</span>
+<span class="sd">        Whether to use a rolling period for splicing the RINEX files.</span>
+<span class="sd">        If ``False``, the spliced files will be based only on the &quot;full&quot;</span>
+<span class="sd">        period provided, i.e. Day1 00h-24h, Day2 00h-24h, etc.</span>
+<span class="sd">        If ``True``, the spliced files will be based on the rolling period,</span>
+<span class="sd">        i.e. Day1 00h-Day2 00h, Day1 01h-Day2 01h, etc.</span>
+<span class="sd">        Defaults to ``False``.</span>
+<span class="sd">    rolling_ref : datetime-like or int, optional</span>
+<span class="sd">        (*Relative* mode only.)</span>
+<span class="sd">        The reference for the rolling period.</span>
+<span class="sd">        If a datetime-like object, that epoch is used as reference.</span>
+<span class="sd">        If an integer, the epoch at that index is used (e.g. ``-1`` for the</span>
+<span class="sd">        last epoch). Defaults to ``-1``.</span>
+<span class="sd">    round_method : str, optional</span>
+<span class="sd">        (*Relative* mode only.)</span>
+<span class="sd">        The method for rounding the epochs during the splice operation.</span>
+<span class="sd">        Defaults to ``&quot;floor&quot;``.</span>
+<span class="sd">    drop_epoch_rnd : bool, optional</span>
+<span class="sd">        (*Relative* mode only.)</span>
+<span class="sd">        Whether to drop the rounded epochs during the splice operation.</span>
+<span class="sd">        Defaults to ``False``.</span>
+<span class="sd">    rinexmod_options : dict, optional</span>
+<span class="sd">        The options for modifying the RINEX files during the splice</span>
+<span class="sd">        operation. Defaults to ``None``.</span>
+<span class="sd">    metadata : str or list, optional</span>
+<span class="sd">        The metadata to be included in the spliced RINEX files. Possible</span>
+<span class="sd">        inputs are:</span>
+
+<span class="sd">        * list of string (sitelog file paths),</span>
+<span class="sd">        * single string (single sitelog file path),</span>
+<span class="sd">        * single string (directory containing the sitelogs),</span>
+<span class="sd">        * list of MetaData objects,</span>
+<span class="sd">        * single MetaData object.</span>
+
+<span class="sd">        Defaults to ``None``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    spc : SpliceGnss</span>
+<span class="sd">        The SpliceGnss object after the splice operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">log_dir</span><span class="p">:</span>
+        <span class="n">log_dir</span> <span class="o">=</span> <span class="n">tmp_dir</span>
+
+    <span class="k">if</span> <span class="n">relative_mode</span><span class="p">:</span>
+        <span class="n">epoch_srt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">epoch_end</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">epo_rng</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">dummy_epochrange</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; Relative-mode splice (experimental)&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">epo_rng</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="n">epoch_srt</span><span class="p">,</span> <span class="n">epoch_end</span><span class="p">,</span> <span class="n">period</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="s2">&quot;UTC&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; Absolute-mode splice&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+    <span class="c1">#  Determine sites                                                   #</span>
+    <span class="c1"># ------------------------------------------------------------------ #</span>
+
+    <span class="c1">### Determine input directory from either a directory string or single-item list</span>
+    <span class="c1"># most common case: the input is a directory string. We use it directly.</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">rnxs_inp</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">inp_dir_use</span> <span class="o">=</span> <span class="n">rnxs_inp</span>
+    <span class="c1"># in this specific case, the input is an alias directory.</span>
+    <span class="c1"># the CLI function could not interpret it as a directory, then it is kept in a single-item list.</span>
+    <span class="c1"># we grab from the list the alias.</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rnxs_inp</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">rnxs_inp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">inp_dir_use</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">rnxs_inp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">inp_dir_use</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">site</span><span class="p">:</span>
+        <span class="n">sites_use</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">listify</span><span class="p">(</span><span class="n">site</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">site</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">inp_dir_use</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;sites will be detected automatically based on the input directory&quot;</span><span class="p">)</span>
+        <span class="n">sites_use</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">guess_sites_list</span><span class="p">(</span><span class="n">inp_dir_use</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to detect site list. aborting...&quot;</span><span class="p">)</span>
+        <span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;give site list with &#39;site&#39; argument or check parent directory (aliases not allowed for site detection): </span><span class="si">%s</span><span class="s2">&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errmsg</span><span class="p">,</span> <span class="n">inp_dir_use</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sites_use</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;no sites found. aborting...&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">site_use</span> <span class="ow">in</span> <span class="n">sites_use</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; Splicing site </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">site_use</span><span class="p">)</span>
+        <span class="c1"># ------------------------------------------------------------------ #</span>
+        <span class="c1">#  Determine input RINEXs                                            #</span>
+        <span class="c1"># ------------------------------------------------------------------ #</span>
+
+        <span class="c1"># We create a SpliceGnss object to store the input RINEX files and prepare for splicing</span>
+        <span class="n">spc_inp_rnx</span> <span class="o">=</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SpliceGnss</span><span class="p">(</span>
+            <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir_use</span><span class="p">,</span>
+            <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+            <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
+            <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+            <span class="n">epoch_range</span><span class="o">=</span><span class="n">epo_rng</span><span class="p">,</span>
+            <span class="n">site</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;site_id&quot;</span><span class="p">:</span> <span class="n">site_use</span><span class="p">},</span>
+            <span class="n">session</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;data_frequency&quot;</span><span class="p">:</span> <span class="n">data_frequency</span><span class="p">},</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Determine the input mode and input RINEX files based on whether an input directory is provided</span>
+        <span class="n">inp_mode</span><span class="p">,</span> <span class="n">inp_rnxs</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;find&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">if</span> <span class="n">inp_dir_use</span> <span class="k">else</span> <span class="p">(</span><span class="s2">&quot;given&quot;</span><span class="p">,</span> <span class="n">rnxs_inp</span><span class="p">)</span>
+        <span class="c1"># Load the input RINEX files into the SpliceGnss object</span>
+        <span class="n">spc_inp_rnx</span> <span class="o">=</span> <span class="n">spc_inp_rnx</span><span class="o">.</span><span class="n">load_input_rnxs</span><span class="p">(</span><span class="n">inp_mode</span><span class="p">,</span> <span class="n">inp_rnxs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spc_inp_rnx</span><span class="o">.</span><span class="n">table</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnmsg</span> <span class="o">=</span> <span class="s2">&quot;No input RINEX files found for site </span><span class="si">%s</span><span class="s2">. Skipping...&quot;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warnmsg</span><span class="p">,</span> <span class="n">site_use</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> input RINEX files found for site </span><span class="si">%s</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">spc_inp_rnx</span><span class="o">.</span><span class="n">table</span><span class="p">),</span> <span class="n">site_use</span>
+        <span class="p">)</span>
+        <span class="n">spc_inp_rnx</span><span class="o">.</span><span class="n">print_table</span><span class="p">()</span>
+
+        <span class="c1"># ------------------------------------------------------------------ #</span>
+        <span class="c1">#  Absolute mode                                                     #</span>
+        <span class="c1"># ------------------------------------------------------------------ #</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">relative_mode</span><span class="p">:</span>
+            <span class="n">spc_main_obj</span> <span class="o">=</span> <span class="n">arohdl</span><span class="o">.</span><span class="n">SpliceGnss</span><span class="p">(</span>
+                <span class="n">inp_dir</span><span class="o">=</span><span class="n">inp_dir_use</span><span class="p">,</span>
+                <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">,</span>
+                <span class="n">tmp_dir</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
+                <span class="n">log_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
+                <span class="n">epoch_range</span><span class="o">=</span><span class="n">epo_rng</span><span class="p">,</span>
+                <span class="n">site</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;site_id&quot;</span><span class="p">:</span> <span class="n">site_use</span><span class="p">},</span>
+                <span class="n">session</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;data_frequency&quot;</span><span class="p">:</span> <span class="n">data_frequency</span><span class="p">},</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">spc_main_obj</span><span class="o">.</span><span class="n">splice</span><span class="p">(</span>
+                <span class="n">input_mode</span><span class="o">=</span><span class="s2">&quot;given&quot;</span><span class="p">,</span>
+                <span class="n">input_rinexs</span><span class="o">=</span><span class="n">spc_inp_rnx</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">add_extra_margin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># ------------------------------------------------------------------ #</span>
+        <span class="c1">#  Relative mode                                                     #</span>
+        <span class="c1"># ------------------------------------------------------------------ #</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spc_main_obj</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spc_inp_rnx</span><span class="o">.</span><span class="n">group_by_epochs</span><span class="p">(</span>
+                <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span>
+                <span class="n">rolling_period</span><span class="o">=</span><span class="n">rolling_period</span><span class="p">,</span>
+                <span class="n">rolling_ref</span><span class="o">=</span><span class="n">rolling_ref</span><span class="p">,</span>
+                <span class="n">round_method</span><span class="o">=</span><span class="n">round_method</span><span class="p">,</span>
+                <span class="n">drop_epoch_rnd</span><span class="o">=</span><span class="n">drop_epoch_rnd</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">spc_main_obj</span><span class="o">.</span><span class="n">splice_core</span><span class="p">(</span>
+                <span class="n">handle_software</span><span class="o">=</span><span class="n">handle_software</span><span class="p">,</span>
+                <span class="n">rinexmod_options</span><span class="o">=</span><span class="n">rinexmod_options</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spc_main_obj</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025 - Pierre Sakic.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

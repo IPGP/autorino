@@ -100,13 +100,13 @@ def download_raw(
     out_dir = os.path.join(out_dir_parent, out_structure)
 
     dwl = arodwl.DownloadGnss(
+        access=access_dic,
         out_dir=out_dir,
         tmp_dir=tmp_dir,
         log_dir=log_dir,
         inp_dir=inp_dir,
         inp_file_regex=inp_file_regex,
         epoch_range=epoch_range,
-        access=access_dic,
         site=site_dic,
         session=session,
         options=options,

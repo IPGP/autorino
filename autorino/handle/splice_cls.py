@@ -6,18 +6,10 @@ Created on 20/05/2025 20:26:56
 @author: psakic
 """
 
-
-
+from __future__ import annotations
 
 # Create a logger object.
-import os
 import time
-
-import numpy as np
-import pandas as pd
-from pathlib import Path
-
-from geodezyx import utils, conv
 
 import autorino.common as arocmn
 import autorino.convert as arocnv
@@ -26,6 +18,7 @@ import autorino.handle.handle_cls as arohdlcls
 # +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+from typing import Any
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
@@ -45,19 +38,7 @@ BOLD_END = "\033[0m"
 
 
 class SpliceGnss(arohdlcls.HandleGnss):
-    def __init__(
-        self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        inp_dir=None,
-        inp_file_regex=None,
-        epoch_range=None,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
-    ):
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initialize a SpliceGnss object.
 
@@ -66,50 +47,34 @@ class SpliceGnss(arohdlcls.HandleGnss):
 
         Parameters
         ----------
-        out_dir : str
-            The output directory for the spliced RINEX files.
-        tmp_dir : str
-            The temporary directory for intermediate files.
-        log_dir : str
-            The directory for log files.
-        inp_dir : str, optional
-            The input directory for raw files. Default is None.
-        inp_file_regex : str, optional
-            The regular expression for filtering input files. Default is None.
-        epoch_range : EpochRange, optional
-            The range of epochs to be processed. Default is None.
-        site : dict, optional
-            Information about the site. Default is None.
-        session : dict, optional
-            Information about the session. Default is None.
-        options : dict, optional
-            Additional options for the splicing operation. Default is None.
-        metadata : dict, optional
-            Metadata for the splicing operation. Default is None.
+        **kwargs : keyword arguments
+            Additional keyword arguments passed to the parent HandleGnss class.
+            Common parameters include:
+            - out_dir : str - The output directory for the spliced RINEX files.
+            - tmp_dir : str - The temporary directory for intermediate files.
+            - log_dir : str - The directory for log files.
+            - inp_dir : str, optional - The input directory for raw files. Default is None.
+            - inp_file_regex : str, optional - Regular expression pattern for input files.
+            - epoch_range : EpochRange, optional - The range of epochs to be processed. Default is None.
+            - site : dict, optional - Information about the site. Default is None.
+            - session : dict, optional - Information about the session. Default is None.
+            - options : dict, optional - Additional options for the splicing operation. Default is None.
+            - metadata : str or list, optional - Metadata for the splicing operation. Default is None.
         """
-
-        super().__init__(
-            out_dir=out_dir,
-            tmp_dir=tmp_dir,
-            log_dir=log_dir,
-            inp_dir=inp_dir,
-            inp_file_regex=inp_file_regex,
-            epoch_range=epoch_range,
-            site=site,
-            session=session,
-            options=options,
-            metadata=metadata,
-        )
+        super().__init__(**kwargs)
 
     def splice(
         self,
-        input_mode="find",
-        input_rinexs=None,
-        handle_software="converto",
-        rinexmod_options=None,
-        verbose=False,
-        force=False,
-    ):
+        input_mode: str = "find",
+        input_rinexs: str | list | Any | None = None,
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+        rinexmod_options: dict | None = None,
+        verbose: bool = False,
+        force: bool = False,
+        reverse_order: bool = False,
+        add_extra_margin: bool = False,
+    ) -> None:
         """
         Splice RINEX files.
 
@@ -124,19 +89,33 @@ class SpliceGnss(arohdlcls.HandleGnss):
             - "find": to find local input files.
             - "given": to use provided input RINEX files.
             Default is "find".
-        input_rinexs : str or list or StepGnss, optional
+        input_rinexs : str or list or StepGnss or None, optional
             The input RINEX files. It can be:
             - A list of RINEX file paths.
             - An existing StepGnss object.
             Default is None.
         handle_software : str, optional
             The software to use for handling the RINEX files. Default is "converto".
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the handling software.
+            - A list of strings, where each string is an option to be passed to the handling
+                software.
+            - None, if no additional options are needed. Default is None.
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
         verbose : bool, optional
             If True, prints the table for debugging purposes. Default is False.
         force : bool, optional
             If True, forces the splicing operation. Default is False.
+        reverse_order : bool, optional
+            If True, processes the files in reverse order (anti-chronological, newer first).
+            Default is False.
+        add_extra_margin : bool, optional
+            If True, adds an extra margin to the splicing operation.
+            This can be useful for handling
+            Leica raw files that can be a bit over their nominal end.
+            Default is False.
 
         Returns
         -------
@@ -152,9 +131,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
         self.table["ok_inp"] = True
 
         # generate the potential local files
-        self.guess_local_rnx()
+        self.guess_local_rnx(fname_update=True)
         # tests if the output local files are already there
-        self.check_local_files("out")
+        self.check_loc_files("out")
         # switch ok_inp to False if the output files are already there
         self.filter_ok_out()
 
@@ -162,14 +141,31 @@ class SpliceGnss(arohdlcls.HandleGnss):
         if force:
             self.force("splice")
 
+        if reverse_order:
+            self.reverse_table()
+
         # Find the input RINEX files
-        stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
+        stp_obj_rnxs_inp = self.load_input_rnxs(str(input_mode), input_rinexs)
+
+        # Check if input RINEX files were found
+        if stp_obj_rnxs_inp is None or len(stp_obj_rnxs_inp.table) == 0:
+            logger.warning("No input RINEX files found. Aborting splice operation.")
+            self.close_logfile()
+            return None
+
         # Feed the epochs for splicing
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="splice", print_table=verbose)
+        self.feed_by_epochs(
+            stp_obj_rnxs_inp,
+            mode="splice",
+            print_table=bool(verbose),
+            add_extra_margin=add_extra_margin,
+        )
 
         # Perform the core splicing operation
         self.splice_core(
-            handle_software=handle_software, rinexmod_options=rinexmod_options
+            handle_software=handle_software,
+            handle_software_options=handle_software_options,
+            rinexmod_options=rinexmod_options,
         )
 
         # close the log file
@@ -178,8 +174,11 @@ class SpliceGnss(arohdlcls.HandleGnss):
         return None
 
     def splice_core(
-        self, handle_software="converto", rinexmod_options=None, rm_inp_files=False
-    ):
+        self,
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+        rinexmod_options: dict | None = None,
+    ) -> None:
         """
         Perform the core splicing operation.
 
@@ -193,6 +192,14 @@ class SpliceGnss(arohdlcls.HandleGnss):
             The software to use for handling the RINEX files. Default is "converto".
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
+        handle_software : str, optional
+            The software to use for handling the RINEX files.
+            Default is "converto".
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the handling software.
+            - A list of strings, where each string is an option to be passed to the handling software.
+            - None, if no additional options are needed. Default is None.
 
         Returns
         -------
@@ -200,7 +207,6 @@ class SpliceGnss(arohdlcls.HandleGnss):
         """
 
         self.set_tmp_dirs()
-
         for irow, row in self.table.iterrows():
             if not self.mono_ok_check(
                 irow,
@@ -217,7 +223,10 @@ class SpliceGnss(arohdlcls.HandleGnss):
             )
 
             self.mono_splice(
-                irow, self.tmp_dir_converted, handle_software=handle_software
+                irow,
+                self.tmp_dir_converted,
+                handle_software=str(handle_software),
+                handle_software_options=handle_software_options,
             )
 
             if not self.table.loc[irow, "ok_out"] and self.table.loc[irow, "ok_inp"]:
@@ -229,18 +238,21 @@ class SpliceGnss(arohdlcls.HandleGnss):
                 irow, self.tmp_dir_rinexmoded, rinexmod_options=rinexmod_options
             )
 
-            # if rm_inp_files:
-            # IMPLEMENT ME !!!!!!
-
             if self.tmp_dir_rinexmoded != self.out_dir:
                 self.mono_mv_final(irow, self.out_dir)
 
-        self.remov_tmp_files()
+            self.remov_tmp_files()
+
         return None
 
     def mono_splice(
-        self, irow, out_dir=None, table_col="fpath_inp", handle_software="converto"
-    ):
+        self,
+        irow: Any,
+        out_dir: str | None = None,
+        table_col: str = "fpath_inp",
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+    ) -> str | None:
         """
         "on row" method
 
@@ -282,10 +294,13 @@ class SpliceGnss(arohdlcls.HandleGnss):
                 out_dir_main_use, self.table.loc[irow, "epoch_srt"]
             )
 
-            fpath_inp_lst = list(spc_row.table["fpath_inp"])
+            fpath_inp_lst = list(sorted([str(e) for e in spc_row.table[table_col]]))
 
-            conv_options, conv_kwoptions = self.conv_softs_opts(
-                irow, handle_software=handle_software, conv_options_sup=["-cat"]
+            hndl_opts_use, hndl_kwopts_use = self.handl_soft_opts(
+                irow,
+                handl_soft=handle_software,
+                mode="splice",
+                handl_opts_supl=handle_software_options,
             )
             try:
                 time.sleep(1)
@@ -293,8 +308,9 @@ class SpliceGnss(arohdlcls.HandleGnss):
                     fpath_inp_lst,
                     out_dir_use,
                     converter=handle_software,
-                    bin_options=conv_options,
-                    bin_kwoptions=conv_kwoptions,
+                    bin_options=hndl_opts_use,
+                    bin_kwoptions=hndl_kwopts_use,
+                    timeout=600,
                 )
             except Exception as e:
                 logger.error("Error for: %s", fpath_inp_lst)
@@ -308,9 +324,11 @@ class SpliceGnss(arohdlcls.HandleGnss):
             self.table.loc[irow, "ok_out"] = False
             # raise e
 
-        ### it is not the current object temps which are removed, but the row sub object's ones
+        ### it is not the current object tmps files which are removed,
+        # but the row sub object's ones
         spc_row.remov_tmp_files()
 
+        ### add the tmp spliced file to the tmp list
+        self.tmp_rnx_files.append(frnx_spliced)
+
         return frnx_spliced
-
-

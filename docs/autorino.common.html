@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.common package &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -16,8 +16,8 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
@@ -66,6 +66,7 @@
 <li class="toctree-l3"><a class="reference internal" href="autorino.check.html">autorino.check package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">autorino.common package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-autorino.common.cli_fcts">autorino.common.cli_fcts module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.common.decompress">autorino.common.decompress module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.common.eporng_cls">autorino.common.eporng_cls module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-autorino.common.eporng_fcts">autorino.common.eporng_fcts module</a></li>
@@ -112,6 +113,41 @@
 <span id="autorino-common-package"></span><h1>autorino.common package<a class="headerlink" href="#module-autorino.common" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-autorino.common.cli_fcts">
+<span id="autorino-common-cli-fcts-module"></span><h2>autorino.common.cli_fcts module<a class="headerlink" href="#module-autorino.common.cli_fcts" title="Link to this heading"></a></h2>
+<p>Created on 17/04/2026</p>
+<p>&#64;author: psakic</p>
+<p>Utility functions shared across autorino CLI entry-points.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="autorino.common.cli_fcts.prep_inputs">
+<span class="sig-prename descclassname"><span class="pre">autorino.common.cli_fcts.</span></span><span class="sig-name descname"><span class="pre">prep_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_file_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/cli_fcts.html#prep_inputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.cli_fcts.prep_inputs" title="Link to this definition"></a></dt>
+<dd><p>Prepare the list of input files for autorino CLI entry-points.</p>
+<p>Handles three input styles:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">list_file_input=True</span></code>: <code class="docutils literal notranslate"><span class="pre">inp[0]</span></code> is a text file whose lines are
+the actual file paths → returns a list of strings.</p></li>
+<li><p>Single path that is a directory → returns the directory path as a string.</p></li>
+<li><p>One or several explicit paths → returns them as a list.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp</strong> (<em>list</em><em> of </em><em>str</em>) – Raw list of input paths as received from <code class="docutils literal notranslate"><span class="pre">argparse</span></code> (<code class="docutils literal notranslate"><span class="pre">nargs=&quot;+&quot;</span></code>).
+Typically <code class="docutils literal notranslate"><span class="pre">args.rnxs_inp</span></code>, <code class="docutils literal notranslate"><span class="pre">args.inp_raws</span></code>, etc.</p></li>
+<li><p><strong>list_file_input</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, <code class="docutils literal notranslate"><span class="pre">inp[0]</span></code> is treated as a text file containing one file
+path per line. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Either a directory path (str) or a list of file paths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-autorino.common.decompress">
 <span id="autorino-common-decompress-module"></span><h2>autorino.common.decompress module<a class="headerlink" href="#module-autorino.common.decompress" title="Link to this heading"></a></h2>
@@ -211,7 +247,7 @@ If not provided, the decompressed file will be stored in the same directory as t
 <p>This module, eporng_cls.py, provides a class for handling ranges of epochs.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="autorino.common.eporng_cls.EpochRange">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_cls.</span></span><span class="sig-name descname"><span class="pre">EpochRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'floor'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UTC'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_cls.html#EpochRange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_cls.</span></span><span class="sig-name descname"><span class="pre">EpochRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'floor'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UTC'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_cls.html#EpochRange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class used to represent a range of epochs.</p>
 <p>…</p>
@@ -284,14 +320,15 @@ If not provided, the decompressed file will be stored in the same directory as t
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.eporng_cls.EpochRange.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'floor'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UTC'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_cls.html#EpochRange.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epoch1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'floor'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UTC'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_cls.html#EpochRange.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.__init__" title="Link to this definition"></a></dt>
 <dd><p>Constructs all the necessary attributes for the epoch range object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>epoch1</strong> (<em>str</em><em>, </em><em>datetime</em><em>, </em><em>pd.Timestamp</em><em>, </em><em>pd.NaT</em><em>, </em><em>list</em>) – the start of the epoch range.</p></li>
-<li><p><strong>epoch2</strong> (<em>str</em><em>, </em><em>datetime</em><em>, </em><em>pd.Timestamp</em><em>, </em><em>pd.NaT</em>) – the end of the epoch range.</p></li>
-<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – the rounding period. Use the pandas’ frequency aliases convention.</p></li>
+<li><p><strong>epoch1</strong> (<em>str</em><em>, </em><em>dt.datetime</em><em>, </em><em>pd.Timestamp</em><em>, </em><em>pd.NaT</em><em>, </em><em>list</em>) – the start of the epoch range.</p></li>
+<li><p><strong>epoch2</strong> (<em>str</em><em>, </em><em>dt.datetime</em><em>, </em><em>pd.Timestamp</em><em>, </em><em>pd.NaT</em>) – the end of the epoch range.</p></li>
+<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – the rounding period. Use the pandas’ frequency aliases convention.
+set to “1d” if not provided.</p></li>
 <li><p><strong>round_method</strong> (<em>str</em><em>, </em><em>optional</em>) – the method used for rounding the epochs.</p></li>
 <li><p><strong>tz</strong> (<em>str</em><em>, </em><em>optional</em>) – the timezone used for the epochs.</p></li>
 </ul>
@@ -301,13 +338,13 @@ If not provided, the decompressed file will be stored in the same directory as t
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.eporng_cls.EpochRange.epoch_end">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epoch_end</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.epoch_end" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">epoch_end</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.epoch_end" title="Link to this definition"></a></dt>
 <dd><p>Gets the end of the epoch range.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.eporng_cls.EpochRange.epoch_start">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epoch_start</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.epoch_start" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">epoch_start</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.epoch_start" title="Link to this definition"></a></dt>
 <dd><p>Gets the start of the epoch range.</p>
 </dd></dl>
 
@@ -388,14 +425,14 @@ so we need to add a margin to the splicing operation.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.eporng_cls.EpochRange.period_as_timedelta">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">period_as_timedelta</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.period_as_timedelta" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">period_as_timedelta</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.period_as_timedelta" title="Link to this definition"></a></dt>
 <dd><p>For a period, e.g. 15min, 1H…
 return in as a pandas Timedelta</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.eporng_cls.EpochRange.period_values">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">period_values</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.period_values" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">period_values</span></span><a class="headerlink" href="#autorino.common.eporng_cls.EpochRange.period_values" title="Link to this definition"></a></dt>
 <dd><p>For a period, e.g. 15min, 1H…
 Returns the value (e.g. 15, 1) and the unit (e.g. min, H)</p>
 </dd></dl>
@@ -407,21 +444,6 @@ Returns the value (e.g. 15, 1) and the unit (e.g. min, H)</p>
 <span id="autorino-common-eporng-fcts-module"></span><h2>autorino.common.eporng_fcts module<a class="headerlink" href="#module-autorino.common.eporng_fcts" title="Link to this heading"></a></h2>
 <p>Created on Mon Jan  8 15:47:58 2024</p>
 <p>&#64;author: psakic</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.common.eporng_fcts.create_dummy_epochrange">
-<span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_fcts.</span></span><span class="sig-name descname"><span class="pre">create_dummy_epochrange</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_fcts.html#create_dummy_epochrange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_fcts.create_dummy_epochrange" title="Link to this definition"></a></dt>
-<dd><p>Create a fake/dummy EpochRange object
-for test/development purpose</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ses</strong> – dummy EpochRange object.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>EpochRange object</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.common.eporng_fcts.datepars_intrpt">
 <span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_fcts.</span></span><span class="sig-name descname"><span class="pre">datepars_intrpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tz_if_naive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'UTC'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_fcts.html#datepars_intrpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_fcts.datepars_intrpt" title="Link to this definition"></a></dt>
@@ -486,6 +508,21 @@ This may not be the most accurate or desired method and should be improved in fu
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="autorino.common.eporng_fcts.dummy_epochrange">
+<span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_fcts.</span></span><span class="sig-name descname"><span class="pre">dummy_epochrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'15min'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_fcts.html#dummy_epochrange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_fcts.dummy_epochrange" title="Link to this definition"></a></dt>
+<dd><p>Create a fake/dummy EpochRange object
+for test/development purpose</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ses</strong> – dummy EpochRange object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>EpochRange object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="autorino.common.eporng_fcts.epoch_range_intrpt">
 <span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_fcts.</span></span><span class="sig-name descname"><span class="pre">epoch_range_intrpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">epo_inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_fcts.html#epoch_range_intrpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_fcts.epoch_range_intrpt" title="Link to this definition"></a></dt>
 <dd><p>This function interprets an input to get an output EpochRange object. The input can either be a tuple,
@@ -525,34 +562,6 @@ using the elements of the tuple.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.common.eporng_fcts.round_date">
 <span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_fcts.</span></span><span class="sig-name descname"><span class="pre">round_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'floor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_fcts.html#round_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_fcts.round_date" title="Link to this definition"></a></dt>
-<dd><p>low-level function to round a Pandas Serie or a datetime-like object
-according to the “ceil”, “floor”, “round”, “none” approach</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>date_in</strong> (<em>Pandas Serie</em><em> or </em><em>a datetime-like object</em>) – Input date .</p></li>
-<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – the rounding period.
-Use the pandas’ frequency aliases convention (see bellow for details).</p></li>
-<li><p><strong>round_method</strong> (<em>str</em><em>, </em><em>optional</em>) – round method: ‘ceil’, ‘floor’, ‘round’, ‘none’. The default is “floor”.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>date_out</strong> – rounded date.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Pandas Serie or datetime-like object (same as input)</p>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Pandas’ frequency aliases memo
-<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases">https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#timeseries-offset-aliases</a></p>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="autorino.common.eporng_fcts.round_date_legacy">
-<span class="sig-prename descclassname"><span class="pre">autorino.common.eporng_fcts.</span></span><span class="sig-name descname"><span class="pre">round_date_legacy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'floor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/eporng_fcts.html#round_date_legacy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.eporng_fcts.round_date_legacy" title="Link to this definition"></a></dt>
 <dd><p>low-level function to round a Pandas Serie or a datetime-like object
 according to the “ceil”, “floor”, “round”, “none” approach</p>
 <dl class="field-list simple">
@@ -649,7 +658,7 @@ The default is -1.</p></li>
 <p>&#64;author: psakic</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autorino.common.step_cls.</span></span><span class="sig-name descname"><span class="pre">StepGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">autorino.common.step_cls.</span></span><span class="sig-name descname"><span class="pre">StepGnss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The StepGnss class represents a step in a GNSS processing chain.
 It contains methods for initializing and managing
@@ -657,104 +666,6 @@ various aspects of a processing step, including epoch ranges,
 sites, sessions, options, and metadata. It also provides
 methods for handling temporary directories, logging,
 and table management.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.out_dir">
-<span class="sig-name descname"><span class="pre">out_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.out_dir" title="Link to this definition"></a></dt>
-<dd><p>The output directory for the step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.tmp_dir">
-<span class="sig-name descname"><span class="pre">tmp_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.tmp_dir" title="Link to this definition"></a></dt>
-<dd><p>The temporary directory for the step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.log_dir">
-<span class="sig-name descname"><span class="pre">log_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.log_dir" title="Link to this definition"></a></dt>
-<dd><p>The log directory for the step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.epoch_range">
-<span class="sig-name descname"><span class="pre">epoch_range</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.epoch_range" title="Link to this definition"></a></dt>
-<dd><p>The epoch range for the step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#autorino.common.eporng_cls.EpochRange" title="autorino.common.eporng_cls.EpochRange">EpochRange</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.site">
-<span class="sig-name descname"><span class="pre">site</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.site" title="Link to this definition"></a></dt>
-<dd><p>The site information for the step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.session">
-<span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.session" title="Link to this definition"></a></dt>
-<dd><p>The session information for the step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.options">
-<span class="sig-name descname"><span class="pre">options</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.options" title="Link to this definition"></a></dt>
-<dd><p>The options for the step.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.metadata">
-<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.metadata" title="Link to this definition"></a></dt>
-<dd><dl>
-<dt>The metadata to be included in the converted RINEX files. Possible inputs are:</dt><dd><ul class="simple">
-<li><p>list of string (sitelog file paths),</p></li>
-<li><p>single string (single sitelog file path)</p></li>
-<li><p>single string (directory containing the sitelogs)</p></li>
-<li><p>list of MetaData objects</p></li>
-<li><p>single MetaData object.</p></li>
-</ul>
-<p>Defaults to None.</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str or list, optional</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_file_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.__init__" title="Link to this definition"></a></dt>
@@ -812,12 +723,12 @@ the <cite>EpochRange</cite> function from the <cite>arocmn</cite> module.</p>
 <span class="sig-name descname"><span class="pre">_init_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss._init_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss._init_metadata" title="Link to this definition"></a></dt>
 <dd><p>Initializes the metadata attribute of the StepGnss object.</p>
 <p>This method checks if a ‘metadata’ is provided. If it is, it translates the path of the metadata,
-manages the site log input using the <cite>metadata_input_manage</cite> function from the <cite>rinexmod_api</cite> module,
+manages the site log input using the <cite>load_metadata</cite> function from the <cite>rinexmod_core</cite> module,
 and sets the ‘metadata’ attribute of the StepGnss object to the managed site log input.
 If a ‘metadata’ is not provided, it sets the ‘metadata’ attribute to None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>metadata</strong> (<em>str</em><em>, </em><em>optional</em>) – The metadata for the step. If not provided, the ‘metadata’ attribute is set to None.</p>
+<dd class="field-odd"><p><strong>metadata</strong> (<em>str</em>) – The metadata for the step. If not provided, the ‘metadata’ attribute is set to None.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
@@ -915,7 +826,7 @@ StepGnss object and the ‘site’ column with the site ID of the StepGnss objec
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss._init_tmp_dirs_paths">
 <span class="sig-name descname"><span class="pre">_init_tmp_dirs_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp_subdir_dwnld</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'010_downloaded'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_subdir_unzip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'020_unzipped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_subdir_conv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'030_converted'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_subdir_rnxmod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'040_rinexmoded'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_subdir_tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'090_tables'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss._init_tmp_dirs_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss._init_tmp_dirs_paths" title="Link to this definition"></a></dt>
 <dd><p>Initializes the temporary directories paths as attribute for the StepGnss object.</p>
-<p>This method is internal only, for the initialisation of the StepGnss object.</p>
+<p>This method is internal only, for the initialization of the StepGnss object.</p>
 <p>See set_tmp_dirs for the actual creation of the directories.</p>
 <p>This method sets the paths for the temporary directories of the StepGnss object.
 It creates the paths in a generic form, with placeholders and without creating the actual directories.
@@ -923,11 +834,16 @@ The directories include logs, unzipped, converted, rinexmoded, and downloaded di
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tmp_subdir_dwnld</strong> (<em>str</em><em>, </em><em>optional</em>) – The subdirectory for downloaded files. Default is ‘downloaded’.</p></li>
-<li><p><strong>tmp_subdir_unzip</strong> (<em>str</em><em>, </em><em>optional</em>) – The subdirectory for unzipped files. Default is ‘unzipped’.</p></li>
-<li><p><strong>tmp_subdir_conv</strong> (<em>str</em><em>, </em><em>optional</em>) – The subdirectory for converted files. Default is ‘converted’.</p></li>
-<li><p><strong>tmp_subdir_rnxmod</strong> (<em>str</em><em>, </em><em>optional</em>) – The subdirectory for rinexmoded files. Default is ‘rinexmoded’.</p></li>
-<li><p><strong>tmp_subdir_tables</strong> (<em>str</em><em>, </em><em>optional</em>) – The subdirectory for logs. Default is ‘logs’.</p></li>
+<li><p><strong>tmp_subdir_dwnld</strong> (<em>str</em>) – The subdirectory for downloaded files.
+Default is ‘downloaded’.</p></li>
+<li><p><strong>tmp_subdir_unzip</strong> (<em>str</em>) – The subdirectory for unzipped files.
+Default is ‘unzipped’.</p></li>
+<li><p><strong>tmp_subdir_conv</strong> (<em>str</em>) – The subdirectory for converted files.
+Default is ‘converted’.</p></li>
+<li><p><strong>tmp_subdir_rnxmod</strong> (<em>str</em>) – The subdirectory for rinexmoded files.
+Default is ‘rinexmoded’.</p></li>
+<li><p><strong>tmp_subdir_tables</strong> (<em>str</em>) – The subdirectory for logs.
+Default is ‘logs’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -938,13 +854,13 @@ The directories include logs, unzipped, converted, rinexmoded, and downloaded di
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.autorino_vers">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">autorino_vers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.autorino_vers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.autorino_vers" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">autorino_vers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.autorino_vers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.autorino_vers" title="Link to this definition"></a></dt>
 <dd><p>Returns the version of the autorino package.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.check_local_files">
-<span class="sig-name descname"><span class="pre">check_local_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.check_local_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.check_local_files" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.check_loc_files">
+<span class="sig-name descname"><span class="pre">check_loc_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.check_loc_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.check_loc_files" title="Link to this definition"></a></dt>
 <dd><p>Checks the existence of the output (‘out’) or input (‘inp’) local files (for non download cases)
 and updates the corresponding booleans in the ‘ok_out’ or ‘ok_inp’ column of the table.</p>
 <p>This method iterates over each row in the table. For each row,
@@ -958,7 +874,10 @@ the ‘ok_out’ entry for the file in the table to False.</p>
 <p>The method returns a list of the paths of the existing and non-empty local files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – The input/output direction to check. Default is ‘out’.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – The input/output direction to check. Default is ‘out’.</p></li>
+<li><p><strong>bis</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True and io=’out’, uses out_bis_dir instead of out_dir.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The list of paths of the existing and non-empty local files.</p>
@@ -971,7 +890,7 @@ the ‘ok_out’ entry for the file in the table to False.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.clean_tmp_dirs">
-<span class="sig-name descname"><span class="pre">clean_tmp_dirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_table_logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.clean_tmp_dirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.clean_tmp_dirs" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">clean_tmp_dirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_table_logs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.clean_tmp_dirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.clean_tmp_dirs" title="Link to this definition"></a></dt>
 <dd><p>Cleans the temporary directories of the StepGnss object.</p>
 <p>This method removes all files older than a specified number of days in the temporary
 directories of the StepGnss object.
@@ -999,7 +918,7 @@ Default is True.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.close_logfile">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close_logfile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.close_logfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.close_logfile" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">close_logfile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.close_logfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.close_logfile" title="Link to this definition"></a></dt>
 <dd><p>close the file handler of the logger</p>
 </dd></dl>
 
@@ -1068,7 +987,8 @@ to keep the trace of the original file</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.decompress_table_batch">
 <span class="sig-name descname"><span class="pre">decompress_table_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fpath_inp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_ok_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ok_inp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.decompress_table_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.decompress_table_batch" title="Link to this definition"></a></dt>
-<dd><p>Decompresses the potential compressed files in the specified column of the table.</p>
+<dd><p>THIS FUNCTION IS DISCONTINUED IN FAVOR OF THE decompress() FUNCTION</p>
+<p>Decompresses the potential compressed files in the specified column of the table.</p>
 <p>This method checks if the files specified in the ‘table_col’ column of the table are compressed.
 If they are, the method decompresses the files and updates the ‘table_col’ column with the paths of
 the decompressed files.
@@ -1095,8 +1015,8 @@ Default is ‘ok_inp’.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id0">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">epoch_range</span></span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.epoch_range">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">epoch_range</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.epoch_range" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1122,7 +1042,7 @@ Default is ‘ok_inp’.</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.exit_code">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exit_code</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.exit_code" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">exit_code</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.exit_code" title="Link to this definition"></a></dt>
 <dd><p>Returns the exit code of the StepGnss object.</p>
 <ul class="simple">
 <li><p>0:
@@ -1300,8 +1220,39 @@ year_in_inp_path is 4</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.find_loc_files">
+<span class="sig-name descname"><span class="pre">find_loc_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.find_loc_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.find_loc_files" title="Link to this definition"></a></dt>
+<dd><p>Find the paths and names of the local files based on the specified method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method to find local files. Can be ‘guess’ or ‘ask’. Default is ‘guess’.
+- ‘ask’: Determine local file paths based on the table’s <cite>fpath_inp</cite> basename
+- ‘guess’: Guess local file paths based on EpochRange and <cite>inp_file_regex</cite> attributes.</p></li>
+<li><p><strong>bis</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True and out_bis_dir is defined, generates paths for out_bis_dir.
+If False, generates paths for out_dir.
+Default is False.</p></li>
+<li><p><strong>check</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, checks the exisitence of the output files after finding local raw files.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of local file paths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Merge of 2 previous methods in DownloadStepGnss:
+ask_local_raw &amp; guess_local_raw</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.force">
-<span class="sig-name descname"><span class="pre">force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.force" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">force</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.force"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.force" title="Link to this definition"></a></dt>
 <dd><p>Enables the force mode for the current step.</p>
 <p>This method sets the ‘ok_inp’ column of the table to True and updates the ‘note’ column
 to indicate that the force mode is enabled for the specified step.</p>
@@ -1359,36 +1310,54 @@ the last 4 characters are removed from the class name.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.guess_local_rnx">
-<span class="sig-name descname"><span class="pre">guess_local_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.guess_local_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.guess_local_rnx" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">guess_local_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.guess_local_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.guess_local_rnx" title="Link to this definition"></a></dt>
 <dd><p>For a given site name and date in a table, guess the potential local RINEX files
-and write it as ‘fpath_out’ value in the table</p>
+and write it as ‘fpath_out’ (or ‘fpath_out_bis’ if bis=True) value in the table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies whether to guess the input (<cite>inp</cite>) or output (<cite>out</cite>) file path.
+Default is <cite>out</cite>.</p></li>
+<li><p><strong>shortname</strong> (<em>bool</em><em>, </em><em>optional</em>) – guess RINEX’s shortname if True. Default is False.</p></li>
+<li><p><strong>bis</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True and io=’out’, uses out_bis_dir instead of out_dir.
+Default is False.</p></li>
+<li><p><strong>fname_update</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, updates the file name in the table. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of guessed local RINEX file paths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.guess_out_files">
-<span class="sig-name descname"><span class="pre">guess_out_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.guess_out_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.guess_out_files" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">guess_out_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.guess_out_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.guess_out_files" title="Link to this definition"></a></dt>
 <dd><p>Generates output file paths for each row in the table and updates the table.</p>
 <p>This method iterates over the rows of the table, constructs the output file path
-for each input file, and updates the <cite>fpath_out</cite> column in the table. It also
-ensures that the output directory exists and checks the validity of the output files.</p>
+for each input file, and updates the <cite>fpath_out</cite> or <cite>fpath_out_bis</cite> column in the table.
+It also ensures that the output directory exists and checks the validity of the output files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A list of output file paths generated for the table rows.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bis</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True and out_bis_dir is defined, generates paths for out_bis_dir (fpath_out_bis).
+If False, generates paths for out_dir (fpath_out).
+Default is False.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of output file paths generated for the table rows.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<ul class="simple">
-<li><p>The output directory is created if it does not exist.</p></li>
-<li><p>The <cite>check_local_files</cite> method is called to validate the output files.</p></li>
-</ul>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.inp_dir">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inp_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.inp_dir" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">inp_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.inp_dir" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1518,13 +1487,13 @@ Default is ‘out’.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id1">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log_dir</span></span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.log_dir">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">log_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.log_dir" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_chk_local">
-<span class="sig-name descname"><span class="pre">mono_chk_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_chk_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_chk_local" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.m_chk_loc_file">
+<span class="sig-name descname"><span class="pre">m_chk_loc_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.m_chk_loc_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.m_chk_loc_file" title="Link to this definition"></a></dt>
 <dd><p>Checks the existence and validity of a local file for a specific row in the table.</p>
 <p>This method verifies if the file specified in the <cite>fpath_&lt;io&gt;</cite> column of the table exists
 and is non-empty. It updates the corresponding <cite>ok_&lt;io&gt;</cite> and <cite>size_&lt;io&gt;</cite> columns in the table
@@ -1550,6 +1519,107 @@ Default is <cite>out</cite>.</p></li>
 <li><p>If the file exists and is non-empty, the method sets <cite>ok_&lt;io&gt;</cite> to True and updates <cite>size_&lt;io&gt;</cite>
 with the file size.</p></li>
 <li><p>If the file does not exist or is empty, the method sets <cite>ok_&lt;io&gt;</cite> to False and <cite>size_&lt;io&gt;</cite> to NaN.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.m_find_loc_file">
+<span class="sig-name descname"><span class="pre">m_find_loc_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ask'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.m_find_loc_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.m_find_loc_file" title="Link to this definition"></a></dt>
+<dd><p>Finds the local file path for a given row in the table based on the specified method.</p>
+<p>This method determines the local file path for a specific row in the table. It supports two methods:
+‘ask’ and ‘guess’. Based on the method, it either retrieves the file name from the table or generates
+a file name using a regex pattern. The method also supports handling an alternate output directory
+if the <cite>bis</cite> parameter is set to True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table for which the local file path is to be determined.</p></li>
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method to use for determining the file path. Can be either ‘ask’ or ‘guess’.
+Default is ‘ask’.</p></li>
+<li><p><strong>bis</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, uses the alternate output directory (<cite>out_bis_dir</cite>) instead of the standard
+output directory (<cite>out_dir</cite>). Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The determined local file path.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the <cite>method</cite> parameter is not ‘ask’ or ‘guess’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.m_guess_loc_rnx">
+<span class="sig-name descname"><span class="pre">m_guess_loc_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.m_guess_loc_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.m_guess_loc_rnx" title="Link to this definition"></a></dt>
+<dd><p>Guesses the local RINEX file path for a given row in the table.</p>
+<p>This method determines the local RINEX file path based on the epoch range
+and site information for a specific row in the table. It supports both
+input (<cite>inp</cite>) and output (<cite>out</cite>) modes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table for which the RINEX file path is to be guessed.</p></li>
+<li><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies whether to guess the input (<cite>inp</cite>) or output (<cite>out</cite>) file path.
+Default is <cite>out</cite>.</p></li>
+<li><p><strong>shortname</strong> (<em>bool</em><em>, </em><em>optional</em>) – guess RINEX’s shortname if True
+Default is False.</p></li>
+<li><p><strong>bis</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True and io=’out’, uses out_bis_dir instead of out_dir.
+Default is False.</p></li>
+<li><p><strong>fname_update</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, updates the ‘fname’ column in the table with the guessed file name.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The guessed local RINEX file path.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the <cite>io</cite> parameter is not <cite>inp</cite> or <cite>out</cite>.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The method ensures that the timezone information is removed from the
+epoch start and end times to avoid compatibility issues with <cite>rinexmod</cite>.</p></li>
+<li><p>The guessed file path is stored in the <cite>fpath_&lt;io&gt;</cite> column of the table.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.m_guess_out_fil">
+<span class="sig-name descname"><span class="pre">m_guess_out_fil</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.m_guess_out_fil"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.m_guess_out_fil" title="Link to this definition"></a></dt>
+<dd><p>Guesses the output file path for a given row in the table.</p>
+<p>This method constructs the output file path based on the input file basename
+for a specific row in the table. It supports both standard output (<cite>out</cite>)
+and bis output (<cite>out_bis</cite>) modes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table for which the output file path is to be guessed.</p></li>
+<li><p><strong>bis</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True and io=’out’, uses out_bis_dir instead of out_dir.
+Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The guessed output file path.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the <cite>io</cite> parameter is not ‘out’.</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The guessed file path is stored in the <cite>fpath_out</cite> or <cite>fpath_out_bis</cite> column of the table.</p></li>
+<li><p>The output directory is created if it does not exist.</p></li>
 </ul>
 </dd></dl>
 
@@ -1585,41 +1655,6 @@ Default is ‘ok_inp’.</p></li>
 <dd class="field-odd"><p>str, bool</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.mono_guess_rnx">
-<span class="sig-name descname"><span class="pre">mono_guess_rnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">irow</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">io</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'out'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.mono_guess_rnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.mono_guess_rnx" title="Link to this definition"></a></dt>
-<dd><p>Guesses the local RINEX file path for a given row in the table.</p>
-<p>This method determines the local RINEX file path based on the epoch range
-and site information for a specific row in the table. It supports both
-input (<cite>inp</cite>) and output (<cite>out</cite>) modes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>irow</strong> (<em>int</em>) – The index of the row in the table for which the RINEX file path is to be guessed.</p></li>
-<li><p><strong>io</strong> (<em>str</em><em>, </em><em>optional</em>) – Specifies whether to guess the input (<cite>inp</cite>) or output (<cite>out</cite>) file path.
-Default is <cite>out</cite>.</p></li>
-<li><p><strong>shortname</strong> (<em>bool</em><em>, </em><em>optional</em>) – guess RINEX’s shortname if True
-Default is False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The guessed local RINEX file path.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>Exception</strong> – If the <cite>io</cite> parameter is not <cite>inp</cite> or <cite>out</cite>.</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<ul class="simple">
-<li><p>The method ensures that the timezone information is removed from the
-epoch start and end times to avoid compatibility issues with <cite>rinexmod</cite>.</p></li>
-<li><p>The guessed file path is stored in the <cite>fpath_&lt;io&gt;</cite> column of the table.</p></li>
-</ul>
 </dd></dl>
 
 <dl class="py method">
@@ -1814,8 +1849,13 @@ Default is ‘inpout’.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id2">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">out_dir</span></span><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.out_bis_dir">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">out_bis_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.out_bis_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.out_dir">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">out_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.out_dir" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1853,6 +1893,18 @@ If a file exists and is not an original file, it is removed and its path is remo
 If a file does not exist or is an original file, its path is kept in the list for future reference.</p>
 <p>Note: This method modifies the ‘tmp_rnx_files’ and ‘tmp_decmp_files’ attributes of the object.</p>
 <p>See Also clean_tmp_dirs(), which clean all the temporary files based on their creation date</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.reverse_table">
+<span class="sig-name descname"><span class="pre">reverse_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_cls.html#StepGnss.reverse_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_cls.StepGnss.reverse_table" title="Link to this definition"></a></dt>
+<dd><p>Reverses the order of the rows in the table.</p>
+<p>This method reverses the order of the rows in the table. The first row becomes the last row, and the last row becomes the first row.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -1912,22 +1964,22 @@ It directly modifies the ‘translate_dict’ attribute of the object.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.site_id">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">site_id</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.site_id" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">site_id</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.site_id" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.site_id4">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">site_id4</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.site_id4" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">site_id4</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.site_id4" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.site_id9">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">site_id9</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.site_id9" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">site_id9</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.site_id9" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.table">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">table</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.table" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">table</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.table" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1945,8 +1997,8 @@ The column is converted to True if the value is ‘OK’ and False otherwise.</p
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="id3">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tmp_dir</span></span><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="autorino.common.step_cls.StepGnss.tmp_dir">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">tmp_dir</span></span><a class="headerlink" href="#autorino.common.step_cls.StepGnss.tmp_dir" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1965,10 +2017,12 @@ If the translated path is a full path with a filename, you will get nasty result
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path_inp</strong> (<em>str</em>) – The input path to be translated.</p></li>
-<li><p><strong>epoch_inp</strong> (<em>datetime</em><em>, </em><em>optional</em>) – The epoch input to be used in the translation. Default is None.</p></li>
+<li><p><strong>epoch_inp</strong> (<em>datetime</em><em>, </em><em>optional</em>) – The epoch input to be used in the translation.
+Default is None.</p></li>
 <li><p><strong>make_dir</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the function will create the directory corresponding to the translated path.
 Default is False.</p></li>
-<li><p><strong>absolute</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the function will return the absolute path. Default is False.</p></li>
+<li><p><strong>absolute</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, the function will return the absolute path.
+Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2232,24 +2286,32 @@ See <cite>import_files</cite> for details.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="autorino.common.step_fcts.import_files">
 <span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">import_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp_fil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inp_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.*'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#import_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.import_files" title="Link to this definition"></a></dt>
-<dd><p>Handles multiple types of input lists and returns a python list of the input.</p>
-<p>This function can handle various types of input lists and convert them into a python list.
-The input can be:</p>
-<blockquote>
-<div><ul class="simple">
+<dd><p>Handles multiple types of input lists and returns a
+python list of the input.</p>
+<dl class="simple">
+<dt>This function can handle various types of input lists</dt><dd><p>and convert them into a python list.</p>
+</dd>
+<dt>The input can be:</dt><dd><ul class="simple">
 <li><p>a python list</p></li>
 <li><p>a text file path containing a list of files</p></li>
 <li><p>a tuple containing several text files path</p></li>
 <li><p>a directory path.</p></li>
 </ul>
-</div></blockquote>
-<p>If the input is a directory path, all the files matching the regular expression specified by ‘inp_regex’ are read.</p>
+</dd>
+<dt>If the input is a directory path, all the files matching the</dt><dd><p>regular expression specified by ‘inp_regex’ are read.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>inp_fil</strong> (<em>list</em><em> or </em><em>str</em><em> or </em><em>tuple</em>) – The input list to be interpreted. It can be a python list, a text file path containing a list of files,
-a tuple containing several text files path, or a directory path.</p></li>
-<li><p><strong>inp_regex</strong> (<em>str</em><em>, </em><em>optional</em>) – The regular expression used to filter the files when ‘inp_fil’ is a directory path.
+<li><p><strong>inp_fil</strong> (<em>list</em><em> or </em><em>str</em><em> or </em><em>tuple</em>) – <dl class="simple">
+<dt>The input list to be interpreted. It can be a python list,</dt><dd><p>a text file path containing a list of files,</p>
+</dd>
+</dl>
+<p>a tuple containing several text files path, or a directory path.</p>
+</p></li>
+<li><p><strong>inp_regex</strong> (<em>str</em><em>, </em><em>optional</em>) – The regular expression used to filter the files when
+‘inp_fil’ is a directory path.
 Default is “.*” which matches any file.</p></li>
 </ul>
 </dd>
@@ -2287,7 +2349,7 @@ Can handle iterables.</p>
 <dt class="sig sig-object py" id="autorino.common.step_fcts.load_previous_tables">
 <span class="sig-prename descclassname"><span class="pre">autorino.common.step_fcts.</span></span><span class="sig-name descname"><span class="pre">load_previous_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autorino/common/step_fcts.html#load_previous_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autorino.common.step_fcts.load_previous_tables" title="Link to this definition"></a></dt>
 <dd><p>Load all previous tables from the log directory.</p>
-<p>This function searches for all files ending with “<a href="#id4"><span class="problematic" id="id5">*</span></a>table.log” in the log directory
+<p>This function searches for all files ending with “<a href="#id1"><span class="problematic" id="id2">*</span></a>table.log” in the log directory
 and concatenates them into a single pandas DataFrame. If no such files are found,
 it returns an empty DataFrame and logs a warning.</p>
 <dl class="field-list simple">

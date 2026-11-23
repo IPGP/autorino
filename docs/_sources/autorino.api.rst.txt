@@ -41,18 +41,10 @@ autorino.api.download\_raw module
    :show-inheritance:
    :undoc-members:
 
-autorino.api.splice\_rnx\_abs module
-------------------------------------
+autorino.api.splice\_rnx module
+-------------------------------
 
-.. automodule:: autorino.api.splice_rnx_abs
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-autorino.api.splice\_rnx\_rel module
-------------------------------------
-
-.. automodule:: autorino.api.splice_rnx_rel
+.. automodule:: autorino.api.splice_rnx
    :members:
    :show-inheritance:
    :undoc-members:

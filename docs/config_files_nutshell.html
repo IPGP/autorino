@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Configuration files in a nutshell &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -16,8 +16,8 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
@@ -94,8 +94,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="configuration-files-in-a-nutshell">
-<span id="config-files-nutshell"></span><h1>Configuration files in a nutshell<a class="headerlink" href="#configuration-files-in-a-nutshell" title="Link to this heading"></a></h1>
+  <section id="config-files-nutshell">
+<span id="configuration-files-in-a-nutshell"></span><h1>Configuration files in a nutshell<a class="headerlink" href="#config-files-nutshell" title="Link to this heading"></a></h1>
 <p><em>autorino</em> relies on YAML configuration files to perform its <em>workflow</em>
 (i.e. set of <em>steps</em>) operations.</p>
 <section id="location-of-the-configuration-files">
@@ -208,9 +208,13 @@ The following aliases are managed:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;site_id4&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;SITE_ID4&gt;</span></code>: the 4-characters site name</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;site_id9&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;SITE_ID9&gt;</span></code>: the 9-characters site name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;hourchar&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;HOURCHAR&gt;</span></code>: character for the n-th hour in the day, as defined by the RINEX2 naming convention.
+(<code class="docutils literal notranslate"><span class="pre">a</span></code>= 1st hour: 00h-01h, <code class="docutils literal notranslate"><span class="pre">b</span></code>= 2nd hour: 1h to 2h,…, <code class="docutils literal notranslate"><span class="pre">x</span></code>=24th hour: 23h-24h.)</p></li>
 </ul>
-<p>Time aliases can also be used. They follow the <code class="docutils literal notranslate"><span class="pre">date</span></code> format convention,
-e.g. <code class="docutils literal notranslate"><span class="pre">%Y</span></code> for the year, <code class="docutils literal notranslate"><span class="pre">%H</span></code> for the hour, <code class="docutils literal notranslate"><span class="pre">%j</span></code> for the day of year, etc…</p>
+<p>Time aliases can also be used.
+They follow the <em>C standard</em> convention, like the UNIX command <code class="docutils literal notranslate"><span class="pre">date</span></code>.
+e.g. <code class="docutils literal notranslate"><span class="pre">%Y</span></code> for the year, <code class="docutils literal notranslate"><span class="pre">%H</span></code> for the hour, <code class="docutils literal notranslate"><span class="pre">%j</span></code> for the day of year, etc…
+Complete list of time aliases can be found in the <a class="reference external" href="https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes">Python documentation</a>.</p>
 <p>The environment variables can also be used as aliases. They follow the <code class="docutils literal notranslate"><span class="pre">&lt;$ENVVAR&gt;</span></code> convention,
 using <code class="docutils literal notranslate"><span class="pre">$</span></code> and between <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">&lt;$HOME&gt;</span></code> for the home directory.</p>
 </section>

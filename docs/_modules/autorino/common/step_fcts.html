@@ -6,8 +6,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.common.step_fcts &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -15,8 +15,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -88,20 +89,20 @@
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">geodezyx</span> <span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
-<span class="kn">from</span> <span class="nn">filelock</span> <span class="kn">import</span> <span class="n">FileLock</span><span class="p">,</span> <span class="n">Timeout</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geodezyx</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">conv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">filelock</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileLock</span><span class="p">,</span> <span class="n">Timeout</span>
 
 <span class="c1">#### Import the logger</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
-<span class="kn">import</span> <span class="nn">autorino.common</span> <span class="k">as</span> <span class="nn">arocmn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.common</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">arocmn</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
@@ -109,7 +110,7 @@
 
 <div class="viewcode-block" id="make_site_id9">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.make_site_id9">[docs]</a>
-<span class="k">def</span> <span class="nf">make_site_id9</span><span class="p">(</span><span class="n">site_id_inp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_site_id9</span><span class="p">(</span><span class="n">site_id_inp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a site ID to a 9-character format.</span>
 
@@ -138,7 +139,7 @@
 
 <div class="viewcode-block" id="dummy_site_dic">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.dummy_site_dic">[docs]</a>
-<span class="k">def</span> <span class="nf">dummy_site_dic</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dummy_site_dic</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a dummy site dictionary.</span>
 
@@ -169,7 +170,7 @@
 
 <div class="viewcode-block" id="dummy_sess_dic">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.dummy_sess_dic">[docs]</a>
-<span class="k">def</span> <span class="nf">dummy_sess_dic</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dummy_sess_dic</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a dummy session dictionary.</span>
 
@@ -206,25 +207,30 @@
 
 <div class="viewcode-block" id="import_files">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.import_files">[docs]</a>
-<span class="k">def</span> <span class="nf">import_files</span><span class="p">(</span><span class="n">inp_fil</span><span class="p">,</span> <span class="n">inp_regex</span><span class="o">=</span><span class="s2">&quot;.*&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">import_files</span><span class="p">(</span><span class="n">inp_fil</span><span class="p">,</span> <span class="n">inp_regex</span><span class="o">=</span><span class="s2">&quot;.*&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handles multiple types of input lists and returns a python list of the input.</span>
+<span class="sd">    Handles multiple types of input lists and returns a</span>
+<span class="sd">    python list of the input.</span>
 
-<span class="sd">    This function can handle various types of input lists and convert them into a python list.</span>
+<span class="sd">    This function can handle various types of input lists</span>
+<span class="sd">     and convert them into a python list.</span>
 <span class="sd">    The input can be:</span>
 <span class="sd">     * a python list</span>
 <span class="sd">     * a text file path containing a list of files</span>
 <span class="sd">     * a tuple containing several text files path</span>
 <span class="sd">     * a directory path.</span>
-<span class="sd">    If the input is a directory path, all the files matching the regular expression specified by &#39;inp_regex&#39; are read.</span>
+<span class="sd">    If the input is a directory path, all the files matching the</span>
+<span class="sd">     regular expression specified by &#39;inp_regex&#39; are read.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    inp_fil : list or str or tuple</span>
-<span class="sd">        The input list to be interpreted. It can be a python list, a text file path containing a list of files,</span>
+<span class="sd">        The input list to be interpreted. It can be a python list,</span>
+<span class="sd">         a text file path containing a list of files,</span>
 <span class="sd">        a tuple containing several text files path, or a directory path.</span>
 <span class="sd">    inp_regex : str, optional</span>
-<span class="sd">        The regular expression used to filter the files when &#39;inp_fil&#39; is a directory path.</span>
+<span class="sd">        The regular expression used to filter the files when</span>
+<span class="sd">        &#39;inp_fil&#39; is a directory path.</span>
 <span class="sd">        Default is &quot;.*&quot; which matches any file.</span>
 
 <span class="sd">    Returns</span>
@@ -264,7 +270,7 @@
 
 <div class="viewcode-block" id="load_previous_tables">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.load_previous_tables">[docs]</a>
-<span class="k">def</span> <span class="nf">load_previous_tables</span><span class="p">(</span><span class="n">log_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_previous_tables</span><span class="p">(</span><span class="n">log_dir</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Load all previous tables from the log directory.</span>
 
@@ -299,7 +305,7 @@
 
 <div class="viewcode-block" id="print_tab_core">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.print_tab_core">[docs]</a>
-<span class="k">def</span> <span class="nf">print_tab_core</span><span class="p">(</span><span class="n">table_inp</span><span class="p">,</span> <span class="n">max_colwidth</span><span class="o">=</span><span class="mi">33</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_tab_core</span><span class="p">(</span><span class="n">table_inp</span><span class="p">,</span> <span class="n">max_colwidth</span><span class="o">=</span><span class="mi">33</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Prints the table of the StepGnss object with specified formatting.</span>
 
@@ -322,7 +328,7 @@
 <span class="sd">        The formatted table as a string.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_shrink_str</span><span class="p">(</span><span class="n">str_inp</span><span class="p">,</span> <span class="n">maxlen</span><span class="o">=</span><span class="n">max_colwidth</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_shrink_str</span><span class="p">(</span><span class="n">str_inp</span><span class="p">,</span> <span class="n">maxlen</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="n">max_colwidth</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shrinks a string to a specified maximum length.</span>
 
@@ -372,7 +378,7 @@
 
 <div class="viewcode-block" id="is_ok">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.is_ok">[docs]</a>
-<span class="k">def</span> <span class="nf">is_ok</span><span class="p">(</span><span class="n">val_inp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_ok</span><span class="p">(</span><span class="n">val_inp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks if the input value is OK or not.</span>
 
@@ -414,7 +420,7 @@
 
 <div class="viewcode-block" id="check_lockfile">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.check_lockfile">[docs]</a>
-<span class="k">def</span> <span class="nf">check_lockfile</span><span class="p">(</span><span class="n">lockfile_path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_lockfile</span><span class="p">(</span><span class="n">lockfile_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks the lock status of a specified file.</span>
 
@@ -443,7 +449,7 @@
 
 <div class="viewcode-block" id="rnxs2step_obj">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.rnxs2step_obj">[docs]</a>
-<span class="k">def</span> <span class="nf">rnxs2step_obj</span><span class="p">(</span><span class="n">rnxs_lis_inp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rnxs2step_obj</span><span class="p">(</span><span class="n">rnxs_lis_inp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a list of RINEX files to a StepGnss object.</span>
 
@@ -473,7 +479,7 @@
 
 <div class="viewcode-block" id="guess_sites_list">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.guess_sites_list">[docs]</a>
-<span class="k">def</span> <span class="nf">guess_sites_list</span><span class="p">(</span><span class="n">inp_fil</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">guess_sites_list</span><span class="p">(</span><span class="n">inp_fil</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Guess the list of sites from the input list.</span>
 
@@ -510,7 +516,7 @@
 
 <div class="viewcode-block" id="move_copy_core">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.move_copy_core">[docs]</a>
-<span class="k">def</span> <span class="nf">move_copy_core</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">move_copy_core</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">copy_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Moves or copies a file from the source to the destination.</span>
 
@@ -561,7 +567,7 @@
 
 <div class="viewcode-block" id="log_tester">
 <a class="viewcode-back" href="../../../autorino.common.html#autorino.common.step_fcts.log_tester">[docs]</a>
-<span class="k">def</span> <span class="nf">log_tester</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_tester</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tests if the logger is working.</span>
 
@@ -573,7 +579,7 @@
 <span class="sd">    Exception</span>
 <span class="sd">        If the logger is not working.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">logging_tree</span> <span class="kn">import</span> <span class="n">printout</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">logging_tree</span><span class="w"> </span><span class="kn">import</span> <span class="n">printout</span>
     <span class="n">printout</span><span class="p">()</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;level debug&quot;</span><span class="p">)</span>

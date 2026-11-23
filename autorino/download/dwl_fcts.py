@@ -131,6 +131,7 @@ def ftp_create_obj(
     while True:
         try:
             ftp = ftplib.FTP(hostname_inp, timeout=timeout)
+            ftp.set_pasv(True)
             if (username is not None) and (password is not None):
                 ftp.login(username, password)
             return ftp
@@ -358,15 +359,22 @@ def download_ftp(
 
     while True:
         try:
-            with tqdm.tqdm(
-                total=file_size, unit="B", unit_scale=True, desc=filename
-            ) as pbar, open(output_path, "wb") as f:
+            exist_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+            if exist_size >= file_size and file_size > 0:
+                logger.info("File %s already downloaded (%i/%i bytes)", filename, exist_size, file_size)
+                break
 
-                _ftp_callback.bytes_transferred = 0
+            mode = "ab" if exist_size > 0 else "wb"
+            with tqdm.tqdm(
+                total=file_size, initial=exist_size, unit="B", unit_scale=True, desc=filename
+            ) as pbar, open(output_path, mode) as f:
+
+                _ftp_callback.bytes_transferred = exist_size
                 ftp_obj.retrbinary(
                     "RETR " + filename,
                     lambda data: (f.write(data), pbar.update(len(data))),
-                    1024,
+                    65536,
+                    rest=exist_size if exist_size > 0 else None,
                 )
                 break
         # here are all the possible exceptions that can be raised
@@ -378,9 +386,27 @@ def download_ftp(
                 # this error will be handled by the upper function mono_fetch
             else:
                 logger.warning(
-                    "download failed (%s), try %i/%i", str(e), try_count, max_try
+                    "download failed (%s), try %i/%i. Reconnecting FTP...", str(e), try_count, max_try
                 )
                 time.sleep(sleep_time)
+                try:
+                    if disposable_ftp_obj:
+                        try:
+                            ftp_obj.quit()
+                        except Exception:
+                            pass
+                        ftp_obj = ftp_create_obj(
+                            url_host,
+                            username=username,
+                            password=password,
+                            timeout=timeout,
+                            max_try=max_try,
+                            sleep_time=sleep_time,
+                        )
+                    ftp_obj.cwd(url_dir)
+                    ftp_obj.sendcmd("TYPE I")
+                except Exception as reconn_err:
+                    logger.warning("FTP reconnection attempt failed: %s", str(reconn_err))
 
     f.close()
 

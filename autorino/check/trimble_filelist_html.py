@@ -132,6 +132,36 @@ def trimble_filelist_html(
     structure="download/Internal/%Y%m",
     force=False
 ):
+    """
+    Generate a list of Trimble files from a remote HTML directory.
+
+    Downloads HTML directory listings from a remote Trimble server for a specified
+    time period and extracts file information into a CSV list.
+
+    Parameters
+    ----------
+    site : str
+        The site identifier (4 characters).
+    hostname : str
+        The hostname of the remote server.
+    output_dir : str
+        The directory where the downloaded HTML files will be saved.
+    start_date : str
+        The start date for the file search.
+    end_date : str
+        The end date for the file search.
+    period : str, optional
+        The period for the file search, usually a month. Default is '1M'.
+    structure : str, optional
+        The directory structure on the remote server.
+        Default is 'download/Internal/%Y%m'.
+    force : bool, optional
+        Force the download even if the output files already exist. Default is False.
+
+    Returns
+    -------
+    None
+    """
 
     eporng = arocmn.EpochRange(start_date, end_date, period, round_method="none")
     output_paths_ok = []

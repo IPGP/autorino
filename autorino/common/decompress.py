@@ -41,7 +41,7 @@ def is_compressed(file_inp):
     bool
         True if the file is compressed, False otherwise.
     """
-    file_inp2 = Path(file_inp)
+    file_inp2 = Path(str(file_inp))
 
     ext = file_inp2.suffix.lower()
 
@@ -131,8 +131,13 @@ def decomp_hatanaka(crx_file_inp, out_dir_inp=None, force=False):
     if os.path.isfile(rnx_file_potential) and not force:
         rnx_file_out = rnx_file_potential
     else:
-        rnx_file_out = hatanaka.decompress_on_disk(crx_file, delete=dell)
-        logger.debug("decompress (hatanaka): %s > %s", crx_file_inp2.name, rnx_file_out)
+        try:
+            rnx_file_out = hatanaka.decompress_on_disk(crx_file, delete=dell)
+            logger.debug("decompress (hatanaka): %s > %s", crx_file_inp2.name, rnx_file_out)
+        except Exception as e:
+            logger.error("decompress (hatanaka) failed for %s:", crx_file_inp2.name)
+            logger.exception("exception raised: %s", e)
+            rnx_file_out = None
 
     return str(rnx_file_out)
 

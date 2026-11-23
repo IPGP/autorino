@@ -5,18 +5,9 @@ Created on 20/05/2025 20:26:44
 
 @author: psakic
 """
-
+from __future__ import annotations
 
 # Create a logger object.
-import os
-import time
-
-import numpy as np
-import pandas as pd
-from pathlib import Path
-
-from geodezyx import utils, conv
-
 import autorino.common as arocmn
 import autorino.convert as arocnv
 import autorino.handle.handle_cls as arohdlcls
@@ -24,6 +15,7 @@ import autorino.handle.handle_cls as arohdlcls
 # +++ Import the logger
 import logging
 import autorino.cfgenv.env_read as aroenv
+from typing import Any
 
 logger = logging.getLogger("autorino")
 logger.setLevel(aroenv.ARO_ENV_DIC["general"]["log_level"])
@@ -42,19 +34,7 @@ BOLD_END = "\033[0m"
 
 
 class SplitGnss(arohdlcls.HandleGnss):
-    def __init__(
-        self,
-        out_dir,
-        tmp_dir,
-        log_dir,
-        inp_dir=None,
-        inp_file_regex=None,
-        epoch_range=None,
-        site=None,
-        session=None,
-        options=None,
-        metadata=None,
-    ):
+    def __init__(self, **kwargs: Any) -> None:
         """
         Initialize a SplitGnss object.
 
@@ -63,49 +43,34 @@ class SplitGnss(arohdlcls.HandleGnss):
 
         Parameters
         ----------
-        out_dir : str
-            The output directory for the split RINEX files.
-        tmp_dir : str
-            The temporary directory for intermediate files.
-        log_dir : str
-            The directory for log files.
-        inp_dir : str, optional
-            The input directory for raw files. Default is None.
-        inp_file_regex : str, optional
-            The regular expression for filtering input files. Default is None.
-        epoch_range : EpochRange, optional
-            The range of epochs to be processed. Default is None.
-        site : dict, optional
-            Information about the site. Default is None.
-        session : dict, optional
-            Information about the session. Default is None.
-        options : dict, optional
-            Additional options for the splitting operation. Default is None.
-        metadata : dict, optional
-            Metadata for the splitting operation. Default is None.
+        **kwargs : keyword arguments
+            Additional keyword arguments passed to the parent HandleGnss class.
+            Common parameters include:
+            - out_dir : str - The output directory for the split RINEX files.
+            - tmp_dir : str - The temporary directory for intermediate files.
+            - log_dir : str - The directory for log files.
+            - inp_dir : str, optional - The input directory for raw files. Default is None.
+            - inp_file_regex : str, optional - Regular expression pattern for input files.
+            - epoch_range : EpochRange, optional - The range of epochs to be processed. Default is None.
+            - site : dict, optional - Information about the site. Default is None.
+            - session : dict, optional - Information about the session. Default is None.
+            - options : dict, optional - Additional options for the splitting operation. Default is None.
+            - metadata : str or list, optional - Metadata for the splitting operation. Default is None.
         """
-        super().__init__(
-            out_dir=out_dir,
-            tmp_dir=tmp_dir,
-            log_dir=log_dir,
-            inp_dir=inp_dir,
-            inp_file_regex=inp_file_regex,
-            epoch_range=epoch_range,
-            site=site,
-            session=session,
-            options=options,
-            metadata=metadata,
-        )
+        super().__init__(**kwargs)
 
     def split(
         self,
-        input_mode="given",
-        input_rinexs=None,
-        handle_software="converto",
-        rinexmod_options=None,
-        verbose=False,
-        force=False,
-    ):
+        input_mode: str = "given",
+        input_rinexs: str | list | Any | None = None,
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+        rinexmod_options: dict | None = None,
+        verbose: bool = False,
+        force: bool = False,
+        reverse_order: bool = False,
+        add_extra_margin: bool = False
+    ) -> None:
         """
         Split RINEX files.
 
@@ -120,19 +85,29 @@ class SplitGnss(arohdlcls.HandleGnss):
             - "find": to find local input files.
             - "given": to use provided input RINEX files.
             Default is "given".
-        input_rinexs : str or list or StepGnss, optional
+        input_rinexs : str or list or StepGnss or None, optional
             The input RINEX files. It can be:
             - A list of RINEX file paths.
             - An existing StepGnss object.
             Default is None.
         handle_software : str, optional
             The software to use for handling the RINEX files. Default is "converto".
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the software.
+            - A list of strings, where each string is an option to be passed to the software.
+            - None, if no additional options are needed. Default is None.
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
         verbose : bool, optional
             If True, prints the table for debugging purposes. Default is False.
         force : bool, optional
             If True, forces the splitting operation. Default is False.
+        reverse_order : bool, optional
+            If True, processes the files in reverse order (anti-chronological, newer first).
+            Default is False.
+        add_extra_margin : bool, optional
+            If True, adds an extra margin to the epochs for splitting. Default is False.
 
         Returns
         -------
@@ -150,22 +125,26 @@ class SplitGnss(arohdlcls.HandleGnss):
         # generate the potential local files
         self.guess_local_rnx()
         # tests if the output local files are already there
-        self.check_local_files("out")
+        self.check_loc_files("out")
         # switch ok_inp to False if the output files are already there
         self.filter_ok_out()
         # if force is True, force the splicing operation
         if force:
             self.force("split")
+        if reverse_order:
+            self.reverse_table()
 
         # Find the input RINEX files
-        stp_obj_rnxs_inp = self.load_input_rnxs(input_mode, input_rinexs)
+        stp_obj_rnxs_inp = self.load_input_rnxs(str(input_mode), input_rinexs)
 
         # Feed the epochs for splitting
-        self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose)
+        self.feed_by_epochs(stp_obj_rnxs_inp, mode="split", print_table=verbose, add_extra_margin=add_extra_margin)
 
         # Perform the core splitting operation
         self.split_core(
-            handle_software=handle_software, rinexmod_options=rinexmod_options
+            handle_software=handle_software,
+            handle_software_options=handle_software_options,
+            rinexmod_options=rinexmod_options
         )
 
         # close the log file
@@ -173,7 +152,12 @@ class SplitGnss(arohdlcls.HandleGnss):
 
         return None
 
-    def split_core(self, handle_software="converto", rinexmod_options=None):
+    def split_core(
+        self,
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+        rinexmod_options: dict | None = None,
+    ) -> None:
         """
         Perform the core splitting operation.
 
@@ -185,6 +169,11 @@ class SplitGnss(arohdlcls.HandleGnss):
         ----------
         handle_software : str, optional
             The software to use for handling the RINEX files. Default is "converto".
+        handle_software_options : str or list of str or None, optional
+            Additional options for the handling software. It can be:
+            - A string of options to be passed to the software.
+            - A list of strings, where each string is an option to be passed to the software.
+            - None, if no additional options are needed. Default is None.
         rinexmod_options : dict, optional
             Additional options for the RINEX modification. Default is None.
 
@@ -207,7 +196,10 @@ class SplitGnss(arohdlcls.HandleGnss):
             self.tmp_decmp_files.append(fdecmptmp)
 
             frnx_splited = self.mono_split(
-                irow, self.tmp_dir_converted, handle_software=handle_software
+                irow,
+                self.tmp_dir_converted,
+                handle_software=handle_software,
+                handle_software_options=handle_software_options,
             )
             if not self.table.loc[irow, "ok_out"]:
                 logger.error("unable to split %s, skip", self.table.loc[irow])
@@ -227,8 +219,13 @@ class SplitGnss(arohdlcls.HandleGnss):
         return None
 
     def mono_split(
-        self, irow, out_dir=None, table_col="fpath_inp", handle_software="converto"
-    ):
+        self,
+        irow: Any,
+        out_dir: str | None = None,
+        table_col: str = "fpath_inp",
+        handle_software: str = "converto",
+        handle_software_options: str | list[str] | None = None,
+    ) -> str | None:
         """
         "on row" method
 
@@ -258,16 +255,19 @@ class SplitGnss(arohdlcls.HandleGnss):
 
         frnx_inp = self.table.loc[irow, table_col]
 
-        conv_options, conv_kwoptions = self.conv_softs_opts(
-            irow, handle_software=handle_software
+        handl_opts, handl_kwopts = self.handl_soft_opts(
+            irow,
+            handl_soft=handle_software,
+            mode="split",
+            handl_opts_supl=handle_software_options,
         )
         try:
             frnxtmp, _ = arocnv.converter_run(
                 frnx_inp,
                 out_dir_use,
                 converter=handle_software,
-                bin_options=conv_options,
-                bin_kwoptions=conv_kwoptions,
+                bin_options=handl_opts,
+                bin_kwoptions=handl_kwopts,
             )
         except Exception as e:
             logger.error("Error for %s", frnx_inp)
