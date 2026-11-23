@@ -1644,11 +1644,11 @@ class StepGnss:
 
         """
 
-        # !!!!! THIS METHOD IS REDUNDANT WITH find_local_raw !!!!!
-        # !!!!! must be merged with find_local_raw !!!!!!!
+        # !!!!! THIS METHOD IS REDUNDANT WITH find_loc_files !!!!!
+        # !!!!! must be merged with find_loc_files !!!!!!!
 
         logger.warning(
-            "guess_out_files is redundant with find_local_raw, should be merged"
+            "guess_out_files is redundant with find_loc_files, should be merged"
         )
 
         out_paths_list = []
