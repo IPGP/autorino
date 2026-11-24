@@ -292,6 +292,7 @@ class HandleGnss(arocmn.StepGnss):
                 ###### can be improved !
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = rnxinp_row["fpath_inp"]
+                self.table.loc[irow, "fname"] = rnxinp_row["fname"]
                 logger.info("found for feed: %s", rnxinp_row["fpath_inp"])
 
             elif mode == "splice":
@@ -312,6 +313,9 @@ class HandleGnss(arocmn.StepGnss):
 
                 self.table.loc[irow, "ok_inp"] = True
                 self.table.loc[irow, "fpath_inp"] = spc_obj
+                self.table.loc[irow, "fname"] = os.path.basename(
+                    spc_obj.table.iloc[0]["fpath_inp"]
+                )
             else:  # should not happend
                 self.table.loc[irow, "ok_inp"] = False
                 self.table.loc[irow, "fpath_inp"] = None
