@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.api.configfile_run &mdash; autorino  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -15,8 +15,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -111,7 +111,7 @@
     <span class="n">exclude_sites</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">epo_srt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">epo_end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">period</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">steps_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">exclude_steps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -151,7 +151,7 @@
 <span class="sd">    epo_end : str, optional</span>
 <span class="sd">        The end date for the epoch range. Default is None.</span>
 <span class="sd">    period : str, optional</span>
-<span class="sd">        The period for the epoch range. Default is &quot;1D&quot;.</span>
+<span class="sd">        The period for the epoch range. Default is None.</span>
 <span class="sd">    steps_list : list, optional</span>
 <span class="sd">        A list of selected steps to be executed.</span>
 <span class="sd">        If not provided, all steps in &#39;steps_lis&#39; will be executed.</span>
@@ -190,8 +190,11 @@
 
     <span class="c1"># Determine the epoch range based on the provided start and end dates</span>
     <span class="k">if</span> <span class="n">epo_srt</span> <span class="ow">and</span> <span class="n">epo_end</span><span class="p">:</span>
+        <span class="c1">## defalut period is 1 day if not provided</span>
+        <span class="c1">## a warning will be issued by arocmn.EpochRange</span>
         <span class="n">epoch_range</span> <span class="o">=</span> <span class="n">arocmn</span><span class="o">.</span><span class="n">EpochRange</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">,</span> <span class="n">epo_end</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">epo_srt</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">epo_end</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only &#39;epo_srt&#39; provided, using it as a list of start epochs&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">):</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">epo_srt</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">start_use</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>

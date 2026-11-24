@@ -3,8 +3,8 @@
 # autorino
 autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Observations_  🛰️ 🌐 🦏 
 
-**Version: 2.5.0-beta2**  
-**Date: 2026-11-20**
+**Version: 2.5.0**  
+**Date: 2026-11-23**
 
 **Main developper:** [Pierre Sakic](https://github.com/PierreS-alpha) (IPGP-OVS, Paris, France)  
 **Contact e-mail:** sakic@ipgp.fr
@@ -14,6 +14,8 @@ autorino is a tool for _Assisted Unloading, Treatment & Organisation of RINex Ob
 **GitHub repository:** [https://github.com/IPGP/autorino](https://github.com/IPGP/autorino) 
 
 **Licence:** GNU GPL v3 (see attached license file) 
+
+**DOI**: [https://doi.org/10.5281/zenodo.19000388](https://doi.org/10.5281/zenodo.19000388)
 
 ## Introduction
 The _autorino_ package (for _Assisted Unloading, Treatment & Organisation of RINex Observations_) is designed for

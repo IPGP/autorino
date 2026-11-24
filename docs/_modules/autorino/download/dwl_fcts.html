@@ -6,8 +6,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>autorino.download.dwl_fcts &mdash; autorino  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
       <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
@@ -15,8 +15,8 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
       <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_nutshell.html">Configuration files in a nutshell</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../config_files_details.html">Configuration file details</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html">Under the hood</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../under_hood.html#about-epoch-range-and-timing">About <em>epoch range</em> and timing.</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../autorino.html">autorino package</a></li>
 </ul>
 
@@ -88,26 +89,26 @@
 <span class="sd">@author: psakic</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">ftplib</span>
-<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ftplib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
 <span class="c1"># import socket</span>
-<span class="kn">import</span> <span class="nn">urllib</span>
-<span class="kn">import</span> <span class="nn">urllib.request</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
-<span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
-<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tqdm</span>
 
 <span class="c1">#### Import the logger</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">autorino.cfgenv.env_read</span> <span class="k">as</span> <span class="nn">aroenv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">autorino.cfgenv.env_read</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">aroenv</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;autorino&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">aroenv</span><span class="o">.</span><span class="n">ARO_ENV_DIC</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">][</span><span class="s2">&quot;log_level&quot;</span><span class="p">])</span>
@@ -117,21 +118,21 @@
 <span class="c1"># define Python user-defined exceptions</span>
 <div class="viewcode-block" id="AutorinoError">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.AutorinoError">[docs]</a>
-<span class="k">class</span> <span class="nc">AutorinoError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AutorinoError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
 
 <div class="viewcode-block" id="AutorinoDownloadError">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.AutorinoDownloadError">[docs]</a>
-<span class="k">class</span> <span class="nc">AutorinoDownloadError</span><span class="p">(</span><span class="n">AutorinoError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AutorinoDownloadError</span><span class="p">(</span><span class="n">AutorinoError</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
 
 <div class="viewcode-block" id="TqdmToLogger">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.TqdmToLogger">[docs]</a>
-<span class="k">class</span> <span class="nc">TqdmToLogger</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TqdmToLogger</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Output stream for TQDM which will output to logger module instead of</span>
 <span class="sd">    the StdOut.</span>
@@ -141,20 +142,20 @@
     <span class="n">level</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger_inp</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger_inp</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TqdmToLogger</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger_inp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">level</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
 
 <div class="viewcode-block" id="TqdmToLogger.write">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.TqdmToLogger.write">[docs]</a>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buf</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n\t</span><span class="s2"> &quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TqdmToLogger.flush">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.TqdmToLogger.flush">[docs]</a>
-    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buf</span><span class="p">)</span></div>
 </div>
 
@@ -162,7 +163,7 @@
 
 <div class="viewcode-block" id="join_url">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.join_url">[docs]</a>
-<span class="k">def</span> <span class="nf">join_url</span><span class="p">(</span><span class="n">protocol_inp</span><span class="p">,</span> <span class="n">hostname_inp</span><span class="p">,</span> <span class="n">dir_inp</span><span class="p">,</span> <span class="n">fname_inp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">join_url</span><span class="p">(</span><span class="n">protocol_inp</span><span class="p">,</span> <span class="n">hostname_inp</span><span class="p">,</span> <span class="n">dir_inp</span><span class="p">,</span> <span class="n">fname_inp</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    a wrapper to classical join to format correctly the URL</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -198,7 +199,7 @@
 
 <div class="viewcode-block" id="ftp_create_obj">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.ftp_create_obj">[docs]</a>
-<span class="k">def</span> <span class="nf">ftp_create_obj</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ftp_create_obj</span><span class="p">(</span>
     <span class="n">hostname_inp</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">max_try</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -233,6 +234,7 @@
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ftp</span> <span class="o">=</span> <span class="n">ftplib</span><span class="o">.</span><span class="n">FTP</span><span class="p">(</span><span class="n">hostname_inp</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="n">ftp</span><span class="o">.</span><span class="n">set_pasv</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">password</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="n">ftp</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ftp</span>
@@ -250,7 +252,7 @@
 
 <div class="viewcode-block" id="list_remote_ftp">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.list_remote_ftp">[docs]</a>
-<span class="k">def</span> <span class="nf">list_remote_ftp</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_remote_ftp</span><span class="p">(</span>
     <span class="n">hostname</span><span class="p">,</span>
     <span class="n">remote_dir</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -368,7 +370,7 @@
 
 <div class="viewcode-block" id="download_ftp">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.download_ftp">[docs]</a>
-<span class="k">def</span> <span class="nf">download_ftp</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_ftp</span><span class="p">(</span>
     <span class="n">url</span><span class="p">,</span>
     <span class="n">output_dir</span><span class="p">,</span>
     <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -417,7 +419,7 @@
 <span class="sd">        If the download fails after the maximum number of retry attempts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">_ftp_callback</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ftp_callback</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
         <span class="n">_ftp_callback</span><span class="o">.</span><span class="n">bytes_transferred</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
     <span class="n">urlp</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -466,15 +468,22 @@
 
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
-                <span class="n">total</span><span class="o">=</span><span class="n">file_size</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">filename</span>
-            <span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">exist_size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">exist_size</span> <span class="o">&gt;=</span> <span class="n">file_size</span> <span class="ow">and</span> <span class="n">file_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">%s</span><span class="s2"> already downloaded (</span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2"> bytes)&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">exist_size</span><span class="p">,</span> <span class="n">file_size</span><span class="p">)</span>
+                <span class="k">break</span>
 
-                <span class="n">_ftp_callback</span><span class="o">.</span><span class="n">bytes_transferred</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;ab&quot;</span> <span class="k">if</span> <span class="n">exist_size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;wb&quot;</span>
+            <span class="k">with</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span>
+                <span class="n">total</span><span class="o">=</span><span class="n">file_size</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="n">exist_size</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="n">unit_scale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">filename</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+
+                <span class="n">_ftp_callback</span><span class="o">.</span><span class="n">bytes_transferred</span> <span class="o">=</span> <span class="n">exist_size</span>
                 <span class="n">ftp_obj</span><span class="o">.</span><span class="n">retrbinary</span><span class="p">(</span>
                     <span class="s2">&quot;RETR &quot;</span> <span class="o">+</span> <span class="n">filename</span><span class="p">,</span>
                     <span class="k">lambda</span> <span class="n">data</span><span class="p">:</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))),</span>
-                    <span class="mi">1024</span><span class="p">,</span>
+                    <span class="mi">65536</span><span class="p">,</span>
+                    <span class="n">rest</span><span class="o">=</span><span class="n">exist_size</span> <span class="k">if</span> <span class="n">exist_size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">break</span>
         <span class="c1"># here are all the possible exceptions that can be raised</span>
@@ -486,9 +495,27 @@
                 <span class="c1"># this error will be handled by the upper function mono_fetch</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;download failed (</span><span class="si">%s</span><span class="s2">), try </span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">try_count</span><span class="p">,</span> <span class="n">max_try</span>
+                    <span class="s2">&quot;download failed (</span><span class="si">%s</span><span class="s2">), try </span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2">. Reconnecting FTP...&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">try_count</span><span class="p">,</span> <span class="n">max_try</span>
                 <span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">sleep_time</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">disposable_ftp_obj</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">ftp_obj</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="n">ftp_obj</span> <span class="o">=</span> <span class="n">ftp_create_obj</span><span class="p">(</span>
+                            <span class="n">url_host</span><span class="p">,</span>
+                            <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+                            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+                            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                            <span class="n">max_try</span><span class="o">=</span><span class="n">max_try</span><span class="p">,</span>
+                            <span class="n">sleep_time</span><span class="o">=</span><span class="n">sleep_time</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="n">ftp_obj</span><span class="o">.</span><span class="n">cwd</span><span class="p">(</span><span class="n">url_dir</span><span class="p">)</span>
+                    <span class="n">ftp_obj</span><span class="o">.</span><span class="n">sendcmd</span><span class="p">(</span><span class="s2">&quot;TYPE I&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">reconn_err</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;FTP reconnection attempt failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">reconn_err</span><span class="p">))</span>
 
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
@@ -510,7 +537,7 @@
 
 <div class="viewcode-block" id="list_remote_http">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.list_remote_http">[docs]</a>
-<span class="k">def</span> <span class="nf">list_remote_http</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">remote_dir</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_remote_http</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">remote_dir</span><span class="p">):</span>
 
     <span class="n">url</span> <span class="o">=</span> <span class="n">join_url</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">remote_dir</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
@@ -527,7 +554,7 @@
     <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
 
     <span class="c1"># extract list of files</span>
-    <span class="k">def</span> <span class="nf">_parse_remote_file_http</span><span class="p">(</span><span class="n">file_list_in</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_remote_file_http</span><span class="p">(</span><span class="n">file_list_in</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Internal function to parse the raw response of the remote file list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -553,7 +580,7 @@
 
 <div class="viewcode-block" id="size_remote_file_http">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.size_remote_file_http">[docs]</a>
-<span class="k">def</span> <span class="nf">size_remote_file_http</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">size_remote_file_http</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
     <span class="n">req</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;HEAD&quot;</span><span class="p">)</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Content-Length&quot;</span><span class="p">]</span></div>
@@ -562,7 +589,7 @@
 
 <div class="viewcode-block" id="download_http">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.download_http">[docs]</a>
-<span class="k">def</span> <span class="nf">download_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">download_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">max_try</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sleep_time</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download a file from an HTTP server with retry logic and progress bar.</span>
 
@@ -636,7 +663,7 @@
 
 <div class="viewcode-block" id="ping">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.ping">[docs]</a>
-<span class="k">def</span> <span class="nf">ping</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">ping_timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">ping_timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes the ping command and captures the output.</span>
 
@@ -675,7 +702,7 @@
 
 <div class="viewcode-block" id="check_file_size">
 <a class="viewcode-back" href="../../../autorino.download.html#autorino.download.dwl_fcts.check_file_size">[docs]</a>
-<span class="k">def</span> <span class="nf">check_file_size</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">min_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_file_size</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">min_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check the size of a file and log a warning if it is too</span>
 <span class="sd">    small to be useful.</span>

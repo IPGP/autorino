@@ -25,6 +25,14 @@ autorino.convert.cnv\_cmd\_build module
    :show-inheritance:
    :undoc-members:
 
+autorino.convert.cnv\_cmd\_build\_refactor module
+-------------------------------------------------
+
+.. automodule:: autorino.convert.cnv_cmd_build_refactor
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 autorino.convert.cnv\_cmd\_run module
 -------------------------------------
 
@@ -45,6 +53,14 @@ autorino.convert.cnv\_regex module
 ----------------------------------
 
 .. automodule:: autorino.convert.cnv_regex
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+autorino.convert.cnv\_regex\_refactor module
+--------------------------------------------
+
+.. automodule:: autorino.convert.cnv_regex_refactor
    :members:
    :show-inheritance:
    :undoc-members:

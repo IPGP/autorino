@@ -41,10 +41,10 @@ autorino.bin.autorino\_convert\_rnx module
    :show-inheritance:
    :undoc-members:
 
-autorino.bin.autorino\_splice\_rnx\_relative module
----------------------------------------------------
+autorino.bin.autorino\_splice\_rnx module
+-----------------------------------------
 
-.. automodule:: autorino.bin.autorino_splice_rnx_relative
+.. automodule:: autorino.bin.autorino_splice_rnx
    :members:
    :show-inheritance:
    :undoc-members:
