@@ -249,7 +249,6 @@ class HandleGnss(arocmn.StepGnss):
                 # For Leica, the end epoch of the RINEX can be after the theoretical one...
                 # we add one hour as margin, the splice software integrates the option
                 # to stop at the right epoch
-                add_extra_margin = True
                 if add_extra_margin:
                     m = self.epoch_range.extra_margin_splice()
                     logger.debug("adding an extra margin of %s to the end epoch", m)
